@@ -1,0 +1,26 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint-config-airbnb",
+        "tslint-react",
+        "tslint-config-prettier"
+    ],
+    "jsRules": {},
+    "rules": {
+        "max-line-length": [true, 120],
+        "trailing-comma": false,
+        "ter-indent": [
+            true,
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "variable-name": false,
+        "jsx-alignment": true,
+        "jsx-equals-spacing": [true, "never"],
+        "jsx-no-string-ref": true,
+        "jsx-self-close": true
+    },
+    "rulesDirectory": []
+}
