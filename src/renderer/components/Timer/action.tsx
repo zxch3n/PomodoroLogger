@@ -36,7 +36,7 @@ export const setRestDuration = createActionCreator(
 export const setProject = createActionCreator(
     '[Timer]SET_PROJECT',
     resolve=>(project: string)=>resolve(project)
-)
+);
 
 
 export const reducer = createReducer<TimerState, any>(defaultState, handle => [
