@@ -21,15 +21,23 @@ export interface ApplicationSpentTime{
 
 export interface ProjectItem {
     name: string,
-    todoList: TodoItem[],
+    todoList: {[todoTitle: string]: TodoItem},
     spentHours: number,
     applicationSpentTime: {[appName: string]: ApplicationSpentTime},
+}
 
+export function createProjectItem (name: string) {
+    return {
+        name,
+        todoList: {},
+        spentHours: 0,
+        applicationSpentTime: {}
+    } as ProjectItem;
 }
 
 const defaultProjectItem: ProjectItem = {
     name: '',
-    todoList: [],
+    todoList: {},
     spentHours: 0,
     applicationSpentTime: {}
 };
@@ -59,6 +67,10 @@ export const removeItem = createActionCreator('[Project]REMOVE_ITEM', resolve=>
 
 export const addTodoItem = createActionCreator('[Project]ADD_TODO_ITEM', resolve =>
     (name: string, todoItem: TodoItem) => resolve({name, todoItem})
+);
+
+export const removeTodoItem = createActionCreator('[Project]REMOVE_TODO_ITEM', resolve =>
+    (name: string, _id: string) => resolve({name, _id})
 );
 
 export const setName = createActionCreator('[Project]SET_NAME', resolve=>(
@@ -112,10 +124,23 @@ export const actions = {
     addTodoItem: (name: string, title: string) => (dispatch: Dispatch) => {
         const todoItem: TodoItem = createTodoItem(title);
         dbs.projectDB.update({name},
-            {$push: {todoList: todoItem}}, {}, (err)=>{
+            {$set: {[`todoList.${todoItem._id}`]: todoItem}},
+            {returnUpdatedDocs: true}, (err, doc)=>{
                 if(err) throw err;
                 dispatch(addTodoItem(name, todoItem));
             })
+    },
+
+    removeTodoItem: (name: string, _id: string) => (dispatch: Dispatch) => {
+        dbs.projectDB.update(
+            {name},
+            {$unset: {[`todoList.${_id}`]: true}},
+            {},
+            err=>{
+                if (err) throw err;
+                dispatch(removeTodoItem(name, _id));
+            }
+        )
     },
 
     updateAppSpentTime: (name: string, appName: string, spentHours: number) =>
@@ -178,7 +203,14 @@ export const projectReducer = createReducer<ProjectState, any>(defaultState, han
 
     handle(addTodoItem, (state: ProjectState, {payload: {name, todoItem}})=>{
         const newState = cloneDeep(state);
-        newState.projectList[name].todoList.push(todoItem);
+        const todoId = todoItem._id;
+        newState.projectList[name].todoList[todoId] = todoItem;
+        return newState;
+    }),
+
+    handle(removeTodoItem, (state: ProjectState, {payload: {name, _id}})=>{
+        const newState = cloneDeep(state);
+        delete newState.projectList[name].todoList[_id];
         return newState;
     }),
 

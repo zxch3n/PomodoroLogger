@@ -5,14 +5,16 @@ import {
 } from './action';
 import {cloneDeep} from 'lodash';
 import {existsSync, unlink} from 'fs';
-import {todoDBPath} from '../../../config';
+import {projectDBPath} from '../../../config';
 import {promisify} from 'util';
 import dbs from '../../dbs';
+import { createProjectItem, ProjectItem } from '../Project/action';
+import { addProjectToDB, executeThunkAction, generateRandomName } from '../../utils';
 
 
 beforeAll(async ()=>{
-    if (existsSync(todoDBPath)) {
-        await promisify(unlink)(todoDBPath);
+    if (existsSync(projectDBPath)) {
+        await promisify(unlink)(projectDBPath);
     }
 });
 
@@ -73,7 +75,7 @@ describe("Combiner Handler", ()=>{
 });
 
 
-describe("Thunk actions", ()=>{
+describe("TODO thunk action creator", ()=>{
     it ('can dispatch correctly', done=>{
         const thunkFunc = actions.addItem('111');
         const dispatch = jest.fn(x=>{
@@ -88,8 +90,8 @@ describe("Thunk actions", ()=>{
         thunkFunc(dispatch);
     });
 
-    it ('can remove item', done=>{
-        const thunkFunc = actions.removeItem('0');
+    it ('can dispatch removeItem', done=>{
+        const thunkFunc = actions.removeItem('0', '0');
         const dispatch = jest.fn(x=>{
             expect(x.type).toEqual('[Project]REMOVE_ITEM');
             expect(x.payload._id).toEqual('0');
@@ -106,28 +108,30 @@ describe("Thunk actions", ()=>{
 
     it ('can add & remove db item', async ()=>{
         const title = 'can add & remove db item';
-        const addFunc = actions.addItem(title);
+        const addFunc = actions.addItem(title, title);
         await new Promise(resolve=>{
             addFunc((x)=>{resolve(); return x;});
         });
         const _id: string = await new Promise((resolve, reject) => {
-            dbs.todoDB.findOne({title}, (err, item: TodoItem)=>{
-                if (err) {reject(err);}
-                expect(item).toBeTruthy();
-                const _id = item._id;
-                resolve(_id);
-            });
+            dbs.projectDB.findOne(
+                {name: title},
+                (err, item: ProjectItem)=>{
+                    if (err) {reject(err);}
+                    expect(item).toBeTruthy();
+                    const _id = Object.keys(item.todoList)[0];
+                    resolve(_id);
+                });
         });
 
-        const rmFunc = actions.removeItem(_id);
+        const rmFunc = actions.removeItem(title, _id);
         await new Promise(resolve=>{
             rmFunc(x=>{resolve(); return x;});
         });
 
         await new Promise((resolve, reject)=>{
-            dbs.todoDB.findOne({title}, (err, item?: TodoItem)=>{
+            dbs.projectDB.findOne({name: title}, (err, item: ProjectItem)=>{
                 if (err) reject(err);
-                expect(item).toBeFalsy();
+                expect(item.todoList).not.toHaveProperty(title);
                 resolve();
             });
         });
@@ -152,6 +156,51 @@ describe("Thunk actions", ()=>{
 
         fetchAllFunc(dispatch);
     });
+
+    it ("'s setProject works", async ()=>{
+        const title = generateRandomName();
+        const project = generateRandomName();
+        const newProject = generateRandomName();
+        await addProjectToDB(newProject);
+        await addProjectToDB(project);
+        await executeThunkAction(actions.addItem(title, project));
+        let projectItem =
+            await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name: project}) as ProjectItem;
+        const _id = Object.keys(projectItem.todoList)[0];
+        await executeThunkAction(actions.setProject(_id, newProject));
+        projectItem =
+            await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name: project}) as ProjectItem;
+        expect(Object.keys(projectItem.todoList).length).toEqual(0);
+        const newProjectItem =
+            await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name: newProject}) as ProjectItem;
+        expect(Object.keys(newProjectItem.todoList).length).toEqual(1);
+        expect(Object.keys(newProjectItem.todoList)[0]).toEqual(_id);
+        expect(newProjectItem.todoList[_id].title).toEqual(title);
+    });
+
+    it ("'s setFinished works", async ()=>{
+        // TODO:
+    });
+
+    it ("'s setTitle works", async ()=>{
+        // TODO:
+    });
+
+    it ("'s setContent works", async ()=>{
+        const content = generateRandomName();
+        const title = generateRandomName();
+        const project = generateRandomName();
+        await addProjectToDB(project);
+        await executeThunkAction(actions.addItem(title, project));
+        let projectItem =
+            await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name: project}) as ProjectItem;
+        const _id = Object.keys(projectItem.todoList)[0];
+
+        await executeThunkAction(actions.setContent(_id, content));
+        projectItem =
+            await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name: project}) as ProjectItem;
+        expect(Object.values(projectItem.todoList)[0].content).toEqual(content);
+    })
 });
 
 

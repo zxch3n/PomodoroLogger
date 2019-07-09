@@ -7,6 +7,5 @@ if (!existsSync(dbBaseDir)){
     mkdirSync(dbBaseDir);
 }
 
-export const todoDBPath = join(dbBaseDir, 'todo.nedb');
 export const projectDBPath = join(dbBaseDir, 'projects.nedb');
 
