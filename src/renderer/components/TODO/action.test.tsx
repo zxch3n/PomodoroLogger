@@ -76,34 +76,59 @@ describe("Combiner Handler", ()=>{
 
 
 describe("TODO thunk action creator", ()=>{
-    it ('can dispatch correctly', done=>{
+    it ('can dispatch correctly', async ()=>{
         const thunkFunc = actions.addItem('111');
-        const dispatch = jest.fn(x=>{
-            expect(x).toHaveProperty('payload');
-            expect(x).toHaveProperty('type');
-            expect(x.payload).toHaveProperty('_id');
-            expect(x.payload).toHaveProperty('title');
-            expect(x.payload.title).toEqual('111');
-            done();
-            return x;
+        let dispatch;
+        await new Promise(resolve=>{
+            dispatch = jest.fn(x=>{
+                resolve();
+                return x;
+            });
+            thunkFunc(dispatch);
         });
-        thunkFunc(dispatch);
+
+        // @ts-ignore
+        const x = dispatch.mock.calls[0][0];
+        expect(x).toHaveProperty('payload');
+        expect(x).toHaveProperty('type');
+        expect(x.payload).toHaveProperty('_id');
+        expect(x.payload).toHaveProperty('title');
+        expect(x.payload.title).toEqual('111');
     });
 
-    it ('can dispatch removeItem', done=>{
-        const thunkFunc = actions.removeItem('0', '0');
-        const dispatch = jest.fn(x=>{
-            expect(x.type).toEqual('[Project]REMOVE_ITEM');
-            expect(x.payload._id).toEqual('0');
-            const state = todoReducer(defaultState, x);
-            expect(state.todoList.length).toEqual(2);
-            expect(state.todoList[0]._id).not.toEqual(0);
-            expect(state.todoList[1]._id).not.toEqual(0);
-            done();
-            return x;
+    it ('can dispatch removeItem', async ()=>{
+        const projectName = generateRandomName();
+        const todoTitle = generateRandomName();
+        await addProjectToDB(projectName);
+        await executeThunkAction(actions.addItem(todoTitle, projectName));
+        const projectItem: ProjectItem = await new Promise(resolve=>{
+            dbs.projectDB.findOne(
+                {name: projectName},
+                (err, item)=>resolve(item as ProjectItem)
+            );
+        });
+        const _id = Object.keys(projectItem.todoList)[0];
+        const thunkFunc = actions.removeItem(projectName, _id);
+        let dispatch;
+        await new Promise(resolve=>{
+            dispatch = jest.fn(x=>{
+                resolve();
+                return x;
+            });
+
+            thunkFunc(dispatch);
         });
 
-        thunkFunc(dispatch);
+        // @ts-ignore
+        const x = dispatch.mock.calls[0][0];
+        expect(x.type).toEqual('[TODO]REMOVE_ITEM');
+        expect(x.payload._id).toEqual(_id);
+        let state = cloneDeep(defaultState);
+        state.todoList[0]._id = _id;
+        state = todoReducer(state, x);
+        expect(state.todoList.length).toEqual(2);
+        expect(state.todoList[0]._id).not.toEqual(_id);
+        expect(state.todoList[1]._id).not.toEqual(_id);
     });
 
     it ('can add & remove db item', async ()=>{

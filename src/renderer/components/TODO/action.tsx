@@ -5,7 +5,8 @@ import { Dispatch } from 'redux';
 import { ProjectItem } from '../Project/action';
 import { promisify } from 'util';
 import { removeTodoItem as projectStateRemoveTodo,
-    addTodoItem as projectStateAddTodo } from '../Project/action';
+    addTodoItem as projectStateAddTodo,
+    actions as projectActions} from '../Project/action';
 
 
 export interface TodoItem {
@@ -41,37 +42,37 @@ const defaultState: TodoState = {
 };
 
 
-export const addItem = createActionCreator('[Project]ADD_ITEM', resolve =>
+export const addItem = createActionCreator('[TODO]ADD_ITEM', resolve =>
     (_id: string, title: string, datetime: string, project: string = 'Default', content?: string, expiryDate?: string) => (
         resolve({ _id, title, datetime, project, content, expiryDate })
     )
 );
 
-export const removeItem = createActionCreator('[Project]REMOVE_ITEM', resolve =>
+export const removeItem = createActionCreator('[TODO]REMOVE_ITEM', resolve =>
     (_id: string) => resolve({ _id })
 );
 
-export const setProject = createActionCreator('[Project]SET_PROJECT', resolve =>
+export const setProject = createActionCreator('[TODO]SET_PROJECT', resolve =>
     (_id: string, project: string) => resolve({ _id, project })
 );
 
-export const setTitle = createActionCreator('[Project]SET_TITLE', resolve => (
+export const setTitle = createActionCreator('[TODO]SET_TITLE', resolve => (
     (_id: string, title: string) => resolve({ _id, title })
 ));
 
-export const setContent = createActionCreator('[Project]SET_CONTENT', resolve => (
+export const setContent = createActionCreator('[TODO]SET_CONTENT', resolve => (
     (_id: string, content: string) => resolve({ _id, content })
 ));
 
-export const setFinished = createActionCreator('[Project]SET_FINISHED', resolve => (
+export const setFinished = createActionCreator('[TODO]SET_FINISHED', resolve => (
     (_id: string, isFinished: boolean) => resolve({ _id, isFinished })
 ));
 
-export const setFocus = createActionCreator('[Project]SET_FOCUSED', resolve => (
+export const setFocus = createActionCreator('[TODO]SET_FOCUSED', resolve => (
     (_id: string, isFocused: boolean) => resolve({ _id, isFocused })
 ));
 
-export const fetchAll = createActionCreator('[Project]FETCH_ALL', resolve => (
+export const fetchAll = createActionCreator('[TODO]FETCH_ALL', resolve => (
     (todoList: TodoItem[]) => resolve(todoList)
 ));
 
@@ -103,6 +104,7 @@ export const actions = {
             (err: Error, num, doc: ProjectItem) => {
                 if (err) throw err;
                 dispatch(removeItem(_id));
+                console.log('removeItem', num, doc);
                 dispatch(projectStateRemoveTodo(doc.name, _id));
             });
     },
@@ -118,6 +120,8 @@ export const actions = {
                     }
 
                     dispatch(setFinished(_id, isFinished));
+                    // TODO: find better way
+                    projectActions.fetchAll();
                 });
         },
     setTitle:
@@ -132,6 +136,8 @@ export const actions = {
                     }
 
                     dispatch(setTitle(_id, title));
+                    // TODO: find better way
+                    projectActions.fetchAll();
                 });
         },
     setProject:
@@ -157,6 +163,8 @@ export const actions = {
                 {}
             );
             dispatch(setProject(_id, project));
+            // TODO: find better way
+            projectActions.fetchAll();
         },
     setContent:
         (_id: string, content: string) => async (dispatch: Dispatch) => {
@@ -167,6 +175,8 @@ export const actions = {
             );
 
             dispatch(setContent(_id, content));
+            // TODO: find better way
+            projectActions.fetchAll();
         },
     addItem:
         (title: string, project: string = 'Default', content?: string, expiryDate?: string) =>
@@ -179,6 +189,7 @@ export const actions = {
                     { upsert: true }
                 );
                 dispatch(addItem(data._id, title, datetime, project, content, expiryDate));
+                dispatch(projectStateAddTodo(project, data))
             }
 };
 

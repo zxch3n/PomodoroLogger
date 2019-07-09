@@ -14,7 +14,15 @@ const columns = [
     {
         title: 'Project',
         dataIndex: 'project'
-    }
+    },
+    {
+        title: 'id',
+        dataIndex: '_id'
+    },
+    {
+        title: 'Content',
+        dataIndex: 'content'
+    },
 ];
 
 const TODO: React.FC<Props> = (props: Props) => {
