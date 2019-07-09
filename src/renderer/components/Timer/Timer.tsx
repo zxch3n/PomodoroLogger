@@ -1,15 +1,12 @@
 import * as React from 'react';
 import { Component, useEffect, useState } from 'react';
 import { Button } from 'antd';
+import {ActionCreatorTypes} from '../TODO/action';
+import {RootState} from '../../reducers';
+import {FocusSelector} from './FocusSelector';
 
 
-export interface Props {
-    targetTime?: number; // date
-    focusDuration: number,
-    restDuration: number,
-    isFocusing: boolean,
-    isRunning: boolean;
-    project: string;
+interface BasicProps {
     startTimer: () => any;
     stopTimer: () => any;
     clearTimer: () => any;
@@ -18,6 +15,8 @@ export interface Props {
     setFocusDuration: (duration: number) => any,
     setRestDuration: (duration: number) => any
 }
+
+interface Props extends BasicProps, ActionCreatorTypes, RootState{ }
 
 
 function to2digits(num: number) {
@@ -40,7 +39,7 @@ class Counter extends Component<Props> {
     }
     componentDidMount(): void {
         this.interval = setInterval(() => {
-            const {targetTime, isRunning} = this.props;
+            const {targetTime, isRunning} = this.props.timer;
             if (!targetTime) {
                 this.setState({leftTime: '00:00'});
                 return;
@@ -71,7 +70,7 @@ class Counter extends Component<Props> {
     }
 
     onStop = () => {
-        if (this.props.isRunning){
+        if (this.props.timer.isRunning){
             this.props.stopTimer();
         } else {
             this.props.continueTimer();
@@ -98,10 +97,11 @@ class Counter extends Component<Props> {
             <div>
                 <span id="left-time-text">{leftTime}</span>
                 <Button onClick={this.onStop} id="stop-timer-button">
-                    {this.props.isRunning? 'Stop' : 'Continue'}
+                    {this.props.timer.isRunning? 'Stop' : 'Continue'}
                 </Button>
                 <Button onClick={this.onStart} id="start-timer-button">Start</Button>
                 <Button onClick={this.onClear}>Clear</Button>
+                <FocusSelector {...this.props}/>
             </div>
         );
     }

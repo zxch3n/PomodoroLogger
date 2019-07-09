@@ -4,6 +4,8 @@ import dbs from '../../dbs';
 import { Dispatch } from 'redux';
 import { ProjectItem } from '../Project/action';
 import { promisify } from 'util';
+import { removeTodoItem as projectStateRemoveTodo,
+    addTodoItem as projectStateAddTodo } from '../Project/action';
 
 
 export interface TodoItem {
@@ -96,9 +98,12 @@ export const actions = {
     removeItem: (project: string, _id: string) => (dispatch: Dispatch) => {
         dbs.projectDB.update(
             { [`todoList.${_id}`]: { $exists: true } },
-            { $unset: { [`todoList.${_id}`]: true } }, {}, (err: Error) => {
+            { $unset: { [`todoList.${_id}`]: true } },
+            {returnUpdatedDocs: true},
+            (err: Error, num, doc: ProjectItem) => {
                 if (err) throw err;
                 dispatch(removeItem(_id));
+                dispatch(projectStateRemoveTodo(doc.name, _id));
             });
     },
     setFinished:
