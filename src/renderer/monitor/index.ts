@@ -1,5 +1,5 @@
 import { remote } from 'electron';
-import { Monitor as BaseWindowMonitor, ActiveWinListener } from '../../main/activeWinMonitor';
+import { ActiveWinListener, Monitor as BaseWindowMonitor } from '../../main/activeWinMonitor';
 import { getScreen } from './screenshot';
 
 // This module may not be available in electron renderer
@@ -25,7 +25,7 @@ class UsageRecorder {
             apps: {},
             durationInHour: 0,
             switchTimes: 0,
-            screenStaticDuration: 0
+            screenStaticDuration: screenShotInterval === undefined ? undefined : 0
         };
 
         this.screenShotInterval = screenShotInterval;
@@ -39,13 +39,28 @@ class UsageRecorder {
         }
 
         row.switchTimes += 1;
-        if (row.startUsingTime) {
-            row.spentTimeInHour += (new Date().getTime() - row.startUsingTime) / 1000 / 3600;
-            row.startUsingTime = undefined;
+        if (row.lastUpdateTime) {
+            row.spentTimeInHour += (new Date().getTime() - row.lastUpdateTime) / 1000 / 3600;
+            row.lastUpdateTime = undefined;
         }
 
         this.lastUsingApp = undefined;
         this.lastScreenShot = undefined;
+    };
+
+    onUpdateApp = (appName: string) => {
+        const row = this.record.apps[appName];
+        if (!row) {
+            throw new Error();
+        }
+
+        if (row.lastUpdateTime) {
+            const now = new Date().getTime();
+            const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
+            row.spentTimeInHour += spentTimeInHour;
+            row.lastUpdateTime = now;
+            this.record.durationInHour += spentTimeInHour;
+        }
     };
 
     getImageData = (canvas: HTMLCanvasElement): ImageData => {
@@ -100,14 +115,15 @@ class UsageRecorder {
                 spentTimeInHour: 0,
                 titleSpentTime: {},
                 switchTimes: 0,
-                screenStaticDuration: 0,
-                startUsingTime: now
+                screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0,
+                lastUpdateTime: now
             };
         }
 
         this.lastUsingApp = appName;
         const appRow = this.record.apps[appName];
         appRow.titleSpentTime[result.title] = 1;
+        this.onUpdateApp(appName);
         if (this.screenShotInterval && this.lastScreenShotTime + this.screenShotInterval < now) {
             const duration = this.lastScreenShotTime;
             this.lastScreenShotTime = now;
@@ -119,7 +135,11 @@ class UsageRecorder {
             if (this.lastScreenShot) {
                 if (this.didScreenShotChange(canvas)) {
                 } else {
-                    appRow.screenStaticDuration += duration;
+                    if (appRow.screenStaticDuration !== undefined) {
+                        appRow.screenStaticDuration += duration;
+                    } else {
+                        throw new Error();
+                    }
                 }
             }
         }
@@ -135,7 +155,6 @@ export class Monitor {
     screenShotInterval?: number;
 
     private winMonitor?: WindowMonitor;
-    private lastUpdateTime: number = 0;
 
     constructor(
         monitorListener: (data: PomodoroRecord) => void,
@@ -178,8 +197,8 @@ interface ApplicationSpentTime {
     // how many times user switched to this app
     switchTimes: number;
     // how long the screen shot stay the same in this app
-    screenStaticDuration: number;
-    startUsingTime?: number;
+    screenStaticDuration?: number;
+    lastUpdateTime?: number;
 }
 
 export interface PomodoroRecord {
@@ -188,5 +207,5 @@ export interface PomodoroRecord {
     };
     durationInHour: number;
     switchTimes: number;
-    screenStaticDuration: number;
+    screenStaticDuration?: number;
 }
