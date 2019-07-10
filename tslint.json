@@ -27,7 +27,8 @@
             "styled-components": "styled",
             "reactTestRenderer": "renderer",
             "react": "React"
-        }]
+        }],
+        "prefer-template": false
     },
     "rulesDirectory": []
 }

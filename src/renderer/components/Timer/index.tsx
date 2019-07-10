@@ -10,14 +10,11 @@ import {
 import { genMapDispatchToProp } from '../../utils';
 
 const mapStateToProps = (state: RootState) => state;
-const todoProps = genMapDispatchToProp<TodoActionCreatorTypes>(todoActions);
-
 type ActionCreatorTypes = { [key in keyof typeof actions]: typeof actions[key] };
-const mapDispatchToProps = {
-    ...todoProps,
-    ...genMapDispatchToProp<ActionCreatorTypes>(actions)
-};
-
+const mapDispatchToProps = genMapDispatchToProp<TodoActionCreatorTypes & ActionCreatorTypes>({
+    ...todoActions,
+    ...actions
+});
 export default connect(
     mapStateToProps,
     mapDispatchToProps

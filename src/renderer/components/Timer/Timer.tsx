@@ -3,8 +3,7 @@ import { Button } from 'antd';
 import { ActionCreatorTypes } from '../TODO/action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
-import { Monitor } from '../../monitor';
-import { BaseResult } from 'active-win';
+import { Monitor, PomodoroRecord } from '../../monitor';
 
 interface BasicProps {
     startTimer: () => any;
@@ -38,7 +37,7 @@ class Timer extends Component<Props> {
         };
     }
 
-    activeWinListener = (data: BaseResult) => {
+    activeWinListener = (data: PomodoroRecord) => {
         // TODO:
     };
 

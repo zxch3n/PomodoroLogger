@@ -11,18 +11,13 @@ import {
     todoReducer,
     TodoState
 } from './action';
+import dbs from '../../dbs';
 import { cloneDeep } from 'lodash';
 import { existsSync, unlink } from 'fs';
 import { projectDBPath } from '../../../config';
 import { promisify } from 'util';
 import { ProjectItem } from '../Project/action';
 import { addProjectToDB, executeThunkAction, generateRandomName } from '../../utils';
-
-beforeAll(async () => {
-    if (existsSync(projectDBPath)) {
-        await promisify(unlink)(projectDBPath);
-    }
-});
 
 describe('TODO reducer', () => {
     it('starts with empty state', () => {
@@ -80,6 +75,12 @@ describe('Combiner Handler', () => {
 });
 
 describe('TODO thunk action creator', () => {
+    beforeEach(async () => {
+        if (existsSync(projectDBPath)) {
+            await promisify(unlink)(projectDBPath);
+        }
+    });
+
     it('can dispatch correctly', async () => {
         const thunkFunc = actions.addItem('111');
         let dispatch;

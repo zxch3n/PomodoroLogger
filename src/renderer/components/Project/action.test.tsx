@@ -10,6 +10,7 @@ import {
     setName,
     updateAppSpentTime
 } from './action';
+import dbs from '../../dbs';
 import { createTodoItem } from '../TODO/action';
 import { addProjectToDB, generateRandomName } from '../../utils';
 import { existsSync, mkdir, unlink } from 'fs';

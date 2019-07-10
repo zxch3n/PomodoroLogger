@@ -8,6 +8,7 @@ import {
     removeTodoItem as projectStateRemoveTodo
 } from '../Project/action';
 import { promisify } from 'util';
+import dbs from '../../dbs';
 
 export interface TodoItem {
     _id: string;
@@ -123,7 +124,6 @@ export const actions = {
             (err: Error, num, doc: ProjectItem) => {
                 if (err) throw err;
                 dispatch(removeItem(_id));
-                console.log('removeItem', num, doc);
                 dispatch(projectStateRemoveTodo(doc.name, _id));
             }
         );

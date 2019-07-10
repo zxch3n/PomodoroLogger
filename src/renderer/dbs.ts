@@ -6,7 +6,10 @@ type dbTypes = 'projectDB';
 let dbs: { [key in dbTypes]: nedb };
 if (remote) {
     dbs = remote.getGlobal('sharedDB');
-} else {
+}
+
+// @ts-ignore
+if (!dbs) {
     dbs = {
         projectDB
     };

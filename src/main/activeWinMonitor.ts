@@ -11,6 +11,10 @@ export class Monitor {
         this.listener = listener;
     }
 
+    get isRunning() {
+        return !!this.timer;
+    }
+
     start = () => {
         if (this.timer) {
             return;
@@ -24,6 +28,7 @@ export class Monitor {
         const data = await activeWin();
         if (data) {
             this.listener(data);
+        } else {
         }
     };
 
