@@ -1,15 +1,13 @@
-import * as React from 'react';
-import {Button, Input, Table} from 'antd'
-import styled from 'styled-components';
-import {actions, ActionCreatorTypes, TodoState} from './action'
-import {useEffect} from 'react';
+import React, { useEffect } from 'react';
+import { Button, Input, Table } from 'antd';
+import styledComponents from 'styled-components';
+import { actions, ActionCreatorTypes, TodoState } from './action';
 
-
-interface Props extends ActionCreatorTypes, TodoState{}
+interface Props extends ActionCreatorTypes, TodoState {}
 const columns = [
     {
         title: 'Title',
-        dataIndex: 'title',
+        dataIndex: 'title'
     },
     {
         title: 'Project',
@@ -22,21 +20,23 @@ const columns = [
     {
         title: 'Content',
         dataIndex: 'content'
-    },
+    }
 ];
 
 const TODO: React.FC<Props> = (props: Props) => {
-    const onClick = ()=>{props.addItem('123', '345')};
-    useEffect(()=>{
+    const onClick = () => {
+        props.addItem('123', '345');
+    };
+    useEffect(() => {
         props.fetchAll();
     }, []);
     return (
         <div>
-            <Table columns={columns} dataSource={props.todoList}/>
+            <Table columns={columns} dataSource={props.todoList} />
             <Input />
-            <Button onClick={onClick}/>
+            <Button onClick={onClick} />
         </div>
-    )
+    );
 };
 
 export default TODO;

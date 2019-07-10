@@ -2,9 +2,11 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
+import { Monitor } from './activeWinMonitor';
 
-const mGlobal: typeof global & {sharedDB?: any} = global;
+const mGlobal: typeof global & { sharedDB?: typeof db; sharedMonitor?: typeof Monitor } = global;
 mGlobal.sharedDB = db;
+mGlobal.sharedMonitor = Monitor;
 let win: BrowserWindow | null;
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');

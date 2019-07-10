@@ -1,8 +1,7 @@
-import {reducer, stopTimer, startTimer, setFocusDuration, setRestDuration} from './action';
+import { reducer, setFocusDuration, setRestDuration, startTimer, stopTimer } from './action';
 
-
-describe('Reducer', ()=>{
-    it ('has default state', ()=>{
+describe('Reducer', () => {
+    it('has default state', () => {
         const state = reducer(undefined, stopTimer());
         expect(state).toHaveProperty('targetTime');
         expect(state).toHaveProperty('focusDuration');
@@ -11,7 +10,7 @@ describe('Reducer', ()=>{
         expect(state).toHaveProperty('isFocusing');
     });
 
-    it ('works when applying start_timer, stop_timer', ()=>{
+    it('works when applying start_timer, stop_timer', () => {
         let state = reducer(undefined, startTimer());
         expect(state.isRunning).toBeTruthy();
         state = reducer(state, stopTimer());
@@ -20,11 +19,10 @@ describe('Reducer', ()=>{
         expect(state.isRunning).toBeTruthy();
     });
 
-    it ('works with user config setting', ()=>{
+    it('works with user config setting', () => {
         let state = reducer(undefined, setFocusDuration(100));
         expect(state.focusDuration).toBe(100);
         state = reducer(state, setRestDuration(123));
         expect(state.restDuration).toBe(123);
     });
 });
-

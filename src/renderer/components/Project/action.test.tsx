@@ -1,16 +1,22 @@
 import {
-    actions, projectReducer, fetchAll, removeItem,
-    setName, addItem, updateAppSpentTime, ProjectState, addTodoItem, ProjectItem
+    actions,
+    addItem,
+    addTodoItem,
+    fetchAll,
+    ProjectItem,
+    projectReducer,
+    ProjectState,
+    removeItem,
+    setName,
+    updateAppSpentTime
 } from './action';
-import {createTodoItem} from '../TODO/action';
+import { createTodoItem } from '../TODO/action';
 import { addProjectToDB, generateRandomName } from '../../utils';
-import {existsSync, unlink, mkdir} from 'fs';
-import {projectDBPath, dbBaseDir} from '../../../config';
-import {promisify} from 'util';
-import dbs from '../../dbs';
+import { existsSync, mkdir, unlink } from 'fs';
+import { dbBaseDir, projectDBPath } from '../../../config';
+import { promisify } from 'util';
 
-
-beforeAll(async ()=>{
+beforeAll(async () => {
     if (existsSync(projectDBPath)) {
         await promisify(unlink)(projectDBPath);
     }
@@ -20,20 +26,19 @@ beforeAll(async ()=>{
     }
 });
 
-
-describe('Project reducer', ()=>{
-    it ('has a default state', ()=>{
-        const state = projectReducer(undefined, {type: ''});
+describe('Project reducer', () => {
+    it('has a default state', () => {
+        const state = projectReducer(undefined, { type: '' });
         expect(state).toHaveProperty('projectList');
     });
 
-    it ("'s addItem works", ()=>{
+    it("'s addItem works", () => {
         const state: ProjectState = projectReducer(undefined, addItem('myProject'));
         expect(state.projectList).toHaveProperty('myProject');
         expect(state.projectList.myProject.name).toBe('myProject');
     });
 
-    it ("'s removeItem works", ()=>{
+    it("'s removeItem works", () => {
         let state: ProjectState = projectReducer(undefined, addItem('myProject'));
         expect(state.projectList).toHaveProperty('myProject');
         expect(state.projectList.myProject.name).toBe('myProject');
@@ -41,7 +46,7 @@ describe('Project reducer', ()=>{
         expect(state.projectList).not.toHaveProperty('myProject');
     });
 
-    it ("'s addTodoItem works", ()=>{
+    it("'s addTodoItem works", () => {
         const state: ProjectState = projectReducer(
             defaultProjectState,
             addTodoItem('project0', createTodoItem('do homework'))
@@ -50,7 +55,7 @@ describe('Project reducer', ()=>{
         expect(Object.values(state.projectList.project0.todoList)[0].title).toBe('do homework');
     });
 
-    it ("'s setName works", ()=>{
+    it("'s setName works", () => {
         const state: ProjectState = projectReducer(
             defaultProjectState,
             setName('project0', 'newProject')
@@ -60,7 +65,7 @@ describe('Project reducer', ()=>{
         expect(state.projectList).toHaveProperty('newProject');
     });
 
-    it ("'s updateAppSpentTime works", ()=>{
+    it("'s updateAppSpentTime works", () => {
         const state: ProjectState = projectReducer(
             defaultProjectState,
             updateAppSpentTime('project1', 'Chrome', 100)
@@ -69,7 +74,7 @@ describe('Project reducer', ()=>{
         expect(state.projectList.project1.applicationSpentTime.Chrome.spentHours).toBe(100);
     });
 
-    it ("'s fetchAll works", ()=>{
+    it("'s fetchAll works", () => {
         const newProjectMap: ProjectItem[] = [
             {
                 name: 'projectElu0',
@@ -88,14 +93,11 @@ describe('Project reducer', ()=>{
                 todoList: {},
                 spentHours: 2,
                 applicationSpentTime: {}
-            },
+            }
         ];
-        const state: ProjectState = projectReducer(
-            defaultProjectState,
-            fetchAll(newProjectMap)
-        );
+        const state: ProjectState = projectReducer(defaultProjectState, fetchAll(newProjectMap));
 
-        for (let i = 0; i < 3; i += 1){
+        for (let i = 0; i < 3; i += 1) {
             const name = `projectElu${i}`;
             expect(state.projectList).toHaveProperty(name);
             expect(state.projectList[name].spentHours).toBe(i);
@@ -103,20 +105,20 @@ describe('Project reducer', ()=>{
     });
 });
 
-describe ('Project thunk actionCreator', ()=>{
-    it ('can fetchAll', async ()=>{
+describe('Project thunk actionCreator', () => {
+    it('can fetchAll', async () => {
         const nameList: string[] = [];
-        for (let i = 0; i < 3; i += 1){
+        for (let i = 0; i < 3; i += 1) {
             const name = generateRandomName();
             nameList.push(name);
-            await addProjectToDB(name)
+            await addProjectToDB(name);
         }
 
         const thunk = actions.fetchAll();
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(({payload: x}: {payload: ProjectItem[]})=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(({ payload: x }: { payload: ProjectItem[] }) => {
                 expect(x.length).toBeGreaterThan(2);
-                const filteredX = x.filter(item=> nameList.includes(item.name) );
+                const filteredX = x.filter(item => nameList.includes(item.name));
                 expect(filteredX.length).toEqual(3);
                 expect(filteredX.length).toEqual(3);
                 resolve();
@@ -125,15 +127,15 @@ describe ('Project thunk actionCreator', ()=>{
 
             // @ts-ignore
             thunk(dispatch);
-        })
+        });
     });
 
-    it ('can removeItem', async ()=>{
+    it('can removeItem', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
         const thunk = actions.removeItem(name);
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(x=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
                 expect(x.payload.name).toEqual(name);
                 resolve();
                 return x;
@@ -142,17 +144,19 @@ describe ('Project thunk actionCreator', ()=>{
             thunk(dispatch);
         });
 
-        const item: ProjectItem = await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name}) as ProjectItem;
+        const item: ProjectItem = (await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({
+            name
+        })) as ProjectItem;
         expect(item).toBeNull();
     });
 
-    it ('can setProject name', async ()=>{
+    it('can setProject name', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
         const newName = generateRandomName();
         const thunk = actions.setName(name, newName);
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(x=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
                 expect(x.payload).toHaveProperty('name');
                 expect(x.payload).toHaveProperty('newName');
                 expect(x.payload.name).toBe(name);
@@ -165,18 +169,20 @@ describe ('Project thunk actionCreator', ()=>{
         });
 
         // @ts-ignore
-        const newNameCount = await promisify(dbs.projectDB.count.bind(dbs.projectDB))({name: newName});
+        const newNameCount = await promisify(dbs.projectDB.count.bind(dbs.projectDB))({
+            name: newName
+        });
         expect(newNameCount).toEqual(1);
         // @ts-ignore
-        const oldNameCount = await promisify(dbs.projectDB.count.bind(dbs.projectDB))({name});
+        const oldNameCount = await promisify(dbs.projectDB.count.bind(dbs.projectDB))({ name });
         expect(oldNameCount).toEqual(0);
     });
 
-    it ('can addItem to DB', async ()=>{
+    it('can addItem to DB', async () => {
         const name = generateRandomName();
         const thunk = actions.addItem(name);
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(x=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
                 expect(x.payload).toHaveProperty('name');
                 expect(x.payload.name).toBe(name);
                 resolve();
@@ -185,11 +191,11 @@ describe ('Project thunk actionCreator', ()=>{
             thunk(dispatch);
         });
 
-        const item: ProjectItem = await new Promise((resolve, reject)=>{
-            dbs.projectDB.findOne({name}, (err, item: ProjectItem)=>{
-                if (err)reject(err);
+        const item: ProjectItem = await new Promise((resolve, reject) => {
+            dbs.projectDB.findOne({ name }, (err, item: ProjectItem) => {
+                if (err) reject(err);
                 resolve(item as ProjectItem);
-            })
+            });
         });
 
         expect(item.name).toBe(name);
@@ -198,14 +204,14 @@ describe ('Project thunk actionCreator', ()=>{
         expect(item.todoList).toStrictEqual({});
     });
 
-    it ('can addTodoItem', async ()=>{
+    it('can addTodoItem', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
         const todoTitle = generateRandomName();
         const thunk = actions.addTodoItem(name, todoTitle);
         let _id = '';
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(x=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
                 expect(x.payload.name).toEqual(name);
                 expect(x.payload.todoItem.title).toEqual(todoTitle);
                 _id = x.payload.todoItem._id;
@@ -216,21 +222,23 @@ describe ('Project thunk actionCreator', ()=>{
             thunk(dispatch);
         });
 
-        const item: ProjectItem = await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name}) as ProjectItem;
+        const item: ProjectItem = (await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({
+            name
+        })) as ProjectItem;
         expect(Object.keys(item.todoList).length).toEqual(1);
         expect(Object.values(item.todoList)[0].title).toEqual(todoTitle);
         expect(item.todoList).toHaveProperty(_id);
         expect(item.todoList[_id].title).toEqual(todoTitle);
     });
 
-    it ('can removeTodoItem', async ()=>{
+    it('can removeTodoItem', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
         const todoTitle = generateRandomName();
         const createThunk = actions.addTodoItem(name, todoTitle);
         let _id = '';
-        await new Promise(resolve=>{
-            createThunk(x=>{
+        await new Promise(resolve => {
+            createThunk(x => {
                 _id = x.payload.todoItem._id;
                 resolve();
                 return x;
@@ -238,8 +246,8 @@ describe ('Project thunk actionCreator', ()=>{
         });
 
         const thunk = actions.removeTodoItem(name, _id);
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(x=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
                 expect(x.payload.name).toEqual(name);
                 expect(x.payload._id).toEqual(_id);
                 resolve();
@@ -250,16 +258,16 @@ describe ('Project thunk actionCreator', ()=>{
         });
 
         const findOne = dbs.projectDB.findOne.bind(dbs.projectDB);
-        const item: ProjectItem = await promisify(findOne)({name}) as ProjectItem;
+        const item: ProjectItem = (await promisify(findOne)({ name })) as ProjectItem;
         expect(item.todoList).not.toHaveProperty(_id);
     });
 
-    it ('can updateAppSpentTime', async ()=>{
+    it('can updateAppSpentTime', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
         const thunk = actions.updateAppSpentTime(name, 'Chrome', 100);
-        await new Promise(resolve=>{
-            const dispatch = jest.fn(x=>{
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
                 expect(x.payload.name).toEqual(name);
                 expect(x.payload.appName).toEqual('Chrome');
                 expect(x.payload.spentHours).toEqual(100);
@@ -270,12 +278,13 @@ describe ('Project thunk actionCreator', ()=>{
             thunk(dispatch);
         });
 
-        const item: ProjectItem = await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({name}) as ProjectItem;
+        const item: ProjectItem = (await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({
+            name
+        })) as ProjectItem;
         expect(item.applicationSpentTime).toHaveProperty('Chrome');
         expect(item.applicationSpentTime.Chrome.spentHours).toEqual(100);
     });
 });
-
 
 const defaultProjectState: ProjectState = {
     projectList: {
@@ -285,10 +294,10 @@ const defaultProjectState: ProjectState = {
             spentHours: 30,
             applicationSpentTime: {
                 Chrome: {
-                    title: "Chrome",
+                    title: 'Chrome',
                     spentHours: 30,
                     subAppSpentTime: [],
-                    keywords: ["Browser"]
+                    keywords: ['Browser']
                 }
             }
         },
@@ -296,15 +305,15 @@ const defaultProjectState: ProjectState = {
         project1: {
             name: 'project1',
             todoList: {
-                "Learn deep learning": createTodoItem('Learn deep learning')
+                'Learn deep learning': createTodoItem('Learn deep learning')
             },
             spentHours: 10,
             applicationSpentTime: {
                 Chrome: {
-                    title: "Chrome",
+                    title: 'Chrome',
                     spentHours: 30,
                     subAppSpentTime: [],
-                    keywords: ["Browser"]
+                    keywords: ['Browser']
                 }
             }
         }

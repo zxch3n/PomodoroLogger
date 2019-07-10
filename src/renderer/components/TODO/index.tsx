@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 
-import TODO from './TODO'
+import TODO from './TODO';
 import { RootState } from '../../reducers';
-import {actions, ActionCreatorTypes} from './action'
-import {genMapDispatchToProp} from '../../utils';
+import { ActionCreatorTypes, actions } from './action';
+import { genMapDispatchToProp } from '../../utils';
 
-
-const mapStateToProps = (state: RootState) => (state.todo);
+const mapStateToProps = (state: RootState) => state.todo;
 const mapDispatchToProps = genMapDispatchToProp<ActionCreatorTypes>(actions);
-export default connect(mapStateToProps, mapDispatchToProps)(TODO);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TODO);

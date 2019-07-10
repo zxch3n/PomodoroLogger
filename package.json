@@ -144,7 +144,7 @@
     "@types/nedb": "^1.8.7",
     "@types/redux-thunk": "^2.1.0",
     "@types/styled-components": "^4.1.16",
-    "active-window": "^0.1.0",
+    "active-win": "^5.1.2",
     "antd": "^3.19.7",
     "deox": "^2.1.0",
     "lodash": "^4.17.11",

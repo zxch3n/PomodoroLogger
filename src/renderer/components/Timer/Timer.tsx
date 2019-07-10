@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { Component, useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import { Button } from 'antd';
 import { ActionCreatorTypes } from '../TODO/action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
-
+import { Monitor } from '../../monitor';
+import { BaseResult } from 'active-win';
 
 interface BasicProps {
     startTimer: () => any;
@@ -12,13 +12,11 @@ interface BasicProps {
     clearTimer: () => any;
     timerFinished: () => any;
     continueTimer: () => any;
-    setFocusDuration: (duration: number) => any,
-    setRestDuration: (duration: number) => any
+    setFocusDuration: (duration: number) => any;
+    setRestDuration: (duration: number) => any;
 }
 
-export interface Props extends BasicProps, ActionCreatorTypes, RootState {
-}
-
+export interface Props extends BasicProps, ActionCreatorTypes, RootState {}
 
 function to2digits(num: number) {
     if (num < 10) {
@@ -28,10 +26,10 @@ function to2digits(num: number) {
     return num;
 }
 
-
 class Timer extends Component<Props> {
     state: { leftTime: string };
     interval?: any;
+    monitor?: Monitor;
 
     constructor(props: Props) {
         super(props);
@@ -40,9 +38,14 @@ class Timer extends Component<Props> {
         };
     }
 
+    activeWinListener = (data: BaseResult) => {
+        // TODO:
+    };
+
     componentDidMount(): void {
         this.interval = setInterval(this.updateLeftTime, 300);
         this.updateLeftTime();
+        this.monitor = new Monitor(this.activeWinListener);
     }
 
     componentWillUnmount(): void {
@@ -63,7 +66,7 @@ class Timer extends Component<Props> {
         }
 
         const now = new Date().getTime();
-        const timeSpan = (targetTime - now);
+        const timeSpan = targetTime - now;
         const sec = Math.floor(timeSpan / 1000 + 0.5);
         if (sec < 0) {
             this.setState({ leftTime: '00:00' });
@@ -71,7 +74,7 @@ class Timer extends Component<Props> {
             return;
         }
 
-        const leftTime = (`${to2digits(Math.floor(sec / 60))}:${to2digits(sec % 60)}`);
+        const leftTime = `${to2digits(Math.floor(sec / 60))}:${to2digits(sec % 60)}`;
         this.setState({ leftTime });
     };
 
@@ -86,7 +89,6 @@ class Timer extends Component<Props> {
     onStart = () => {
         this.props.startTimer();
     };
-
 
     onClear = () => {
         this.props.clearTimer();
@@ -105,13 +107,14 @@ class Timer extends Component<Props> {
                 <Button onClick={this.onStop} id="stop-timer-button">
                     {this.props.timer.isRunning ? 'Stop' : 'Continue'}
                 </Button>
-                <Button onClick={this.onStart} id="start-timer-button">Start</Button>
+                <Button onClick={this.onStart} id="start-timer-button">
+                    Start
+                </Button>
                 <Button onClick={this.onClear}>Clear</Button>
-                <FocusSelector {...this.props}/>
+                <FocusSelector {...this.props} />
             </div>
         );
     }
 }
-
 
 export default Timer;
