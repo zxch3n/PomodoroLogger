@@ -1,4 +1,6 @@
 import { createActionCreator, createReducer } from 'deox';
+import { PomodoroRecord } from '../../monitor';
+import { Dispatch } from 'redux';
 
 export interface TimerState {
     targetTime?: number;
@@ -39,10 +41,13 @@ export const actions = {
     stopTimer,
     continueTimer,
     clearTimer,
-    timerFinished,
     setFocusDuration,
     setRestDuration,
-    setProject
+    setProject,
+    timerFinished: (sessionData?: PomodoroRecord) => (dispatch: Dispatch) => {
+        dispatch(timerFinished());
+        // TODO: save sessionData to DB
+    }
 };
 
 export const reducer = createReducer<TimerState, any>(defaultState, handle => [

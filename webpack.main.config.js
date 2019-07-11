@@ -30,7 +30,11 @@ module.exports = merge.smart(baseConfig, {
                         ['@babel/plugin-proposal-class-properties', { loose: true }]
                     ]
                 }
-            }
+            },
+            // {
+            //     test: /\.node$/,
+            //     loader: "native-ext-loader"
+            // }
         ]
     },
     plugins: [

@@ -1,6 +1,16 @@
-import activeWin, { BaseResult } from 'active-win';
+import { remote } from 'electron';
+import { BaseResult } from 'active-win';
+let activeWin: any;
 
-export type ActiveWinListener = (result: BaseResult) => void;
+if (process.env.NODE_ENV === 'test' && !remote) {
+    // Node Environment
+    activeWin = require('active-win');
+} else {
+    // renderer env
+    activeWin = remote.require('active-win');
+}
+
+export type ActiveWinListener = (result?: BaseResult) => void;
 export class Monitor {
     timer?: number;
     intervalTimeout: number;

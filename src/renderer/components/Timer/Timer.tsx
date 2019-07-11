@@ -9,7 +9,7 @@ interface BasicProps {
     startTimer: () => any;
     stopTimer: () => any;
     clearTimer: () => any;
-    timerFinished: () => any;
+    timerFinished: (sessionData?: PomodoroRecord) => any;
     continueTimer: () => any;
     setFocusDuration: (duration: number) => any;
     setRestDuration: (duration: number) => any;
@@ -19,7 +19,7 @@ export interface Props extends BasicProps, ActionCreatorTypes, RootState {}
 
 function to2digits(num: number) {
     if (num < 10) {
-        return `0${num.toString()}`;
+        return `0${num}`;
     }
 
     return num;
@@ -39,12 +39,13 @@ class Timer extends Component<Props> {
 
     activeWinListener = (data: PomodoroRecord) => {
         // TODO:
+        console.log(data);
     };
 
     componentDidMount(): void {
-        this.interval = setInterval(this.updateLeftTime, 300);
+        this.interval = setInterval(this.updateLeftTime, 200);
         this.updateLeftTime();
-        this.monitor = new Monitor(this.activeWinListener);
+        this.monitor = new Monitor(this.activeWinListener, 1000, undefined);
     }
 
     componentWillUnmount(): void {
@@ -77,24 +78,42 @@ class Timer extends Component<Props> {
         this.setState({ leftTime });
     };
 
-    onStop = () => {
+    onStopOrResume = () => {
         if (this.props.timer.isRunning) {
             this.props.stopTimer();
+            if (this.monitor) {
+                this.monitor.stop();
+            }
         } else {
             this.props.continueTimer();
+            if (this.monitor) {
+                this.monitor.start();
+            }
         }
     };
 
     onStart = () => {
         this.props.startTimer();
+        if (this.monitor) {
+            this.monitor.start();
+        }
     };
 
     onClear = () => {
         this.props.clearTimer();
+        if (this.monitor) {
+            this.monitor.stop();
+            this.monitor.clear();
+        }
     };
 
     onDone = () => {
-        this.props.timerFinished();
+        if (this.monitor) {
+            this.monitor.stop();
+            this.props.timerFinished(this.monitor.sessionData);
+        } else {
+            this.props.timerFinished();
+        }
     };
 
     render() {
@@ -103,7 +122,7 @@ class Timer extends Component<Props> {
         return (
             <div>
                 <span id="left-time-text">{leftTime}</span>
-                <Button onClick={this.onStop} id="stop-timer-button">
+                <Button onClick={this.onStopOrResume} id="stop-timer-button">
                     {this.props.timer.isRunning ? 'Stop' : 'Continue'}
                 </Button>
                 <Button onClick={this.onStart} id="start-timer-button">

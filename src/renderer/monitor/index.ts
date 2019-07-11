@@ -1,24 +1,17 @@
-import { remote } from 'electron';
-import { ActiveWinListener, Monitor as BaseWindowMonitor } from '../../main/activeWinMonitor';
+import { ActiveWinListener, Monitor as WindowMonitor } from './activeWinMonitor';
 import { getScreen } from './screenshot';
+import { BaseResult } from 'active-win';
 
 // This module may not be available in electron renderer
-let WindowMonitor: typeof BaseWindowMonitor = remote.getGlobal('sharedMonitor');
-if (!WindowMonitor) {
-    WindowMonitor = BaseWindowMonitor;
-}
-
-type WindowMonitor = BaseWindowMonitor;
-
 class UsageRecorder {
-    public record: PomodoroRecord;
+    private record: PomodoroRecord;
     private readonly screenShotInterval?: number;
     private lastUsingApp?: string;
     private lastScreenShotTime: number = 0;
     private lock: boolean = false;
 
     private lastScreenShot?: ImageData;
-    private monitorListener: (data: PomodoroRecord) => void;
+    private readonly monitorListener: (data: PomodoroRecord) => void;
 
     constructor(monitorListener: (data: PomodoroRecord) => void, screenShotInterval?: number) {
         this.record = {
@@ -32,15 +25,83 @@ class UsageRecorder {
         this.monitorListener = monitorListener;
     }
 
-    onSwitchApp = (lastAppName: string) => {
+    get sessionData() {
+        return this.record;
+    }
+
+    clear = () => {
+        this.record = {
+            apps: {},
+            durationInHour: 0,
+            switchTimes: 0,
+            screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0
+        };
+    };
+
+    start = () => {};
+
+    stop = () => {
+        // TODO: test to make sure this is invoked
+        this.listener(undefined);
+    };
+
+    /**
+     *
+     * @param result, undefined means the timer is stopped
+     */
+    listener: ActiveWinListener = async (result?: BaseResult) => {
+        // Because we await something here, and
+        // this method is call at an interval, there are chances
+        // that we run call the method before last call is done;
+        // I use a lock to avoid that.
+        if (this.lock) {
+            console.warn('Locked! The update interval is too short.');
+            return;
+        }
+
+        const now = new Date().getTime();
+        const appName = result ? result.owner.name : undefined;
+        if (this.lastUsingApp && appName !== this.lastUsingApp) {
+            this.updateLastAppUsageInfo(this.lastUsingApp);
+        }
+
+        if (!appName || !result) {
+            return;
+        }
+
+        console.log(appName, this.record.apps[appName]);
+        this.lock = true;
+        if (!(appName in this.record.apps)) {
+            this.record.apps[appName] = {
+                appName,
+                spentTimeInHour: 0,
+                titleSpentTime: {},
+                switchTimes: 0,
+                screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0,
+                lastUpdateTime: now
+            };
+        }
+
+        await this.updateThisAppUsageInfo(appName, result.title).catch(err => {
+            this.lock = false;
+            throw err;
+        });
+        this.monitorListener(this.record);
+        this.lock = false;
+    };
+
+    updateLastAppUsageInfo = (lastAppName: string) => {
         const row = this.record.apps[lastAppName];
         if (!row) {
             throw new Error();
         }
 
         row.switchTimes += 1;
+        this.record.switchTimes += 1;
         if (row.lastUpdateTime) {
-            row.spentTimeInHour += (new Date().getTime() - row.lastUpdateTime) / 1000 / 3600;
+            const spentTimeInHour = (new Date().getTime() - row.lastUpdateTime) / 1000 / 3600;
+            row.spentTimeInHour += spentTimeInHour;
+            this.record.durationInHour += spentTimeInHour;
             row.lastUpdateTime = undefined;
         }
 
@@ -48,18 +109,62 @@ class UsageRecorder {
         this.lastScreenShot = undefined;
     };
 
-    onUpdateApp = (appName: string) => {
+    updateThisAppUsageInfo = async (appName: string, title: string) => {
+        const appRow = this.record.apps[appName];
         const row = this.record.apps[appName];
+        const now = new Date().getTime();
+        // TODO: add time info?
+        appRow.titleSpentTime[title] = 1;
         if (!row) {
             throw new Error();
         }
 
         if (row.lastUpdateTime) {
-            const now = new Date().getTime();
             const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
             row.spentTimeInHour += spentTimeInHour;
-            row.lastUpdateTime = now;
             this.record.durationInHour += spentTimeInHour;
+        }
+
+        row.lastUpdateTime = now;
+        await this.takeCareOfScreenShot(appRow).catch(err => {
+            console.error(err);
+            throw err;
+        });
+        this.lastUsingApp = appName;
+    };
+
+    takeCareOfScreenShot = async (appRow: ApplicationSpentTime) => {
+        // Screen Shot
+        const now = new Date().getTime();
+        if (this.screenShotInterval && this.lastScreenShotTime + this.screenShotInterval < now) {
+            const duration = (now - this.lastScreenShotTime) / 3600 / 1000;
+            this.lastScreenShotTime = now;
+            const canvas = await getScreen().catch(err => {
+                throw err;
+            });
+            if (!canvas) {
+                throw new Error();
+            }
+
+            const newScreenShot = this.getImageData(canvas);
+            if (this.lastScreenShot) {
+                console.log('Comparing screenshot');
+                if (this.didScreenShotChange(newScreenShot)) {
+                    console.log('screenshot changed');
+                } else {
+                    console.log('screenshots are the same');
+                    if (appRow.screenStaticDuration !== undefined) {
+                        appRow.screenStaticDuration += duration;
+                        if (this.record.screenStaticDuration !== undefined) {
+                            this.record.screenStaticDuration += duration;
+                        }
+                    } else {
+                        throw new Error();
+                    }
+                }
+            }
+
+            this.lastScreenShot = newScreenShot;
         }
     };
 
@@ -72,13 +177,12 @@ class UsageRecorder {
         return context.getImageData(0, 0, canvas.width, canvas.height);
     };
 
-    didScreenShotChange = (newScreenShot: HTMLCanvasElement): boolean => {
+    didScreenShotChange = (newImg: ImageData): boolean => {
         const oldImg = this.lastScreenShot;
         if (!oldImg) {
             return true;
         }
 
-        const newImg = this.getImageData(newScreenShot);
         if (newImg.data.length !== oldImg.data.length) {
             return true;
         }
@@ -91,70 +195,13 @@ class UsageRecorder {
 
         return false;
     };
-
-    listener: ActiveWinListener = async result => {
-        // Because we await something here, and
-        // this method is call at an interval, there are chances
-        // that we run call the method before last call is done;
-        // I use a lock to avoid that.
-        if (this.lock) {
-            // TODO raise warning
-            return;
-        }
-
-        this.lock = true;
-        const now = new Date().getTime();
-        const appName = result.owner.name;
-        if (this.lastUsingApp && appName !== this.lastUsingApp) {
-            this.onSwitchApp(this.lastUsingApp);
-        }
-
-        if (!(appName in this.record.apps)) {
-            this.record.apps[appName] = {
-                appName,
-                spentTimeInHour: 0,
-                titleSpentTime: {},
-                switchTimes: 0,
-                screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0,
-                lastUpdateTime: now
-            };
-        }
-
-        this.lastUsingApp = appName;
-        const appRow = this.record.apps[appName];
-        appRow.titleSpentTime[result.title] = 1;
-        this.onUpdateApp(appName);
-        if (this.screenShotInterval && this.lastScreenShotTime + this.screenShotInterval < now) {
-            const duration = this.lastScreenShotTime;
-            this.lastScreenShotTime = now;
-            const canvas = await getScreen().catch(err => undefined);
-            if (!canvas) {
-                throw new Error();
-            }
-
-            if (this.lastScreenShot) {
-                if (this.didScreenShotChange(canvas)) {
-                } else {
-                    if (appRow.screenStaticDuration !== undefined) {
-                        appRow.screenStaticDuration += duration;
-                    } else {
-                        throw new Error();
-                    }
-                }
-            }
-        }
-
-        this.monitorListener(this.record);
-        this.lock = false;
-    };
 }
 
 export class Monitor {
     recorder: UsageRecorder;
     monitorInterval: number;
     screenShotInterval?: number;
-
-    private winMonitor?: WindowMonitor;
+    private winMonitor: WindowMonitor;
 
     constructor(
         monitorListener: (data: PomodoroRecord) => void,
@@ -168,22 +215,37 @@ export class Monitor {
         this.monitorInterval = monitorInterval;
         this.screenShotInterval = screenShotInterval;
         this.recorder = new UsageRecorder(monitorListener, this.screenShotInterval);
+        this.winMonitor = new WindowMonitor(this.recorder.listener, this.monitorInterval);
     }
 
     start = () => {
-        if (this.winMonitor && this.winMonitor.isRunning) {
+        if (this.winMonitor.isRunning) {
             return;
         }
 
-        this.winMonitor = new WindowMonitor(this.recorder.listener, this.monitorInterval);
+        this.recorder.start();
         this.winMonitor.start();
     };
 
     stop = () => {
+        this.winMonitor.stop();
+        this.recorder.stop();
+    };
+
+    /**
+     * Clear the data of current session
+     */
+    clear = () => {
         if (this.winMonitor) {
             this.winMonitor.stop();
         }
+
+        this.recorder.clear();
     };
+
+    get sessionData() {
+        return this.recorder.sessionData;
+    }
 }
 
 /**

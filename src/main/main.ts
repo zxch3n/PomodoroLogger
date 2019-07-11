@@ -2,11 +2,9 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
-import { Monitor } from './activeWinMonitor';
 
-const mGlobal: typeof global & { sharedDB?: typeof db; sharedMonitor?: typeof Monitor } = global;
+const mGlobal: typeof global & { sharedDB?: typeof db } = global;
 mGlobal.sharedDB = db;
-mGlobal.sharedMonitor = Monitor;
 let win: BrowserWindow | null;
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
@@ -23,7 +21,10 @@ const createWindow = async () => {
         await installExtensions();
     }
 
-    win = new BrowserWindow({ width: 800, height: 600 });
+    win = new BrowserWindow({
+        width: 800,
+        height: 600
+    });
 
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';

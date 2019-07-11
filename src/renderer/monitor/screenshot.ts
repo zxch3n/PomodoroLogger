@@ -3,17 +3,17 @@ import { remote, screen } from 'electron';
 const currentWindow = remote.getCurrentWindow();
 const getCurrentScreen = () => {
     const { x, y } = currentWindow.getBounds();
-    return screen.getAllDisplays().filter(d => d.bounds.x === x && d.bounds.y === y)[0];
-};
-
-const isCursorInCurrentWindow = () => {
-    const { x, y } = screen.getCursorScreenPoint();
-    const { x: winX, y: winY, width, height } = currentWindow.getBounds();
-    return x >= winX && x <= winX + width && y >= winY && y <= winY + height;
+    return screen.getAllDisplays().filter(d => {
+        return (
+            x <= d.bounds.x + d.bounds.width &&
+            x >= d.bounds.x &&
+            y <= d.bounds.y + d.bounds.height &&
+            y >= d.bounds.y
+        );
+    })[0];
 };
 
 const curScreen = getCurrentScreen();
-
 function getScreenCallback(
     maxSize: number,
     callback: (err?: Error, canvas?: HTMLCanvasElement) => void
@@ -56,25 +56,21 @@ function getScreenCallback(
         document.body.appendChild(video);
     };
 
-    console.log('define error');
     const handleError = (e: Error) => {
         console.error(e);
         callback(e);
     };
 
     if (require('os').platform() === 'win32') {
-        console.log('win32');
         require('electron').desktopCapturer.getSources(
             {
                 types: ['screen'],
                 thumbnailSize: { width: 1, height: 1 }
             },
             (e: any, sources: any) => {
-                console.log('get sources');
                 const selectSource = sources.filter(
                     (source: any) => source.display_id + '' === curScreen.id + ''
                 )[0];
-                console.log(selectSource);
                 navigator.getUserMedia(
                     {
                         audio: false,
@@ -98,7 +94,6 @@ function getScreenCallback(
             }
         );
     } else {
-        console.log('no win32');
         navigator.getUserMedia(
             {
                 audio: false,
@@ -123,15 +118,26 @@ function getScreenCallback(
 }
 
 export async function getScreen(
-    timeout: number = 200,
+    timeout: number = 500,
     maxSize: number = 10
 ): Promise<HTMLCanvasElement> {
     return await new Promise((resolve, reject) => {
+        let finished = false;
         getScreenCallback(maxSize, (err, canvas) => {
-            if (err) reject(err);
-            else resolve(canvas);
+            if (err) {
+                reject(err);
+            } else if (!finished) {
+                finished = true;
+                resolve(canvas);
+            }
         });
 
-        setTimeout(reject, timeout);
+        setTimeout(() => {
+            if (!finished) {
+                finished = true;
+                console.log('timeout... reject screen shot');
+                reject();
+            }
+        }, timeout);
     });
 }
