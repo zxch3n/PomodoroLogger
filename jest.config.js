@@ -17,5 +17,5 @@ const common = {
 
 module.exports = {
     ...common,
-    testMatch: ['**/*.(spec|test).[jt]s?(x)']
+    testMatch: ['**/*.(spec|test).[jt]s?(x)'],
 };

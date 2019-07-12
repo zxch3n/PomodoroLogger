@@ -97,6 +97,8 @@ class Timer extends Component<Props> {
         if (this.monitor) {
             this.monitor.start();
         }
+
+        this.updateLeftTime();
     };
 
     onClear = () => {
@@ -128,7 +130,9 @@ class Timer extends Component<Props> {
                 <Button onClick={this.onStart} id="start-timer-button">
                     Start
                 </Button>
-                <Button onClick={this.onClear}>Clear</Button>
+                <Button onClick={this.onClear} id="clear-timer-button">
+                    Clear
+                </Button>
                 <FocusSelector {...this.props} />
             </div>
         );

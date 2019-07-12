@@ -37,13 +37,13 @@ export const setProject = createActionCreator('[Timer]SET_PROJECT', resolve => (
 );
 
 export const actions = {
-    startTimer,
     stopTimer,
     continueTimer,
     clearTimer,
     setFocusDuration,
     setRestDuration,
     setProject,
+    startTimer,
     timerFinished: (sessionData?: PomodoroRecord) => (dispatch: Dispatch) => {
         dispatch(timerFinished());
         // TODO: save sessionData to DB

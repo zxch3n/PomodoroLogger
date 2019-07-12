@@ -6,17 +6,24 @@ jest.setTimeout(20000);
 describe('Main Window', () => {
     let app: Application;
 
-    beforeEach(() => {
+    beforeAll(async () => {
         app = new Application({
             path: electron.toString(),
-            args: [path.join(__dirname, '..', '..')]
-            // requireName: 'electronRequire'
+            args: [path.join(__dirname, '..', '..')],
+            env: {
+                ELECTRON_ENABLE_LOGGING: 1
+            }
         });
 
-        return app.start();
+        await app.start();
+        app.client.getMainProcessLogs().then(logs => {
+            logs.forEach(log => {
+                console.log(log);
+            });
+        });
     });
 
-    afterEach(() => {
+    afterAll(() => {
         if (app.isRunning()) {
             return app.stop();
         }
@@ -28,14 +35,19 @@ describe('Main Window', () => {
         await client.waitUntilWindowLoaded();
         const title = await browserWindow.getTitle();
 
-        expect(title).toBe('Time Logger');
+        expect(title).toBe('Time-Logger');
     });
 
     it('has a timer', async () => {
         const { client } = app;
         await client.waitUntilWindowLoaded();
-        await client.click('#start-timer-button');
+        await client.$('#start-timer-button').click();
         const text = await client.getText('#left-time-text');
-        expect(text).toBe('24:59');
+        expect(text).toBe('25:00');
+        await new Promise(resolve => {
+            setTimeout(() => {
+                expect(text).toBe('24:59');
+            }, 1000);
+        });
     });
 });

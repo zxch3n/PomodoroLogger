@@ -5,12 +5,11 @@ import * as db from './db';
 
 const mGlobal: typeof global & { sharedDB?: typeof db } = global;
 mGlobal.sharedDB = db;
-let win: BrowserWindow | null;
+let win: BrowserWindow | undefined;
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
     const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-
     return Promise.all(
         extensions.map(name => installer.default(installer[name], forceDownload))
     ).catch(console.log);
@@ -22,14 +21,16 @@ const createWindow = async () => {
     }
 
     win = new BrowserWindow({
-        width: 800,
+        width: 900,
         height: 600
     });
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV === 'development') {
+        console.log('dev url');
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
         win.loadURL(`http://localhost:2003`);
     } else {
+        console.log('file');
         win.loadURL(
             url.format({
                 pathname: path.join(__dirname, 'index.html'),
@@ -47,7 +48,7 @@ const createWindow = async () => {
     }
 
     win.on('closed', () => {
-        win = null;
+        win = undefined;
     });
 };
 
@@ -60,7 +61,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-    if (win === null) {
+    if (!win) {
         createWindow();
     }
 });
