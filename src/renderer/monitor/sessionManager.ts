@@ -36,7 +36,7 @@ function consistencyCheck(record: PomodoroRecord) {
 
         // @ts-ignore
         if (Math.abs(aggFromApp - record[fieldName]) > 1e-6) {
-            console.warn('Duration info not consists');
+            console.warn(`${fieldName} info does not add up`);
             // @ts-ignore
             record[fieldName] = aggFromApp;
         }

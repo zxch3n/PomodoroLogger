@@ -48,7 +48,7 @@ export const reducer = createReducer<HistoryState, any>(defaultState, handle => 
         const newState: HistoryState = { records: state.records.concat() };
         let i;
         for (i = 0; i < state.records.length; i += 1) {
-            if (state.records[i].projectId === payload.projectId) {
+            if (state.records[i].startTime === payload.startTime) {
                 newState.records.splice(i, 1);
                 break;
             }
