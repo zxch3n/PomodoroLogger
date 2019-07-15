@@ -9,6 +9,9 @@ export interface TimerState {
     isFocusing: boolean;
     isRunning: boolean;
     project?: string;
+
+    monitorInterval: number;
+    screenShotInterval?: number;
 }
 
 export const defaultState: TimerState = {
@@ -16,7 +19,10 @@ export const defaultState: TimerState = {
     focusDuration: 25 * 60,
     restDuration: 5 * 60,
     isRunning: true,
-    isFocusing: true
+    isFocusing: true,
+
+    monitorInterval: 1000,
+    screenShotInterval: 5000
 };
 
 export const startTimer = createActionCreator('[Timer]START_TIMER');
@@ -35,6 +41,14 @@ export const setRestDuration = createActionCreator(
 export const setProject = createActionCreator('[Timer]SET_PROJECT', resolve => (project: string) =>
     resolve(project)
 );
+export const setMonitorInterval = createActionCreator(
+    '[Timer]SET_MONITOR_INTERVAL',
+    resolve => (interval: number) => resolve(interval)
+);
+export const setScreenShotInterval = createActionCreator(
+    '[Timer]SET_SCREEN_SHOT_INTERVAL',
+    resolve => (interval: number) => resolve(interval)
+);
 
 export const actions = {
     stopTimer,
@@ -44,12 +58,14 @@ export const actions = {
     setRestDuration,
     setProject,
     startTimer,
+    setMonitorInterval,
     timerFinished: (sessionData?: PomodoroRecord) => (dispatch: Dispatch) => {
         dispatch(timerFinished());
         // TODO: save sessionData to DB
     }
 };
 
+export type ActionCreatorTypes = { [key in keyof typeof actions]: typeof actions[key] };
 export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(startTimer, (state: TimerState) => {
         const duration: number = state.isFocusing ? state.focusDuration : state.restDuration;
@@ -83,5 +99,12 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(setRestDuration, (state, { payload }) =>
         // Project: persistence
         ({ ...state, restDuration: payload })
-    )
+    ),
+
+    handle(setMonitorInterval, (state, { payload }) => ({ ...state, monitorInterval: payload })),
+
+    handle(setScreenShotInterval, (state, { payload }) => ({
+        ...state,
+        screenShotInterval: payload
+    }))
 ]);

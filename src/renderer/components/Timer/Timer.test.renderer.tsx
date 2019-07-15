@@ -2,6 +2,7 @@ import React from 'react';
 import Timer, { Props as TimerProps } from './Timer';
 import renderer from 'react-test-renderer';
 import { cloneDeep } from 'lodash';
+import { unwatchFile } from 'fs';
 
 jest.setTimeout(10000);
 const defaultProps: TimerProps = {
@@ -22,7 +23,10 @@ const defaultProps: TimerProps = {
         isRunning: true,
         project: undefined,
         restDuration: 30,
-        focusDuration: 30
+        focusDuration: 30,
+
+        monitorInterval: 1000,
+        screenShotInterval: undefined
     },
     addItem: title => async dispatch => undefined,
     fetchAll: () => dispatch => dispatch,

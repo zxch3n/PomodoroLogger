@@ -21,13 +21,7 @@
         "jsx-equals-spacing": [true, "never"],
         "jsx-no-string-ref": true,
         "jsx-self-close": true,
-        "import-name": [true, {
-            "lodash": "_",
-            "lodash/fp": "_",
-            "styled-components": "styled",
-            "reactTestRenderer": "renderer",
-            "react": "React"
-        }],
+        "import-name": false,
         "prefer-template": false
     },
     "rulesDirectory": []
