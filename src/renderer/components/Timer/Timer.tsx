@@ -3,7 +3,8 @@ import { Button } from 'antd';
 import { ActionCreatorTypes } from '../TODO/action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
-import { Monitor, PomodoroRecord } from '../../monitor';
+import { ApplicationSpentTime, Monitor, PomodoroRecord } from '../../monitor';
+import { UsagePieChart } from './UsagePieChart';
 
 interface BasicProps {
     startTimer: () => any;
@@ -26,26 +27,41 @@ function to2digits(num: number) {
 }
 
 class Timer extends Component<Props> {
-    state: { leftTime: string };
+    state: {
+        leftTime: string;
+        screenShotUrl?: string;
+        apps: { [appName: string]: ApplicationSpentTime };
+        currentAppName?: string;
+    };
     interval?: any;
     monitor?: Monitor;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            leftTime: '00:00'
+            leftTime: '00:00',
+            apps: {},
+            screenShotUrl: undefined
         };
     }
 
-    activeWinListener = (data: PomodoroRecord) => {
+    activeWinListener = (appName: string, data: PomodoroRecord, imgUrl?: string) => {
         // TODO:
         console.log(data);
+        if (imgUrl) {
+            this.setState({ screenShotUrl: imgUrl });
+        }
+
+        this.setState({
+            apps: data.apps,
+            currentAppName: appName
+        });
     };
 
     componentDidMount(): void {
         this.interval = setInterval(this.updateLeftTime, 200);
         this.updateLeftTime();
-        this.monitor = new Monitor(this.activeWinListener, 1000, undefined);
+        this.monitor = new Monitor(this.activeWinListener, 1000, 5000);
     }
 
     componentWillUnmount(): void {
@@ -87,7 +103,7 @@ class Timer extends Component<Props> {
         } else {
             this.props.continueTimer();
             if (this.monitor) {
-                this.monitor.start();
+                this.monitor.resume();
             }
         }
     };
@@ -101,21 +117,42 @@ class Timer extends Component<Props> {
         this.updateLeftTime();
     };
 
+    private clearStat = () => {
+        this.setState({
+            apps: {},
+            currentAppName: undefined,
+            screenShotUrl: undefined,
+            leftTime: '00:00'
+        });
+    };
+
     onClear = () => {
         this.props.clearTimer();
         if (this.monitor) {
             this.monitor.stop();
             this.monitor.clear();
         }
+
+        this.clearStat();
     };
 
     onDone = () => {
-        if (this.monitor) {
-            this.monitor.stop();
-            this.props.timerFinished(this.monitor.sessionData);
+        if (this.props.timer.isFocusing) {
+            if (this.monitor) {
+                // TODO: Alert user?
+                this.monitor.stop();
+                this.props.timerFinished(this.monitor.sessionData);
+            }
         } else {
+            if (this.monitor) {
+                // TODO: Alert user?
+                this.monitor.start();
+            }
+
             this.props.timerFinished();
         }
+
+        this.clearStat();
     };
 
     render() {
@@ -134,6 +171,20 @@ class Timer extends Component<Props> {
                     Clear
                 </Button>
                 <FocusSelector {...this.props} />
+                <br />
+                <p>Screen Shot</p>
+                <img src={this.state.screenShotUrl} height={100} width={100} />
+
+                <span id="current-using-app-name">{this.state.currentAppName}</span>
+
+                <UsagePieChart
+                    rows={Object.values(this.state.apps).map(row => ({
+                        name: row.appName,
+                        value: row.spentTimeInHour * 60
+                    }))}
+                    unit={'Min'}
+                    size={100}
+                />
             </div>
         );
     }

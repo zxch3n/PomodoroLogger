@@ -3,6 +3,7 @@ import { getScreen } from './screenshot';
 import { BaseResult } from 'active-win';
 
 // This module may not be available in electron renderer
+type Listener = (appName: string, data: PomodoroRecord, imgUrl?: string) => void;
 class UsageRecorder {
     private record: PomodoroRecord;
     private readonly screenShotInterval?: number;
@@ -11,14 +12,16 @@ class UsageRecorder {
     private lock: boolean = false;
 
     private lastScreenShot?: ImageData;
-    private readonly monitorListener: (data: PomodoroRecord) => void;
+    private lastScreenShotUrl?: string;
+    private readonly monitorListener: Listener;
 
-    constructor(monitorListener: (data: PomodoroRecord) => void, screenShotInterval?: number) {
+    constructor(monitorListener: Listener, screenShotInterval?: number) {
         this.record = {
             apps: {},
-            durationInHour: 0,
+            spentTimeInHour: 0,
             switchTimes: 0,
-            screenStaticDuration: screenShotInterval === undefined ? undefined : 0
+            screenStaticDuration: screenShotInterval === undefined ? undefined : 0,
+            startTime: 0
         };
 
         this.screenShotInterval = screenShotInterval;
@@ -32,13 +35,18 @@ class UsageRecorder {
     clear = () => {
         this.record = {
             apps: {},
-            durationInHour: 0,
+            spentTimeInHour: 0,
             switchTimes: 0,
-            screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0
+            screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0,
+            startTime: 0
         };
     };
 
-    start = () => {};
+    start = () => {
+        this.record.startTime = new Date().getTime();
+    };
+
+    resume = () => {};
 
     stop = () => {
         // TODO: test to make sure this is invoked
@@ -86,7 +94,7 @@ class UsageRecorder {
             this.lock = false;
             throw err;
         });
-        this.monitorListener(this.record);
+        this.monitorListener(appName, this.record, this.lastScreenShotUrl);
         this.lock = false;
     };
 
@@ -101,7 +109,7 @@ class UsageRecorder {
         if (row.lastUpdateTime) {
             const spentTimeInHour = (new Date().getTime() - row.lastUpdateTime) / 1000 / 3600;
             row.spentTimeInHour += spentTimeInHour;
-            this.record.durationInHour += spentTimeInHour;
+            this.record.spentTimeInHour += spentTimeInHour;
             row.lastUpdateTime = undefined;
         }
 
@@ -122,7 +130,7 @@ class UsageRecorder {
         if (row.lastUpdateTime) {
             const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
             row.spentTimeInHour += spentTimeInHour;
-            this.record.durationInHour += spentTimeInHour;
+            this.record.spentTimeInHour += spentTimeInHour;
         }
 
         row.lastUpdateTime = now;
@@ -165,6 +173,7 @@ class UsageRecorder {
             }
 
             this.lastScreenShot = newScreenShot;
+            this.lastScreenShotUrl = canvas.toDataURL('image/png');
         }
     };
 
@@ -204,7 +213,7 @@ export class Monitor {
     private winMonitor: WindowMonitor;
 
     constructor(
-        monitorListener: (data: PomodoroRecord) => void,
+        monitorListener: Listener,
         monitorInterval: number = 500,
         screenShotInterval: number | undefined = undefined
     ) {
@@ -224,6 +233,15 @@ export class Monitor {
         }
 
         this.recorder.start();
+        this.winMonitor.start();
+    };
+
+    resume = () => {
+        if (this.winMonitor.isRunning) {
+            return;
+        }
+
+        this.recorder.resume();
         this.winMonitor.start();
     };
 
@@ -252,7 +270,7 @@ export class Monitor {
  * Aggregated application spent time in a session
  *
  */
-interface ApplicationSpentTime {
+export interface ApplicationSpentTime {
     appName: string;
     spentTimeInHour: number;
     titleSpentTime: { [title: string]: number };
@@ -267,7 +285,10 @@ export interface PomodoroRecord {
     apps: {
         [appName: string]: ApplicationSpentTime;
     };
-    durationInHour: number;
+    spentTimeInHour: number;
     switchTimes: number;
+    startTime: number;
     screenStaticDuration?: number;
+    todoId?: string;
+    projectId?: string;
 }

@@ -1,16 +1,19 @@
 import { hot } from 'react-hot-loader/root';
 import * as React from 'react';
-import "antd/dist/antd.css"
-
+import 'antd/dist/antd.css';
 import Timer from './Timer';
 import TODO from './TODO';
+import styledComponents from 'styled-components';
+
+const Main = styled.div`
+    padding: 10px;
+`;
 
 const Application = () => (
-    <div>
-        <Timer/>
-        <TODO/>
-    </div>
-        
+    <Main>
+        <Timer />
+        <TODO />
+    </Main>
 );
 
 export default hot(Application);

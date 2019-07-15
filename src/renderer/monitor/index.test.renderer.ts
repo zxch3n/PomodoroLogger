@@ -4,7 +4,7 @@ describe('Monitor', () => {
     it('calls the listener', done => {
         let times = 0;
         const monitor = new Monitor(
-            data => {
+            (name, data, url) => {
                 expect(data).toHaveProperty('apps');
                 expect(Object.keys(data.apps).length).toBeGreaterThanOrEqual(1);
                 console.log(JSON.stringify(data));

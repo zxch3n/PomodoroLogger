@@ -119,7 +119,7 @@ function getScreenCallback(
 
 export async function getScreen(
     timeout: number = 500,
-    maxSize: number = 10
+    maxSize: number = 16
 ): Promise<HTMLCanvasElement> {
     return await new Promise((resolve, reject) => {
         let finished = false;

@@ -1,8 +1,8 @@
 import { remote } from 'electron';
-import { projectDB } from '../main/db';
+import { projectDB, sessionDB } from '../main/db';
 import nedb from 'nedb';
 
-type dbTypes = 'projectDB';
+type dbTypes = 'projectDB' | 'sessionDB';
 let dbs: { [key in dbTypes]: nedb };
 if (remote) {
     dbs = remote.getGlobal('sharedDB');
@@ -11,7 +11,8 @@ if (remote) {
 // @ts-ignore
 if (!dbs) {
     dbs = {
-        projectDB
+        projectDB,
+        sessionDB
     };
 }
 
