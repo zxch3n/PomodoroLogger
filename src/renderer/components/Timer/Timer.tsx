@@ -4,7 +4,7 @@ import { ActionCreatorTypes } from '../TODO/action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { ApplicationSpentTime, Monitor, PomodoroRecord } from '../../monitor';
-import { UsagePieChart } from './UsagePieChart';
+import { UsagePieChart } from '../Visualization/UsagePieChart';
 
 interface BasicProps {
     startTimer: () => any;
