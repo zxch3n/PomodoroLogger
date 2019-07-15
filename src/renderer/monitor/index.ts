@@ -210,7 +210,7 @@ export class Monitor {
     recorder: UsageRecorder;
     monitorInterval: number;
     screenShotInterval?: number;
-    private winMonitor: WindowMonitor;
+    winMonitor: WindowMonitor;
 
     constructor(
         monitorListener: Listener,
