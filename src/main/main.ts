@@ -23,7 +23,7 @@ const createWindow = async () => {
     win = new BrowserWindow({
         width: 800,
         height: 600,
-        frame: false
+        frame: true
     });
 
     if (process.env.NODE_ENV === 'development') {

@@ -124,7 +124,6 @@ class Timer extends Component<Props, State> {
         const timeSpan = targetTime - now;
         const sec = Math.floor(timeSpan / 1000 + 0.5);
         if (sec < 0) {
-            this.setState({ leftTime: '00:00' });
             this.onDone();
             return;
         }
