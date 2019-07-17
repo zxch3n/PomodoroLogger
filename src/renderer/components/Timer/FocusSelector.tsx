@@ -42,10 +42,13 @@ export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
     return (
         <TreeSelect
             value={value}
-            style={{ minWidth: 300 }}
+            style={{
+                minWidth: 300,
+                width: '100%'
+            }}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
             treeData={tree}
-            placeholder="Please Select Focus"
+            placeholder="Choose Your Focus"
             treeDefaultExpandAll={true}
             onChange={onChange}
         />

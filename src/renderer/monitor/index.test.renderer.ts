@@ -8,7 +8,6 @@ describe('Monitor', () => {
                 expect(url).toBeUndefined();
                 expect(data).toHaveProperty('apps');
                 expect(Object.keys(data.apps).length).toBeGreaterThanOrEqual(1);
-                console.log(JSON.stringify(data));
                 times += 1;
                 if (times >= 3) {
                     done();

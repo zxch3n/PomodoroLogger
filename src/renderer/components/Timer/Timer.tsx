@@ -1,10 +1,46 @@
 import React, { Component } from 'react';
-import { Button } from 'antd';
+import { Button, Divider, Icon, Progress } from 'antd';
 import { ActionCreatorTypes } from '../TODO/action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { ApplicationSpentTime, Monitor, PomodoroRecord } from '../../monitor';
 import { UsagePieChart } from '../Visualization/UsagePieChart';
+import styled from 'styled-components';
+import { remote } from 'electron';
+
+const Layout = styled.div`
+    max-width: 400px;
+    margin: 10px auto;
+`;
+
+const ProgressContainer = styled.div`
+    width: 100%;
+    display: block;
+    position: relative;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+`;
+
+const ButtonRow = styled.div`
+    width: 100%;
+    max-width: 200px;
+    display: flex;
+    justify-content: space-around;
+    font-size: 32px;
+    margin: 0px auto 22px auto;
+    color: darkslategray;
+
+    i {
+        transition: transform 0.2s;
+    }
+
+    i:hover {
+        transform: scale(1.2);
+    }
+`;
+
+const MoreInfo = styled.div``;
 
 interface BasicProps {
     startTimer: () => any;
@@ -26,13 +62,16 @@ function to2digits(num: number) {
     return num;
 }
 
-class Timer extends Component<Props> {
-    state: {
-        leftTime: string;
-        screenShotUrl?: string;
-        apps: { [appName: string]: ApplicationSpentTime };
-        currentAppName?: string;
-    };
+interface State {
+    leftTime: string;
+    screenShotUrl?: string;
+    apps: { [appName: string]: ApplicationSpentTime };
+    currentAppName?: string;
+    percent: number;
+    more: boolean;
+}
+
+class Timer extends Component<Props, State> {
     interval?: any;
     monitor?: Monitor;
 
@@ -40,14 +79,14 @@ class Timer extends Component<Props> {
         super(props);
         this.state = {
             leftTime: '00:00',
+            percent: 0,
             apps: {},
-            screenShotUrl: undefined
+            screenShotUrl: undefined,
+            more: false
         };
     }
 
     activeWinListener = (appName: string, data: PomodoroRecord, imgUrl?: string) => {
-        // TODO:
-        console.log(data);
         if (imgUrl) {
             this.setState({ screenShotUrl: imgUrl });
         }
@@ -91,10 +130,21 @@ class Timer extends Component<Props> {
         }
 
         const leftTime = `${to2digits(Math.floor(sec / 60))}:${to2digits(sec % 60)}`;
-        this.setState({ leftTime });
+        const percent =
+            timeSpan /
+            60 /
+            1000 /
+            (this.props.timer.isFocusing
+                ? this.props.timer.focusDuration
+                : this.props.timer.restDuration);
+        this.setState({ leftTime, percent });
     };
 
-    onStopOrResume = () => {
+    onStopResumeOrStart = () => {
+        if (this.state.percent === 0) {
+            return this.onStart();
+        }
+
         if (this.props.timer.isRunning) {
             this.props.stopTimer();
             if (this.monitor) {
@@ -122,7 +172,8 @@ class Timer extends Component<Props> {
             apps: {},
             currentAppName: undefined,
             screenShotUrl: undefined,
-            leftTime: '00:00'
+            leftTime: '00:00',
+            percent: 0
         });
     };
 
@@ -155,37 +206,88 @@ class Timer extends Component<Props> {
         this.clearStat();
     };
 
+    toggleMore = () => {
+        this.setState(state => {
+            // TODO: need better control
+            const more = !state.more;
+            const win = remote.getCurrentWindow();
+            const [w, h] = win.getSize();
+            if (more) {
+                win.setSize(w, h + 300, true);
+            } else {
+                win.setSize(w, h - 300, true);
+            }
+
+            return { more };
+        });
+    };
+
+    progressFormat = () => this.state.leftTime;
+
     render() {
-        const { leftTime } = this.state;
+        const { leftTime, percent, more } = this.state;
+        const { isRunning } = this.props.timer;
 
         return (
-            <div>
-                <span id="left-time-text">{leftTime}</span>
-                <Button onClick={this.onStopOrResume} id="stop-timer-button">
-                    {this.props.timer.isRunning ? 'Stop' : 'Continue'}
-                </Button>
-                <Button onClick={this.onStart} id="start-timer-button">
-                    Start
-                </Button>
-                <Button onClick={this.onClear} id="clear-timer-button">
-                    Clear
-                </Button>
+            <Layout>
+                <ProgressContainer>
+                    <Progress
+                        type="circle"
+                        strokeColor={{
+                            '0%': '#108ee9',
+                            '100%': '#87d068'
+                        }}
+                        percent={percent}
+                        format={this.progressFormat}
+                        width={300}
+                        style={{
+                            margin: '0 auto'
+                        }}
+                    />
+                    <span style={{ display: 'none' }} id="left-time-text">
+                        {leftTime}
+                    </span>
+                </ProgressContainer>
+
+                <ButtonRow>
+                    {isRunning ? (
+                        <Icon
+                            type="pause-circle"
+                            title="Pause"
+                            onClick={this.onStopResumeOrStart}
+                        />
+                    ) : (
+                        <Icon type="play-circle" title="Start" onClick={this.onStopResumeOrStart} />
+                    )}
+                    <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                    <Icon type="more" title="Show More" onClick={this.toggleMore} />
+                </ButtonRow>
+
                 <FocusSelector {...this.props} />
-                <br />
-                <p>Screen Shot</p>
-                <img src={this.state.screenShotUrl} height={100} width={100} />
 
-                <span id="current-using-app-name">{this.state.currentAppName}</span>
+                <MoreInfo
+                    style={{
+                        display: more ? 'block' : 'none',
+                        margin: '10px auto'
+                    }}
+                >
+                    <h2>Screen Shot</h2>
+                    <img src={this.state.screenShotUrl} height={100} width={100} />
+                    <p id="current-using-app-name">{this.state.currentAppName}</p>
 
-                <UsagePieChart
-                    rows={Object.values(this.state.apps).map(row => ({
-                        name: row.appName,
-                        value: row.spentTimeInHour * 60
-                    }))}
-                    unit={'Min'}
-                    size={100}
-                />
-            </div>
+                    <Divider />
+
+                    <h2>Application Usage</h2>
+                    <UsagePieChart
+                        rows={Object.values(this.state.apps).map(row => ({
+                            name: row.appName,
+                            value: row.spentTimeInHour * 60
+                        }))}
+                        unit={'Min'}
+                        size={100}
+                    />
+                </MoreInfo>
+            </Layout>
         );
     }
 }

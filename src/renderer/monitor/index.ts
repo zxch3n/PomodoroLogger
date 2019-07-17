@@ -77,7 +77,6 @@ class UsageRecorder {
             return;
         }
 
-        console.log(appName, this.record.apps[appName]);
         this.lock = true;
         if (!(appName in this.record.apps)) {
             this.record.apps[appName] = {

@@ -19,7 +19,7 @@ export const defaultState: TimerState = {
     targetTime: undefined,
     focusDuration: 25 * 60,
     restDuration: 5 * 60,
-    isRunning: true,
+    isRunning: false,
     isFocusing: true,
 
     monitorInterval: 1000,

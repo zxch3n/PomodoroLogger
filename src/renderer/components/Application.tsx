@@ -12,7 +12,6 @@ const Main = styled.div`
 const Application = () => (
     <Main>
         <Timer />
-        <TODO />
     </Main>
 );
 
