@@ -31,10 +31,18 @@ module.exports = merge.smart(baseConfig, {
                     ]
                 }
             },
-            // {
-            //     test: /\.node$/,
-            //     loader: "native-ext-loader"
-            // }
+            {
+                test: /\.(gif|png|jpe?g)$/,
+                use: [
+                    'file-loader',
+                    {
+                        loader: 'image-webpack-loader',
+                        options: {
+                            disable: true
+                        }
+                    }
+                ]
+            },
         ]
     },
     plugins: [

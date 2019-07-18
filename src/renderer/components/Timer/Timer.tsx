@@ -1,12 +1,23 @@
-import React, { Component } from 'react';
-import { Button, Divider, Icon, Progress } from 'antd';
-import { ActionCreatorTypes } from '../TODO/action';
+import React, { Component, Fragment } from 'react';
+import { Divider, Icon, Progress } from 'antd';
+import { ActionCreatorTypes as TodoActionTypes } from '../TODO/action';
+import { ActionCreatorTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { ApplicationSpentTime, Monitor, PomodoroRecord } from '../../monitor';
 import { UsagePieChart } from '../Visualization/UsagePieChart';
 import styled from 'styled-components';
-import { remote } from 'electron';
+import { remote, nativeImage } from 'electron';
+import RestIcon from '../../../res/rest.svg';
+import WorkIcon from '../../../res/work.svg';
+import AppIcon from '../../../res/TimeLogger.png';
+import { setTrayImageWithMadeIcon } from './iconMaker';
+
+const ProgressTextContainer = styled.div`
+    padding: 12px;
+    text-align: center;
+    transform: translateY(0.3em);
+`;
 
 const Layout = styled.div`
     max-width: 400px;
@@ -42,17 +53,7 @@ const ButtonRow = styled.div`
 
 const MoreInfo = styled.div``;
 
-interface BasicProps {
-    startTimer: () => any;
-    stopTimer: () => any;
-    clearTimer: () => any;
-    timerFinished: (sessionData?: PomodoroRecord) => any;
-    continueTimer: () => any;
-    setFocusDuration: (duration: number) => any;
-    setRestDuration: (duration: number) => any;
-}
-
-export interface Props extends BasicProps, ActionCreatorTypes, RootState {}
+export interface Props extends ThisActionTypes, TodoActionTypes, RootState {}
 
 function to2digits(num: number) {
     if (num < 10) {
@@ -78,7 +79,7 @@ class Timer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            leftTime: '00:00',
+            leftTime: this.defaultLeftTime(),
             percent: 0,
             apps: {},
             screenShotUrl: undefined,
@@ -100,7 +101,11 @@ class Timer extends Component<Props, State> {
     componentDidMount(): void {
         this.interval = setInterval(this.updateLeftTime, 200);
         this.updateLeftTime();
-        this.monitor = new Monitor(this.activeWinListener, 1000, 5000);
+        this.monitor = new Monitor(
+            this.activeWinListener,
+            1000,
+            this.props.timer.screenShotInterval
+        );
     }
 
     componentWillUnmount(): void {
@@ -112,7 +117,9 @@ class Timer extends Component<Props, State> {
     updateLeftTime = () => {
         const { targetTime, isRunning } = this.props.timer;
         if (!targetTime) {
-            this.setState({ leftTime: '00:00' });
+            this.setState((_, props) => ({
+                leftTime: this.defaultLeftTime(props.timer.isFocusing)
+            }));
             return;
         }
 
@@ -130,12 +137,16 @@ class Timer extends Component<Props, State> {
 
         const leftTime = `${to2digits(Math.floor(sec / 60))}:${to2digits(sec % 60)}`;
         const percent =
+            100 -
             timeSpan /
-            60 /
-            1000 /
-            (this.props.timer.isFocusing
-                ? this.props.timer.focusDuration
-                : this.props.timer.restDuration);
+                10 /
+                (this.props.timer.isFocusing
+                    ? this.props.timer.focusDuration
+                    : this.props.timer.restDuration);
+        if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
+            setTrayImageWithMadeIcon(leftTime.slice(0, 2));
+        }
+
         this.setState({ leftTime, percent });
     };
 
@@ -166,14 +177,27 @@ class Timer extends Component<Props, State> {
         this.updateLeftTime();
     };
 
+    private defaultLeftTime = (isFocusing?: boolean) => {
+        if (isFocusing === undefined) {
+            // tslint:disable-next-line:no-parameter-reassignment
+            isFocusing = this.props.timer.isFocusing;
+        }
+
+        const duration = isFocusing
+            ? this.props.timer.focusDuration
+            : this.props.timer.restDuration;
+        return `${to2digits(duration / 60)}:00`;
+    };
+
     private clearStat = () => {
-        this.setState({
+        setTrayImageWithMadeIcon(undefined);
+        this.setState((_, props) => ({
             apps: {},
             currentAppName: undefined,
             screenShotUrl: undefined,
-            leftTime: '00:00',
+            leftTime: this.defaultLeftTime(props.timer.isFocusing),
             percent: 0
-        });
+        }));
     };
 
     onClear = () => {
@@ -189,23 +213,40 @@ class Timer extends Component<Props, State> {
     onDone = () => {
         if (this.props.timer.isFocusing) {
             if (this.monitor) {
-                // TODO: Alert user?
-                this.monitor.stop();
+                const notification = new remote.Notification({
+                    title: 'Focusing finished. Start resting.',
+                    // TODO: session info
+                    body: `Completed ${5} sessions today. \n\n`,
+                    icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
+                });
+                notification.show();
                 this.props.timerFinished(this.monitor.sessionData);
+                this.monitor.stop();
+                this.monitor.clear();
+            } else {
+                this.props.timerFinished();
             }
         } else {
-            if (this.monitor) {
-                // TODO: Alert user?
-                this.monitor.start();
-            }
-
+            const notification = new remote.Notification({
+                title: 'Focusing finished. Start resting.',
+                // TODO: session info
+                body: `Completed ${5} sessions today. \n\n`,
+                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
+            });
+            notification.show();
+            this.monitor = new Monitor(
+                this.activeWinListener,
+                1000,
+                this.props.timer.screenShotInterval
+            );
+            this.monitor.start();
             this.props.timerFinished();
         }
 
         this.clearStat();
     };
 
-    toggleMore = () => {
+    toggleMode = () => {
         this.setState(state => {
             // TODO: need better control
             const more = !state.more;
@@ -221,7 +262,24 @@ class Timer extends Component<Props, State> {
         });
     };
 
-    progressFormat = () => this.state.leftTime;
+    switchMode = () => {
+        this.props.switchFocusRestMode();
+    };
+
+    progressFormat = () => {
+        return (
+            <ProgressTextContainer>
+                <div style={{ marginBottom: 12 }}>{this.state.leftTime}</div>
+                <div style={{ fontSize: '0.6em', cursor: 'pointer' }} onClick={this.switchMode}>
+                    {this.props.timer.isFocusing ? (
+                        <Icon component={WorkIcon} />
+                    ) : (
+                        <Icon component={RestIcon} />
+                    )}
+                </div>
+            </ProgressTextContainer>
+        );
+    };
 
     render() {
         const { leftTime, percent, more } = this.state;
@@ -259,7 +317,7 @@ class Timer extends Component<Props, State> {
                         <Icon type="play-circle" title="Start" onClick={this.onStopResumeOrStart} />
                     )}
                     <Icon type="close-circle" title="Clear" onClick={this.onClear} />
-                    <Icon type="more" title="Show More" onClick={this.toggleMore} />
+                    <Icon type="more" title="Show More" onClick={this.toggleMode} />
                 </ButtonRow>
 
                 <FocusSelector {...this.props} />
@@ -271,8 +329,14 @@ class Timer extends Component<Props, State> {
                     }}
                 >
                     <h2>Screen Shot</h2>
-                    <img src={this.state.screenShotUrl} height={100} width={100} />
-                    <p id="current-using-app-name">{this.state.currentAppName}</p>
+                    {this.state.screenShotUrl ? (
+                        <Fragment>
+                            <img src={this.state.screenShotUrl} height={100} width={100} />
+                            <p id="current-using-app-name">{this.state.currentAppName}</p>
+                        </Fragment>
+                    ) : (
+                        undefined
+                    )}
 
                     <Divider />
 

@@ -66,7 +66,7 @@ export const removeItem = createActionCreator('[TODO]REMOVE_ITEM', resolve => (_
     resolve({ _id })
 );
 
-export const setProject = createActionCreator(
+export const setTodoProject = createActionCreator(
     '[TODO]SET_PROJECT',
     resolve => (_id: string, project: string) => resolve({ _id, project })
 );
@@ -160,7 +160,7 @@ export const actions = {
             }
         );
     },
-    setProject: (_id: string, project: string) => async (dispatch: Dispatch) => {
+    setTodoProject: (_id: string, project: string) => async (dispatch: Dispatch) => {
         const doc = await new Promise(resolve => {
             dbs.projectDB.update(
                 { [`todoList.${_id}`]: { $exists: true } },
@@ -177,7 +177,7 @@ export const actions = {
             {}
         );
         await update({ name: project }, { $set: { [`todoList.${_id}`]: doc } }, {});
-        dispatch(setProject(_id, project));
+        dispatch(setTodoProject(_id, project));
         // TODO: find better way
         projectActions.fetchAll();
     },
@@ -269,7 +269,7 @@ export const todoReducer = createReducer<TodoState, any>(defaultState, handle =>
 
     handle(setContent, combinedHandler),
     handle(setFinished, combinedHandler),
-    handle(setProject, combinedHandler),
+    handle(setTodoProject, combinedHandler),
     handle(setTitle, combinedHandler),
     handle(setFocus, combinedHandler),
 

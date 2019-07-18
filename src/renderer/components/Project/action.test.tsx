@@ -151,7 +151,7 @@ describe('Project thunk actionCreator', () => {
         expect(item).toBeNull();
     });
 
-    it('can setProject name', async () => {
+    it('can setTodoProject name', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
         const newName = generateRandomName();

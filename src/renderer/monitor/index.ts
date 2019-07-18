@@ -67,6 +67,7 @@ class UsageRecorder {
             return;
         }
 
+        console.log('recorder listener');
         const now = new Date().getTime();
         const appName = result ? result.owner.name : undefined;
         if (this.lastUsingApp && appName !== this.lastUsingApp) {
@@ -134,8 +135,10 @@ class UsageRecorder {
 
         row.lastUpdateTime = now;
         await this.takeCareOfScreenShot(appRow).catch(err => {
-            console.error(err);
-            throw err;
+            if (err) {
+                console.error(err);
+                throw err;
+            }
         });
         this.lastUsingApp = appName;
     };
@@ -253,10 +256,8 @@ export class Monitor {
      * Clear the data of current session
      */
     clear = () => {
-        if (this.winMonitor) {
-            this.winMonitor.stop();
-        }
-
+        this.winMonitor.stop();
+        this.recorder.stop();
         this.recorder.clear();
     };
 

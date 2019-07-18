@@ -61,6 +61,7 @@
   "include": [
     "./src",
     "./test",
-    "./mocks"
+    "./mocks",
+    "./src/res/custom.d.ts"
   ]
 }

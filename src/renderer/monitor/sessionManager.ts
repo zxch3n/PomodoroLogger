@@ -2,8 +2,8 @@ import dbs from '../dbs';
 import { PomodoroRecord } from './index';
 import { promisify } from 'util';
 
-const [find, insert, remove] = [dbs.projectDB.find, dbs.projectDB.insert, dbs.projectDB.remove].map(
-    m => promisify(m.bind(dbs.projectDB))
+const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.sessionDB.remove].map(
+    m => promisify(m.bind(dbs.sessionDB))
 );
 
 function removeRedundantField(record: PomodoroRecord): PomodoroRecord {
@@ -18,9 +18,28 @@ function removeRedundantField(record: PomodoroRecord): PomodoroRecord {
     return record;
 }
 
+function renameIllegalName(record: PomodoroRecord) {
+    for (const app in record.apps) {
+        const appRow = record.apps[app];
+        for (const title in appRow.titleSpentTime) {
+            const newTitle = title.replace(/\./g, '-,-');
+            if (title !== newTitle) {
+                appRow.titleSpentTime[newTitle] = appRow.titleSpentTime[title];
+                delete appRow.titleSpentTime[title];
+            }
+        }
+
+        const newAppName = app.replace(/\..*$/g, '');
+        if (newAppName !== app) {
+            record.apps[newAppName] = appRow;
+            delete record.apps[app];
+        }
+    }
+}
+
 function consistencyCheck(record: PomodoroRecord) {
     if (record.startTime === 0) {
-        throw new Error();
+        throw new Error('no startTime');
     }
     type field = 'switchTimes' | 'spentTimeInHour' | 'screenStaticDuration';
     function sumCheck(fieldName: field) {
@@ -49,11 +68,12 @@ function consistencyCheck(record: PomodoroRecord) {
 
 export async function addSession(record: PomodoroRecord) {
     removeRedundantField(record);
+    renameIllegalName(record);
     if (!record.projectId) {
         // TODO: invoke ML inference
     }
     consistencyCheck(record);
-    await insert(record);
+    await insert(record).catch(err => console.log(err));
 }
 
 export async function removeSession(startTime: number) {

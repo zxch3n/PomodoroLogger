@@ -5,15 +5,9 @@ import { cloneDeep } from 'lodash';
 import { unwatchFile } from 'fs';
 
 jest.setTimeout(10000);
-const defaultProps: TimerProps = {
-    startTimer: () => 0,
-    stopTimer: () => {},
-    clearTimer: () => {},
-    timerFinished: () => {},
-    continueTimer: () => {},
-    setFocusDuration: (d: number) => {},
-    setRestDuration: (d: number) => {},
 
+// @ts-ignore
+const defaultProps: TimerProps = {
     todo: {
         todoList: []
     },
@@ -27,19 +21,7 @@ const defaultProps: TimerProps = {
 
         monitorInterval: 1000,
         screenShotInterval: undefined
-    },
-    addItem: title => async dispatch => undefined,
-    fetchAll: () => dispatch => dispatch,
-    setContent: _id => async dispatch => undefined,
-    setProject: _id => async dispatch => undefined,
-    removeItem: project => dispatch => dispatch,
-    project: {
-        projectList: {}
-    },
-    setFinished: _id => dispatch => undefined,
-    // @ts-ignore
-    setFocus: _id => {},
-    setTitle: _id => dispatch => undefined
+    }
 };
 
 describe('Timer component', () => {

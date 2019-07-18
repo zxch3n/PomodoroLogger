@@ -5,7 +5,7 @@ import {
     setContent,
     setFinished,
     setFocus,
-    setProject,
+    setTodoProject,
     setTitle,
     TodoItem,
     todoReducer,
@@ -69,7 +69,7 @@ describe('Combiner Handler', () => {
     });
 
     it('can set project', () => {
-        const state: TodoState = todoReducer(defaultState, setProject('2', 'new project'));
+        const state: TodoState = todoReducer(defaultState, setTodoProject('2', 'new project'));
         expect(state.todoList[2].project).toEqual('new project');
     });
 });
@@ -195,7 +195,7 @@ describe('TODO thunk action creator', () => {
         fetchAllFunc(dispatch);
     });
 
-    it("'s setProject works", async () => {
+    it("'s setTodoProject works", async () => {
         const title = generateRandomName();
         const project = generateRandomName();
         const newProject = generateRandomName();
@@ -206,7 +206,7 @@ describe('TODO thunk action creator', () => {
             name: project
         })) as ProjectItem;
         const _id = Object.keys(projectItem.todoList)[0];
-        await executeThunkAction(actions.setProject(_id, newProject));
+        await executeThunkAction(actions.setTodoProject(_id, newProject));
         projectItem = (await promisify(dbs.projectDB.findOne.bind(dbs.projectDB))({
             name: project
         })) as ProjectItem;

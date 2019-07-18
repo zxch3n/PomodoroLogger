@@ -5,6 +5,7 @@ import { addSession } from '../../monitor/sessionManager';
 
 export interface TimerState {
     targetTime?: number;
+    leftTime?: number;
     focusDuration: number;
     restDuration: number;
     isFocusing: boolean;
@@ -48,8 +49,9 @@ export const setMonitorInterval = createActionCreator(
 );
 export const setScreenShotInterval = createActionCreator(
     '[Timer]SET_SCREEN_SHOT_INTERVAL',
-    resolve => (interval: number) => resolve(interval)
+    resolve => (interval?: number) => resolve(interval)
 );
+export const switchFocusRestMode = createActionCreator('[Timer]SWITCH_FOCUS_MODE');
 
 export const actions = {
     stopTimer,
@@ -60,12 +62,13 @@ export const actions = {
     setProject,
     startTimer,
     setMonitorInterval,
+    setScreenShotInterval,
+    switchFocusRestMode,
     timerFinished: (sessionData?: PomodoroRecord) => async (dispatch: Dispatch) => {
-        if (sessionData) {
-            await addSession(sessionData);
-        }
-
         dispatch(timerFinished());
+        if (sessionData) {
+            await addSession(sessionData).catch(err => console.error(err));
+        }
     }
 };
 
@@ -74,11 +77,23 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(startTimer, (state: TimerState) => {
         const duration: number = state.isFocusing ? state.focusDuration : state.restDuration;
         const now = new Date().getTime();
+        if (process.env.NODE_ENV !== 'production') {
+            return { ...state, isRunning: true, targetTime: now + (duration * 1000) / 60 };
+        }
+
         return { ...state, isRunning: true, targetTime: now + duration * 1000 };
     }),
 
-    handle(stopTimer, state => ({ ...state, isRunning: false })),
-    handle(continueTimer, state => ({ ...state, isRunning: true })),
+    handle(stopTimer, state => ({
+        ...state,
+        isRunning: false,
+        leftTime: state.targetTime ? state.targetTime - new Date().getTime() : undefined
+    })),
+    handle(continueTimer, state => ({
+        ...state,
+        isRunning: true,
+        targetTime: state.leftTime ? new Date().getTime() + state.leftTime : state.targetTime
+    })),
     handle(clearTimer, state => ({ ...state, isRunning: false, targetTime: undefined })),
     handle(timerFinished, (state: TimerState) => {
         if (!state.isRunning) {
@@ -87,6 +102,15 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
 
         const now = new Date().getTime();
         const duration = state.isFocusing ? state.restDuration : state.focusDuration;
+        if (process.env.NODE_ENV !== 'production') {
+            return {
+                ...state,
+                isRunning: true,
+                targetTime: now + (duration * 1000) / 60,
+                isFocusing: !state.isFocusing
+            };
+        }
+
         return {
             ...state,
             isRunning: true,
@@ -110,5 +134,10 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(setScreenShotInterval, (state, { payload }) => ({
         ...state,
         screenShotInterval: payload
+    })),
+
+    handle(switchFocusRestMode, state => ({
+        ...state,
+        isFocusing: !state.isFocusing
     }))
 ]);

@@ -41,13 +41,27 @@ module.exports = merge.smart(baseConfig, {
                 loaders: ['style-loader', 'css-loader']
             },
             {
-                test: /\.(gif|png|jpe?g|svg)$/,
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
                 use: [
-                    'file-loader',
                     {
-                        loader: 'image-webpack-loader',
+                        loader: 'babel-loader',
+                    },
+                    {
+                        loader: '@svgr/webpack',
                         options: {
-                            disable: true
+                            babel: true,
+                            icon: true,
+                        },
+                    },
+                ],
+            },
+            {
+                test: /\.(gif|png|jpe?g)$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            limit: 8192
                         }
                     }
                 ]

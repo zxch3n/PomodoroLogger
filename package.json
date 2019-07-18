@@ -38,7 +38,7 @@
   },
   "build": {
     "productName": "TimeLogger",
-    "appId": "org.your.productname",
+    "appId": "com.electron.time-logger",
     "mac": {
       "category": "your.app.category.type"
     },
@@ -54,11 +54,7 @@
       "target": "deb"
     },
     "win": {
-      "target": "nsis",
-      "arch": [
-        "x64",
-        "ia32"
-      ]
+      "target": "nsis"
     }
   },
   "repository": {
@@ -83,6 +79,7 @@
     "@babel/preset-typescript": "^7.3.3",
     "@hot-loader/react-dom": "^16.8.6",
     "@jest-runner/electron": "^2.0.2",
+    "@svgr/webpack": "^4.3.2",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/enzyme": "^3.10.1",
     "@types/enzyme-adapter-react-16": "^1.0.5",
@@ -126,6 +123,7 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-react": "^4.0.0",
     "typescript": "^3.4.5",
+    "url-loader": "^2.0.1",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.4.1",
