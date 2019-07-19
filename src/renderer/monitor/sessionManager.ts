@@ -6,7 +6,7 @@ const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.se
     m => promisify(m.bind(dbs.sessionDB))
 );
 
-function removeRedundantField(record: PomodoroRecord): PomodoroRecord {
+export function removeRedundantField(record: PomodoroRecord): PomodoroRecord {
     for (const app in record.apps) {
         // TODO: when add title spent time, add the following part
         // for (let title in record.apps[app].titleSpentTime) {
@@ -18,7 +18,7 @@ function removeRedundantField(record: PomodoroRecord): PomodoroRecord {
     return record;
 }
 
-function renameIllegalName(record: PomodoroRecord) {
+export function renameIllegalName(record: PomodoroRecord) {
     for (const app in record.apps) {
         const appRow = record.apps[app];
         for (const title in appRow.titleSpentTime) {
@@ -67,8 +67,6 @@ function consistencyCheck(record: PomodoroRecord) {
 }
 
 export async function addSession(record: PomodoroRecord) {
-    removeRedundantField(record);
-    renameIllegalName(record);
     if (!record.projectId) {
         // TODO: invoke ML inference
     }

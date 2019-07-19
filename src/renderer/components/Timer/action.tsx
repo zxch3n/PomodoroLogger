@@ -2,6 +2,7 @@ import { createActionCreator, createReducer } from 'deox';
 import { PomodoroRecord } from '../../monitor';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
+import { actions as projectActions } from '../Project/action';
 
 export interface TimerState {
     targetTime?: number;
@@ -40,7 +41,7 @@ export const setRestDuration = createActionCreator(
     '[Timer]SET_REST_DURATION',
     resolve => (duration: number) => resolve(duration)
 );
-export const setProject = createActionCreator('[Timer]SET_PROJECT', resolve => (project: string) =>
+export const setProject = createActionCreator('[Timer]SET_PROJECT', resolve => (project?: string) =>
     resolve(project)
 );
 export const setMonitorInterval = createActionCreator(
@@ -64,10 +65,16 @@ export const actions = {
     setMonitorInterval,
     setScreenShotInterval,
     switchFocusRestMode,
-    timerFinished: (sessionData?: PomodoroRecord) => async (dispatch: Dispatch) => {
+    timerFinished: (sessionData?: PomodoroRecord, project?: string) => async (
+        dispatch: Dispatch
+    ) => {
         dispatch(timerFinished());
         if (sessionData) {
+            console.log(sessionData);
             await addSession(sessionData).catch(err => console.error(err));
+            if (project) {
+                projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
+            }
         }
     }
 };
@@ -139,5 +146,7 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(switchFocusRestMode, state => ({
         ...state,
         isFocusing: !state.isFocusing
-    }))
+    })),
+
+    handle(setProject, (state, { payload }) => ({ ...state, project: payload }))
 ]);

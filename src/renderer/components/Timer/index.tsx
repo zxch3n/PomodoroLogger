@@ -3,15 +3,12 @@ import { connect } from 'react-redux';
 import Timer from './Timer';
 import { RootState } from '../../reducers';
 import { ActionCreatorTypes, actions } from './action';
-import {
-    ActionCreatorTypes as TodoActionCreatorTypes,
-    actions as todoActions
-} from '../TODO/action';
+import { ActionCreatorTypes as ProjectActions, actions as projectActions } from '../Project/action';
 import { genMapDispatchToProp } from '../../utils';
 
 const mapStateToProps = (state: RootState) => state;
-const mapDispatchToProps = genMapDispatchToProp<TodoActionCreatorTypes & ActionCreatorTypes>({
-    ...todoActions,
+const mapDispatchToProps = genMapDispatchToProp<ProjectActions & ActionCreatorTypes>({
+    ...projectActions,
     ...actions
 });
 export default connect(

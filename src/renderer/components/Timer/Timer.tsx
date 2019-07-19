@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Divider, Icon, Progress } from 'antd';
-import { ActionCreatorTypes as TodoActionTypes } from '../TODO/action';
+import { ActionCreatorTypes as ProjectActionTypes } from '../Project/action';
 import { ActionCreatorTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
@@ -53,7 +53,7 @@ const ButtonRow = styled.div`
 
 const MoreInfo = styled.div``;
 
-export interface Props extends ThisActionTypes, TodoActionTypes, RootState {}
+export interface Props extends ThisActionTypes, ProjectActionTypes, RootState {}
 
 function to2digits(num: number) {
     if (num < 10) {
@@ -220,7 +220,7 @@ class Timer extends Component<Props, State> {
                     icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
                 });
                 notification.show();
-                this.props.timerFinished(this.monitor.sessionData);
+                this.props.timerFinished(this.monitor.sessionData, this.props.timer.project);
                 this.monitor.stop();
                 this.monitor.clear();
             } else {

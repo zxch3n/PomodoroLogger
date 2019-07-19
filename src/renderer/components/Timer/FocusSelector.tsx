@@ -1,56 +1,39 @@
-import React, { FunctionComponent, useState } from 'react';
-import { TreeSelect } from 'antd';
-import { ActionCreatorTypes, TodoItem } from '../TODO/action';
+import React, { FunctionComponent, useState, useEffect } from 'react';
+import { Select } from 'antd';
+import { ActionCreatorTypes } from '../Project/action';
+import { ActionCreatorTypes as TimerActions } from './action';
 import { RootState } from '../../reducers';
+const { Option } = Select;
 
-interface Props extends ActionCreatorTypes, RootState {}
+interface Props extends ActionCreatorTypes, TimerActions, RootState {}
 export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
-    const [value, setValue] = useState<string | undefined>(undefined);
-    const todos: TodoItem[] = props.todo.todoList;
-    const projects: { [key: string]: any } = {};
-    todos.forEach(item => {
-        if (!(item.project in projects)) {
-            projects[item.project] = {
-                title: item.project,
-                value: item.project,
-                key: item.project,
-                children: [
-                    {
-                        title: item.title,
-                        value: item._id,
-                        key: item._id
-                    }
-                ]
-            };
-        } else {
-            projects[item.project].children.push({
-                title: item.title,
-                value: item._id,
-                key: item._id
-            });
-        }
-    });
-
-    const tree = Object.values(projects);
-    const onChange = (value: string | undefined) => {
-        setValue(value);
-        if (value) {
-            props.setFocus(value, true);
-        }
+    const onChange = (value?: string) => {
+        props.setProject(value);
     };
 
+    const options = Object.values(props.project.projectList).map(v => (
+        <Option key={v.name} value={v.name}>
+            {v.name}
+        </Option>
+    ));
+
+    useEffect(() => {
+        if (options.length === 0) {
+            props.fetchAll();
+        }
+    }, []);
+
     return (
-        <TreeSelect
-            value={value}
+        <Select
+            value={props.timer.project}
             style={{
                 minWidth: 300,
                 width: '100%'
             }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            treeData={tree}
             placeholder="Choose Your Focus"
-            treeDefaultExpandAll={true}
             onChange={onChange}
-        />
+        >
+            {options}
+        </Select>
     );
 };

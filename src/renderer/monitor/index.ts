@@ -1,6 +1,7 @@
 import { ActiveWinListener, Monitor as WindowMonitor } from './activeWinMonitor';
 import { getScreen } from './screenshot';
 import { BaseResult } from 'active-win';
+import { removeRedundantField, renameIllegalName } from './sessionManager';
 
 // This module may not be available in electron renderer
 type Listener = (appName: string, data: PomodoroRecord, imgUrl?: string) => void;
@@ -262,7 +263,10 @@ export class Monitor {
     };
 
     get sessionData() {
-        return this.recorder.sessionData;
+        const data = this.recorder.sessionData;
+        removeRedundantField(data);
+        renameIllegalName(data);
+        return data;
     }
 }
 
