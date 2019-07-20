@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import { Divider, Icon, Progress, Row, Col } from 'antd';
-import { ActionCreatorTypes as ProjectActionTypes } from '../Project/action';
+import { Divider, Icon, Progress, Row, Col, Layout, message } from 'antd';
+import { ActionCreatorTypes as ProjectActionTypes, ProjectItem } from '../Project/action';
 import { ActionCreatorTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
@@ -14,6 +14,8 @@ import AppIcon from '../../../res/TimeLogger.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
 import { finished } from 'stream';
+import { TodoList } from '../Project/Project';
+const { Sider } = Layout;
 
 const ProgressTextContainer = styled.div`
     padding: 12px;
@@ -21,7 +23,7 @@ const ProgressTextContainer = styled.div`
     transform: translateY(0.3em);
 `;
 
-const Layout = styled.div`
+const TimerLayout = styled.div`
     max-width: 400px;
     margin: 10px auto;
 `;
@@ -102,7 +104,7 @@ class Timer extends Component<Props, State> {
     };
 
     componentDidMount(): void {
-        this.interval = setInterval(this.updateLeftTime, 200);
+        this.interval = setInterval(this.updateLeftTime, 500);
         this.updateLeftTime();
         this.monitor = new Monitor(
             this.activeWinListener,
@@ -121,16 +123,16 @@ class Timer extends Component<Props, State> {
         }
     }
 
-    updateLeftTime = async () => {
+    updateLeftTime = () => {
         const { targetTime, isRunning } = this.props.timer;
-        if (!targetTime) {
-            this.setState((_, props) => ({
-                leftTime: this.defaultLeftTime(props.timer.isFocusing)
-            }));
+        if (!isRunning) {
             return;
         }
 
-        if (!isRunning) {
+        if (!targetTime) {
+            this.setState({
+                leftTime: this.defaultLeftTime(this.props.timer.isFocusing)
+            });
             return;
         }
 
@@ -151,7 +153,7 @@ class Timer extends Component<Props, State> {
                     ? this.props.timer.focusDuration
                     : this.props.timer.restDuration);
         if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
-            await setTrayImageWithMadeIcon(leftTime.slice(0, 2));
+            setTrayImageWithMadeIcon(leftTime.slice(0, 2));
         }
 
         this.setState({ leftTime, percent });
@@ -272,13 +274,21 @@ class Timer extends Component<Props, State> {
     };
 
     switchMode = () => {
+        if (this.props.timer.isRunning || this.state.percent !== 0) {
+            message.warn('Cannot switch mode when timer is running');
+            return;
+        }
+
         this.props.switchFocusRestMode();
+        this.clearStat();
     };
 
     progressFormat = () => {
         return (
             <ProgressTextContainer>
-                <div style={{ marginBottom: 12 }}>{this.state.leftTime}</div>
+                <div style={{ marginBottom: 12 }} key="leftTime">
+                    {this.state.leftTime}
+                </div>
                 <div style={{ fontSize: '0.6em', cursor: 'pointer' }} onClick={this.switchMode}>
                     {this.props.timer.isFocusing ? (
                         <Icon component={WorkIcon} />
@@ -294,6 +304,9 @@ class Timer extends Component<Props, State> {
         const { leftTime, percent, more, pomodorosToday } = this.state;
         const { isRunning } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
+        const projectItem: ProjectItem | undefined = this.props.timer.project
+            ? this.props.project.projectList[this.props.timer.project]
+            : undefined;
         for (const pomodoro of pomodorosToday) {
             for (const appName in pomodoro.apps) {
                 if (!(appName in apps)) {
@@ -308,97 +321,124 @@ class Timer extends Component<Props, State> {
         }
 
         return (
-            <Layout>
-                <ProgressContainer>
-                    <Progress
-                        type="circle"
-                        strokeColor={{
-                            '0%': '#108ee9',
-                            '100%': '#87d068'
-                        }}
-                        percent={percent}
-                        format={this.progressFormat}
-                        width={300}
-                        style={{
-                            margin: '0 auto'
-                        }}
-                    />
-                    <span style={{ display: 'none' }} id="left-time-text">
-                        {leftTime}
-                    </span>
-                </ProgressContainer>
-
-                <ButtonRow>
-                    {isRunning ? (
-                        <Icon
-                            type="pause-circle"
-                            title="Pause"
-                            onClick={this.onStopResumeOrStart}
+            <Layout style={{ backgroundColor: 'white' }}>
+                {projectItem ? (
+                    <Sider
+                        breakpoint="md"
+                        collapsedWidth="0"
+                        theme="light"
+                        style={{ border: '1px solid rgb(240, 240, 240)', borderRadius: 8 }}
+                    >
+                        <div style={{ padding: 12 }}>
+                            <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
+                                {this.props.timer.project}
+                            </h1>
+                            <TodoList {...this.props} project={projectItem} />
+                        </div>
+                    </Sider>
+                ) : (
+                    undefined
+                )}
+                <TimerLayout>
+                    <ProgressContainer>
+                        <Progress
+                            type="circle"
+                            strokeColor={{
+                                '0%': '#108ee9',
+                                '100%': '#87d068'
+                            }}
+                            percent={percent}
+                            format={this.progressFormat}
+                            width={300}
+                            style={{
+                                margin: '0 auto'
+                            }}
                         />
-                    ) : (
-                        <Icon type="play-circle" title="Start" onClick={this.onStopResumeOrStart} />
-                    )}
-                    <Icon type="close-circle" title="Clear" onClick={this.onClear} />
-                    <Icon type="more" title="Show More" onClick={this.toggleMode} />
-                </ButtonRow>
+                        <span style={{ display: 'none' }} id="left-time-text">
+                            {leftTime}
+                        </span>
+                    </ProgressContainer>
 
-                <FocusSelector {...this.props} />
+                    <ButtonRow>
+                        {isRunning ? (
+                            <Icon
+                                type="pause-circle"
+                                title="Pause"
+                                onClick={this.onStopResumeOrStart}
+                            />
+                        ) : (
+                            <Icon
+                                type="play-circle"
+                                title="Start"
+                                onClick={this.onStopResumeOrStart}
+                            />
+                        )}
+                        <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                        <Icon type="more" title="Show More" onClick={this.toggleMode} />
+                    </ButtonRow>
 
-                <MoreInfo>
-                    <h2>Pomodoros Today</h2>
-                    <Row style={{ padding: 12 }}>
-                        <Col span={4} style={{ lineHeight: '1em' }}>
-                            <h4>{this.state.pomodorosToday.length}</h4>
-                        </Col>
-                        <Col span={20} style={{ color: 'red' }}>
-                            {Array.from(Array(this.state.pomodorosToday.length).keys()).map(v => (
-                                <svg
-                                    key={v}
-                                    width="1em"
-                                    height="1em"
-                                    fill="currentColor"
-                                    focusable="false"
-                                    viewBox="0 0 100 100"
-                                    style={{ margin: '0.1em' }}
-                                >
-                                    <circle r={50} cx={50} cy={50} color="red">
-                                        <title>{`Completed ${this.state.pomodorosToday.length} pomodoros today`}</title>
-                                    </circle>
-                                </svg>
-                            ))}
-                        </Col>
-                    </Row>
-                </MoreInfo>
+                    <FocusSelector {...this.props} />
 
-                <MoreInfo
-                    style={{
-                        display: more ? 'block' : 'none'
-                    }}
-                >
-                    <h2>Application Usage</h2>
-                    <UsagePieChart
-                        rows={Object.values(apps).map(row => ({
-                            name: row.appName,
-                            value: row.spentHours * 60
-                        }))}
-                        unit={'Min'}
-                        size={100}
-                    />
+                    <MoreInfo>
+                        <h2>Pomodoros Today</h2>
+                        <Row style={{ padding: 12 }}>
+                            <Col span={4} style={{ lineHeight: '1em' }}>
+                                <h4>{this.state.pomodorosToday.length}</h4>
+                            </Col>
+                            <Col span={20} style={{ color: 'red' }}>
+                                {Array.from(Array(this.state.pomodorosToday.length).keys()).map(
+                                    v => (
+                                        <svg
+                                            key={v}
+                                            width="1em"
+                                            height="1em"
+                                            fill="currentColor"
+                                            focusable="false"
+                                            viewBox="0 0 100 100"
+                                            style={{ margin: '0.1em' }}
+                                        >
+                                            <circle r={50} cx={50} cy={50} color="red">
+                                                <title>
+                                                    {`Completed ${this.state.pomodorosToday.length} pomodoros today`}
+                                                </title>
+                                            </circle>
+                                        </svg>
+                                    )
+                                )}
+                            </Col>
+                        </Row>
+                    </MoreInfo>
 
-                    <Divider />
+                    <MoreInfo
+                        style={{
+                            display: more ? 'block' : 'none'
+                        }}
+                    >
+                        <h2>Application Usage</h2>
+                        <UsagePieChart
+                            rows={Object.values(apps).map(row => ({
+                                name: row.appName,
+                                value: row.spentHours * 60
+                            }))}
+                            unit={'Min'}
+                            size={100}
+                        />
 
-                    <h2>Screen Shot</h2>
-                    {this.state.screenShotUrl ? (
-                        <Fragment>
-                            <img src={this.state.screenShotUrl} height={100} width={100} />
-                            <p id="current-using-app-name">{this.state.currentAppName}</p>
-                        </Fragment>
-                    ) : (
-                        undefined
-                    )}
+                        <Divider />
 
-                    <Divider />
-                </MoreInfo>
+                        <h2>Screen Shot</h2>
+                        {this.state.screenShotUrl ? (
+                            <Fragment>
+                                <img src={this.state.screenShotUrl} height={100} width={100} />
+                                <p id="current-using-app-name">{this.state.currentAppName}</p>
+                            </Fragment>
+                        ) : (
+                            undefined
+                        )}
+
+                        <Divider />
+                    </MoreInfo>
+                </TimerLayout>
             </Layout>
         );
     }

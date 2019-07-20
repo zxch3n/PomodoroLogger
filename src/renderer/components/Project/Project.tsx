@@ -51,7 +51,7 @@ interface TodoListProps extends ActionCreatorTypes {
     project: ProjectItem;
 }
 
-const TodoList: React.FC<TodoListProps> = ({
+export const TodoList: React.FC<TodoListProps> = ({
     project,
     addTodoItem,
     setTodoFinished,
