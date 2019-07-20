@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Divider, Icon, Progress } from 'antd';
+import { Divider, Icon, Progress, Row, Col } from 'antd';
 import { ActionCreatorTypes as ProjectActionTypes } from '../Project/action';
 import { ActionCreatorTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
@@ -12,6 +12,8 @@ import RestIcon from '../../../res/rest.svg';
 import WorkIcon from '../../../res/work.svg';
 import AppIcon from '../../../res/TimeLogger.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
+import { getTodaySessions } from '../../monitor/sessionManager';
+import { finished } from 'stream';
 
 const ProgressTextContainer = styled.div`
     padding: 12px;
@@ -51,7 +53,9 @@ const ButtonRow = styled.div`
     }
 `;
 
-const MoreInfo = styled.div``;
+const MoreInfo = styled.div`
+    margin: 10px auto;
+`;
 
 export interface Props extends ThisActionTypes, ProjectActionTypes, RootState {}
 
@@ -66,10 +70,10 @@ function to2digits(num: number) {
 interface State {
     leftTime: string;
     screenShotUrl?: string;
-    apps: { [appName: string]: ApplicationSpentTime };
     currentAppName?: string;
     percent: number;
     more: boolean;
+    pomodorosToday: PomodoroRecord[];
 }
 
 class Timer extends Component<Props, State> {
@@ -81,9 +85,9 @@ class Timer extends Component<Props, State> {
         this.state = {
             leftTime: this.defaultLeftTime(),
             percent: 0,
-            apps: {},
             screenShotUrl: undefined,
-            more: false
+            more: false,
+            pomodorosToday: []
         };
     }
 
@@ -93,7 +97,6 @@ class Timer extends Component<Props, State> {
         }
 
         this.setState({
-            apps: data.apps,
             currentAppName: appName
         });
     };
@@ -106,6 +109,10 @@ class Timer extends Component<Props, State> {
             1000,
             this.props.timer.screenShotInterval
         );
+
+        getTodaySessions().then(finishedSessions => {
+            this.setState({ pomodorosToday: finishedSessions });
+        });
     }
 
     componentWillUnmount(): void {
@@ -114,7 +121,7 @@ class Timer extends Component<Props, State> {
         }
     }
 
-    updateLeftTime = () => {
+    updateLeftTime = async () => {
         const { targetTime, isRunning } = this.props.timer;
         if (!targetTime) {
             this.setState((_, props) => ({
@@ -144,7 +151,7 @@ class Timer extends Component<Props, State> {
                     ? this.props.timer.focusDuration
                     : this.props.timer.restDuration);
         if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
-            setTrayImageWithMadeIcon(leftTime.slice(0, 2));
+            await setTrayImageWithMadeIcon(leftTime.slice(0, 2));
         }
 
         this.setState({ leftTime, percent });
@@ -192,7 +199,6 @@ class Timer extends Component<Props, State> {
     private clearStat = () => {
         setTrayImageWithMadeIcon(undefined);
         this.setState((_, props) => ({
-            apps: {},
             currentAppName: undefined,
             screenShotUrl: undefined,
             leftTime: this.defaultLeftTime(props.timer.isFocusing),
@@ -210,27 +216,30 @@ class Timer extends Component<Props, State> {
         this.clearStat();
     };
 
-    onDone = () => {
+    onDone = async () => {
         if (this.props.timer.isFocusing) {
             if (this.monitor) {
+                const finishedSessions = await getTodaySessions();
+                const thisSession = this.monitor.sessionData;
+                finishedSessions.push(thisSession);
+
                 const notification = new remote.Notification({
                     title: 'Focusing finished. Start resting.',
-                    // TODO: session info
-                    body: `Completed ${5} sessions today. \n\n`,
+                    body: `Completed ${finishedSessions.length} sessions today. \n\n`,
                     icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
                 });
                 notification.show();
-                this.props.timerFinished(this.monitor.sessionData, this.props.timer.project);
+                this.props.timerFinished(thisSession, this.props.timer.project);
                 this.monitor.stop();
                 this.monitor.clear();
+                this.setState({ pomodorosToday: finishedSessions });
             } else {
                 this.props.timerFinished();
             }
         } else {
             const notification = new remote.Notification({
                 title: 'Focusing finished. Start resting.',
-                // TODO: session info
-                body: `Completed ${5} sessions today. \n\n`,
+                body: `Completed ${this.state.pomodorosToday.length} sessions today. \n\n`,
                 icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
             });
             notification.show();
@@ -282,8 +291,21 @@ class Timer extends Component<Props, State> {
     };
 
     render() {
-        const { leftTime, percent, more } = this.state;
+        const { leftTime, percent, more, pomodorosToday } = this.state;
         const { isRunning } = this.props.timer;
+        const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
+        for (const pomodoro of pomodorosToday) {
+            for (const appName in pomodoro.apps) {
+                if (!(appName in apps)) {
+                    apps[appName] = {
+                        appName,
+                        spentHours: 0
+                    };
+                }
+
+                apps[appName].spentHours += pomodoro.apps[appName].spentTimeInHour;
+            }
+        }
 
         return (
             <Layout>
@@ -322,12 +344,49 @@ class Timer extends Component<Props, State> {
 
                 <FocusSelector {...this.props} />
 
+                <MoreInfo>
+                    <h2>Pomodoros Today</h2>
+                    <Row style={{ padding: 12 }}>
+                        <Col span={4} style={{ lineHeight: '1em' }}>
+                            <h4>{this.state.pomodorosToday.length}</h4>
+                        </Col>
+                        <Col span={20} style={{ color: 'red' }}>
+                            {Array.from(Array(this.state.pomodorosToday.length).keys()).map(v => (
+                                <svg
+                                    key={v}
+                                    width="1em"
+                                    height="1em"
+                                    fill="currentColor"
+                                    focusable="false"
+                                    viewBox="0 0 100 100"
+                                    style={{ margin: '0.1em' }}
+                                >
+                                    <circle r={50} cx={50} cy={50} color="red">
+                                        <title>{`Completed ${this.state.pomodorosToday.length} pomodoros today`}</title>
+                                    </circle>
+                                </svg>
+                            ))}
+                        </Col>
+                    </Row>
+                </MoreInfo>
+
                 <MoreInfo
                     style={{
-                        display: more ? 'block' : 'none',
-                        margin: '10px auto'
+                        display: more ? 'block' : 'none'
                     }}
                 >
+                    <h2>Application Usage</h2>
+                    <UsagePieChart
+                        rows={Object.values(apps).map(row => ({
+                            name: row.appName,
+                            value: row.spentHours * 60
+                        }))}
+                        unit={'Min'}
+                        size={100}
+                    />
+
+                    <Divider />
+
                     <h2>Screen Shot</h2>
                     {this.state.screenShotUrl ? (
                         <Fragment>
@@ -339,16 +398,6 @@ class Timer extends Component<Props, State> {
                     )}
 
                     <Divider />
-
-                    <h2>Application Usage</h2>
-                    <UsagePieChart
-                        rows={Object.values(this.state.apps).map(row => ({
-                            name: row.appName,
-                            value: row.spentTimeInHour * 60
-                        }))}
-                        unit={'Min'}
-                        size={100}
-                    />
                 </MoreInfo>
             </Layout>
         );

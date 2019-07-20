@@ -70,7 +70,6 @@ export const actions = {
     ) => {
         dispatch(timerFinished());
         if (sessionData) {
-            console.log(sessionData);
             await addSession(sessionData).catch(err => console.error(err));
             if (project) {
                 projectActions.updateOnTimerFinished(project, sessionData)(dispatch);

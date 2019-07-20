@@ -78,6 +78,11 @@ export async function removeSession(startTime: number) {
     await remove({ startTime });
 }
 
+export async function getTodaySessions(): Promise<PomodoroRecord[]> {
+    const todayStartTime = new Date(new Date().toDateString()).getTime();
+    return ((await find({ startTime: { $gt: todayStartTime } })) as unknown) as PomodoroRecord[];
+}
+
 export async function getAllSession(): Promise<PomodoroRecord[]> {
     return (await find({})) as PomodoroRecord[];
 }

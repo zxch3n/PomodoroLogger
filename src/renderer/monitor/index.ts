@@ -68,7 +68,6 @@ class UsageRecorder {
             return;
         }
 
-        console.log('recorder listener');
         const now = new Date().getTime();
         const appName = result ? result.owner.name : undefined;
         if (this.lastUsingApp && appName !== this.lastUsingApp) {

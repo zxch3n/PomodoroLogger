@@ -1,5 +1,5 @@
 {
-  "name": "Time-Logger",
+  "name": "time-logger",
   "version": "0.0.0",
   "description": "pomodoro project-time-logger",
   "main": "./dist/main.js",
