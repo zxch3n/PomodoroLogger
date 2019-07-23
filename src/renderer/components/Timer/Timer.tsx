@@ -1,20 +1,21 @@
 import React, { Component, Fragment } from 'react';
-import { Divider, Icon, Progress, Row, Col, Layout, message } from 'antd';
+import { Col, Divider, Icon, Layout, message, Row } from 'antd';
+import Progress from './Progress';
 import { ActionCreatorTypes as ProjectActionTypes, ProjectItem } from '../Project/action';
 import { ActionCreatorTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
-import { ApplicationSpentTime, Monitor, PomodoroRecord } from '../../monitor';
+import { Monitor, PomodoroRecord } from '../../monitor';
 import { UsagePieChart } from '../Visualization/UsagePieChart';
 import styled from 'styled-components';
-import { remote, nativeImage } from 'electron';
+import { nativeImage, remote } from 'electron';
 import RestIcon from '../../../res/rest.svg';
 import WorkIcon from '../../../res/work.svg';
 import AppIcon from '../../../res/TimeLogger.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
-import { finished } from 'stream';
 import { TodoList } from '../Project/Project';
+
 const { Sider } = Layout;
 
 const ProgressTextContainer = styled.div`
@@ -140,7 +141,7 @@ class Timer extends Component<Props, State> {
         const timeSpan = targetTime - now;
         const sec = Math.floor(timeSpan / 1000 + 0.5);
         if (sec < 0) {
-            this.onDone();
+            this.onDone().catch(console.error);
             return;
         }
 
@@ -153,7 +154,7 @@ class Timer extends Component<Props, State> {
                     ? this.props.timer.focusDuration
                     : this.props.timer.restDuration);
         if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
-            setTrayImageWithMadeIcon(leftTime.slice(0, 2));
+            setTrayImageWithMadeIcon(leftTime.slice(0, 2)).catch(console.error);
         }
 
         this.setState({ leftTime, percent });
@@ -199,7 +200,7 @@ class Timer extends Component<Props, State> {
     };
 
     private clearStat = () => {
-        setTrayImageWithMadeIcon(undefined);
+        setTrayImageWithMadeIcon(undefined).catch(console.error);
         this.setState((_, props) => ({
             currentAppName: undefined,
             screenShotUrl: undefined,
@@ -283,23 +284,6 @@ class Timer extends Component<Props, State> {
         this.clearStat();
     };
 
-    progressFormat = () => {
-        return (
-            <ProgressTextContainer>
-                <div style={{ marginBottom: 12 }} key="leftTime">
-                    {this.state.leftTime}
-                </div>
-                <div style={{ fontSize: '0.6em', cursor: 'pointer' }} onClick={this.switchMode}>
-                    {this.props.timer.isFocusing ? (
-                        <Icon component={WorkIcon} />
-                    ) : (
-                        <Icon component={RestIcon} />
-                    )}
-                </div>
-            </ProgressTextContainer>
-        );
-    };
-
     render() {
         const { leftTime, percent, more, pomodorosToday } = this.state;
         const { isRunning } = this.props.timer;
@@ -348,12 +332,27 @@ class Timer extends Component<Props, State> {
                                 '100%': '#87d068'
                             }}
                             percent={percent}
-                            format={this.progressFormat}
                             width={300}
                             style={{
                                 margin: '0 auto'
                             }}
-                        />
+                        >
+                            <ProgressTextContainer>
+                                <div style={{ marginBottom: 12 }} key="leftTime">
+                                    {this.state.leftTime}
+                                </div>
+                                <div
+                                    style={{ fontSize: '0.6em', cursor: 'pointer' }}
+                                    onClick={this.switchMode}
+                                >
+                                    {this.props.timer.isFocusing ? (
+                                        <Icon component={WorkIcon} />
+                                    ) : (
+                                        <Icon component={RestIcon} />
+                                    )}
+                                </div>
+                            </ProgressTextContainer>
+                        </Progress>
                         <span style={{ display: 'none' }} id="left-time-text">
                             {leftTime}
                         </span>

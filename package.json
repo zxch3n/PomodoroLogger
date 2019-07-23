@@ -130,12 +130,14 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
+    "@types/classnames": "^2.2.9",
     "@types/lodash": "^4.14.135",
     "@types/nedb": "^1.8.7",
     "@types/redux-thunk": "^2.1.0",
     "@types/styled-components": "^4.1.16",
     "active-win": "^5.1.2",
     "antd": "^3.19.7",
+    "classnames": "^2.2.6",
     "deox": "^2.1.0",
     "lodash": "^4.17.14",
     "nedb": "^1.8.0",
