@@ -9,3 +9,4 @@ if (!existsSync(dbBaseDir)) {
 
 export const projectDBPath = join(dbBaseDir, 'projects.nedb');
 export const sessionDBPath = join(dbBaseDir, 'session.nedb');
+export const settingDBPath = join(dbBaseDir, 'setting.nedb');

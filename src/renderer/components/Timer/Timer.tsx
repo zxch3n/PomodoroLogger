@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { Col, Divider, Icon, Layout, message, Row } from 'antd';
 import Progress from './Progress';
-import { ActionCreatorTypes as ProjectActionTypes, ProjectItem } from '../Project/action';
-import { ActionCreatorTypes as ThisActionTypes } from './action';
+import { ProjectActionTypes, ProjectItem } from '../Project/action';
+import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor, PomodoroRecord } from '../../monitor';
@@ -86,7 +86,7 @@ class Timer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            leftTime: this.defaultLeftTime(),
+            leftTime: '--:--',
             percent: 0,
             screenShotUrl: undefined,
             more: false,
@@ -127,13 +127,6 @@ class Timer extends Component<Props, State> {
     updateLeftTime = () => {
         const { targetTime, isRunning } = this.props.timer;
         if (!isRunning) {
-            return;
-        }
-
-        if (!targetTime) {
-            this.setState({
-                leftTime: this.defaultLeftTime(this.props.timer.isFocusing)
-            });
             return;
         }
 
@@ -286,7 +279,7 @@ class Timer extends Component<Props, State> {
 
     render() {
         const { leftTime, percent, more, pomodorosToday } = this.state;
-        const { isRunning } = this.props.timer;
+        const { isRunning, targetTime } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
         const projectItem: ProjectItem | undefined = this.props.timer.project
             ? this.props.project.projectList[this.props.timer.project]
@@ -304,6 +297,7 @@ class Timer extends Component<Props, State> {
             }
         }
 
+        const shownLeftTime = isRunning || targetTime ? leftTime : this.defaultLeftTime();
         return (
             <Layout style={{ backgroundColor: 'white' }}>
                 {projectItem ? (
@@ -339,7 +333,7 @@ class Timer extends Component<Props, State> {
                         >
                             <ProgressTextContainer>
                                 <div style={{ marginBottom: 12 }} key="leftTime">
-                                    {this.state.leftTime}
+                                    {shownLeftTime}
                                 </div>
                                 <div
                                     style={{ fontSize: '0.6em', cursor: 'pointer' }}

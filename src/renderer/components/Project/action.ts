@@ -195,7 +195,7 @@ export const actions = {
     }
 };
 
-export type ActionCreatorTypes = { [key in keyof typeof actions]: typeof actions[key] };
+export type ProjectActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
 
 // ==================================
 //

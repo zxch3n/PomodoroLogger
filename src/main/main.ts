@@ -104,6 +104,9 @@ app.on('ready', async () => {
 
 app.on('window-all-closed', () => {
     if (!win) {
+        db.settingDB.persistence.compactDatafile();
+        db.projectDB.persistence.compactDatafile();
+        db.sessionDB.persistence.compactDatafile();
         app.quit();
     }
 });

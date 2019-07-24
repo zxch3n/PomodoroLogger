@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActionCreatorTypes, TimerState } from '../Timer/action';
+import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
 import { Slider, Switch, notification, Icon } from 'antd';
 
@@ -24,7 +24,7 @@ const restMarks = {
     20: '20min'
 };
 
-interface Props extends TimerState, ActionCreatorTypes {}
+interface Props extends TimerState, TimerActionTypes {}
 export const Setting: React.FunctionComponent<Props> = (props: Props) => {
     const onChangeFocus = (v: number | [number, number]) => {
         if (v instanceof Array) {

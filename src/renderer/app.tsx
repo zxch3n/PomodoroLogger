@@ -6,13 +6,12 @@ import { AppContainer } from 'react-hot-loader';
 import Application from './components/Application';
 import store from './store';
 
-
 // Create main element
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
 // Render components
-const render = (Component: () => JSX.Element) => {
+const render = (Component: any) => {
     ReactDOM.render(
         <AppContainer>
             <Provider store={store}>

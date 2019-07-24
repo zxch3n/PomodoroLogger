@@ -12,7 +12,7 @@ import {
     Icon,
     Menu
 } from 'antd';
-import { ActionCreatorTypes, ProjectItem, ProjectState } from './action';
+import { ProjectActionTypes, ProjectItem, ProjectState } from './action';
 import { TodoItem } from '../TODO/action';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import styled from 'styled-components';
@@ -47,7 +47,7 @@ const defaultRecord = {
     applicationSpentTime: {}
 };
 
-interface TodoListProps extends ActionCreatorTypes {
+interface TodoListProps extends ProjectActionTypes {
     project: ProjectItem;
 }
 
@@ -128,7 +128,7 @@ export const TodoList: React.FC<TodoListProps> = ({
     );
 };
 
-interface Props extends ActionCreatorTypes, ProjectState {}
+interface Props extends ProjectActionTypes, ProjectState {}
 const Project: React.FC<Props> = (props: Props) => {
     const [editingRowName, setEditingRowName] = useState('');
     const [editingRecordRow, setEditingRecordRow] = useState(defaultRecord);

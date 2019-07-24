@@ -3,18 +3,22 @@ import { PomodoroRecord } from '../../monitor';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
 import { actions as projectActions } from '../Project/action';
+import { promisify } from 'util';
+import dbs from '../../dbs';
 
-export interface TimerState {
-    targetTime?: number;
-    leftTime?: number;
+export interface Setting {
     focusDuration: number;
     restDuration: number;
+    monitorInterval: number;
+    screenShotInterval?: number;
+}
+
+export interface TimerState extends Setting {
+    targetTime?: number;
+    leftTime?: number;
     isFocusing: boolean;
     isRunning: boolean;
     project?: string;
-
-    monitorInterval: number;
-    screenShotInterval?: number;
 }
 
 export const defaultState: TimerState = {
@@ -54,17 +58,72 @@ export const setScreenShotInterval = createActionCreator(
 );
 export const switchFocusRestMode = createActionCreator('[Timer]SWITCH_FOCUS_MODE');
 
+const throwError = (err: Error) => {
+    if (err) {
+        throw err;
+    }
+};
 export const actions = {
     stopTimer,
     continueTimer,
     clearTimer,
-    setFocusDuration,
-    setRestDuration,
     setProject,
     startTimer,
-    setMonitorInterval,
-    setScreenShotInterval,
     switchFocusRestMode,
+    fetchSettings: () => async (dispatch: Dispatch) => {
+        const settings: Partial<Setting> = await promisify(
+            dbs.settingDB.findOne.bind(dbs.settingDB)
+        )({ name: 'setting' });
+        const settingKeywords = [
+            ['focusDuration', setFocusDuration],
+            ['restDuration', setRestDuration],
+            ['monitorInterval', setMonitorInterval],
+            ['screenShotInterval', setScreenShotInterval]
+        ];
+        for (const key of settingKeywords) {
+            if (key[0] in settings) {
+                // @ts-ignore
+                const action = key[1](settings[key[0]]);
+                dispatch(action);
+            }
+        }
+    },
+    setFocusDuration: (focusDuration: number) => async (dispatch: Dispatch) => {
+        dispatch(setFocusDuration(focusDuration));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { focusDuration } },
+            { upsert: true },
+            throwError
+        );
+    },
+    setRestDuration: (restDuration: number) => async (dispatch: Dispatch) => {
+        dispatch(setRestDuration(restDuration));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { restDuration } },
+            { upsert: true },
+            throwError
+        );
+    },
+    setMonitorInterval: (monitorInterval: number) => async (dispatch: Dispatch) => {
+        dispatch(setMonitorInterval(monitorInterval));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { monitorInterval } },
+            { upsert: true },
+            throwError
+        );
+    },
+    setScreenShotInterval: (screenShotInterval?: number) => async (dispatch: Dispatch) => {
+        dispatch(setScreenShotInterval(screenShotInterval));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { screenShotInterval } },
+            { upsert: true },
+            throwError
+        );
+    },
     timerFinished: (sessionData?: PomodoroRecord, project?: string) => async (
         dispatch: Dispatch
     ) => {
@@ -78,7 +137,7 @@ export const actions = {
     }
 };
 
-export type ActionCreatorTypes = { [key in keyof typeof actions]: typeof actions[key] };
+export type TimerActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
 export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(startTimer, (state: TimerState) => {
         const duration: number = state.isFocusing ? state.focusDuration : state.restDuration;

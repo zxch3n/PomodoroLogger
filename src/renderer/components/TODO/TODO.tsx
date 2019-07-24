@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { Button, Input, Table } from 'antd';
 import styledComponents from 'styled-components';
-import { actions, ActionCreatorTypes, TodoState } from './action';
+import { actions, TodoActionTypes, TodoState } from './action';
 
-interface Props extends ActionCreatorTypes, TodoState {}
+interface Props extends TodoActionTypes, TodoState {}
 const columns = [
     {
         title: 'Title',
