@@ -86,7 +86,7 @@ class Timer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            leftTime: '--:--',
+            leftTime: '',
             percent: 0,
             screenShotUrl: undefined,
             more: false,
@@ -119,6 +119,7 @@ class Timer extends Component<Props, State> {
     }
 
     componentWillUnmount(): void {
+        this.onClear();
         if (this.interval) {
             clearInterval(this.interval);
         }
@@ -126,7 +127,7 @@ class Timer extends Component<Props, State> {
 
     updateLeftTime = () => {
         const { targetTime, isRunning } = this.props.timer;
-        if (!isRunning) {
+        if (!isRunning || !targetTime) {
             return;
         }
 
@@ -297,7 +298,8 @@ class Timer extends Component<Props, State> {
             }
         }
 
-        const shownLeftTime = isRunning || targetTime ? leftTime : this.defaultLeftTime();
+        const shownLeftTime =
+            (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
         return (
             <Layout style={{ backgroundColor: 'white' }}>
                 {projectItem ? (
