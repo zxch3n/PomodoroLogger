@@ -10,8 +10,8 @@ const Container = styled.div`
 
 interface Props {
     width?: number;
-    projectData: [{ name: string; value: number }];
-    appData: [{ name: string; value: number }];
+    projectData: { name: string; value: number }[];
+    appData: { name: string; value: number }[];
 }
 
 export const DualPieChart: React.FC<any> = (props: Props) => {

@@ -15,6 +15,7 @@ import AppIcon from '../../../res/TimeLogger.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
 import { TodoList } from '../Project/Project';
+import { getIdFromProjectName } from '../../dbs';
 
 const { Sider } = Layout;
 
@@ -218,8 +219,11 @@ class Timer extends Component<Props, State> {
             if (this.monitor) {
                 const finishedSessions = await getTodaySessions();
                 const thisSession = this.monitor.sessionData;
-                finishedSessions.push(thisSession);
+                if (this.props.timer.project) {
+                    thisSession.projectId = await getIdFromProjectName(this.props.timer.project);
+                }
 
+                finishedSessions.push(thisSession);
                 const notification = new remote.Notification({
                     title: 'Focusing finished. Start resting.',
                     body: `Completed ${finishedSessions.length} sessions today. \n\n`,

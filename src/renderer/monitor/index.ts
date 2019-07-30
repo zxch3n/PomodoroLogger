@@ -261,7 +261,7 @@ export class Monitor {
         this.recorder.clear();
     };
 
-    get sessionData() {
+    get sessionData(): PomodoroRecord {
         const data = this.recorder.sessionData;
         removeRedundantField(data);
         renameIllegalName(data);
