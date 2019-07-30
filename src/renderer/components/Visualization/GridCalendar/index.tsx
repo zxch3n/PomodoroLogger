@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 const Container = styled.div`
     position: relative;
+    display: flex;
+    justify-content: center;
 `;
 
 const SvgContainer = styled.div`
@@ -184,7 +186,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         return firstMonthWeekPair.map(v => (
             <SvgText
                 x={v[1] * (gridWidth + gridMargin)}
-                y={axisMargin - gridMargin}
+                y={axisMargin - gridMargin * 2}
                 key={v[1]}
                 textAnchor="start"
                 style={{ fontSize: gridWidth }}

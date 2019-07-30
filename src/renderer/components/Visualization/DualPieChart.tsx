@@ -6,7 +6,6 @@ const Container = styled.div`
     margin: 0 auto;
     display: flex;
     justify-content: center;
-    align-items: center;
 `;
 
 interface Props {
@@ -24,10 +23,7 @@ export const DualPieChart: React.FC<any> = (props: Props) => {
             throw new Error();
         }
 
-        if (chart === undefined) {
-            chart = echarts.init(container.current);
-        }
-
+        chart = echarts.init(container.current);
         const option: EChartOption = {
             tooltip: {
                 trigger: 'item',

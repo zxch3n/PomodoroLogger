@@ -50,8 +50,8 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
         const setWidth = () => {
             const w = !container.current
                 ? 800
-                : container.current.clientWidth > 1200
-                ? 1200 - 60
+                : container.current.clientWidth > 1060
+                ? 1000
                 : container.current.clientWidth - 60;
             setCalendarWidth(w);
         };
@@ -96,9 +96,14 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                     </Card>
                 </Col>
             </Row>
-            {calendarWidth > 670 ? <GridCalendar data={mock()} width={calendarWidth} /> : undefined}
-
-            <DualPieChart width={calendarWidth} {...mockTimeSpentData()} />
+            {calendarWidth > 670 ? (
+                <React.Fragment>
+                    <GridCalendar data={mock()} width={calendarWidth} />
+                    <DualPieChart width={calendarWidth} {...mockTimeSpentData()} />
+                </React.Fragment>
+            ) : (
+                undefined
+            )}
         </Container>
     );
 };
