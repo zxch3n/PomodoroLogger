@@ -5,11 +5,37 @@ const Container = styled.div`
     position: relative;
 `;
 
+const SvgContainer = styled.div`
+    padding: 10px 10px 30px 10px;
+    margin: 0;
+    position: relative;
+`;
+
+const SvgText = styled.text`
+    fill: #444;
+    font-weight: 300;
+`;
+
 type Data = {
     [timestamp: number]: {
         count: number;
     };
 };
+
+const monthList = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+];
 
 interface GridData {
     month: number;
@@ -63,26 +89,24 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     const shownGrids = (day === 0 ? 7 : day) + (shownWeeks - 1) * 7;
     const grids = getGridData(data, tillTimestamp, shownGrids);
     const maxCountInADay = Math.max(...grids.map(v => v.count));
+    const axisMargin = 28;
+    const innerWidth = width - axisMargin;
 
-    const gridMargin = Math.floor((width / shownWeeks) * 0.1 + 2);
-    const gridWidth = Math.floor(width / shownWeeks) - gridMargin;
+    const gridMargin = Math.floor((innerWidth / shownWeeks) * 0.1 + 2);
+    const gridWidth = Math.floor(innerWidth / shownWeeks) - gridMargin;
     const gridHeight = gridWidth;
     const height = (gridWidth + gridMargin) * 7 + gridMargin;
-    const SvgContainer = styled.div`
-        padding: 0;
-        margin: 0;
-        position: relative;
-    `;
     const Tooltip = chosenIndex ? (
         <div
             style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.9)',
                 color: 'white',
                 position: 'absolute',
-                left: (gridMargin + gridWidth) * grids[chosenIndex].week,
-                top: (gridMargin + gridWidth) * (grids[chosenIndex].day + 1.8),
+                left: (gridMargin + gridWidth) * grids[chosenIndex].week + axisMargin,
+                top: (gridMargin + gridWidth) * (grids[chosenIndex].day + 1.8) + axisMargin,
                 padding: '16px 8px',
-                borderRadius: 8
+                borderRadius: 8,
+                zIndex: 10
             }}
         >
             <span style={{ fontWeight: 700 }}>
@@ -95,49 +119,80 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     ) : (
         undefined
     );
+
+    const rects = grids.map((v, index) => {
+        const onEnter = () => setChosenIndex(index);
+        const onLeave = () =>
+            setChosenIndex(oldIndex => {
+                if (oldIndex === index) {
+                    return undefined;
+                }
+
+                return oldIndex;
+            });
+        return (
+            <rect
+                width={gridWidth}
+                height={gridHeight}
+                x={v.week * (gridWidth + gridMargin)}
+                y={v.day * (gridWidth + gridMargin)}
+                fill={`hsl(50, ${v.count === 0 ? '0%' : '60%'}, ${92 -
+                    (v.count / maxCountInADay) * 70}%`}
+                key={index}
+                onMouseOver={onEnter}
+                onMouseOut={onLeave}
+            />
+        );
+    });
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'].map((v, index) => {
+        return (
+            <SvgText
+                x={axisMargin - gridMargin}
+                y={index * (gridWidth + gridMargin)}
+                key={index}
+                alignmentBaseline="hanging"
+                textAnchor="end"
+                style={{ fontSize: gridWidth }}
+            >
+                {v}
+            </SvgText>
+        );
+    });
+
+    function getMonthText() {
+        const weekMonthMap: number[] = [];
+        grids.forEach(v => {
+            weekMonthMap[v.week] = v.month;
+        });
+        const firstMonthWeekPair: [number, number][] = [];
+        for (let i = 0; i < weekMonthMap.length; i += 1) {
+            const week = i;
+            const month = weekMonthMap[week];
+            if (firstMonthWeekPair.findIndex(v => v[0] === month) === -1) {
+                firstMonthWeekPair.push([month, week]);
+            }
+        }
+
+        return firstMonthWeekPair.map(v => (
+            <SvgText
+                x={v[1] * (gridWidth + gridMargin)}
+                y={axisMargin - gridMargin}
+                key={v[1]}
+                textAnchor="start"
+                style={{ fontSize: gridWidth }}
+            >
+                {monthList[v[0] - 1]}
+            </SvgText>
+        ));
+    }
+
     return (
         <Container>
-            <ul>
-                {/*TODO*/}
-                <li>Jan</li>
-                <li>...</li>
-            </ul>
-
-            <ul>
-                <li>Sun</li>
-                <li>Mon</li>
-                <li>Tue</li>
-                <li>Wed</li>
-                <li>Thur</li>
-                <li>Fri</li>
-                <li>Sat</li>
-            </ul>
-
             <SvgContainer>
-                <svg width={width} height={height}>
-                    {grids.map((v, index) => {
-                        const onEnter = () => setChosenIndex(index);
-                        const onLeave = () =>
-                            setChosenIndex(oldIndex => {
-                                if (oldIndex === index) {
-                                    return undefined;
-                                }
-
-                                return oldIndex;
-                            });
-                        return (
-                            <rect
-                                width={gridWidth}
-                                height={gridHeight}
-                                x={v.week * (gridWidth + gridMargin)}
-                                y={v.day * (gridWidth + gridMargin)}
-                                fill={'black'}
-                                key={index}
-                                onMouseOver={onEnter}
-                                onMouseOut={onLeave}
-                            />
-                        );
-                    })}
+                <svg width={width + axisMargin} height={height + axisMargin}>
+                    <g transform={`translate(${axisMargin}, 0)`}>{getMonthText()}</g>
+                    <g transform={`translate(0, ${axisMargin})`}>{weekdays}</g>
+                    <g transform={`translate(${axisMargin}, ${axisMargin})`}>{rects}</g>
                 </svg>
                 {Tooltip}
             </SvgContainer>
