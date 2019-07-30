@@ -96,6 +96,12 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     const gridWidth = Math.floor(innerWidth / shownWeeks) - gridMargin;
     const gridHeight = gridWidth;
     const height = (gridWidth + gridMargin) * 7 + gridMargin;
+    let toolTipTop = chosenIndex
+        ? (gridMargin + gridWidth) * (grids[chosenIndex].day + 1.8) + axisMargin
+        : 0;
+    if (toolTipTop + 20 > height + axisMargin) {
+        toolTipTop -= 70;
+    }
     const Tooltip = chosenIndex ? (
         <div
             style={{
@@ -103,10 +109,12 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                 color: 'white',
                 position: 'absolute',
                 left: (gridMargin + gridWidth) * grids[chosenIndex].week + axisMargin,
-                top: (gridMargin + gridWidth) * (grids[chosenIndex].day + 1.8) + axisMargin,
+                top: toolTipTop,
                 padding: '16px 8px',
                 borderRadius: 8,
-                zIndex: 10
+                zIndex: 10,
+                overflow: 'hidden',
+                textOverflow: 'clip'
             }}
         >
             <span style={{ fontWeight: 700 }}>
@@ -165,11 +173,11 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
             weekMonthMap[v.week] = v.month;
         });
         const firstMonthWeekPair: [number, number][] = [];
-        for (let i = 0; i < weekMonthMap.length; i += 1) {
+        for (let i = 0; i < weekMonthMap.length - 1; i += 1) {
             const week = i;
             const month = weekMonthMap[week];
             if (firstMonthWeekPair.findIndex(v => v[0] === month) === -1) {
-                firstMonthWeekPair.push([month, week]);
+                firstMonthWeekPair.push([month, week + 1]);
             }
         }
 

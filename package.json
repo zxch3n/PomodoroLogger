@@ -131,6 +131,7 @@
   },
   "dependencies": {
     "@types/classnames": "^2.2.9",
+    "@types/echarts": "^4.1.9",
     "@types/lodash": "^4.14.135",
     "@types/nedb": "^1.8.7",
     "@types/redux-thunk": "^2.1.0",
@@ -139,6 +140,7 @@
     "antd": "^3.19.7",
     "classnames": "^2.2.6",
     "deox": "^2.1.0",
+    "echarts": "^4.2.1",
     "lodash": "^4.17.14",
     "nedb": "^1.8.0",
     "react": "^16.8.6",
