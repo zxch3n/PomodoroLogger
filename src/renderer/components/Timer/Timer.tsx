@@ -16,6 +16,7 @@ import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
 import { TodoList } from '../Project/Project';
 import { getIdFromProjectName } from '../../dbs';
+import { DualPieChart, PomodoroDualPieChart } from '../Visualization/DualPieChart';
 
 const { Sider } = Layout;
 
@@ -26,7 +27,7 @@ const ProgressTextContainer = styled.div`
 `;
 
 const TimerLayout = styled.div`
-    max-width: 400px;
+    max-width: 500px;
     margin: 10px auto;
 `;
 
@@ -220,7 +221,9 @@ class Timer extends Component<Props, State> {
                 const finishedSessions = await getTodaySessions();
                 const thisSession = this.monitor.sessionData;
                 if (this.props.timer.project) {
-                    thisSession.projectId = await getIdFromProjectName(this.props.timer.project);
+                    thisSession.projectId = await getIdFromProjectName(
+                        this.props.timer.project
+                    ).catch(() => undefined);
                 }
 
                 finishedSessions.push(thisSession);
@@ -406,6 +409,8 @@ class Timer extends Component<Props, State> {
                                 )}
                             </Col>
                         </Row>
+                        <h2>Time Spent</h2>
+                        <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={500} />
                     </MoreInfo>
 
                     <MoreInfo

@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Statistic, Card, Icon, Row, Col } from 'antd';
-import { HistoryActionCreatorTypes, actions, HistoryState } from './action';
+import React, { useEffect, useRef, useState } from 'react';
+import { Card, Col, Row, Statistic } from 'antd';
+import { HistoryActionCreatorTypes, HistoryState } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
-import { DualPieChart } from '../Visualization/DualPieChart';
+import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroRecord } from '../../monitor';
 import { Counter } from '../../utils';
-import { getNameFromProjectId } from '../../dbs';
 
 const Container = styled.div`
     max-width: 1200px;
@@ -66,44 +65,6 @@ const _getDateFromTimestamp = (time: number): Date => {
     return new Date(dateStr);
 };
 
-interface TimeSpentData {
-    projectData: { name: string; value: number }[];
-    appData: { name: string; value: number }[];
-}
-
-const getTimeSpentDataFromRecords = async (pomodoros: PomodoroRecord[]): Promise<TimeSpentData> => {
-    const appTimeCounter = new Counter();
-    const projectTimeCounter = new Counter();
-    const UNK = 'UNK[qqwe]';
-    for (const pomodoro of pomodoros) {
-        if (pomodoro.projectId) {
-            projectTimeCounter.add(pomodoro.projectId, pomodoro.spentTimeInHour);
-        } else {
-            projectTimeCounter.add(UNK, pomodoro.spentTimeInHour);
-        }
-
-        const apps = pomodoro.apps;
-        for (const app in apps) {
-            appTimeCounter.add(apps[app].appName, apps[app].spentTimeInHour);
-        }
-    }
-
-    const projectData = projectTimeCounter.getNameValuePairs({ toFixed: 2 });
-    for (const v of projectData) {
-        if (v.name === UNK) {
-            v.name = 'Unknown';
-            continue;
-        }
-
-        v.name = await getNameFromProjectId(v.name);
-    }
-
-    return {
-        projectData,
-        appData: appTimeCounter.getNameValuePairs({ toFixed: 2, topK: 10 })
-    };
-};
-
 const getPomodoroCount = (days: number, pomodoros: PomodoroRecord[]): number => {
     const time = _getDateFromTimestamp(new Date().getTime()).getTime() - days * 24 * 3600 * 1000;
     let n = 0;
@@ -120,7 +81,6 @@ interface Props extends HistoryState, HistoryActionCreatorTypes {}
 export const History: React.FunctionComponent<Props> = (props: Props) => {
     const container = useRef<HTMLDivElement>();
     const [calendarWidth, setCalendarWidth] = useState(800);
-    const [timeSpent, setTimeSpent] = useState<TimeSpentData>({ projectData: [], appData: [] });
 
     const resizeEffect = () => {
         const setWidth = () => {
@@ -142,11 +102,6 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
         props.fetchHistoryFromDisk();
     }, []);
     useEffect(resizeEffect, []);
-    useEffect(() => {
-        getTimeSpentDataFromRecords(props.records).then(v => {
-            setTimeSpent(v);
-        });
-    }, [props.records]);
 
     return (
         // @ts-ignore
@@ -189,7 +144,7 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                         data={getPomodoroCalendarData(props.records)}
                         width={calendarWidth}
                     />
-                    <DualPieChart width={calendarWidth} {...timeSpent} />
+                    <PomodoroDualPieChart pomodoros={props.records} width={calendarWidth} />
                 </React.Fragment>
             ) : (
                 undefined

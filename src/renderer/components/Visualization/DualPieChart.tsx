@@ -1,6 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import echarts, { ECharts, EChartOption } from 'echarts';
+import { PomodoroRecord } from '../../monitor';
+import { Counter } from '../../utils';
+import { getNameFromProjectId } from '../../dbs';
 
 const Container = styled.div`
     margin: 0 auto;
@@ -14,7 +17,7 @@ interface Props {
     appData: { name: string; value: number }[];
 }
 
-export const DualPieChart: React.FC<any> = (props: Props) => {
+export const DualPieChart: React.FC<Props> = (props: Props) => {
     const { width = 800 } = props;
     const container = React.useRef<HTMLDivElement>();
     let chart: undefined | ECharts = undefined;
@@ -103,4 +106,63 @@ export const DualPieChart: React.FC<any> = (props: Props) => {
             style={{ width, height: (width - 80) * 0.8 }}
         />
     );
+};
+
+interface PomodoroPieChartProps {
+    pomodoros: PomodoroRecord[];
+    width?: number;
+}
+
+interface TimeSpentData {
+    projectData: { name: string; value: number }[];
+    appData: { name: string; value: number }[];
+}
+
+const getTimeSpentDataFromRecords = async (pomodoros: PomodoroRecord[]): Promise<TimeSpentData> => {
+    const appTimeCounter = new Counter();
+    const projectTimeCounter = new Counter();
+    const UNK = 'UNK[qqwe]';
+    for (const pomodoro of pomodoros) {
+        if (pomodoro.projectId) {
+            projectTimeCounter.add(pomodoro.projectId, pomodoro.spentTimeInHour);
+        } else {
+            projectTimeCounter.add(UNK, pomodoro.spentTimeInHour);
+        }
+
+        const apps = pomodoro.apps;
+        for (const app in apps) {
+            appTimeCounter.add(apps[app].appName, apps[app].spentTimeInHour);
+        }
+    }
+
+    const projectData = projectTimeCounter.getNameValuePairs({ toFixed: 2 });
+    for (const v of projectData) {
+        if (v.name === UNK) {
+            v.name = 'Unknown';
+            continue;
+        }
+
+        v.name = await getNameFromProjectId(v.name).catch(() => 'Unknown');
+    }
+
+    return {
+        projectData,
+        appData: appTimeCounter.getNameValuePairs({ toFixed: 2, topK: 10 })
+    };
+};
+
+export const PomodoroDualPieChart: React.FC<PomodoroPieChartProps> = (
+    props: PomodoroPieChartProps
+) => {
+    const { pomodoros, ...restProps } = props;
+    const [timeSpent, setTimeSpent] = React.useState<TimeSpentData>({
+        projectData: [],
+        appData: []
+    });
+    React.useEffect(() => {
+        getTimeSpentDataFromRecords(pomodoros).then(v => {
+            setTimeSpent(v);
+        });
+    }, [pomodoros]);
+    return <DualPieChart {...timeSpent} {...restProps} />;
 };

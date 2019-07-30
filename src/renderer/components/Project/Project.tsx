@@ -140,7 +140,7 @@ const Project: React.FC<Props> = (props: Props) => {
         } else {
             // Change old project
             if (editingRecordRow.name === 'New Project') {
-                // TODO: raise warning
+                message.warn('Project name cannot be "New Project"');
             }
 
             props.setName(editingRowName, editingRecordRow.name);
@@ -161,6 +161,18 @@ const Project: React.FC<Props> = (props: Props) => {
             title: 'Hours',
             dataIndex: 'spentHours',
             key: 'spentHours',
+            editable: false
+        },
+        {
+            title: 'Unfinished Todos',
+            dataIndex: 'unfinishedNum',
+            key: 'unfinishedNum',
+            editable: false
+        },
+        {
+            title: 'Todos',
+            dataIndex: 'todoNum',
+            key: 'todoNum',
             editable: false
         },
         {
@@ -259,7 +271,16 @@ const Project: React.FC<Props> = (props: Props) => {
         props.fetchAll();
     }, []);
 
-    const projects = Object.values(props.projectList);
+    const projects: (ProjectItem & { todoNum?: number; unfinishedNum?: number })[] = Object.values(
+        props.projectList
+    );
+    for (const project of projects) {
+        project.spentHours = Math.floor(project.spentHours * 100) / 100;
+        const todos = Object.values(project.todoList);
+        const unfinishedNum = todos.filter(v => !v.isFinished).length;
+        project.todoNum = todos.length;
+        project.unfinishedNum = unfinishedNum;
+    }
 
     // @ts-ignore
     projects.push({ ...defaultRecord, name: 'New Project', spentHours: undefined });

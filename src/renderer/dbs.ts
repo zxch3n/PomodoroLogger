@@ -26,6 +26,10 @@ export async function getIdFromProjectName(name: string) {
                 return;
             }
 
+            if (!doc) {
+                reject(new Error(`cannot find name=${name}`));
+            }
+
             resolve(doc._id);
         });
     });
@@ -37,6 +41,10 @@ export async function getNameFromProjectId(_id: string) {
             if (err) {
                 reject(err);
                 return;
+            }
+
+            if (!doc) {
+                reject(new Error(`cannot find _id=${_id}`));
             }
 
             resolve(doc.name);

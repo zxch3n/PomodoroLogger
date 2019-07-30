@@ -217,6 +217,7 @@ export const projectReducer = createReducer<ProjectState, any>(defaultState, han
     handle(setName, (state: ProjectState, { payload: { name, newName } }) => {
         const newState = cloneDeep(state);
         newState.projectList[newName] = newState.projectList[name];
+        newState.projectList[newName].name = newName;
         delete newState.projectList[name];
         return newState;
     }),
