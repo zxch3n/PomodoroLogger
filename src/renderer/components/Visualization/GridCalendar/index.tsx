@@ -104,6 +104,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     if (toolTipTop + 20 > height + axisMargin) {
         toolTipTop -= 70;
     }
+
     const Tooltip = chosenIndex ? (
         <div
             style={{
@@ -132,14 +133,6 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
 
     const rects = grids.map((v, index) => {
         const onEnter = () => setChosenIndex(index);
-        const onLeave = () =>
-            setChosenIndex(oldIndex => {
-                if (oldIndex === index) {
-                    return undefined;
-                }
-
-                return oldIndex;
-            });
         return (
             <rect
                 width={gridWidth}
@@ -150,7 +143,6 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                     (v.count / maxCountInADay) * 70}%`}
                 key={index}
                 onMouseOver={onEnter}
-                onMouseOut={onLeave}
             />
         );
     });
@@ -196,9 +188,10 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         ));
     }
 
+    const onMouseLeave = () => setChosenIndex(undefined);
     return (
         <Container>
-            <SvgContainer>
+            <SvgContainer onMouseLeave={onMouseLeave}>
                 <svg width={width + axisMargin} height={height + axisMargin}>
                     <g transform={`translate(${axisMargin}, 0)`}>{getMonthText()}</g>
                     <g transform={`translate(0, ${axisMargin})`}>{weekdays}</g>

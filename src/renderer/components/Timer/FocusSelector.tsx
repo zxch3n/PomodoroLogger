@@ -5,7 +5,9 @@ import { TimerActionTypes as TimerActions } from './action';
 import { RootState } from '../../reducers';
 const { Option } = Select;
 
-interface Props extends ProjectActionTypes, TimerActions, RootState {}
+interface Props extends ProjectActionTypes, TimerActions, RootState {
+    width?: number;
+}
 export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
     const onChange = (value?: string) => {
         props.setProject(value);
@@ -23,13 +25,19 @@ export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
         }
     }, []);
 
+    let style: any = {
+        minWidth: 100,
+        width: '100%'
+    };
+
+    if (props.width) {
+        style = { width: props.width };
+    }
+
     return (
         <Select
             value={props.timer.project}
-            style={{
-                minWidth: 300,
-                width: '100%'
-            }}
+            style={style}
             placeholder="Choose Your Focus"
             onChange={onChange}
         >

@@ -18,6 +18,7 @@ export interface ApplicationSpentTime {
 }
 
 export interface ProjectItem {
+    _id: string;
     name: string;
     todoList: { [todoTitle: string]: TodoItem };
     spentHours: number;
@@ -33,7 +34,10 @@ export function createProjectItem(name: string) {
     } as ProjectItem;
 }
 
-const defaultProjectItem: ProjectItem = {
+const defaultProjectItem: Pick<
+    ProjectItem,
+    'name' | 'todoList' | 'spentHours' | 'applicationSpentTime'
+> = {
     name: '',
     todoList: {},
     spentHours: 0,
@@ -50,8 +54,9 @@ const defaultState: ProjectState = {
     projectList: {}
 };
 
-export const addItem = createActionCreator('[Project]ADD_ITEM', resolve => (name: string) =>
-    resolve({ name })
+export const addItem = createActionCreator(
+    '[Project]ADD_ITEM',
+    resolve => (_id: string, name: string) => resolve({ _id, name })
 );
 
 export const removeItem = createActionCreator('[Project]REMOVE_ITEM', resolve => (name: string) =>
@@ -79,7 +84,7 @@ export const setName = createActionCreator(
     resolve => (name: string, newName: string) => resolve({ name, newName })
 );
 
-export const updateAppSpentTime = createActionCreator(
+export const addAppSpentTime = createActionCreator(
     '[Project]UPDATE_APP_SPENT_TIME',
     resolve => (name: string, appName: string, spentHours: number) =>
         resolve({ name, appName, spentHours })
@@ -129,7 +134,7 @@ export const actions = {
                 throw err;
             }
 
-            dispatch(addItem(newDoc.name));
+            dispatch(addItem(newDoc._id, newDoc.name));
         });
     },
 
@@ -165,7 +170,7 @@ export const actions = {
         });
     },
 
-    updateAppSpentTime: (name: string, appName: string, spentHours: number) => (
+    addAppSpentTime: (name: string, appName: string, spentHours: number) => (
         dispatch: Dispatch
     ) => {
         dbs.projectDB.update(
@@ -179,7 +184,7 @@ export const actions = {
             { upsert: true },
             err => {
                 if (err) throw err;
-                dispatch(updateAppSpentTime(name, appName, spentHours));
+                dispatch(addAppSpentTime(name, appName, spentHours));
             }
         );
     },
@@ -190,7 +195,7 @@ export const actions = {
         dispatch(updateOnTimerFinished(name, pomodoroRecord));
         for (const appName in pomodoroRecord.apps) {
             const app = pomodoroRecord.apps[appName];
-            actions.updateAppSpentTime(name, appName, app.spentTimeInHour)(dispatch);
+            actions.addAppSpentTime(name, appName, app.spentTimeInHour)(dispatch);
         }
     }
 };
@@ -204,10 +209,11 @@ export type ProjectActionTypes = { [key in keyof typeof actions]: typeof actions
 // ==================================
 
 export const projectReducer = createReducer<ProjectState, any>(defaultState, handle => [
-    handle(addItem, (state: ProjectState, { payload: { name } }) => {
+    handle(addItem, (state: ProjectState, { payload: { _id, name } }) => {
         const newState = cloneDeep(state);
         const data = {
             ...defaultProjectItem,
+            _id,
             name
         };
         newState.projectList[name] = data;
@@ -251,24 +257,21 @@ export const projectReducer = createReducer<ProjectState, any>(defaultState, han
         return newState;
     }),
 
-    handle(
-        updateAppSpentTime,
-        (state: ProjectState, { payload: { name, appName, spentHours } }) => {
-            const newState = cloneDeep(state);
-            const project = newState.projectList[name];
-            project.spentHours += spentHours;
-            if (!(appName in project.applicationSpentTime)) {
-                project.applicationSpentTime[appName] = {
-                    spentHours: 0,
-                    keywords: [],
-                    subAppSpentTime: [],
-                    title: appName
-                };
-            }
-            project.applicationSpentTime[appName].spentHours += spentHours;
-            return newState;
+    handle(addAppSpentTime, (state: ProjectState, { payload: { name, appName, spentHours } }) => {
+        const newState = cloneDeep(state);
+        const project = newState.projectList[name];
+        project.spentHours += spentHours;
+        if (!(appName in project.applicationSpentTime)) {
+            project.applicationSpentTime[appName] = {
+                spentHours: 0,
+                keywords: [],
+                subAppSpentTime: [],
+                title: appName
+            };
         }
-    ),
+        project.applicationSpentTime[appName].spentHours += spentHours;
+        return newState;
+    }),
 
     handle(setTodoFinished, (state: ProjectState, { payload: { name, _id, isFinished } }) => {
         const newState = cloneDeep(state);

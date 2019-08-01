@@ -5,6 +5,7 @@ import { Dispatch } from 'redux';
 
 export interface HistoryState {
     records: PomodoroRecord[];
+    chosenProjectId?: string;
 }
 
 export const defaultState: HistoryState = {
@@ -24,9 +25,15 @@ const removeRecordFromHistory = createActionCreator(
     resolve => (record: PomodoroRecord) => resolve(record)
 );
 
+const setChosenProjectId = createActionCreator(
+    '[History]setChosenProjectId',
+    resolve => (project?: string) => resolve(project)
+);
+
 export const actions = {
     addRecordToHistory,
     removeRecordFromHistory,
+    setChosenProjectId,
     fetchHistoryFromDisk: () => async (dispatch: Dispatch) => {
         const records = await getAllSession();
         dispatch(fetchHistoryFromDisk(records));
@@ -54,5 +61,10 @@ export const reducer = createReducer<HistoryState, any>(defaultState, handle => 
             }
         }
         return newState;
-    })
+    }),
+
+    handle(setChosenProjectId, (state: HistoryState, { payload }) => ({
+        ...state,
+        chosenProjectId: payload
+    }))
 ]);

@@ -19,12 +19,15 @@ async function makeIcon(leftTime?: string): Promise<string> {
             reject(e);
         });
         img.addEventListener('load', e => {
-            ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 200, 200);
             if (leftTime !== undefined) {
                 ctx.fillStyle = 'rgb(255, 255, 255)';
-                ctx.font = '90px Arial';
+                ctx.font = '150px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(leftTime, 100, 150);
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center';
+                ctx.fillText(leftTime, 100, 100);
+            } else {
+                ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 200, 200);
             }
 
             resolve(canvas.toDataURL('image/png'));

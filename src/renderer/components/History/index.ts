@@ -5,7 +5,7 @@ import { RootState } from '../../reducers';
 import { genMapDispatchToProp } from '../../utils';
 import { HistoryActionCreatorTypes, actions } from './action';
 
-const mapStateToProps = (state: RootState) => state.history;
+const mapStateToProps = (state: RootState) => state;
 const mapDispatchToProps = genMapDispatchToProp<HistoryActionCreatorTypes>(actions);
 export default connect(
     mapStateToProps,

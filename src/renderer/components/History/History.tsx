@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Card, Col, Row, Statistic } from 'antd';
-import { HistoryActionCreatorTypes, HistoryState } from './action';
+import { Card, Col, Row, Select, Statistic } from 'antd';
+import { HistoryActionCreatorTypes } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroRecord } from '../../monitor';
 import { Counter } from '../../utils';
+import { RootState } from '../../reducers';
+
+const { Option } = Select;
 
 const Container = styled.div`
     max-width: 1200px;
     margin: 10px auto;
-    padding: 30px;
+    padding: 20px;
 `;
 
 const mock = () => {
@@ -77,7 +80,7 @@ const getPomodoroCount = (days: number, pomodoros: PomodoroRecord[]): number => 
     return n;
 };
 
-interface Props extends HistoryState, HistoryActionCreatorTypes {}
+interface Props extends RootState, HistoryActionCreatorTypes {}
 export const History: React.FunctionComponent<Props> = (props: Props) => {
     const container = useRef<HTMLDivElement>();
     const [calendarWidth, setCalendarWidth] = useState(800);
@@ -99,19 +102,48 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
     };
 
     useEffect(() => {
+        // TODO: Move all fetch all to parent
         props.fetchHistoryFromDisk();
     }, []);
     useEffect(resizeEffect, []);
 
+    const ALL_PROJECT_KEY = 'allProject[sdfasdf2f21';
+    const onChange = (v: string) => {
+        if (v === ALL_PROJECT_KEY) {
+            props.setChosenProjectId(undefined);
+        } else {
+            props.setChosenProjectId(v);
+        }
+    };
+    let pomodoros = props.history.records;
+    if (props.history.chosenProjectId !== undefined) {
+        // tslint:disable-next-line:no-parameter-reassignment
+        pomodoros = pomodoros.filter(v => v.projectId === props.history.chosenProjectId);
+    }
+
     return (
         // @ts-ignore
         <Container ref={container}>
+            <Row style={{ marginBottom: 20 }}>
+                <Select onChange={onChange} style={{ width: 200 }} defaultValue={ALL_PROJECT_KEY}>
+                    <Option value={ALL_PROJECT_KEY} key={ALL_PROJECT_KEY}>
+                        All Projects
+                    </Option>
+                    {Object.values(props.project.projectList).map(v => {
+                        return (
+                            <Option value={v._id} key={v._id}>
+                                {v.name}
+                            </Option>
+                        );
+                    })}
+                </Select>
+            </Row>
             <Row gutter={16}>
                 <Col span={8}>
                     <Card>
                         <Statistic
                             title="Pomodoros Today"
-                            value={getPomodoroCount(0, props.records)}
+                            value={getPomodoroCount(0, props.history.records)}
                             precision={0}
                             valueStyle={{ color: '#3f8600' }}
                         />
@@ -121,7 +153,7 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                     <Card>
                         <Statistic
                             title="Pomodoros This Week"
-                            value={getPomodoroCount(new Date().getDay(), props.records)}
+                            value={getPomodoroCount(new Date().getDay(), props.history.records)}
                             precision={0}
                             valueStyle={{ color: '#3f8600' }}
                         />
@@ -131,7 +163,10 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                     <Card>
                         <Statistic
                             title="Pomodoros This Month"
-                            value={getPomodoroCount(new Date().getDate() - 1, props.records)}
+                            value={getPomodoroCount(
+                                new Date().getDate() - 1,
+                                props.history.records
+                            )}
                             precision={0}
                             valueStyle={{ color: '#cf1322' }}
                         />
@@ -140,11 +175,8 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             </Row>
             {calendarWidth > 670 ? (
                 <React.Fragment>
-                    <GridCalendar
-                        data={getPomodoroCalendarData(props.records)}
-                        width={calendarWidth}
-                    />
-                    <PomodoroDualPieChart pomodoros={props.records} width={calendarWidth} />
+                    <GridCalendar data={getPomodoroCalendarData(pomodoros)} width={calendarWidth} />
+                    <PomodoroDualPieChart pomodoros={pomodoros} width={calendarWidth} />
                 </React.Fragment>
             ) : (
                 undefined

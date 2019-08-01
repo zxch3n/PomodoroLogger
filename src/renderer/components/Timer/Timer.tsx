@@ -6,7 +6,6 @@ import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor, PomodoroRecord } from '../../monitor';
-import { UsagePieChart } from '../Visualization/UsagePieChart';
 import styled from 'styled-components';
 import { nativeImage, remote } from 'electron';
 import RestIcon from '../../../res/rest.svg';
@@ -16,22 +15,25 @@ import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
 import { TodoList } from '../Project/Project';
 import { getIdFromProjectName } from '../../dbs';
-import { DualPieChart, PomodoroDualPieChart } from '../Visualization/DualPieChart';
+import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 
 const { Sider } = Layout;
+const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
 const ProgressTextContainer = styled.div`
     padding: 12px;
     text-align: center;
-    transform: translateY(0.3em);
+    transform: translateY(0.4em);
 `;
 
 const TimerLayout = styled.div`
-    max-width: 500px;
+    max-width: 1080px;
     margin: 10px auto;
 `;
 
 const ProgressContainer = styled.div`
+    max-width: 800px;
+    margin: 0 auto;
     width: 100%;
     display: block;
     position: relative;
@@ -84,6 +86,7 @@ interface State {
 class Timer extends Component<Props, State> {
     interval?: any;
     monitor?: Monitor;
+    mainDiv: React.RefObject<HTMLDivElement>;
 
     constructor(props: Props) {
         super(props);
@@ -94,6 +97,7 @@ class Timer extends Component<Props, State> {
             more: false,
             pomodorosToday: []
         };
+        this.mainDiv = React.createRef<HTMLDivElement>();
     }
 
     activeWinListener = (appName: string, data: PomodoroRecord, imgUrl?: string) => {
@@ -118,6 +122,49 @@ class Timer extends Component<Props, State> {
         getTodaySessions().then(finishedSessions => {
             this.setState({ pomodorosToday: finishedSessions });
         });
+
+        this.addMenuItems();
+    }
+
+    addMenuItems(): void {
+        setMenuItems([
+            {
+                label: 'Start Focusing',
+                type: 'normal',
+                click: () => {
+                    if (!this.props.timer.isFocusing) {
+                        this.switchMode();
+                    }
+
+                    this.onStart();
+                }
+            },
+            {
+                label: 'Start Resting',
+                type: 'normal',
+                click: () => {
+                    if (this.props.timer.isFocusing) {
+                        this.switchMode();
+                    }
+
+                    this.onStart();
+                }
+            },
+            {
+                label: 'Stop',
+                type: 'normal',
+                click: () => {
+                    if (this.props.timer.isRunning) {
+                        this.onStopResumeOrStart();
+                    }
+                }
+            },
+            {
+                label: 'Clear',
+                type: 'normal',
+                click: this.onClear
+            }
+        ]);
     }
 
     componentWillUnmount(): void {
@@ -326,7 +373,7 @@ class Timer extends Component<Props, State> {
                 ) : (
                     undefined
                 )}
-                <TimerLayout>
+                <TimerLayout ref={this.mainDiv}>
                     <ProgressContainer>
                         <Progress
                             type="circle"
@@ -361,6 +408,9 @@ class Timer extends Component<Props, State> {
                         </span>
                     </ProgressContainer>
 
+                    <div style={{ margin: '2em auto', textAlign: 'center' }}>
+                        <FocusSelector {...this.props} width={240} />
+                    </div>
                     <ButtonRow>
                         {isRunning ? (
                             <Icon
@@ -378,8 +428,6 @@ class Timer extends Component<Props, State> {
                         <Icon type="close-circle" title="Clear" onClick={this.onClear} />
                         <Icon type="more" title="Show More" onClick={this.toggleMode} />
                     </ButtonRow>
-
-                    <FocusSelector {...this.props} />
 
                     <MoreInfo>
                         <h2>Pomodoros Today</h2>
@@ -409,8 +457,6 @@ class Timer extends Component<Props, State> {
                                 )}
                             </Col>
                         </Row>
-                        <h2>Time Spent</h2>
-                        <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={500} />
                     </MoreInfo>
 
                     <MoreInfo
@@ -418,17 +464,8 @@ class Timer extends Component<Props, State> {
                             display: more ? 'block' : 'none'
                         }}
                     >
-                        <h2>Application Usage</h2>
-                        <UsagePieChart
-                            rows={Object.values(apps).map(row => ({
-                                name: row.appName,
-                                value: row.spentHours * 60
-                            }))}
-                            unit={'Min'}
-                            size={100}
-                        />
-
-                        <Divider />
+                        <h2>Time Spent</h2>
+                        <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={800} />
 
                         <h2>Screen Shot</h2>
                         {this.state.screenShotUrl ? (

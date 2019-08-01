@@ -8,7 +8,7 @@ import {
     ProjectState,
     removeItem,
     setName,
-    updateAppSpentTime
+    addAppSpentTime
 } from './action';
 import dbs from '../../dbs';
 import { createTodoItem } from '../TODO/action';
@@ -34,13 +34,13 @@ describe('Project reducer', () => {
     });
 
     it("'s addItem works", () => {
-        const state: ProjectState = projectReducer(undefined, addItem('myProject'));
+        const state: ProjectState = projectReducer(undefined, addItem('me', 'myProject'));
         expect(state.projectList).toHaveProperty('myProject');
         expect(state.projectList.myProject.name).toBe('myProject');
     });
 
     it("'s removeItem works", () => {
-        let state: ProjectState = projectReducer(undefined, addItem('myProject'));
+        let state: ProjectState = projectReducer(undefined, addItem('me', 'myProject'));
         expect(state.projectList).toHaveProperty('myProject');
         expect(state.projectList.myProject.name).toBe('myProject');
         state = projectReducer(state, removeItem('myProject'));
@@ -66,30 +66,33 @@ describe('Project reducer', () => {
         expect(state.projectList).toHaveProperty('newProject');
     });
 
-    it("'s updateAppSpentTime works", () => {
+    it("'s addAppSpentTime works", () => {
         const state: ProjectState = projectReducer(
             defaultProjectState,
-            updateAppSpentTime('project1', 'Chrome', 100)
+            addAppSpentTime('project1', 'Chrome', 100)
         );
 
-        expect(state.projectList.project1.applicationSpentTime.Chrome.spentHours).toBe(100);
+        expect(state.projectList.project1.applicationSpentTime.Chrome.spentHours).toBe(130);
     });
 
     it("'s fetchAll works", () => {
         const newProjectMap: ProjectItem[] = [
             {
+                _id: 'projectElu0',
                 name: 'projectElu0',
                 todoList: {},
                 spentHours: 0,
                 applicationSpentTime: {}
             },
             {
+                _id: 'projectElu1',
                 name: 'projectElu1',
                 todoList: {},
                 spentHours: 1,
                 applicationSpentTime: {}
             },
             {
+                _id: 'projectElu2',
                 name: 'projectElu2',
                 todoList: {},
                 spentHours: 2,
@@ -263,10 +266,10 @@ describe('Project thunk actionCreator', () => {
         expect(item.todoList).not.toHaveProperty(_id);
     });
 
-    it('can updateAppSpentTime', async () => {
+    it('can addAppSpentTime', async () => {
         const name = generateRandomName();
         await addProjectToDB(name);
-        const thunk = actions.updateAppSpentTime(name, 'Chrome', 100);
+        const thunk = actions.addAppSpentTime(name, 'Chrome', 100);
         await new Promise(resolve => {
             const dispatch = jest.fn(x => {
                 expect(x.payload.name).toEqual(name);
@@ -290,6 +293,7 @@ describe('Project thunk actionCreator', () => {
 const defaultProjectState: ProjectState = {
     projectList: {
         project0: {
+            _id: 'project0',
             name: 'project0',
             todoList: {},
             spentHours: 30,
@@ -304,6 +308,7 @@ const defaultProjectState: ProjectState = {
         },
 
         project1: {
+            _id: 'project1',
             name: 'project1',
             todoList: {
                 'Learn deep learning': createTodoItem('Learn deep learning')

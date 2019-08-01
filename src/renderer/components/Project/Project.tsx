@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Checkbox,
-    Dropdown,
-    message,
-    Popconfirm,
-    Button,
-    Form,
-    List,
-    Input,
-    Table,
-    Icon,
-    Menu
-} from 'antd';
+import { Checkbox, Dropdown, Icon, Input, List, Menu, message, Popconfirm, Table } from 'antd';
 import { ProjectActionTypes, ProjectItem, ProjectState } from './action';
 import { TodoItem } from '../TODO/action';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
@@ -164,12 +152,6 @@ const Project: React.FC<Props> = (props: Props) => {
             editable: false
         },
         {
-            title: 'Unfinished Todos',
-            dataIndex: 'unfinishedNum',
-            key: 'unfinishedNum',
-            editable: false
-        },
-        {
             title: 'Todos',
             dataIndex: 'todoNum',
             key: 'todoNum',
@@ -271,15 +253,12 @@ const Project: React.FC<Props> = (props: Props) => {
         props.fetchAll();
     }, []);
 
-    const projects: (ProjectItem & { todoNum?: number; unfinishedNum?: number })[] = Object.values(
-        props.projectList
-    );
+    const projects: (ProjectItem & { todoNum?: string })[] = Object.values(props.projectList);
     for (const project of projects) {
         project.spentHours = Math.floor(project.spentHours * 100) / 100;
         const todos = Object.values(project.todoList);
         const unfinishedNum = todos.filter(v => !v.isFinished).length;
-        project.todoNum = todos.length;
-        project.unfinishedNum = unfinishedNum;
+        project.todoNum = `${unfinishedNum} / ${todos.length}`;
     }
 
     // @ts-ignore

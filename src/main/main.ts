@@ -7,6 +7,7 @@ import logo from '../res/TimeLogger.png';
 const mGlobal: typeof global & {
     sharedDB?: typeof db;
     tray?: Tray;
+    setMenuItems?: any;
 } = global;
 mGlobal.sharedDB = db;
 let win: BrowserWindow | undefined;
@@ -30,8 +31,8 @@ const createWindow = async () => {
     }
 
     win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1080,
+        height: 800,
         frame: true,
         icon: nativeImage.createFromPath(path.join(__dirname, logo))
     });
@@ -79,15 +80,17 @@ const createWindow = async () => {
 app.on('ready', async () => {
     const img = nativeImage.createFromPath(path.join(__dirname, logo));
     mGlobal.tray = new Tray(img);
-    const contextMenu = Menu.buildFromTemplate([
+    const menuItems = [
         {
             label: 'Quit',
             type: 'normal',
-            click: menuItem => {
+            click: () => {
                 app.quit();
             }
         }
-    ]);
+    ];
+    // @ts-ignore
+    const contextMenu = Menu.buildFromTemplate(menuItems);
     mGlobal.tray.setToolTip('Time Logger');
     mGlobal.tray.setContextMenu(contextMenu);
 
@@ -102,6 +105,27 @@ app.on('ready', async () => {
     await createWindow();
 });
 
+function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
+    if (!mGlobal.tray) {
+        return;
+    }
+
+    const menuItems = items.concat([
+        {
+            label: 'Quit',
+            type: 'normal',
+            click: () => {
+                app.quit();
+            }
+        }
+    ]);
+
+    // @ts-ignore
+    const contextMenu = Menu.buildFromTemplate(menuItems);
+    mGlobal.tray.setContextMenu(contextMenu);
+}
+
+mGlobal.setMenuItems = setMenuItems;
 app.on('window-all-closed', () => {
     if (!win) {
         db.settingDB.persistence.compactDatafile();
