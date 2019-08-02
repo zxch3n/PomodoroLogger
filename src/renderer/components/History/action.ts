@@ -31,9 +31,11 @@ const setChosenProjectId = createActionCreator(
 );
 
 export const actions = {
-    addRecordToHistory,
     removeRecordFromHistory,
     setChosenProjectId,
+    addRecordToHistory: (record: PomodoroRecord) => (dispatch: Dispatch) => {
+        dispatch(addRecordToHistory(record));
+    },
     fetchHistoryFromDisk: () => async (dispatch: Dispatch) => {
         const records = await getAllSession();
         dispatch(fetchHistoryFromDisk(records));

@@ -3,6 +3,7 @@ import { PomodoroRecord } from '../../monitor';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
 import { actions as projectActions } from '../Project/action';
+import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
 import dbs from '../../dbs';
 
@@ -133,6 +134,8 @@ export const actions = {
             if (project) {
                 projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
             }
+
+            historyActions.addRecordToHistory(sessionData)(dispatch);
         }
     }
 };
