@@ -35,7 +35,7 @@ describe('Main Window', () => {
         await client.waitUntilWindowLoaded();
         const title = await browserWindow.getTitle();
 
-        expect(title).toBe('Time-Logger');
+        expect(title).toBe('Pomodoro Logger');
     });
 
     it('has a timer', async () => {

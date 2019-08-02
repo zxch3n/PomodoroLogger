@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
 import logo from '../res/TimeLogger.png';
+import { build } from '../../package.json';
 
 const mGlobal: typeof global & {
     sharedDB?: typeof db;
@@ -34,7 +35,8 @@ const createWindow = async () => {
         width: 1080,
         height: 800,
         frame: true,
-        icon: nativeImage.createFromPath(path.join(__dirname, logo))
+        icon: nativeImage.createFromPath(path.join(__dirname, logo)),
+        title: 'Pomodoro Logger'
     });
 
     if (process.env.NODE_ENV === 'development') {
@@ -138,6 +140,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
     if (!win) {
+        app.setName(build.productName);
         createWindow();
     }
 });

@@ -1,5 +1,5 @@
 {
-  "name": "time-logger",
+  "name": "pomodoro-logger",
   "version": "0.0.0",
   "description": "pomodoro project-time-logger",
   "main": "./dist/main.js",
@@ -37,7 +37,7 @@
     ]
   },
   "build": {
-    "productName": "TimeLogger",
+    "productName": "Pomodoro Logger",
     "appId": "com.electron.time-logger",
     "mac": {
       "category": "your.app.category.type"

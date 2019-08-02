@@ -30,6 +30,7 @@ class UsageRecorder {
     }
 
     get sessionData() {
+        this.normalizeTitleSpentTime();
         return this.record;
     }
 
@@ -91,9 +92,12 @@ class UsageRecorder {
         }
 
         await this.updateThisAppUsageInfo(appName, result.title).catch(err => {
-            this.lock = false;
-            throw err;
+            if (err) {
+                this.lock = false;
+                throw err;
+            }
         });
+        this.lastUsingApp = appName;
         this.monitorListener(appName, this.record, this.lastScreenShotUrl);
         this.lock = false;
     };
@@ -118,14 +122,18 @@ class UsageRecorder {
     };
 
     updateThisAppUsageInfo = async (appName: string, title: string) => {
-        const appRow = this.record.apps[appName];
         const row = this.record.apps[appName];
         const now = new Date().getTime();
-        // TODO: add time info?
-        appRow.titleSpentTime[title] = 1;
         if (!row) {
             throw new Error();
         }
+
+        // Count the title occurrences.
+        // This should be normalized when session finished.
+        if (!(title in row.titleSpentTime)) {
+            row.titleSpentTime[title] = 0;
+        }
+        row.titleSpentTime[title] += 1;
 
         if (row.lastUpdateTime) {
             const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
@@ -134,13 +142,29 @@ class UsageRecorder {
         }
 
         row.lastUpdateTime = now;
-        await this.takeCareOfScreenShot(appRow).catch(err => {
+        await this.takeCareOfScreenShot(row).catch(err => {
             if (err) {
                 console.error(err);
                 throw err;
             }
         });
-        this.lastUsingApp = appName;
+    };
+
+    private normalizeTitleSpentTime = () => {
+        let totalTitleOccurrences = 0;
+        for (const app in this.record.apps) {
+            const titles = this.record.apps[app].titleSpentTime;
+            for (const title in titles) {
+                totalTitleOccurrences += titles[title];
+            }
+        }
+
+        for (const app in this.record.apps) {
+            const titles = this.record.apps[app].titleSpentTime;
+            for (const title in titles) {
+                titles[title] /= totalTitleOccurrences;
+            }
+        }
     };
 
     takeCareOfScreenShot = async (appRow: ApplicationSpentTime) => {
