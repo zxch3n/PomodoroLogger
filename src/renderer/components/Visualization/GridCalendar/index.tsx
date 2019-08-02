@@ -90,7 +90,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     const day = (new Date(till).getDay() + 1) % 7;
     const shownGrids = (day === 0 ? 7 : day) + (shownWeeks - 1) * 7;
     const grids = getGridData(data, tillTimestamp, shownGrids);
-    const maxCountInADay = Math.max(...grids.map(v => v.count));
+    const maxCountInADay = Math.max(5, Math.max(...grids.map(v => v.count)));
     const axisMargin = 28;
     const innerWidth = width - axisMargin;
 

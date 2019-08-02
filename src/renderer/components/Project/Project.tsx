@@ -85,7 +85,7 @@ export const TodoList: React.FC<TodoListProps> = ({
         );
     };
 
-    const onKeyDown = (event: any) => {
+    const onTodoKeyDown = (event: any) => {
         if (event.key === 'Enter' || event.which === 13) {
             if (newTodo.length === 0) {
                 message.warn('Todo title cannot be empty');
@@ -107,7 +107,7 @@ export const TodoList: React.FC<TodoListProps> = ({
             <List.Item>
                 <Input
                     placeholder={'New TODO'}
-                    onKeyDown={onKeyDown}
+                    onKeyDown={onTodoKeyDown}
                     value={newTodo}
                     onChange={onChange}
                 />
@@ -249,6 +249,16 @@ const Project: React.FC<Props> = (props: Props) => {
         return <TodoList project={record} {...props} />;
     };
 
+    const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!editingRecordRow) {
+            return;
+        }
+
+        if (event.key === 'Enter' || event.which === 13) {
+            save();
+        }
+    };
+
     useEffect(() => {
         props.fetchAll();
     }, []);
@@ -264,7 +274,7 @@ const Project: React.FC<Props> = (props: Props) => {
     // @ts-ignore
     projects.push({ ...defaultRecord, name: 'New Project', spentHours: undefined });
     return (
-        <Container>
+        <Container onKeyDown={onKeyDown}>
             <Table
                 rowKey={'name'}
                 components={{ body: { cell: EditableCell } }}

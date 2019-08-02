@@ -115,7 +115,8 @@ function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
             label: 'Quit',
             type: 'normal',
             click: () => {
-                app.quit();
+                win = undefined;
+                app.exit();
             }
         }
     ]);
@@ -131,7 +132,7 @@ app.on('window-all-closed', () => {
         db.settingDB.persistence.compactDatafile();
         db.projectDB.persistence.compactDatafile();
         db.sessionDB.persistence.compactDatafile();
-        app.quit();
+        app.exit();
     }
 });
 
