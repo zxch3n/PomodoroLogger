@@ -74,6 +74,17 @@ function to2digits(num: number) {
     return num;
 }
 
+function joinDict<T>(maps: { [key: string]: T }[]): { [key: string]: T } {
+    const dict: { [key: string]: T } = {};
+    for (const d of maps) {
+        for (const key in d) {
+            dict[key] = d[key];
+        }
+    }
+
+    return dict;
+}
+
 interface State {
     leftTime: string;
     screenShotUrl?: string;
@@ -336,9 +347,17 @@ class Timer extends Component<Props, State> {
         const { leftTime, percent, more, pomodorosToday } = this.state;
         const { isRunning, targetTime } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
-        const projectItem: ProjectItem | undefined = this.props.timer.project
+        const projectItem: ProjectItem = this.props.timer.project
             ? this.props.project.projectList[this.props.timer.project]
-            : undefined;
+            : {
+                spentHours: 0,
+                name: 'All TODOs',
+                applicationSpentTime: {},
+                todoList: joinDict(
+                      Object.values(this.props.project.projectList).map(v => v.todoList)
+                  ),
+                _id: 'All TODOs'
+            };
         for (const pomodoro of pomodorosToday) {
             for (const appName in pomodoro.apps) {
                 if (!(appName in apps)) {
@@ -356,23 +375,19 @@ class Timer extends Component<Props, State> {
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
         return (
             <Layout style={{ backgroundColor: 'white' }}>
-                {projectItem ? (
-                    <Sider
-                        breakpoint="md"
-                        collapsedWidth="0"
-                        theme="light"
-                        style={{ border: '1px solid rgb(240, 240, 240)', borderRadius: 8 }}
-                    >
-                        <div style={{ padding: 12 }}>
-                            <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
-                                {this.props.timer.project}
-                            </h1>
-                            <TodoList {...this.props} project={projectItem} />
-                        </div>
-                    </Sider>
-                ) : (
-                    undefined
-                )}
+                <Sider
+                    breakpoint="md"
+                    collapsedWidth="0"
+                    theme="light"
+                    style={{ border: '1px solid rgb(240, 240, 240)', borderRadius: 8 }}
+                >
+                    <div style={{ padding: 12 }}>
+                        <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
+                            {this.props.timer.project}
+                        </h1>
+                        <TodoList {...this.props} project={projectItem} />
+                    </div>
+                </Sider>
                 <TimerLayout ref={this.mainDiv}>
                     <ProgressContainer>
                         <Progress

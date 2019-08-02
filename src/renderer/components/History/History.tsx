@@ -102,18 +102,12 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
     };
 
     useEffect(() => {
-        // TODO: Move all fetch all to parent
         props.fetchHistoryFromDisk();
     }, []);
     useEffect(resizeEffect, []);
 
-    const ALL_PROJECT_KEY = 'allProject[sdfasdf2f21';
     const onChange = (v: string) => {
-        if (v === ALL_PROJECT_KEY) {
-            props.setChosenProjectId(undefined);
-        } else {
-            props.setChosenProjectId(v);
-        }
+        props.setChosenProjectId(v);
     };
     let pomodoros = props.history.records;
     if (props.history.chosenProjectId !== undefined) {
@@ -121,12 +115,23 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
         pomodoros = pomodoros.filter(v => v.projectId === props.history.chosenProjectId);
     }
 
+    const onProjectClick = (name: string) => {
+        if (name in props.project.projectList) {
+            props.setChosenProjectId(props.project.projectList[name]._id);
+        }
+    };
+
     return (
         // @ts-ignore
         <Container ref={container}>
             <Row style={{ marginBottom: 20 }}>
-                <Select onChange={onChange} style={{ width: 200 }} defaultValue={ALL_PROJECT_KEY}>
-                    <Option value={ALL_PROJECT_KEY} key={ALL_PROJECT_KEY}>
+                <Select
+                    onChange={onChange}
+                    value={props.history.chosenProjectId}
+                    style={{ width: 200 }}
+                    placeholder={'Set Project Filter'}
+                >
+                    <Option value={undefined} key="All Projects">
                         All Projects
                     </Option>
                     {Object.values(props.project.projectList).map(v => {
@@ -176,7 +181,11 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             {calendarWidth > 670 ? (
                 <React.Fragment>
                     <GridCalendar data={getPomodoroCalendarData(pomodoros)} width={calendarWidth} />
-                    <PomodoroDualPieChart pomodoros={pomodoros} width={calendarWidth} />
+                    <PomodoroDualPieChart
+                        pomodoros={pomodoros}
+                        width={calendarWidth}
+                        onProjectClick={onProjectClick}
+                    />
                 </React.Fragment>
             ) : (
                 undefined

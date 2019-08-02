@@ -9,17 +9,19 @@ import History from './History';
 import { connect } from 'react-redux';
 import { TimerActionTypes, actions as timerActions } from './Timer/action';
 import { ProjectActionTypes, actions as projectActions } from './Project/action';
+import { HistoryActionCreatorTypes, actions as historyActions } from './History/action';
 import { RootState } from '../reducers';
 import { genMapDispatchToProp } from '../utils';
 
 const { TabPane } = Tabs;
 
-interface Props extends TimerActionTypes, ProjectActionTypes {}
+interface Props extends TimerActionTypes, ProjectActionTypes, HistoryActionCreatorTypes {}
 
 const Application = (props: Props) => {
     React.useEffect(() => {
         props.fetchAll();
         props.fetchSettings();
+        props.fetchHistoryFromDisk();
     }, []);
 
     return (
@@ -77,9 +79,10 @@ const Application = (props: Props) => {
 
 const ApplicationContainer = connect(
     undefined,
-    genMapDispatchToProp<TimerActionTypes & ProjectActionTypes>({
+    genMapDispatchToProp<TimerActionTypes & ProjectActionTypes & HistoryActionCreatorTypes>({
         ...timerActions,
-        ...projectActions
+        ...projectActions,
+        ...historyActions
     })
 )(Application);
 

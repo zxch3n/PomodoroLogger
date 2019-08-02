@@ -15,6 +15,7 @@ interface Props {
     width?: number;
     projectData: { name: string; value: number }[];
     appData: { name: string; value: number }[];
+    onProjectClick?: (project: string) => void;
 }
 
 export const DualPieChart: React.FC<Props> = (props: Props) => {
@@ -97,6 +98,11 @@ export const DualPieChart: React.FC<Props> = (props: Props) => {
             ]
         };
         chart.setOption(option);
+        chart.on('click', (event: any) => {
+            if (props.onProjectClick && event.seriesName === 'Project Hours') {
+                props.onProjectClick(event.data.name);
+            }
+        });
     });
 
     return (
@@ -108,9 +114,8 @@ export const DualPieChart: React.FC<Props> = (props: Props) => {
     );
 };
 
-interface PomodoroPieChartProps {
+interface PomodoroPieChartProps extends Partial<Props> {
     pomodoros: PomodoroRecord[];
-    width?: number;
 }
 
 interface TimeSpentData {
