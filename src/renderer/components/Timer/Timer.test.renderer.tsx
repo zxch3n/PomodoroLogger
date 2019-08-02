@@ -2,12 +2,12 @@ import React from 'react';
 import Timer, { Props as TimerProps } from './Timer';
 import renderer from 'react-test-renderer';
 import { cloneDeep } from 'lodash';
-import { unwatchFile } from 'fs';
+import { ProjectState } from '../Project/action';
 
 jest.setTimeout(10000);
 
 // @ts-ignore
-const defaultProps: TimerProps = {
+const defaultProps: TimerProps & { project: ProjectState } = {
     todo: {
         todoList: []
     },
@@ -21,6 +21,17 @@ const defaultProps: TimerProps = {
 
         monitorInterval: 1000,
         screenShotInterval: undefined
+    },
+    project: {
+        projectList: {
+            a: {
+                name: 'a',
+                todoList: {},
+                _id: 'a',
+                applicationSpentTime: {},
+                spentHours: 3
+            }
+        }
     }
 };
 

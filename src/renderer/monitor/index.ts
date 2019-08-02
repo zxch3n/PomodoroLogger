@@ -131,9 +131,12 @@ class UsageRecorder {
         // Count the title occurrences.
         // This should be normalized when session finished.
         if (!(title in row.titleSpentTime)) {
-            row.titleSpentTime[title] = 0;
+            row.titleSpentTime[title] = {
+                normalizedWeight: 0,
+                occurrence: 0
+            };
         }
-        row.titleSpentTime[title] += 1;
+        row.titleSpentTime[title].occurrence += 1;
 
         if (row.lastUpdateTime) {
             const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
@@ -155,14 +158,14 @@ class UsageRecorder {
         for (const app in this.record.apps) {
             const titles = this.record.apps[app].titleSpentTime;
             for (const title in titles) {
-                totalTitleOccurrences += titles[title];
+                totalTitleOccurrences += titles[title].occurrence;
             }
         }
 
         for (const app in this.record.apps) {
             const titles = this.record.apps[app].titleSpentTime;
             for (const title in titles) {
-                titles[title] /= totalTitleOccurrences;
+                titles[title].normalizedWeight = titles[title].occurrence / totalTitleOccurrences;
             }
         }
     };
@@ -300,7 +303,7 @@ export class Monitor {
 export interface ApplicationSpentTime {
     appName: string;
     spentTimeInHour: number;
-    titleSpentTime: { [title: string]: number };
+    titleSpentTime: { [title: string]: { occurrence: number; normalizedWeight: number } };
     // how many times user switched to this app
     switchTimes: number;
     // how long the screen shot stay the same in this app

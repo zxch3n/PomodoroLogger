@@ -59,4 +59,20 @@ describe('Monitor', () => {
     it('can clear correctly', async () => {
         // TODO:
     });
+
+    it('will normalize timer when session is finished', async () => {
+        const monitor = new Monitor(() => {}, 500);
+        monitor.start();
+        await new Promise(r => setTimeout(r, 1000));
+        monitor.stop();
+        let sum = 0;
+        for (const app in monitor.sessionData.apps) {
+            const titles = monitor.sessionData.apps[app].titleSpentTime;
+            for (const t in titles) {
+                sum += titles[t].normalizedWeight;
+            }
+        }
+
+        expect(sum).toBeCloseTo(1);
+    });
 });

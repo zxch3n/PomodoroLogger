@@ -25,6 +25,8 @@ describe('Main Window', () => {
 
     afterAll(() => {
         if (app.isRunning()) {
+            app.mainProcess.exit();
+            app.browserWindow.close();
             return app.stop();
         }
     });
