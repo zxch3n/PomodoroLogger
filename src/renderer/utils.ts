@@ -39,6 +39,11 @@ export async function executeThunkAction(action: (dispatch: Dispatch) => void) {
     });
 }
 
+export function getBetterAppName(appName: string) {
+    const name = appName.replace(/\.exe$/g, '');
+    return name[0].toUpperCase() + name.slice(1);
+}
+
 export class Counter {
     private _dict: { [key: string]: number } = {};
     add(key: string | number, num: number = 1) {
@@ -56,7 +61,7 @@ export class Counter {
     getNameValuePairs({
         toFixed = undefined,
         topK = undefined
-    }: { toFixed?: number; topK?: number } = {}) {
+    }: { toFixed?: number; topK?: number } = {}): { name: string; value: number }[] {
         let ans = [];
         for (const key in this._dict) {
             let value = this._dict[key];

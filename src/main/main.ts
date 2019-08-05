@@ -66,8 +66,8 @@ const createWindow = async () => {
             win.hide();
             event.preventDefault();
             const notification = new Notification({
-                title: 'TimeLogger is not closed',
-                body: 'You can close or open TimeLogger in tray.'
+                title: 'Pomodoro Logger is running in the background',
+                body: 'You can close or open Pomodoro Logger in tray.'
             });
             notification.on('click', () => {
                 if (win) {

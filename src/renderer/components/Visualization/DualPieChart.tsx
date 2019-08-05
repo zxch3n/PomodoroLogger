@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import echarts, { ECharts, EChartOption } from 'echarts';
 import { PomodoroRecord } from '../../monitor';
-import { Counter } from '../../utils';
+import { Counter, getBetterAppName } from '../../utils';
 import { getNameFromProjectId } from '../../dbs';
 
 const Container = styled.div`
@@ -150,9 +150,13 @@ const getTimeSpentDataFromRecords = async (pomodoros: PomodoroRecord[]): Promise
         v.name = await getNameFromProjectId(v.name).catch(() => 'Unknown');
     }
 
+    const appData = appTimeCounter
+        .getNameValuePairs({ toFixed: 2, topK: 10 })
+        .map(v => ({ ...v, name: getBetterAppName(v.name) }));
+
     return {
         projectData,
-        appData: appTimeCounter.getNameValuePairs({ toFixed: 2, topK: 10 })
+        appData
     };
 };
 

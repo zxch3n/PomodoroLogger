@@ -7,7 +7,9 @@ import { PomodoroRecord } from './index';
 describe('sessionManager', () => {
     beforeAll(() => {
         if (existsSync(sessionDBPath)) {
-            unlinkSync(sessionDBPath);
+            try {
+                unlinkSync(sessionDBPath);
+            } catch (e) {}
         }
     });
 

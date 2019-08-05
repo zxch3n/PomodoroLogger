@@ -5,4 +5,5 @@ release/
 .idea/
 .vscode/
 build/
+coverage/
 yarn.error

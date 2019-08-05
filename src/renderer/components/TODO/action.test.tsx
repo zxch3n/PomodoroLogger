@@ -13,7 +13,7 @@ import {
 } from './action';
 import dbs from '../../dbs';
 import { cloneDeep } from 'lodash';
-import { existsSync, unlink } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 import { projectDBPath } from '../../../config';
 import { promisify } from 'util';
 import { ProjectItem } from '../Project/action';
@@ -75,9 +75,11 @@ describe('Combiner Handler', () => {
 });
 
 describe('TODO thunk action creator', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
         if (existsSync(projectDBPath)) {
-            await promisify(unlink)(projectDBPath);
+            try {
+                unlinkSync(projectDBPath);
+            } catch (error) {}
         }
     });
 
