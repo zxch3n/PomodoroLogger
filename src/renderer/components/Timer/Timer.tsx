@@ -403,7 +403,7 @@ class Timer extends Component<Props, State> {
                             }}
                         >
                             <ProgressTextContainer>
-                                <div style={{ marginBottom: 12 }} key="leftTime">
+                                <div style={{ marginBottom: 12 }} key="leftTime" id="leftTime">
                                     {shownLeftTime}
                                 </div>
                                 <div
@@ -427,19 +427,21 @@ class Timer extends Component<Props, State> {
                         <FocusSelector {...this.props} width={240} />
                     </div>
                     <ButtonRow>
-                        {isRunning ? (
-                            <Icon
-                                type="pause-circle"
-                                title="Pause"
-                                onClick={this.onStopResumeOrStart}
-                            />
-                        ) : (
-                            <Icon
-                                type="play-circle"
-                                title="Start"
-                                onClick={this.onStopResumeOrStart}
-                            />
-                        )}
+                        <div id="start-timer-button">
+                            {isRunning ? (
+                                <Icon
+                                    type="pause-circle"
+                                    title="Pause"
+                                    onClick={this.onStopResumeOrStart}
+                                />
+                            ) : (
+                                <Icon
+                                    type="play-circle"
+                                    title="Start"
+                                    onClick={this.onStopResumeOrStart}
+                                />
+                            )}
+                        </div>
                         <Icon type="close-circle" title="Clear" onClick={this.onClear} />
                         <Icon type="more" title="Show More" onClick={this.toggleMode} />
                     </ButtonRow>

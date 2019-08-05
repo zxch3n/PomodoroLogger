@@ -143,6 +143,7 @@
     "echarts": "^4.2.1",
     "lodash": "^4.17.14",
     "nedb": "^1.8.0",
+    "node-nlp": "^3.4.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",

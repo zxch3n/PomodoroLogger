@@ -23,11 +23,11 @@ describe('Main Window', () => {
         });
     });
 
-    afterAll(() => {
+    afterAll(async () => {
         if (app.isRunning()) {
             app.mainProcess.exit();
             app.browserWindow.close();
-            return app.stop();
+            return await app.stop();
         }
     });
 

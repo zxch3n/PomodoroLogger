@@ -17,7 +17,7 @@ import { existsSync, mkdir, unlink } from 'fs';
 import { dbBaseDir, projectDBPath } from '../../../config';
 import { promisify } from 'util';
 
-beforeAll(async () => {
+beforeEach(async () => {
     if (existsSync(projectDBPath)) {
         await promisify(unlink)(projectDBPath);
     }
