@@ -1,5 +1,5 @@
 'use strict';
-
+const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 module.exports = {
@@ -13,9 +13,10 @@ module.exports = {
         __filename: false
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js', '.json']
+        extensions: ['.tsx', '.ts', '.js', '.json'],
+        modules: [path.join(__dirname, 'node_modules')]
     },
     devtool: 'source-map',
-    plugins: [
-    ]
+    externals: [nodeExternals()],
+    plugins: [ ]
 };

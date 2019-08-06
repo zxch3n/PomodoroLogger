@@ -18,5 +18,6 @@ const common = {
 module.exports = {
     ...common,
     collectCoverage: true,
+    transformIgnorePatterns: ["/.*@tensorflow\\/.*\\.ts/"],
     testMatch: ['**/*.(spec|test).[jt]s?(x)'],
 };

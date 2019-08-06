@@ -4,6 +4,7 @@ import * as url from 'url';
 import * as db from './db';
 import logo from '../res/TimeLogger.png';
 import { build } from '../../package.json';
+import { temp } from './temp';
 
 const mGlobal: typeof global & {
     sharedDB?: typeof db;
@@ -105,6 +106,13 @@ app.on('ready', async () => {
     });
 
     await createWindow();
+    temp()
+        .then(v => {
+            console.log('yeah!!!', v);
+        })
+        .catch(err => {
+            console.error(err);
+        });
 });
 
 function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
@@ -131,9 +139,6 @@ function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
 mGlobal.setMenuItems = setMenuItems;
 app.on('window-all-closed', () => {
     if (!win) {
-        db.settingDB.persistence.compactDatafile();
-        db.projectDB.persistence.compactDatafile();
-        db.sessionDB.persistence.compactDatafile();
         app.exit();
     }
 });
