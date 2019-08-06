@@ -1,4 +1,5 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -43,11 +44,16 @@ module.exports = merge.smart(baseConfig, {
                     }
                 ]
             },
+            {
+                test: /\.dat$/,
+                use: 'file-loader'
+            }
         ]
     },
     plugins: [
         new ForkTsCheckerWebpackPlugin({
             reportFiles: ['src/main/**/*']
         })
-    ]
+    ],
+    externals: [nodeExternals()],
 });

@@ -98,6 +98,8 @@
     "@types/webdriverio": "^4.8.7",
     "@types/webpack-env": "^1.13.3",
     "babel-loader": "^8.0.6",
+    "babel-plugin-console": "^0.2.1",
+    "babel-plugin-macros": "^2.6.1",
     "cross-env": "^5.1.3",
     "css-loader": "^2.1.1",
     "electron": "^3.1.9",
@@ -151,7 +153,6 @@
     "react-redux": "^7.0.3",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "strip-ansi": "^5.2.0",
     "styled-components": "^4.3.2"
   }
 }

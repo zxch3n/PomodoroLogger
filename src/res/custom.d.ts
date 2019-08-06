@@ -12,3 +12,8 @@ declare module '*.png' {
 declare module '*/package.json' {
     export const build: { productName: string };
 }
+
+declare module '*.dat' {
+    const path: string;
+    export default path;
+}

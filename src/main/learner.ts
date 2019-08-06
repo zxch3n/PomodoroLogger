@@ -1,6 +1,6 @@
 import { PomodoroRecord } from '../renderer/monitor';
-import tf from '@tensorflow/tfjs';
-import * as use from '@tensorflow-models/universal-sentence-encoder';
+import * as tf from '@tensorflow/tfjs';
+import * as use from '../use';
 
 type Titles = { [title: string]: number };
 interface TitleProjectPair {
@@ -35,6 +35,7 @@ function preprocessSentence(s: string) {
 }
 
 async function embed(titles: Titles[]) {
+    // TODO: filter stopwords
     const sentences = titles.map(title =>
         Object.keys(title)
             .map(v => {
@@ -56,8 +57,7 @@ export async function embeddingTitles(
     const pairs = _pairs.filter(v => v.project !== undefined);
     const titles = pairs.map(v => v.titles);
     const embeddings = await embed(titles);
-    // @ts-ignore
-    return [embeddings, pairs.map(v => v.project)];
+    return [embeddings, pairs.map(v => v.project as string)];
 }
 
 function oneHotEncode(
@@ -85,7 +85,8 @@ export async function trainTitlesProjectPair(
     const [embeddings, projects] = await embeddingTitles(pairs);
     const [projectEncoding, invertEncode] = oneHotEncode(projects);
     const outputSize = Object.values(projectEncoding).length;
-    const model = await createModel(embeddings.shape[1], outputSize, 2, 100);
+    console.log(outputSize);
+    const model = await createModel(embeddings.shape[1], outputSize, 1, 100);
     const projectsTensors = tf.tensor1d(projects.map(p => projectEncoding[p]));
     await trainModel({
         model,
@@ -133,12 +134,28 @@ async function createModel(
         tf.layers.dense({
             inputShape: [inputSize],
             units: hiddenSize * hiddenLayer ? hiddenSize : outputSize,
-            useBias: true
+            useBias: true,
+            name: 'hidden_0'
         })
     );
     for (let i = 1; i < hiddenLayer; i += 1) {
-        model.add(tf.layers.dense({ inputShape: [inputSize], units: hiddenSize, useBias: true }));
+        model.add(
+            tf.layers.dense({
+                inputShape: [hiddenSize],
+                units: hiddenSize,
+                useBias: true,
+                name: `hidden_${i}`
+            })
+        );
     }
+    model.add(
+        tf.layers.dense({
+            inputShape: [hiddenSize],
+            units: outputSize,
+            useBias: true,
+            name: `hidden_${hiddenLayer}`
+        })
+    );
     model.compile({
         optimizer: tf.train.adam(),
         loss: tf.losses.softmaxCrossEntropy,

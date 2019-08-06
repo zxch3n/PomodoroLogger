@@ -11,7 +11,7 @@ export const sessionDB = new nedb({
     autoload: true
 });
 
-jest.setTimeout(100000);
+jest.setTimeout(200000);
 async function getTitlesProjectMapFromDB() {
     const records: PomodoroRecord[] = await new Promise((resolve, reject) => {
         sessionDB.find({}, {}, (err, docs) => {
