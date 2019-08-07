@@ -211,7 +211,13 @@ class Timer extends Component<Props, State> {
             setTrayImageWithMadeIcon(leftTime.slice(0, 2)).catch(console.error);
         }
 
-        this.setState({ leftTime, percent });
+        if (leftTime !== this.state.leftTime) {
+            this.setState({ leftTime });
+        }
+
+        if (Math.abs(percent - this.state.percent) > 2) {
+            this.setState({ percent });
+        }
     };
 
     onStopResumeOrStart = () => {
