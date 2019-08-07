@@ -85,15 +85,18 @@ export async function trainTitlesProjectPair(
     const [embeddings, projects] = await embeddingTitles(pairs);
     const [projectEncoding, invertEncode] = oneHotEncode(projects);
     const outputSize = Object.values(projectEncoding).length;
-    console.log(outputSize);
-    const model = await createModel(embeddings.shape[1], outputSize, 1, 100);
-    const projectsTensors = tf.tensor1d(projects.map(p => projectEncoding[p]));
+    console.log('emb', embeddings.shape);
+    console.log('Encode', projectEncoding);
+    console.log('outputSize', outputSize);
+    const model = await createModel(embeddings.shape[1], outputSize, 0, 100);
+    const projectsTensor = tf.tensor1d(projects.map(p => projectEncoding[p]), 'int32');
+    const oneHotTensor = tf.oneHot(projectsTensor, outputSize);
     await trainModel({
         model,
         batchSize,
         epochs,
         input: embeddings,
-        labels: projectsTensors,
+        labels: oneHotTensor,
         shuffle: true
     });
     return {
@@ -141,26 +144,29 @@ async function createModel(
     for (let i = 1; i < hiddenLayer; i += 1) {
         model.add(
             tf.layers.dense({
-                inputShape: [hiddenSize],
                 units: hiddenSize,
                 useBias: true,
                 name: `hidden_${i}`
             })
         );
     }
-    model.add(
-        tf.layers.dense({
-            inputShape: [hiddenSize],
-            units: outputSize,
-            useBias: true,
-            name: `hidden_${hiddenLayer}`
-        })
-    );
+
+    if (hiddenLayer * hiddenSize !== 0) {
+        model.add(
+            tf.layers.dense({
+                units: outputSize,
+                useBias: true,
+                name: `hidden_${hiddenLayer}`
+            })
+        );
+    }
+
     model.compile({
         optimizer: tf.train.adam(),
-        loss: tf.losses.softmaxCrossEntropy,
+        loss: 'categoricalCrossentropy',
         metrics: ['accuracy']
     });
+    model.summary();
     return model;
 }
 
@@ -185,7 +191,7 @@ export async function trainModel({
         shuffle,
         callbacks: [
             {
-                onBatchBegin: (batch: any, logs: any) => {
+                onBatchEnd: (batch: any, logs: any) => {
                     console.log(batch, logs);
                 }
             }

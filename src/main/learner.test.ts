@@ -32,7 +32,6 @@ describe('Main.Learner', () => {
             expect(typeof v[0].titles[title]).toBe('number');
             expect(v[0].titles[title]).not.toBeNaN();
         }
-        console.log(v);
     });
 
     it('can be trained', async () => {
