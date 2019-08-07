@@ -1,5 +1,6 @@
 import { PomodoroRecord } from '../renderer/monitor';
 import * as tf from '@tensorflow/tfjs';
+// import "@tensorflow/tfjs-node"
 import * as use from '../use';
 
 type Titles = { [title: string]: number };
@@ -34,7 +35,7 @@ function preprocessSentence(s: string) {
     return s.replace(/[\.,\/\\\(\)!\?]/g, ' ');
 }
 
-async function embed(titles: Titles[]) {
+async function embed(titles: Titles[]): Promise<tf.Tensor2D> {
     // TODO: filter stopwords
     const sentences = titles.map(title =>
         Object.keys(title)
@@ -88,7 +89,7 @@ export async function trainTitlesProjectPair(
     console.log('emb', embeddings.shape);
     console.log('Encode', projectEncoding);
     console.log('outputSize', outputSize);
-    const model = await createModel(embeddings.shape[1], outputSize, 0, 100);
+    const model = await createModel(embeddings.shape[1], outputSize, 2, 100);
     const projectsTensor = tf.tensor1d(projects.map(p => projectEncoding[p]), 'int32');
     const oneHotTensor = tf.oneHot(projectsTensor, outputSize);
     await trainModel({
@@ -115,14 +116,23 @@ export async function predict(
         return (await predict(model, [titles], invertEncode))[0];
     }
 
-    const embeddings = await embed(titles);
-    let pred = model.predict(embeddings);
-    if (!(pred instanceof Array)) {
+    const embedding = await embed(titles);
+    let pred = model.predict(embedding);
+    if (!Array.isArray(pred)) {
         pred = [pred];
     }
-
-    const argmax = await Promise.all(pred.map(v => v.argMax().array()));
-    // @ts-ignore
+    const argmax = await Promise.all(
+        pred.map(
+            v =>
+                v
+                    .flatten()
+                    .argMax()
+                    .array() as Promise<number>
+        )
+    );
+    console.log(pred);
+    console.log(argmax);
+    console.log(invertEncode);
     return argmax.map((p: number) => invertEncode[p]);
 }
 
@@ -191,8 +201,8 @@ export async function trainModel({
         shuffle,
         callbacks: [
             {
-                onBatchEnd: (batch: any, logs: any) => {
-                    console.log(batch, logs);
+                onEpochEnd: (epoch: number, logs: any) => {
+                    console.log(epoch, logs);
                 }
             }
         ]

@@ -36,11 +36,12 @@ describe('Main.Learner', () => {
 
     it('can be trained', async () => {
         const v = await getTitlesProjectMapFromDB();
-        const { model, invertEncode } = await trainTitlesProjectPair(v, { epochs: 10 });
+        const { model, invertEncode } = await trainTitlesProjectPair(v, { epochs: 40 });
         let t = 0;
         let f = 0;
         for (const { titles, project } of v) {
             const pred = await predict(model, titles, invertEncode);
+            console.log(pred, project);
             if (pred === project) {
                 t += 1;
             } else {

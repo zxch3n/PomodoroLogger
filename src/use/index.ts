@@ -18,13 +18,11 @@
 import * as tfconv from '@tensorflow/tfjs-converter';
 import * as tf from '@tensorflow/tfjs-core';
 import {
-    WeightsManifestConfig,
     IOHandler,
-    WeightsManifestEntry,
-    ModelArtifacts
+    ModelArtifacts,
+    WeightsManifestConfig,
+    WeightsManifestEntry
 } from '@tensorflow/tfjs-core/src/io/types';
-import { loadWeightsAsArrayBuffer } from '@tensorflow/tfjs-core/src/io/weights_loader';
-import { concatenateArrayBuffers } from '@tensorflow/tfjs-core/src/io/io_utils';
 import vocab from '../res/vocab.json';
 import modelJson from '../res/model.json';
 import weights from '../res/weights.dat';
@@ -155,6 +153,7 @@ export class UniversalSentenceEncoder {
         const indices = tf.tensor2d(flattenedIndicesArr, [flattenedIndicesArr.length, 2], 'int32');
         const values = tf.tensor1d(tf.util.flatten(encodings) as number[], 'int32');
 
+        // @ts-ignore
         const embeddings = await this.model.executeAsync({ indices, values });
         indices.dispose();
         values.dispose();

@@ -26,5 +26,14 @@ module.exports = {
         'ts-jest': {
             diagnostics: false
         }
-    }
+    },
+    "roots": [
+        "<rootDir>",
+    ],
+    "modulePaths": [
+        "<rootDir>",
+    ],
+    "moduleDirectories": [
+        "node_modules"
+    ],
 };
