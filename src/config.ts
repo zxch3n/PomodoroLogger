@@ -7,6 +7,8 @@ if (!existsSync(dbBaseDir)) {
     mkdirSync(dbBaseDir);
 }
 
-export const projectDBPath = join(dbBaseDir, 'projects.nedb');
-export const sessionDBPath = join(dbBaseDir, 'session.nedb');
-export const settingDBPath = join(dbBaseDir, 'setting.nedb');
+export const dbPaths = {
+    projectDBPath: join(dbBaseDir, 'projects.nedb'),
+    sessionDBPath: join(dbBaseDir, 'session.nedb'),
+    settingDBPath: join(dbBaseDir, 'setting.nedb')
+};

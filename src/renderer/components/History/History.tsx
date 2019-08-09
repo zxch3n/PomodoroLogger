@@ -4,9 +4,8 @@ import { HistoryActionCreatorTypes } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
-import { PomodoroRecord } from '../../monitor';
-import { Counter } from '../../utils';
 import { RootState } from '../../reducers';
+import { getPomodoroCalendarData, getPomodoroCount } from './op';
 
 const { Option } = Select;
 
@@ -45,39 +44,6 @@ const mockTimeSpentData = () => {
             { name: 'E0', value: 50 }
         ]
     };
-};
-
-const getPomodoroCalendarData = (pomodoros: PomodoroRecord[]) => {
-    const counter = new Counter();
-    pomodoros.map(v => {
-        const date = _getDateFromTimestamp(v.startTime).getTime();
-        counter.add(date);
-    });
-
-    const ans: Record<string, any> = counter.dict;
-    for (const key in ans) {
-        ans[key] = { count: ans[key] };
-    }
-
-    return ans;
-};
-
-const _getDateFromTimestamp = (time: number): Date => {
-    const datetime = new Date(time);
-    const dateStr = `${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`;
-    return new Date(dateStr);
-};
-
-const getPomodoroCount = (days: number, pomodoros: PomodoroRecord[]): number => {
-    const time = _getDateFromTimestamp(new Date().getTime()).getTime() - days * 24 * 3600 * 1000;
-    let n = 0;
-    for (const p of pomodoros) {
-        if (p.startTime >= time) {
-            n += 1;
-        }
-    }
-
-    return n;
 };
 
 interface Props extends RootState, HistoryActionCreatorTypes {}

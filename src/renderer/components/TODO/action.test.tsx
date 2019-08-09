@@ -14,10 +14,11 @@ import {
 import dbs from '../../dbs';
 import { cloneDeep } from 'lodash';
 import { existsSync, unlinkSync } from 'fs';
-import { projectDBPath } from '../../../config';
+import { dbPaths } from '../../../config';
 import { promisify } from 'util';
 import { ProjectItem } from '../Project/action';
 import { addProjectToDB, executeThunkAction, generateRandomName } from '../../utils';
+const { projectDBPath } = dbPaths;
 
 describe('TODO reducer', () => {
     it('starts with empty state', () => {

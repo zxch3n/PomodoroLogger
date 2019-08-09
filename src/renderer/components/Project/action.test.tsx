@@ -14,9 +14,10 @@ import dbs from '../../dbs';
 import { createTodoItem } from '../TODO/action';
 import { addProjectToDB, generateRandomName } from '../../utils';
 import { existsSync, mkdir, unlink } from 'fs';
-import { dbBaseDir, projectDBPath } from '../../../config';
+import { dbBaseDir, dbPaths } from '../../../config';
 import { promisify } from 'util';
 import { PomodoroRecord } from '../../monitor';
+const { projectDBPath } = dbPaths;
 
 beforeEach(async () => {
     if (existsSync(projectDBPath)) {

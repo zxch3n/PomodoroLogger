@@ -1,7 +1,8 @@
 import { remote } from 'electron';
 import { projectDB, sessionDB, settingDB } from '../main/db';
+import { promisify } from 'util';
 import nedb from 'nedb';
-import { reject } from 'q';
+import { PomodoroRecord } from './monitor';
 
 type dbTypes = 'projectDB' | 'sessionDB' | 'settingDB';
 let dbs: { [key in dbTypes]: nedb };

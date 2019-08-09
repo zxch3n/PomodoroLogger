@@ -1,8 +1,9 @@
 import { addSession, removeSession, getAllSession } from './sessionManager';
-import { sessionDBPath } from '../../config';
+import { dbPaths } from '../../config';
 import { existsSync, unlinkSync } from 'fs';
 import { generateRandomName } from '../utils';
 import { PomodoroRecord } from './index';
+const { sessionDBPath } = dbPaths;
 
 describe('sessionManager', () => {
     beforeAll(() => {

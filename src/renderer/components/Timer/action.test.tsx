@@ -10,8 +10,9 @@ import dbs from '../../dbs';
 import { PomodoroRecord } from '../../monitor';
 import { generateRandomName } from '../../utils';
 import { getAllSession } from '../../monitor/sessionManager';
-import { projectDBPath } from '../../../config';
+import { dbPaths } from '../../../config';
 import { existsSync, unlinkSync } from 'fs';
+const { projectDBPath } = dbPaths;
 
 describe('Reducer', () => {
     it('has default state', () => {
