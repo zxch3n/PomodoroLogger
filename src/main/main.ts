@@ -4,20 +4,21 @@ import * as url from 'url';
 import * as db from './db';
 import logo from '../res/TimeLogger.png';
 import { build } from '../../package.json';
-import { temp } from './temp';
+import * as learner from './learner/learner';
 
 const mGlobal: typeof global & {
     sharedDB?: typeof db;
     tray?: Tray;
     setMenuItems?: any;
+    learner?: any;
 } = global;
 mGlobal.sharedDB = db;
-let win: BrowserWindow | undefined;
-console.log(process.platform);
+mGlobal.learner = learner;
 if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
 }
 
+let win: BrowserWindow | undefined;
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -106,13 +107,6 @@ app.on('ready', async () => {
     });
 
     await createWindow();
-    temp()
-        .then(v => {
-            console.log('yeah!!!', v);
-        })
-        .catch(err => {
-            console.error(err);
-        });
 });
 
 function setMenuItems(items: [{ label: string; type: string; click: any }][]) {

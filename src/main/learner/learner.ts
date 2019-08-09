@@ -1,7 +1,7 @@
-import { PomodoroRecord } from '../renderer/monitor';
+import { PomodoroRecord } from '../../renderer/monitor';
 import * as tf from '@tensorflow/tfjs';
 // import "@tensorflow/tfjs-node"
-import * as use from '../use';
+import * as use from '../../use';
 
 type Titles = { [title: string]: number };
 interface TitleProjectPair {
@@ -81,7 +81,11 @@ function oneHotEncode(
 
 export async function trainTitlesProjectPair(
     pairs: TitleProjectPair[],
-    { batchSize = 32, epochs = 20 }: { batchSize?: number; epochs?: number } = {}
+    {
+        batchSize = 32,
+        epochs = 20,
+        callback = undefined
+    }: { batchSize?: number; epochs?: number; callback?: (epoch: number, log?: any) => void } = {}
 ) {
     const [embeddings, projects] = await embeddingTitles(pairs);
     const [projectEncoding, invertEncode] = oneHotEncode(projects);
@@ -89,13 +93,14 @@ export async function trainTitlesProjectPair(
     console.log('emb', embeddings.shape);
     console.log('Encode', projectEncoding);
     console.log('outputSize', outputSize);
-    const model = await createModel(embeddings.shape[1], outputSize, 2, 100);
+    const model = await createModel(embeddings.shape[1], outputSize, 1, 100);
     const projectsTensor = tf.tensor1d(projects.map(p => projectEncoding[p]), 'int32');
     const oneHotTensor = tf.oneHot(projectsTensor, outputSize);
     await trainModel({
         model,
         batchSize,
         epochs,
+        callback,
         input: embeddings,
         labels: oneHotTensor,
         shuffle: true
@@ -186,7 +191,8 @@ export async function trainModel({
     labels,
     batchSize = 32,
     epochs = 20,
-    shuffle = true
+    shuffle = true,
+    callback = console.log
 }: {
     model: tf.Sequential;
     input: tf.Tensor;
@@ -194,17 +200,18 @@ export async function trainModel({
     batchSize: number;
     epochs: number;
     shuffle: boolean;
+    callback?: (epoch: number, logs?: any) => any;
 }) {
+    const callbacks = [];
+    if (callback) {
+        callbacks.push({
+            onEpochEnd: callback
+        });
+    }
     return await model.fit(input, labels, {
         batchSize,
         epochs,
         shuffle,
-        callbacks: [
-            {
-                onEpochEnd: (epoch: number, logs: any) => {
-                    console.log(epoch, logs);
-                }
-            }
-        ]
+        callbacks
     });
 }

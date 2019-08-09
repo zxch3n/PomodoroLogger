@@ -1,16 +1,16 @@
 import { hot } from 'react-hot-loader/root';
-import { Tabs, Icon } from 'antd';
+import { Icon, Tabs } from 'antd';
 import * as React from 'react';
 import 'antd/dist/antd.css';
 import Timer from './Timer';
 import Project from './Project';
 import Setting from './Setting';
 import History from './History';
+import Analyser from './Analyser';
 import { connect } from 'react-redux';
-import { TimerActionTypes, actions as timerActions } from './Timer/action';
-import { ProjectActionTypes, actions as projectActions } from './Project/action';
-import { HistoryActionCreatorTypes, actions as historyActions } from './History/action';
-import { RootState } from '../reducers';
+import { actions as timerActions, TimerActionTypes } from './Timer/action';
+import { actions as projectActions, ProjectActionTypes } from './Project/action';
+import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { genMapDispatchToProp } from '../utils';
 
 const { TabPane } = Tabs;
@@ -73,6 +73,21 @@ const Application = (props: Props) => {
             >
                 <Setting />
             </TabPane>
+            {process.env.NODE_ENV !== 'production' ? (
+                <TabPane
+                    tab={
+                        <span>
+                            <Icon type="bar-chart" />
+                            Analyser
+                        </span>
+                    }
+                    key="analyser"
+                >
+                    <Analyser />
+                </TabPane>
+            ) : (
+                undefined
+            )}
         </Tabs>
     );
 };

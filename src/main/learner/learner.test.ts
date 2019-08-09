@@ -2,12 +2,12 @@
  * @jest-environment node
  */
 
-import { PomodoroRecord } from '../renderer/monitor';
+import { PomodoroRecord } from '../../renderer/monitor';
 import { getTitlesProjectPairs, predict, trainTitlesProjectPair } from './learner';
 import nedb from 'nedb';
 
 export const sessionDB = new nedb({
-    filename: `${__dirname}/../../__mocks__/session.nedb`,
+    filename: `${__dirname}/../../../__mocks__/session.nedb`,
     autoload: true
 });
 
@@ -34,7 +34,7 @@ describe('Main.Learner', () => {
         }
     });
 
-    it('can be trained', async () => {
+    it('can be trained (overfit)', async () => {
         const v = await getTitlesProjectMapFromDB();
         const { model, invertEncode } = await trainTitlesProjectPair(v, { epochs: 40 });
         let t = 0;

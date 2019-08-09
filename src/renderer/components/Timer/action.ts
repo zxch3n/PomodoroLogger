@@ -30,7 +30,7 @@ export const defaultState: TimerState = {
     isFocusing: true,
 
     monitorInterval: 1000,
-    screenShotInterval: 5000
+    screenShotInterval: undefined
 };
 
 export const startTimer = createActionCreator('[Timer]START_TIMER');

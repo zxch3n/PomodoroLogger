@@ -1,4 +1,5 @@
 'use strict';
+
 const path = require('path');
 
 module.exports = {
@@ -12,9 +13,9 @@ module.exports = {
         __filename: false
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js', '.json'],
-        // modules: [path.join(__dirname, 'node_modules')]
+        extensions: ['.tsx', '.ts', '.js', '.json']
     },
     devtool: 'source-map',
-    plugins: [ ]
+    plugins: [
+    ]
 };

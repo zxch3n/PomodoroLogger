@@ -433,7 +433,7 @@ class Timer extends Component<Props, State> {
                         <FocusSelector {...this.props} width={240} />
                     </div>
                     <ButtonRow>
-                        <div id="start-timer-button">
+                        <div id="start-timer-button" style={{ lineHeight: 0 }}>
                             {isRunning ? (
                                 <Icon
                                     type="pause-circle"
