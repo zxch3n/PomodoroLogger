@@ -16,6 +16,7 @@ import { addProjectToDB, generateRandomName } from '../../utils';
 import { existsSync, mkdir, unlink } from 'fs';
 import { dbBaseDir, projectDBPath } from '../../../config';
 import { promisify } from 'util';
+import { PomodoroRecord } from '../../monitor';
 
 beforeEach(async () => {
     if (existsSync(projectDBPath)) {
@@ -132,6 +133,65 @@ describe('Project thunk actionCreator', () => {
             // @ts-ignore
             thunk(dispatch);
         });
+    });
+
+    it('fetchPomodorosCount correctly', async () => {
+        const now = new Date().getTime();
+        const createRecord = (id: string, day: number): PomodoroRecord => {
+            return {
+                projectId: id,
+                startTime: now - day * 24 * 3600 * 1000,
+                spentTimeInHour: 0.3,
+                apps: {},
+                screenStaticDuration: 0,
+                switchTimes: 10
+            };
+        };
+
+        const records: PomodoroRecord[] = [
+            createRecord('4', 2),
+            createRecord('4', 0),
+            createRecord('4', 0),
+            createRecord('4', 29),
+            createRecord('4', 31),
+
+            createRecord('0', 40),
+            createRecord('0', 50),
+            createRecord('0', 60),
+
+            createRecord('1', 10)
+        ];
+
+        const thunk = actions.countPomodoros(records, 30);
+        await new Promise(resolve => {
+            const dispatch = jest.fn(x => {
+                expect(x.type).toBe('[Project]FETCH_POMODOROS_COUNTS');
+                const counter = x.payload;
+                const wholeList = ['0', '1', '4'];
+                for (const v of wholeList) {
+                    expect(v in counter).toBeTruthy();
+                }
+
+                for (const key in counter) {
+                    expect(wholeList.includes(key)).toBeTruthy();
+                }
+
+                expect(counter['0']).toBeInstanceOf(Array);
+                expect(counter['0'].reduce((l: number, r: number) => r + l, 0)).toBe(0);
+
+                expect(counter['1'].reduce((l: number, r: number) => r + l, 0)).toBe(1);
+                expect(counter['4'].reduce((l: number, r: number) => r + l, 0)).toBe(4);
+
+                expect(counter['4'].length).toBe(30);
+                expect(counter['4'].reverse()[0]).toBe(2);
+                expect(counter['4'].reverse()[1]).toBe(0);
+                expect(counter['4'].reverse()[2]).toBe(1);
+                resolve();
+                return x;
+            });
+
+            return thunk(dispatch);
+        }).then(v => v);
     });
 
     it('can removeItem', async () => {
@@ -291,6 +351,7 @@ describe('Project thunk actionCreator', () => {
 });
 
 const defaultProjectState: ProjectState = {
+    pomodorosCountsSpanInDay: 30,
     projectList: {
         project0: {
             _id: 'project0',

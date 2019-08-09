@@ -23,6 +23,7 @@ export interface ProjectItem {
     todoList: { [todoTitle: string]: TodoItem };
     spentHours: number;
     applicationSpentTime: { [appName: string]: ApplicationSpentTime };
+    pomodorosCounts?: number[];
 }
 
 export function createProjectItem(name: string) {
@@ -48,10 +49,12 @@ type ProjectMap = { [name: string]: ProjectItem };
 
 export interface ProjectState {
     projectList: ProjectMap;
+    pomodorosCountsSpanInDay: number;
 }
 
 const defaultState: ProjectState = {
-    projectList: {}
+    projectList: {},
+    pomodorosCountsSpanInDay: 30
 };
 
 export const addItem = createActionCreator(
@@ -95,17 +98,59 @@ export const fetchAll = createActionCreator(
     resolve => (projects: ProjectItem[]) => resolve(projects)
 );
 
+export const countPomodoros = createActionCreator(
+    '[Project]FETCH_POMODOROS_COUNTS',
+    resolve => (projectsPomodoroCounts: { [projectId: string]: number[] }) =>
+        resolve(projectsPomodoroCounts)
+);
+
 export const updateOnTimerFinished = createActionCreator(
     '[Project]UPDATE_ON_TIMER_FINISHED',
     resolve => (name: string, pomodoroRecord: PomodoroRecord) => resolve({ name, pomodoroRecord })
 );
 
 export const actions = {
-    fetchAll: () => (dispatch: Dispatch) => {
-        dbs.projectDB.find({}, {}, (err, items) => {
-            const newProjectList: ProjectItem[] = items as ProjectItem[];
-            return dispatch(fetchAll(newProjectList));
+    fetchAll: () => async (dispatch: Dispatch) => {
+        return new Promise(resolve => {
+            dbs.projectDB.find({}, {}, (err, items) => {
+                const newProjectList: ProjectItem[] = items as ProjectItem[];
+                resolve(dispatch(fetchAll(newProjectList)));
+            });
         });
+    },
+    countPomodoros: (records: PomodoroRecord[], spanInDay: number) => async (
+        dispatch: Dispatch
+    ) => {
+        const counter: { [projectId: string]: number[] } = {};
+        const now = new Date().getTime();
+        let i = 0;
+        for (const record of records) {
+            i += 1;
+            if (!record.projectId) {
+                continue;
+            }
+
+            if (!(record.projectId in counter)) {
+                counter[record.projectId] = Array(spanInDay).fill(0);
+            }
+
+            const dayCountTillToday = (now - record.startTime) / 1000 / 3600 / 24;
+            if (dayCountTillToday >= spanInDay) {
+                continue;
+            }
+
+            const countIndex = Math.floor(spanInDay - dayCountTillToday);
+            counter[record.projectId][countIndex] += 1;
+            if (i % 15 === 0) {
+                await new Promise(r => setTimeout(r, 0));
+            }
+        }
+
+        dispatch(countPomodoros(counter));
+    },
+    fetchAndCount: (records: PomodoroRecord[], spanInDay: number) => async (dispatch: Dispatch) => {
+        await actions.fetchAll()(dispatch);
+        await actions.countPomodoros(records, spanInDay)(dispatch);
     },
     removeItem: (name: string) => (dispatch: Dispatch) => {
         dbs.projectDB.remove({ name }, err => {
@@ -276,6 +321,27 @@ export const projectReducer = createReducer<ProjectState, any>(defaultState, han
     handle(setTodoFinished, (state: ProjectState, { payload: { name, _id, isFinished } }) => {
         const newState = cloneDeep(state);
         newState.projectList[name].todoList[_id].isFinished = isFinished;
+        return newState;
+    }),
+
+    handle(countPomodoros, (state: ProjectState, { payload }) => {
+        const newState = cloneDeep(state);
+        const projects = Object.values(newState.projectList);
+        function getNameById(id: string) {
+            for (const pr of projects) {
+                if (pr._id === id) {
+                    return pr.name;
+                }
+            }
+
+            throw new Error(`Cannot find name of id ${id}`);
+        }
+
+        for (const projectId in payload) {
+            const count = payload[projectId];
+            newState.projectList[getNameById(projectId)].pomodorosCounts = count;
+        }
+
         return newState;
     })
 ]);

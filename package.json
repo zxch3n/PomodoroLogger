@@ -152,6 +152,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
+    "react-trend": "^1.2.5",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2"

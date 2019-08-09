@@ -4,9 +4,15 @@ import { ProjectActionTypes, ProjectItem, ProjectState } from './action';
 import { TodoItem } from '../TODO/action';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import styled from 'styled-components';
+// @ts-ignore
+import Trend from 'react-trend';
+import { ProjectTrend } from './ProjectTrend';
+import { RootState } from '../../reducers';
 
 const Container = styled.div`
     padding: 24px;
+    max-width: 1040px;
+    margin: 0 auto;
 `;
 
 interface EditableProps {
@@ -116,7 +122,7 @@ export const TodoList: React.FC<TodoListProps> = ({
     );
 };
 
-interface Props extends ProjectActionTypes, ProjectState {}
+interface Props extends ProjectActionTypes, RootState {}
 const Project: React.FC<Props> = (props: Props) => {
     const [editingRowName, setEditingRowName] = useState('');
     const [editingRecordRow, setEditingRecordRow] = useState(defaultRecord);
@@ -156,6 +162,16 @@ const Project: React.FC<Props> = (props: Props) => {
             dataIndex: 'todoNum',
             key: 'todoNum',
             editable: false
+        },
+        {
+            title: 'Trend',
+            dataIndex: 'trend',
+            key: 'trend',
+            editable: false,
+            render: (text: any, record: ProjectItem, index: number) => {
+                const data = record.pomodorosCounts || [0, 0, 0, 0, 0, 0];
+                return <ProjectTrend data={data} />;
+            }
         },
         {
             title: 'Operations',
@@ -246,7 +262,7 @@ const Project: React.FC<Props> = (props: Props) => {
             return undefined;
         }
 
-        return <TodoList project={record} {...props} />;
+        return <TodoList {...props} project={record} />;
     };
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -260,10 +276,16 @@ const Project: React.FC<Props> = (props: Props) => {
     };
 
     useEffect(() => {
-        props.fetchAll();
+        props.fetchAndCount(props.history.records, props.project.pomodorosCountsSpanInDay);
     }, []);
 
-    const projects: (ProjectItem & { todoNum?: string })[] = Object.values(props.projectList);
+    useEffect(() => {
+        props.countPomodoros(props.history.records, props.project.pomodorosCountsSpanInDay);
+    }, [props.history.records]);
+
+    const projects: (ProjectItem & { todoNum?: string })[] = Object.values(
+        props.project.projectList
+    );
     for (const project of projects) {
         project.spentHours = Math.floor(project.spentHours * 100) / 100;
         const todos = Object.values(project.todoList);

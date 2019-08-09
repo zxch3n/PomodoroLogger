@@ -9994,6 +9994,13 @@ react-test-renderer@^16.0.0-0, react-test-renderer@^16.8.6:
     react-is "^16.8.6"
     scheduler "^0.13.6"
 
+react-trend@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.npmjs.org/react-trend/-/react-trend-1.2.5.tgz#c65798063b3b2aa8662ae43748f358ac40c02630"
+  integrity sha512-8//dg52xjPKkWPcd7Iml5WfwellgBpeILbN2tKhTP5gacJbg8jDTsNoEJboN9ATf9OllODpo4/gXhguNAIo7gg==
+  dependencies:
+    prop-types "^15.5.8"
+
 react@^16.8.6:
   version "16.8.6"
   resolved "https://registry.npmjs.org/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
