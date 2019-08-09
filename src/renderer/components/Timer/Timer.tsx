@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Col, Divider, Icon, Layout, message, Row } from 'antd';
+import { Button, Col, Divider, Icon, Layout, message, Row } from 'antd';
 import Progress from './Progress';
 import { ProjectActionTypes, ProjectItem } from '../Project/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
@@ -7,7 +7,7 @@ import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor, PomodoroRecord } from '../../monitor';
 import styled from 'styled-components';
-import { nativeImage, remote } from 'electron';
+import { nativeImage, remote, BrowserWindow } from 'electron';
 import RestIcon from '../../../res/rest.svg';
 import WorkIcon from '../../../res/work.svg';
 import AppIcon from '../../../res/TimeLogger.png';
@@ -16,9 +16,30 @@ import { getTodaySessions } from '../../monitor/sessionManager';
 import { TodoList } from '../Project/Project';
 import { getIdFromProjectName } from '../../dbs';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
+import { PomodoroNumView } from './PomodoroNumView';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
+
+const Mask = styled.div`
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    background-color: #dd5339;
+    text-align: center;
+    color: white !important;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+`;
+
+const MaskInnerContainer = styled.div`
+    max-width: 500px;
+`;
 
 const ProgressTextContainer = styled.div`
     padding: 12px;
@@ -92,11 +113,13 @@ interface State {
     percent: number;
     more: boolean;
     pomodorosToday: PomodoroRecord[];
+    showMask: boolean;
 }
 
 class Timer extends Component<Props, State> {
     interval?: any;
     monitor?: Monitor;
+    win?: BrowserWindow;
     mainDiv: React.RefObject<HTMLDivElement>;
 
     constructor(props: Props) {
@@ -106,7 +129,8 @@ class Timer extends Component<Props, State> {
             percent: 0,
             screenShotUrl: undefined,
             more: false,
-            pomodorosToday: []
+            pomodorosToday: [],
+            showMask: false
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
     }
@@ -123,13 +147,8 @@ class Timer extends Component<Props, State> {
 
     componentDidMount(): void {
         this.interval = setInterval(this.updateLeftTime, 500);
+        this.win = remote.getCurrentWindow();
         this.updateLeftTime();
-        this.monitor = new Monitor(
-            this.activeWinListener,
-            1000,
-            this.props.timer.screenShotInterval
-        );
-
         getTodaySessions().then(finishedSessions => {
             this.setState({ pomodorosToday: finishedSessions });
         });
@@ -147,7 +166,9 @@ class Timer extends Component<Props, State> {
                         this.switchMode();
                     }
 
-                    this.onStart();
+                    if (!this.props.timer.isRunning) {
+                        this.onStopResumeOrStart();
+                    }
                 }
             },
             {
@@ -158,7 +179,9 @@ class Timer extends Component<Props, State> {
                         this.switchMode();
                     }
 
-                    this.onStart();
+                    if (!this.props.timer.isRunning) {
+                        this.onStopResumeOrStart();
+                    }
                 }
             },
             {
@@ -186,6 +209,7 @@ class Timer extends Component<Props, State> {
     }
 
     updateLeftTime = () => {
+        // TODO: refactor this and add small tests
         const { targetTime, isRunning } = this.props.timer;
         if (!isRunning || !targetTime) {
             return;
@@ -215,7 +239,7 @@ class Timer extends Component<Props, State> {
             this.setState({ leftTime });
         }
 
-        if (Math.abs(percent - this.state.percent) > 2) {
+        if (Math.abs(percent - this.state.percent) > 2 || percent === 0) {
             this.setState({ percent });
         }
     };
@@ -226,24 +250,37 @@ class Timer extends Component<Props, State> {
         }
 
         if (this.props.timer.isRunning) {
-            this.props.stopTimer();
-            if (this.monitor) {
-                this.monitor.stop();
-            }
+            this.onStop();
         } else {
-            this.props.continueTimer();
-            if (this.monitor) {
-                this.monitor.resume();
-            }
+            this.onResume();
         }
     };
 
-    onStart = () => {
-        this.props.startTimer();
+    private onResume() {
+        this.props.continueTimer();
         if (this.monitor) {
+            this.monitor.resume();
+        }
+    }
+
+    private onStop() {
+        this.props.stopTimer();
+        if (this.monitor) {
+            this.monitor.stop();
+        }
+    }
+
+    onStart = () => {
+        if (this.props.timer.isFocusing) {
+            this.monitor = new Monitor(
+                this.activeWinListener,
+                1000,
+                this.props.timer.screenShotInterval
+            );
             this.monitor.start();
         }
 
+        this.props.startTimer();
         this.updateLeftTime();
     };
 
@@ -289,19 +326,21 @@ class Timer extends Component<Props, State> {
                         this.props.timer.project
                     ).catch(() => undefined);
                 }
-
                 finishedSessions.push(thisSession);
+                this.setState({ pomodorosToday: finishedSessions });
+                this.props.timerFinished(thisSession, this.props.timer.project);
+
                 const notification = new remote.Notification({
                     title: 'Focusing finished. Start resting.',
                     body: `Completed ${finishedSessions.length} sessions today. \n\n`,
                     icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
                 });
                 notification.show();
-                this.props.timerFinished(thisSession, this.props.timer.project);
                 this.monitor.stop();
                 this.monitor.clear();
-                this.setState({ pomodorosToday: finishedSessions });
+                this.monitor = undefined;
             } else {
+                console.error('No monitor');
                 this.props.timerFinished();
             }
         } else {
@@ -311,17 +350,21 @@ class Timer extends Component<Props, State> {
                 icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
             });
             notification.show();
-            this.monitor = new Monitor(
-                this.activeWinListener,
-                1000,
-                this.props.timer.screenShotInterval
-            );
-            this.monitor.start();
+            this.onStart();
             this.props.timerFinished();
         }
 
+        this.focusOnCurrentWindow();
         this.clearStat();
+        this.setState({ showMask: true });
     };
+
+    private focusOnCurrentWindow() {
+        if (this.win) {
+            this.win.show();
+            this.win.focus();
+        }
+    }
 
     toggleMode = () => {
         this.setState(state => {
@@ -349,8 +392,17 @@ class Timer extends Component<Props, State> {
         this.clearStat();
     };
 
+    private onMaskClick = () => {
+        this.setState({ showMask: false });
+    };
+
+    private onMaskButtonClick() {
+        this.setState({ showMask: false });
+        this.onStart();
+    }
+
     render() {
-        const { leftTime, percent, more, pomodorosToday } = this.state;
+        const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
         const projectItem: ProjectItem = this.props.timer.project
@@ -381,6 +433,25 @@ class Timer extends Component<Props, State> {
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
         return (
             <Layout style={{ backgroundColor: 'white' }}>
+                <Mask style={{ display: showMask ? 'flex' : 'none' }} onClick={this.onMaskClick}>
+                    <MaskInnerContainer>
+                        <Row>
+                            <h1 style={{ color: 'white', fontSize: '4em' }}>Session Finished</h1>
+                        </Row>
+                        <Button size="large" onClick={this.onMaskButtonClick}>
+                            Start {this.props.timer.isFocusing ? 'Focusing' : 'Resting'}
+                        </Button>
+                        <Row style={{ marginTop: '2em' }}>
+                            <h1 style={{ color: 'white' }}>Today Pomodoros</h1>
+                            <PomodoroNumView
+                                num={this.state.pomodorosToday.length}
+                                color={'#f9ec52'}
+                                showNum={false}
+                            />
+                        </Row>
+                    </MaskInnerContainer>
+                </Mask>
+
                 <Sider
                     breakpoint="md"
                     collapsedWidth="0"
@@ -454,32 +525,7 @@ class Timer extends Component<Props, State> {
 
                     <MoreInfo>
                         <h2>Pomodoros Today</h2>
-                        <Row style={{ padding: 12 }}>
-                            <Col span={4} style={{ lineHeight: '1em' }}>
-                                <h4>{this.state.pomodorosToday.length}</h4>
-                            </Col>
-                            <Col span={20} style={{ color: 'red' }}>
-                                {Array.from(Array(this.state.pomodorosToday.length).keys()).map(
-                                    v => (
-                                        <svg
-                                            key={v}
-                                            width="1em"
-                                            height="1em"
-                                            fill="currentColor"
-                                            focusable="false"
-                                            viewBox="0 0 100 100"
-                                            style={{ margin: '0.1em' }}
-                                        >
-                                            <circle r={50} cx={50} cy={50} color="red">
-                                                <title>
-                                                    {`Completed ${this.state.pomodorosToday.length} pomodoros today`}
-                                                </title>
-                                            </circle>
-                                        </svg>
-                                    )
-                                )}
-                            </Col>
-                        </Row>
+                        <PomodoroNumView num={this.state.pomodorosToday.length} />
                     </MoreInfo>
 
                     <MoreInfo

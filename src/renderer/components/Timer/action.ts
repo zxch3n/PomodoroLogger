@@ -168,21 +168,19 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
             throw new Error('is not running');
         }
 
-        const now = new Date().getTime();
-        const duration = state.isFocusing ? state.restDuration : state.focusDuration;
         if (process.env.NODE_ENV !== 'production') {
             return {
                 ...state,
-                isRunning: true,
-                targetTime: now + (duration * 1000) / 60,
+                isRunning: false,
+                targetTime: undefined,
                 isFocusing: !state.isFocusing
             };
         }
 
         return {
             ...state,
-            isRunning: true,
-            targetTime: now + duration * 1000,
+            isRunning: false,
+            targetTime: undefined,
             isFocusing: !state.isFocusing
         };
     }),
