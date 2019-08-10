@@ -396,10 +396,10 @@ class Timer extends Component<Props, State> {
         this.setState({ showMask: false });
     };
 
-    private onMaskButtonClick() {
+    private onMaskButtonClick = () => {
         this.setState({ showMask: false });
         this.onStart();
-    }
+    };
 
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
