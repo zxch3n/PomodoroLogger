@@ -15,7 +15,6 @@
     "start": "electron .",
     "lint": "tslint '{src,test,mocks}/**/*.{ts,tsx}' --project ./tsconfig.json",
     "test": "cross-env NODE_ENV=test jest",
-    "test-renderer": "cross-env NODE_ENV=test jest --config jest.config.renderer.js",
     "pretest:e2e": "npm run build",
     "test:e2e": "jest '(\\/test\\/e2e/).*'",
     "pack": "npm run build && electron-builder --dir",
@@ -74,6 +73,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
@@ -140,6 +140,7 @@
     "worker-loader": "^2.0.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.5.5",
     "@tensorflow-models/universal-sentence-encoder": "^1.1.1",
     "@tensorflow/tfjs": "^1.1.1",
     "active-win": "^5.1.2",

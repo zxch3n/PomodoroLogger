@@ -91,6 +91,7 @@ export async function trainTitlesProjectPair(
     const [projectEncoding, invertEncode] = oneHotEncode(projects);
     const outputSize = Object.values(projectEncoding).length;
     console.log('emb', embeddings.shape);
+    console.log('projects', projects.length);
     console.log('Encode', projectEncoding);
     console.log('outputSize', outputSize);
     const model = await createModel(embeddings.shape[1], outputSize, 1, 100);

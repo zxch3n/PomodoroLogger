@@ -8,8 +8,7 @@ export const baseDir =
         : process.env.HOME + '/.local/share');
 
 const dbDir = process.env.NODE_ENV !== 'test' ? 'db' : '__test__db';
-export const dbBaseDir =
-    process.env.NODE_ENV === 'production' ? join(baseDir, dbDir) : './' + dbDir;
+export const dbBaseDir = process.env.NODE_ENV === 'production' ? join(baseDir, dbDir) : dbDir;
 
 if (!existsSync(dbBaseDir)) {
     mkdirSync(dbBaseDir);
@@ -19,4 +18,8 @@ export const dbPaths = {
     projectDBPath: join(dbBaseDir, 'projects.nedb'),
     sessionDBPath: join(dbBaseDir, 'session.nedb'),
     settingDBPath: join(dbBaseDir, 'setting.nedb')
+};
+
+export const env = {
+    isWorker: false
 };

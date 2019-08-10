@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Checkbox, Dropdown, Icon, Input, List, Menu, message, Popconfirm, Table } from 'antd';
 import { ProjectActionTypes, ProjectItem, ProjectState } from './action';
 import { TodoItem } from '../TODO/action';
@@ -31,7 +31,9 @@ const ListItem = styled(List.Item)`
 
 const EditableCell: React.FunctionComponent<EditableProps> = (props: EditableProps) => {
     const { editing, value, onChange, children } = props;
-    return <td>{editing ? <Input value={value} onChange={onChange} /> : children}</td>;
+    return (
+        <td>{editing ? <Input autoFocus={true} value={value} onChange={onChange} /> : children}</td>
+    );
 };
 
 const defaultRecord = {
@@ -135,11 +137,16 @@ const Project: React.FC<Props> = (props: Props) => {
             // Change old project
             if (editingRecordRow.name === 'New Project') {
                 message.warn('Project name cannot be "New Project"');
+            } else if (editingRecordRow.name !== editingRowName) {
+                props.setName(editingRowName, editingRecordRow.name);
             }
-
-            props.setName(editingRowName, editingRecordRow.name);
         }
 
+        setEditingRowName('');
+        setEditingRecordRow(defaultRecord);
+    };
+
+    const cancel = () => {
         setEditingRowName('');
         setEditingRecordRow(defaultRecord);
     };
@@ -184,7 +191,12 @@ const Project: React.FC<Props> = (props: Props) => {
                         return (
                             <span>
                                 <a style={{ marginRight: 12 }} onClick={save}>
-                                    Save
+                                    {' '}
+                                    Save{' '}
+                                </a>
+                                <a style={{ marginRight: 12 }} onClick={cancel}>
+                                    {' '}
+                                    Cancel{' '}
                                 </a>
                             </span>
                         );
@@ -198,6 +210,7 @@ const Project: React.FC<Props> = (props: Props) => {
                 const onClick = () => {
                     setEditingRowName(record.name);
                     setEditingRecordRow(record);
+                    // TODO add auto focus
                 };
                 if (index === projects.length - 1) {
                     return (

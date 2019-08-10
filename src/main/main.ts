@@ -38,7 +38,10 @@ const createWindow = async () => {
         height: 800,
         frame: true,
         icon: nativeImage.createFromPath(path.join(__dirname, logo)),
-        title: 'Pomodoro Logger'
+        title: 'Pomodoro Logger',
+        webPreferences: {
+            nodeIntegrationInWorker: true
+        }
     });
 
     if (process.env.NODE_ENV === 'development') {

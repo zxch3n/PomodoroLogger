@@ -17,6 +17,7 @@
 
 import * as tfconv from '@tensorflow/tfjs-converter';
 import * as tf from '@tensorflow/tfjs-core';
+import { env } from '../config';
 import {
     IOHandler,
     ModelArtifacts,
@@ -26,6 +27,7 @@ import {
 import vocab from '../res/vocab.json';
 import modelJson from '../res/model.json';
 import weights from '../res/weights.dat';
+import { join, dirname } from 'path';
 import fs from 'fs';
 import { Tokenizer } from './tokenizer';
 
@@ -82,8 +84,17 @@ async function loadWeights(
         weightSpecs.push(...entry.weights);
     }
 
+    // FIXME: current worker's path solution can only run in dev env
     const weightsPath =
-        process.env.NODE_ENV === 'test' ? './src/res/weights.dat' : `${__dirname}/${weights}`;
+        process.env.NODE_ENV === 'test'
+            ? './src/res/weights.dat'
+            : env.isWorker
+            ? join('dist', weights)
+            : join(__dirname, weights);
+    if (env.isWorker) {
+        // @ts-ignore
+        self.postMessage({ payload: weightsPath, type: 'log' });
+    }
     const data: Buffer = await new Promise((resolve, reject) => {
         fs.readFile(weightsPath, null, (err, data) => {
             if (err) {

@@ -1,12 +1,11 @@
 import { remote } from 'electron';
 import { projectDB, sessionDB, settingDB } from '../main/db';
-import { promisify } from 'util';
+import { env } from '../config';
 import nedb from 'nedb';
-import { PomodoroRecord } from './monitor';
 
 type dbTypes = 'projectDB' | 'sessionDB' | 'settingDB';
 let dbs: { [key in dbTypes]: nedb };
-if (remote) {
+if (remote && !env.isWorker) {
     dbs = remote.getGlobal('sharedDB');
 }
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Card, Col, Progress, Row, Statistic } from 'antd';
-import { ipcRenderer } from 'electron';
 import { RootState } from '../../reducers';
 import { HistoryActionCreatorTypes } from '../History/action';
+import Worker from 'worker-loader!./train.worker';
 
 const Container = styled.div`
     position: relative;
@@ -17,14 +17,20 @@ export const Analyser: React.FC<Props> = (props: Props) => {
     const [acc, setAcc] = useState<undefined | number>(undefined);
     const [isTraining, setIsTraining] = useState(false);
     const [progress, setProgress] = useState(0);
+    const worker = new Worker();
     useEffect(() => {
-        ipcRenderer.on('setTrainProgress', (progress: number) => {
-            setProgress(progress);
-            if (progress >= 100) {
-                setIsTraining(true);
+        worker.onmessage = ({ data: { type, payload } }) => {
+            if (type === 'setProgress') {
+                setProgress(payload);
+                if (payload >= 100) {
+                    setIsTraining(false);
+                }
+            } else if (type === 'setAcc') {
+                setAcc(payload);
+            } else if (type === 'log') {
+                console.log(payload);
             }
-        });
-        ipcRenderer.on('setTrainAcc', setAcc);
+        };
     }, []);
     const onTrain = async () => {
         console.log(`Training ${props.history.records.length} samples`);
@@ -33,7 +39,7 @@ export const Analyser: React.FC<Props> = (props: Props) => {
         }
 
         setIsTraining(true);
-        ipcRenderer.send('startTrain');
+        worker.postMessage('startTraining');
     };
 
     return (

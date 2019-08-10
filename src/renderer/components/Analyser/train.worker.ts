@@ -1,11 +1,18 @@
-/**
- * Run by main process
- */
+import { env } from '../../../config';
+env.isWorker = true;
+import { PomodoroRecord } from '../../monitor';
+import { sessionDB } from '../../../main/db';
+import {
+    getTitlesProjectPairs,
+    predict,
+    trainTitlesProjectPair
+} from '../../../main/learner/learner';
 
-import { getTitlesProjectPairs, predict, trainTitlesProjectPair } from './learner';
-import { PomodoroRecord } from '../../renderer/monitor';
-import { sessionDB } from '../db';
 const ctx: Worker = self as any;
+
+function log(info: string) {
+    ctx.postMessage({ payload: info, type: 'log' });
+}
 
 async function getTitlesProjectMapFromDB() {
     const records: PomodoroRecord[] = await new Promise((resolve, reject) => {
@@ -26,13 +33,15 @@ async function train() {
         callback: (epoch, log) => {
             ctx.postMessage({
                 type: 'setProgress',
-                progress: epoch / epochs
+                progress: (epoch / epochs) * 100
             });
+
+            console.log(epoch / epochs);
         }
     });
     ctx.postMessage({
         type: 'setProgress',
-        progress: 100
+        payload: 100
     });
     let t = 0;
     let f = 0;
@@ -47,7 +56,7 @@ async function train() {
 
     ctx.postMessage({
         type: 'setAcc',
-        acc: t / (t + f)
+        payload: t / (t + f)
     });
 }
 
