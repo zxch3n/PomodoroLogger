@@ -456,7 +456,11 @@ class Timer extends Component<Props, State> {
                     breakpoint="md"
                     collapsedWidth="0"
                     theme="light"
-                    style={{ border: '1px solid rgb(240, 240, 240)', borderRadius: 8 }}
+                    style={{
+                        border: '1px solid rgb(240, 240, 240)',
+                        borderRadius: 8,
+                        display: this.props.timer.project ? undefined : 'none'
+                    }}
                 >
                     <div style={{ padding: 12 }}>
                         <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
