@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 
 export const baseDir =
     process.env.APPDATA ||
@@ -20,6 +20,24 @@ export const dbPaths = {
     settingDBPath: join(dbBaseDir, 'setting.nedb')
 };
 
+let asarDirName;
+let dir = __dirname;
+let oldDir = undefined;
+while (!dir.endsWith('.asar')) {
+    if (oldDir === dir) {
+        break;
+    }
+
+    oldDir = dir;
+    dir = dirname(dir);
+}
+
+if (dir.endsWith('.asar')) {
+    asarDirName = dirname(dir);
+}
+
 export const env = {
-    isWorker: false
+    isWorker: false,
+    electronAsarDir: asarDirName ? join(asarDirName, 'electron.asar') : undefined,
+    appAsarDir: asarDirName ? join(asarDirName, 'app.asar') : undefined
 };

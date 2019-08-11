@@ -5,6 +5,7 @@
   "main": "./dist/main.js",
   "scripts": {
     "clean": "rm ./dist/*.worker.js",
+    "prebuild": "npm run clean",
     "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
     "build-renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
     "build": "npm run build-main && npm run build-renderer",
@@ -46,9 +47,8 @@
       "output": "release"
     },
     "files": [
-      "dist/",
-      "node_modules/",
-      "package.json"
+      "./dist/*",
+      "./package.json"
     ],
     "linux": {
       "target": "deb"

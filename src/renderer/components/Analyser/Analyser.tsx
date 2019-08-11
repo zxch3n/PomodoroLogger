@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Card, Col, Progress, Row, Statistic } from 'antd';
+import { Button, Card, Col, Progress, Row, Statistic, message } from 'antd';
 import { RootState } from '../../reducers';
 import { HistoryActionCreatorTypes } from '../History/action';
 import Worker from 'worker-loader!./train.worker';
@@ -29,6 +29,8 @@ export const Analyser: React.FC<Props> = (props: Props) => {
                 setAcc(payload);
             } else if (type === 'log') {
                 console.log(payload);
+            } else if (type === 'error') {
+                message.error(payload);
             }
         };
     }, []);
@@ -39,6 +41,7 @@ export const Analyser: React.FC<Props> = (props: Props) => {
         }
 
         setIsTraining(true);
+        setProgress(0);
         worker.postMessage('startTraining');
     };
 

@@ -73,21 +73,21 @@ const Application = (props: Props) => {
             >
                 <Setting />
             </TabPane>
-            {process.env.NODE_ENV !== 'production' ? (
-                <TabPane
-                    tab={
-                        <span>
-                            <Icon type="bar-chart" />
-                            Analyser
-                        </span>
-                    }
-                    key="analyser"
-                >
-                    <Analyser />
-                </TabPane>
-            ) : (
-                undefined
-            )}
+            {/*{process.env.NODE_ENV !== 'production' ? (*/}
+            <TabPane
+                tab={
+                    <span>
+                        <Icon type="bar-chart" />
+                        Analyser
+                    </span>
+                }
+                key="analyser"
+            >
+                <Analyser />
+            </TabPane>
+            {/*) : (*/}
+            {/*    undefined*/}
+            {/*)}*/}
         </Tabs>
     );
 };

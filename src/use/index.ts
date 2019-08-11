@@ -85,12 +85,23 @@ async function loadWeights(
     }
 
     // FIXME: current worker's path solution can only run in dev env
-    const weightsPath =
-        process.env.NODE_ENV === 'test'
-            ? './src/res/weights.dat'
-            : env.isWorker
-            ? join('dist', weights)
-            : join(__dirname, weights);
+    let weightsPath: string = '';
+    if (process.env.NODE_ENV === 'test') {
+        weightsPath = './src/res/weights.dat';
+    } else if (process.env.NODE_ENV === 'development') {
+        if (env.isWorker) {
+            weightsPath = join('dist', weights);
+        } else {
+            weightsPath = join(__dirname, weights);
+        }
+    } else {
+        if (env.appAsarDir) {
+            weightsPath = join(env.appAsarDir, 'dist', weights);
+        } else {
+            throw new Error();
+        }
+    }
+
     if (env.isWorker) {
         // @ts-ignore
         self.postMessage({ payload: weightsPath, type: 'log' });
