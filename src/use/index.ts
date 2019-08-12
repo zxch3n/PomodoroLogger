@@ -150,7 +150,7 @@ export class UniversalSentenceEncoder {
     /**
      *
      * Returns a 2D Tensor of shape [input.length, 512] that contains the
-     * Universal Sentence Encoder embeddings for each input.
+     * Universal Sentence NameEncoder embeddings for each input.
      *
      * @param inputs A string or an array of strings to embed.
      */
