@@ -43,6 +43,15 @@ const MaskInnerContainer = styled.div`
     max-width: 500px;
 `;
 
+const ProjectName = styled.span`
+    transition: color 0.4s;
+    color: black;
+    cursor: pointer;
+    :hover {
+        color: white;
+    }
+`;
+
 const ProgressTextContainer = styled.div`
     padding: 12px;
     text-align: center;
@@ -431,7 +440,10 @@ class Timer extends Component<Props, State> {
                 <Mask style={{ display: showMask ? 'flex' : 'none' }} onClick={this.onMaskClick}>
                     <MaskInnerContainer>
                         <Row>
-                            <h1 style={{ color: 'white', fontSize: '4em' }}>Session Finished</h1>
+                            <h1 style={{ color: 'white', fontSize: '4em' }}>
+                                <ProjectName>{this.props.timer.project} </ProjectName>
+                                Session Finished
+                            </h1>
                         </Row>
                         <Button size="large" onClick={this.onMaskButtonClick}>
                             Start {this.props.timer.isFocusing ? 'Focusing' : 'Resting'}
