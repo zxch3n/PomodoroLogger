@@ -133,6 +133,14 @@ export class KNN {
         return this.encodings !== undefined;
     }
 
+    public get length() {
+        if (!this.encodings) {
+            return 0;
+        }
+
+        return this.encodings.length;
+    }
+
     public fit = (records: PomodoroRecord[]) => {
         const pairs = getAppProjectPairs(records);
         const { encoder, encodings } = encodeAppUsage(pairs);

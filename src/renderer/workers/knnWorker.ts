@@ -4,6 +4,7 @@ import { BaseWorker } from './BaseWorker';
 
 export class KnnWorker extends BaseWorker {
     protected worker: Worker = new Worker();
+    private ready: boolean = false;
     constructor() {
         super();
     }
@@ -11,6 +12,20 @@ export class KnnWorker extends BaseWorker {
     async train(onDone: (accuracy: number) => void, onProgress: (progress: number) => void) {
         return this.createHandler(
             { type: 'trainModel' },
+            {
+                setProgress: onProgress,
+                setAcc: (acc, done) => {
+                    onDone(acc);
+                    done();
+                }
+            },
+            30000
+        );
+    }
+
+    async test(onDone: (accuracy: number) => void, onProgress: (progress: number) => void) {
+        return this.createHandler(
+            { type: 'testModel' },
             {
                 setProgress: onProgress,
                 setAcc: (acc, done) => {
@@ -42,9 +57,9 @@ export class KnnWorker extends BaseWorker {
         );
     }
 
-    async loadModel() {
+    async loadModel(dbSize: number) {
         return this.createHandler(
-            { type: 'loadModel' },
+            { type: 'loadModel', payload: { dbSize } },
             {
                 onDone: (payload, done) => done()
             }

@@ -26,14 +26,29 @@ async function getRecords() {
         });
     });
 
-    return records;
+    return records.filter(r => r.projectId !== undefined);
 }
 
 let knn = new KNN();
-async function train() {
+async function train(isTest = false) {
     try {
         const records = await getRecords();
-        const [train, test] = sample(records, 0.5);
+        if (records.length === 0) {
+            ctx.postMessage({
+                type: 'error',
+                payload: 'Training array is empty'
+            });
+            return;
+        }
+
+        let train;
+        let test;
+        if (isTest) {
+            [train, test] = sample(records, 0.5);
+        } else {
+            [train, test] = sample(records, 1);
+        }
+
         ctx.postMessage({
             type: 'setProgress',
             payload: 20
@@ -88,7 +103,7 @@ function saveModel() {
     }
 }
 
-async function loadModel() {
+async function loadModel(dbSize: number = 0) {
     if (!existsSync(modelPath.knnPath)) {
         await train();
         saveModel();
@@ -97,7 +112,7 @@ async function loadModel() {
         knn = KNN.fromJson(json);
     }
 
-    if (!knn.isTrained) {
+    if (!knn.isTrained || dbSize - knn.length > 20 || dbSize / knn.length > 1.5) {
         await train();
         saveModel();
     }
@@ -107,20 +122,34 @@ async function loadModel() {
     });
 }
 
+function predict(payload: PomodoroRecord[]) {
+    const record = payload as PomodoroRecord[];
+    const ans = knn.predict(record);
+    ctx.postMessage({
+        type: 'predict',
+        payload: ans
+    });
+}
+
 ctx.addEventListener('message', async ({ data: { type, payload } }) => {
-    if (type === 'trainModel') {
-        knn = new KNN();
-        await train();
-    } else if (type === 'saveModel') {
-        saveModel();
-    } else if (type === 'loadModel') {
-        await loadModel();
-    } else if (type === 'predict') {
-        const record = payload as PomodoroRecord[];
-        const ans = knn.predict(record);
+    try {
+        if (type === 'trainModel') {
+            knn = new KNN();
+            await train(false);
+        } else if (type === 'testModel') {
+            knn = new KNN();
+            await train(true);
+        } else if (type === 'saveModel') {
+            saveModel();
+        } else if (type === 'loadModel') {
+            await loadModel(payload.dbSize);
+        } else if (type === 'predict') {
+            predict(payload);
+        }
+    } catch (e) {
         ctx.postMessage({
-            type: 'predict',
-            payload: ans
+            type: 'error',
+            payload: JSON.stringify(e)
         });
     }
 });

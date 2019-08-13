@@ -4,6 +4,10 @@ import { BaseResult } from 'active-win';
 import { removeRedundantField, renameIllegalName } from './sessionManager';
 import { ApplicationSpentTime, PomodoroRecord } from './type';
 
+function removeAppSuffix(name: string) {
+    return name.replace(/\.exe$/g, '');
+}
+
 // This module may not be available in electron renderer
 type Listener = (appName: string, data: PomodoroRecord, imgUrl?: string) => void;
 class UsageRecorder {
@@ -71,7 +75,7 @@ class UsageRecorder {
         }
 
         const now = new Date().getTime();
-        const appName = result ? result.owner.name : undefined;
+        const appName = result ? removeAppSuffix(result.owner.name) : undefined;
         if (this.lastUsingApp && appName !== this.lastUsingApp) {
             this.updateLastAppUsageInfo(this.lastUsingApp);
         }

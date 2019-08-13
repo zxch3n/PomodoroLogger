@@ -27,7 +27,7 @@ export const Analyser: React.FC<Props> = (props: Props) => {
         setIsTraining(true);
         setProgress(0);
         worker
-            .train(acc => {
+            .test(acc => {
                 setAcc(acc);
                 setProgress(100);
                 setIsTraining(false);

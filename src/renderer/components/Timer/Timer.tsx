@@ -18,6 +18,7 @@ import { getIdFromProjectName } from '../../dbs';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
+import { workers } from '../../workers';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
@@ -148,6 +149,7 @@ class Timer extends Component<Props, State> {
         });
 
         this.addMenuItems();
+        workers.knn.loadModel(this.props.history.records.length).catch(console.error);
     }
 
     addMenuItems(): void {
