@@ -129,6 +129,10 @@ export class KNN {
 
     constructor(public k: number = 5) {}
 
+    public get isTrained() {
+        return this.encodings !== undefined;
+    }
+
     public fit = (records: PomodoroRecord[]) => {
         const pairs = getAppProjectPairs(records);
         const { encoder, encodings } = encodeAppUsage(pairs);
@@ -147,6 +151,10 @@ export class KNN {
     public predict = (records: PomodoroRecord[]) => {
         if (!this.encoder || !this.encodings) {
             throw new Error('Must fit before predicting');
+        }
+
+        if (records.length === 0) {
+            return [];
         }
 
         const pairs = getAppProjectPairs(records);

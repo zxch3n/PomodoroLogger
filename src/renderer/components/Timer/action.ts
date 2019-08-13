@@ -6,6 +6,7 @@ import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
 import dbs from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
+import { workers } from '../../workers';
 
 export interface Setting {
     focusDuration: number;
@@ -125,13 +126,24 @@ export const actions = {
             throwError
         );
     },
-    timerFinished: (sessionData?: PomodoroRecord, project?: string) => async (
+    timerFinished: (sessionData?: PomodoroRecord, project?: string | undefined) => async (
         dispatch: Dispatch
     ) => {
         dispatch(timerFinished());
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
-            if (project) {
+            if (project === undefined) {
+                // Predict session's project
+                const newProject = (await workers.knn.predict(sessionData).catch(err => {
+                    console.error(err);
+                    return undefined;
+                })) as string | undefined;
+
+                if (newProject !== undefined) {
+                    projectActions.updateOnTimerFinished(newProject, sessionData)(dispatch);
+                    dispatch(setProject(project));
+                }
+            } else {
                 projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
             }
 

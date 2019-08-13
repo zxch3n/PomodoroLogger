@@ -1,16 +1,16 @@
-import { PomodoroRecord } from '../../monitor/type';
-import { dbPaths, env, modelPath } from '../../../config';
-import { KNN } from '../../../main/learner/appKnn';
-import { sample } from '../../../utils/random';
-import { readFileSync, writeFileSync } from 'fs';
+import { dbPaths, env, modelPath } from '../../config';
+env.isWorker = true;
+
+import { ApplicationSpentTime, PomodoroRecord } from '../monitor/type';
+import { KNN } from '../../main/learner/appKnn';
+import { sample } from '../../utils/random';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import nedb from 'nedb';
 
 const ctx: Worker = self as any;
 function log(info: string) {
     ctx.postMessage({ payload: info, type: 'log' });
 }
-
-env.isWorker = true;
 
 async function getRecords() {
     const sessionDB = new nedb({ filename: dbPaths.sessionDBPath, autoload: false });
@@ -32,23 +32,18 @@ async function getRecords() {
 let knn = new KNN();
 async function train() {
     try {
-        console.log('getting record');
         const records = await getRecords();
-        console.log('length', records.length);
         const [train, test] = sample(records, 0.5);
-        console.log('split test train');
         ctx.postMessage({
             type: 'setProgress',
             payload: 20
         });
         knn.fit(train);
-        console.log('fitted');
         ctx.postMessage({
             type: 'setProgress',
             payload: 80
         });
         const preds = knn.predict(test);
-        console.log('pred');
         let t = 0;
         let f = 0;
         for (let i = 0; i < test.length; i += 1) {
@@ -69,7 +64,6 @@ async function train() {
             type: 'setProgress',
             payload: 100
         });
-        console.log('done');
     } catch (e) {
         console.error(e);
         ctx.postMessage({
@@ -79,16 +73,54 @@ async function train() {
     }
 }
 
-ctx.addEventListener('message', async (event: any) => {
-    console.log(event.data);
-    if (event.data === 'startTraining') {
-        knn = new KNN();
-        await train();
-    } else if (event.data === 'saveModel') {
-        const json = knn.toJson();
+function saveModel() {
+    const json = knn.toJson();
+    try {
         writeFileSync(modelPath.knnPath, JSON.stringify(json), { encoding: 'utf-8' });
-    } else if (event.data === 'loadModel') {
+        ctx.postMessage({
+            type: 'onDone'
+        });
+    } catch (e) {
+        ctx.postMessage({
+            type: 'error',
+            payload: e
+        });
+    }
+}
+
+async function loadModel() {
+    if (!existsSync(modelPath.knnPath)) {
+        await train();
+        saveModel();
+    } else {
         const json = JSON.parse(readFileSync(modelPath.knnPath, { encoding: 'utf-8' }));
         knn = KNN.fromJson(json);
+    }
+
+    if (!knn.isTrained) {
+        await train();
+        saveModel();
+    }
+
+    ctx.postMessage({
+        type: 'onDone'
+    });
+}
+
+ctx.addEventListener('message', async ({ data: { type, payload } }) => {
+    if (type === 'trainModel') {
+        knn = new KNN();
+        await train();
+    } else if (type === 'saveModel') {
+        saveModel();
+    } else if (type === 'loadModel') {
+        await loadModel();
+    } else if (type === 'predict') {
+        const record = payload as PomodoroRecord[];
+        const ans = knn.predict(record);
+        ctx.postMessage({
+            type: 'predict',
+            payload: ans
+        });
     }
 });

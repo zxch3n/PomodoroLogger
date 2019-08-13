@@ -84,7 +84,7 @@ async function loadWeights(
         weightSpecs.push(...entry.weights);
     }
 
-    // FIXME: current worker's path solution can only run in dev env
+    // FIXME: current index's path solution can only run in dev env
     let weightsPath: string = '';
     if (process.env.NODE_ENV === 'test') {
         weightsPath = './src/res/weights.dat';

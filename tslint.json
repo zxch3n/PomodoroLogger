@@ -22,7 +22,8 @@
         "jsx-no-string-ref": true,
         "jsx-self-close": true,
         "import-name": false,
-        "prefer-template": false
+        "prefer-template": false,
+        "no-parameter-properties": false
     },
     "rulesDirectory": []
 }

@@ -12,6 +12,7 @@ import { actions as timerActions, TimerActionTypes } from './Timer/action';
 import { actions as projectActions, ProjectActionTypes } from './Project/action';
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { genMapDispatchToProp } from '../utils';
+import { workers } from '../workers';
 
 const { TabPane } = Tabs;
 
@@ -22,6 +23,10 @@ const Application = (props: Props) => {
         props.fetchAll();
         props.fetchSettings();
         props.fetchHistoryFromDisk();
+        workers.knn
+            .loadModel()
+            .then(() => console.log('Model loaded'))
+            .catch(console.error);
     }, []);
 
     return (

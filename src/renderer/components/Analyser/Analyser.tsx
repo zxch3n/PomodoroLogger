@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button, Card, Col, Progress, Row, Statistic, message } from 'antd';
+import { Button, Card, Col, Progress, Row, Statistic } from 'antd';
 import { RootState } from '../../reducers';
 import { HistoryActionCreatorTypes } from '../History/action';
-import Worker from 'worker-loader!./trainKnn.worker';
+import { workers } from '../../workers';
 
 const Container = styled.div`
     position: relative;
@@ -17,36 +17,22 @@ export const Analyser: React.FC<Props> = (props: Props) => {
     const [acc, setAcc] = useState<undefined | number>(undefined);
     const [isTraining, setIsTraining] = useState(false);
     const [progress, setProgress] = useState(0);
-    const worker = new Worker();
-    const listener = ({ data: { type, payload } }: { data: { type: string; payload: any } }) => {
-        console.log('Analyser', type, payload);
-        if (type === 'setProgress') {
-            setProgress(payload);
-            if (payload >= 100) {
-                setIsTraining(false);
-            }
-        } else if (type === 'setAcc') {
-            setAcc(payload);
-        } else if (type === 'log') {
-            console.log(payload);
-        } else if (type === 'error') {
-            message.error(payload);
-            setIsTraining(false);
-            setProgress(0);
-        }
-    };
-
+    const worker = workers.knn;
     const onTrain = async () => {
         if (isTraining) {
             return;
         }
 
-        worker.addEventListener('message', listener);
-
         console.log(`Training ${props.history.records.length} samples`);
         setIsTraining(true);
         setProgress(0);
-        worker.postMessage('startTraining');
+        worker
+            .train(acc => {
+                setAcc(acc);
+                setProgress(100);
+                setIsTraining(false);
+            }, setProgress)
+            .catch(console.error);
     };
 
     return (

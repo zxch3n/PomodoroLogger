@@ -130,7 +130,7 @@ module.exports = merge.smart(baseConfig, {
             },
             {
                 test: /\.worker\.js$/,
-                use: { loader: 'worker-loader' }
+                use: { loader: 'index-loader' }
             }
         ]
     },
@@ -147,7 +147,7 @@ module.exports = merge.smart(baseConfig, {
     resolve: {
         plugins: [
             // This plugin allow us to use nedb of node.js version directly
-            // in renderer process (and the web worker)
+            // in renderer process (and the web index)
             // See https://stackoverflow.com/questions/55389659/persist-nedb-to-disk-in-electron-renderer-process-webpack-electron-nedb-configu
             fixNedbForElectronRenderer
         ]

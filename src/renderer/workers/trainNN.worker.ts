@@ -1,13 +1,9 @@
-import { env } from '../../../config';
-import { DBs } from '../../../main/db';
-import {
-    getTitlesProjectPairs,
-    predict,
-    trainTitlesProjectPair
-} from '../../../main/learner/learner';
+import { env } from '../../config';
+import { DBs } from '../../main/db';
+import { getTitlesProjectPairs, predict, trainTitlesProjectPair } from '../../main/learner/learner';
 import { readdir } from 'fs';
 import { dirname, join } from 'path';
-import { PomodoroRecord } from '../../monitor/type';
+import { PomodoroRecord } from '../monitor/type';
 
 env.isWorker = true;
 

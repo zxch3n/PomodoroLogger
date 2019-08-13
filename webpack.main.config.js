@@ -34,7 +34,7 @@ module.exports = merge.smart(baseConfig, {
             },
             {
                 test: /\.worker\.js$/,
-                use: { loader: 'worker-loader' }
+                use: { loader: 'index-loader' }
             }
         ]
     },
