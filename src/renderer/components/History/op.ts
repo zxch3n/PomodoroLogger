@@ -1,5 +1,5 @@
-import { PomodoroRecord } from '../../monitor';
-import { Counter } from '../../utils';
+import { Counter } from '../../../utils/Counter';
+import { PomodoroRecord } from '../../monitor/type';
 
 export const getPomodoroCalendarData = (pomodoros: PomodoroRecord[]) => {
     const counter = new Counter();

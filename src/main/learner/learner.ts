@@ -1,7 +1,7 @@
-import { PomodoroRecord } from '../../renderer/monitor';
 import * as tf from '@tensorflow/tfjs';
 // import "@tensorflow/tfjs-node"
 import * as use from '../../use';
+import { PomodoroRecord } from '../../renderer/monitor/type';
 
 type Titles = { [title: string]: number };
 interface TitleProjectPair {

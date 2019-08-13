@@ -1,10 +1,10 @@
 import { generateRandomName } from '../../src/renderer/utils';
 import { ProjectItem } from '../../src/renderer/components/Project/action';
 import { TodoItem } from '../../src/renderer/components/TODO/action';
-import { ApplicationSpentTime, PomodoroRecord } from '../../src/renderer/monitor';
 import { promisify } from 'util';
 import { join } from 'path';
 import nedb from 'nedb';
+import { ApplicationSpentTime, PomodoroRecord } from '../../src/renderer/monitor/type';
 const projectNum = 100;
 const todoNum = 1000;
 const recordNum = 100000;

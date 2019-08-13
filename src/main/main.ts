@@ -7,12 +7,12 @@ import { build } from '../../package.json';
 import * as learner from './learner/learner';
 
 const mGlobal: typeof global & {
-    sharedDB?: typeof db;
+    sharedDB?: typeof db.DBs;
     tray?: Tray;
     setMenuItems?: any;
     learner?: any;
 } = global;
-mGlobal.sharedDB = db;
+mGlobal.sharedDB = db.DBs;
 mGlobal.learner = learner;
 if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
@@ -40,7 +40,8 @@ const createWindow = async () => {
         icon: nativeImage.createFromPath(path.join(__dirname, logo)),
         title: 'Pomodoro Logger',
         webPreferences: {
-            nodeIntegrationInWorker: true
+            nodeIntegrationInWorker: true,
+            nodeIntegration: true
         }
     });
 

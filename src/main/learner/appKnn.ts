@@ -1,5 +1,5 @@
-import { PomodoroRecord } from '../../renderer/monitor';
-import { Counter } from '../../renderer/utils';
+import { Counter } from '../../utils/Counter';
+import { PomodoroRecord } from '../../renderer/monitor/type';
 
 interface AppProjectPair {
     apps: { appName: string; time: number }[];
@@ -46,6 +46,14 @@ export class NameEncoder {
         }
 
         return encoding;
+    }
+
+    public toJson() {
+        return this.appNameMap;
+    }
+
+    public static fromJson(json: { [appName: string]: number }) {
+        return new NameEncoder(json);
     }
 }
 
@@ -138,7 +146,7 @@ export class KNN {
 
     public predict = (records: PomodoroRecord[]) => {
         if (!this.encoder || !this.encodings) {
-            throw new Error('Must fit before predict');
+            throw new Error('Must fit before predicting');
         }
 
         const pairs = getAppProjectPairs(records);
@@ -156,17 +164,23 @@ export class KNN {
         return pred;
     };
 
-    private minDistance(encoding: number[]) {
-        let minDist = 100000000;
-        let ans = '';
-        // @ts-ignore
-        for (const gtPair of this.encodings) {
-            const d = dist(gtPair.encoding, encoding);
-            if (d < minDist) {
-                minDist = d;
-                ans = gtPair.project;
-            }
+    public toJson() {
+        if (!this.encoder || !this.encodings) {
+            throw new Error('Must fit before saving');
         }
+
+        return {
+            encoder: this.encoder.toJson(),
+            encodings: this.encodings,
+            k: this.k
+        };
+    }
+
+    public static fromJson(json: { encoder: any; encoding: any; k: number }) {
+        const knn = new KNN(json.k);
+        knn.encodings = json.encoding;
+        knn.encoder = NameEncoder.fromJson(json.encoder);
+        return knn;
     }
 }
 

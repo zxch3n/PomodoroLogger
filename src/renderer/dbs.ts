@@ -1,21 +1,15 @@
 import { remote } from 'electron';
-import { projectDB, sessionDB, settingDB } from '../main/db';
+import { DBs } from '../main/db';
 import { env } from '../config';
-import nedb from 'nedb';
 
-type dbTypes = 'projectDB' | 'sessionDB' | 'settingDB';
-let dbs: { [key in dbTypes]: nedb };
-if (remote && !env.isWorker) {
+let dbs: typeof DBs;
+if (remote) {
     dbs = remote.getGlobal('sharedDB');
 }
 
 // @ts-ignore
 if (!dbs) {
-    dbs = {
-        projectDB,
-        sessionDB,
-        settingDB
-    };
+    dbs = DBs;
 }
 
 export async function getIdFromProjectName(name: string) {

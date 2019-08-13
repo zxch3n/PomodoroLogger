@@ -2,9 +2,9 @@
  * @jest-environment node
  */
 
-import { PomodoroRecord } from '../../renderer/monitor';
 import { getTitlesProjectPairs, predict, trainTitlesProjectPair } from './learner';
 import nedb from 'nedb';
+import { PomodoroRecord } from '../../renderer/monitor/type';
 
 export const sessionDB = new nedb({
     filename: `${__dirname}/../../../__mocks__/session.nedb`,

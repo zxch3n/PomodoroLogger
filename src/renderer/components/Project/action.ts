@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 import { Dispatch } from 'redux';
 import { createTodoItem, TodoItem } from '../TODO/action';
 import dbs from '../../dbs';
-import { PomodoroRecord } from '../../monitor';
+import { PomodoroRecord } from '../../monitor/type';
 
 export interface SubAppSpentTime {
     title: string;

@@ -1,6 +1,6 @@
 import { TopKManager, KNN, NameEncoder } from './appKnn';
-import { ApplicationSpentTime, PomodoroRecord } from '../../renderer/monitor';
 import { generateRandomName } from '../../renderer/utils';
+import { ApplicationSpentTime, PomodoroRecord } from '../../renderer/monitor/type';
 
 describe('AppKNN TopManager', () => {
     it('gets the top 1 correctly', async () => {
