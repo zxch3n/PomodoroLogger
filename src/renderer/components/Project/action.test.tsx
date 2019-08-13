@@ -16,16 +16,16 @@ import { addProjectToDB, generateRandomName } from '../../utils';
 import { existsSync, mkdir, unlink } from 'fs';
 import { dbBaseDir, dbPaths } from '../../../config';
 import { promisify } from 'util';
-import { PomodoroRecord } from '../../monitor';
+import { PomodoroRecord } from '../../monitor/type';
 const { projectDBPath } = dbPaths;
 
 beforeEach(async () => {
     if (existsSync(projectDBPath)) {
-        await promisify(unlink)(projectDBPath);
+        await promisify(unlink)(projectDBPath).catch(() => {});
     }
 
     if (!existsSync(dbBaseDir)) {
-        await promisify(mkdir)(dbBaseDir);
+        await promisify(mkdir)(dbBaseDir).catch(() => {});
     }
 });
 

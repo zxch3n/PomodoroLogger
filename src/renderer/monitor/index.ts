@@ -2,6 +2,11 @@ import { ActiveWinListener, Monitor as WindowMonitor } from './activeWinMonitor'
 import { getScreen } from './screenshot';
 import { BaseResult } from 'active-win';
 import { removeRedundantField, renameIllegalName } from './sessionManager';
+import { ApplicationSpentTime, PomodoroRecord } from './type';
+
+function removeAppSuffix(name: string) {
+    return name.replace(/\.exe$/g, '');
+}
 
 // This module may not be available in electron renderer
 type Listener = (appName: string, data: PomodoroRecord, imgUrl?: string) => void;
@@ -70,7 +75,7 @@ class UsageRecorder {
         }
 
         const now = new Date().getTime();
-        const appName = result ? result.owner.name : undefined;
+        const appName = result ? removeAppSuffix(result.owner.name) : undefined;
         if (this.lastUsingApp && appName !== this.lastUsingApp) {
             this.updateLastAppUsageInfo(this.lastUsingApp);
         }
@@ -102,10 +107,12 @@ class UsageRecorder {
         this.lock = false;
     };
 
-    updateLastAppUsageInfo = (lastAppName: string) => {
+    private updateLastAppUsageInfo = (lastAppName: string) => {
         const row = this.record.apps[lastAppName];
         if (!row) {
-            throw new Error();
+            throw new Error(
+                `App "${lastAppName}" does not exists in ${JSON.stringify(this.record.apps)}`
+            );
         }
 
         row.switchTimes += 1;
@@ -294,31 +301,4 @@ export class Monitor {
         renameIllegalName(data);
         return data;
     }
-}
-
-/**
- * Aggregated application spent time in a session
- *
- */
-export interface ApplicationSpentTime {
-    appName: string;
-    spentTimeInHour: number;
-    titleSpentTime: { [title: string]: { occurrence: number; normalizedWeight: number } };
-    // how many times user switched to this app
-    switchTimes: number;
-    // how long the screen shot stay the same in this app
-    screenStaticDuration?: number;
-    lastUpdateTime?: number;
-}
-
-export interface PomodoroRecord {
-    apps: {
-        [appName: string]: ApplicationSpentTime;
-    };
-    spentTimeInHour: number;
-    switchTimes: number;
-    startTime: number;
-    screenStaticDuration?: number;
-    todoId?: string;
-    projectId?: string;
 }

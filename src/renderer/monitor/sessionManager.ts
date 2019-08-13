@@ -1,6 +1,6 @@
 import dbs from '../dbs';
-import { PomodoroRecord } from './index';
 import { promisify } from 'util';
+import { PomodoroRecord } from './type';
 
 const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.sessionDB.remove].map(
     m => promisify(m.bind(dbs.sessionDB))

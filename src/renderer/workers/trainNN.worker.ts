@@ -1,14 +1,11 @@
-import { baseDir, env } from '../../../config';
-env.isWorker = true;
-import { PomodoroRecord } from '../../monitor';
-import { sessionDB } from '../../../main/db';
-import {
-    getTitlesProjectPairs,
-    predict,
-    trainTitlesProjectPair
-} from '../../../main/learner/learner';
+import { env } from '../../config';
+import { DBs } from '../../main/db';
+import { getTitlesProjectPairs, predict, trainTitlesProjectPair } from '../../main/learner/learner';
 import { readdir } from 'fs';
 import { dirname, join } from 'path';
+import { PomodoroRecord } from '../monitor/type';
+
+env.isWorker = true;
 
 const ctx: Worker = self as any;
 
@@ -32,7 +29,7 @@ readdir(dirname(__dirname), (err, files) => {
 
 async function getTitlesProjectMapFromDB() {
     const records: PomodoroRecord[] = await new Promise((resolve, reject) => {
-        sessionDB.find({}, {}, (err, docs) => {
+        DBs.sessionDB.find({}, {}, (err, docs) => {
             if (err) reject(err);
             resolve(docs as PomodoroRecord[]);
         });

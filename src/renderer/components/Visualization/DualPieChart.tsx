@@ -1,9 +1,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import echarts, { ECharts, EChartOption } from 'echarts';
-import { PomodoroRecord } from '../../monitor';
-import { Counter, getBetterAppName } from '../../utils';
+import { getBetterAppName } from '../../utils';
 import { getNameFromProjectId } from '../../dbs';
+import { Counter } from '../../../utils/Counter';
+import { PomodoroRecord } from '../../monitor/type';
 
 const Container = styled.div`
     margin: 0 auto;

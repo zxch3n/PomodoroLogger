@@ -1,13 +1,13 @@
-import React, { Component, Fragment } from 'react';
-import { Button, Col, Divider, Icon, Layout, message, Row } from 'antd';
+import React, { Component } from 'react';
+import { Button, Divider, Icon, Layout, message, Row } from 'antd';
 import Progress from './Progress';
 import { ProjectActionTypes, ProjectItem } from '../Project/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
-import { Monitor, PomodoroRecord } from '../../monitor';
+import { Monitor } from '../../monitor';
 import styled from 'styled-components';
-import { nativeImage, remote, BrowserWindow } from 'electron';
+import { BrowserWindow, nativeImage, remote } from 'electron';
 import RestIcon from '../../../res/rest.svg';
 import WorkIcon from '../../../res/work.svg';
 import AppIcon from '../../../res/TimeLogger.png';
@@ -17,6 +17,8 @@ import { TodoList } from '../Project/Project';
 import { getIdFromProjectName } from '../../dbs';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
+import { PomodoroRecord } from '../../monitor/type';
+import { workers } from '../../workers';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
@@ -41,6 +43,15 @@ const MaskInnerContainer = styled.div`
     max-width: 500px;
 `;
 
+const ProjectName = styled.span`
+    transition: color 0.4s;
+    color: black;
+    cursor: pointer;
+    :hover {
+        color: white;
+    }
+`;
+
 const ProgressTextContainer = styled.div`
     padding: 12px;
     text-align: center;
@@ -56,7 +67,6 @@ const ProgressContainer = styled.div`
     max-width: 800px;
     margin: 0 auto;
     width: 100%;
-    display: block;
     position: relative;
     padding: 10px;
     display: flex;
@@ -69,7 +79,7 @@ const ButtonRow = styled.div`
     display: flex;
     justify-content: space-around;
     font-size: 32px;
-    margin: 0px auto 22px auto;
+    margin: 0 auto 22px auto;
     color: darkslategray;
 
     i {
@@ -108,7 +118,6 @@ function joinDict<T>(maps: { [key: string]: T }[]): { [key: string]: T } {
 
 interface State {
     leftTime: string;
-    screenShotUrl?: string;
     currentAppName?: string;
     percent: number;
     more: boolean;
@@ -127,7 +136,6 @@ class Timer extends Component<Props, State> {
         this.state = {
             leftTime: '',
             percent: 0,
-            screenShotUrl: undefined,
             more: false,
             pomodorosToday: [],
             showMask: false
@@ -136,10 +144,6 @@ class Timer extends Component<Props, State> {
     }
 
     activeWinListener = (appName: string, data: PomodoroRecord, imgUrl?: string) => {
-        if (imgUrl) {
-            this.setState({ screenShotUrl: imgUrl });
-        }
-
         this.setState({
             currentAppName: appName
         });
@@ -154,6 +158,7 @@ class Timer extends Component<Props, State> {
         });
 
         this.addMenuItems();
+        workers.knn.loadModel(this.props.history.records.length).catch(console.error);
     }
 
     addMenuItems(): void {
@@ -300,7 +305,6 @@ class Timer extends Component<Props, State> {
         setTrayImageWithMadeIcon(undefined).catch(console.error);
         this.setState((_, props) => ({
             currentAppName: undefined,
-            screenShotUrl: undefined,
             leftTime: this.defaultLeftTime(props.timer.isFocusing),
             percent: 0
         }));
@@ -436,7 +440,10 @@ class Timer extends Component<Props, State> {
                 <Mask style={{ display: showMask ? 'flex' : 'none' }} onClick={this.onMaskClick}>
                     <MaskInnerContainer>
                         <Row>
-                            <h1 style={{ color: 'white', fontSize: '4em' }}>Session Finished</h1>
+                            <h1 style={{ color: 'white', fontSize: '4em' }}>
+                                <ProjectName>{this.props.timer.project} </ProjectName>
+                                Session Finished
+                            </h1>
                         </Row>
                         <Button size="large" onClick={this.onMaskButtonClick}>
                             Start {this.props.timer.isFocusing ? 'Focusing' : 'Resting'}
@@ -539,17 +546,6 @@ class Timer extends Component<Props, State> {
                     >
                         <h2>Time Spent</h2>
                         <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={800} />
-
-                        <h2>Screen Shot</h2>
-                        {this.state.screenShotUrl ? (
-                            <Fragment>
-                                <img src={this.state.screenShotUrl} height={100} width={100} />
-                                <p id="current-using-app-name">{this.state.currentAppName}</p>
-                            </Fragment>
-                        ) : (
-                            undefined
-                        )}
-
                         <Divider />
                     </MoreInfo>
                 </TimerLayout>

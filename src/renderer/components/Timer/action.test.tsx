@@ -7,11 +7,11 @@ import {
     stopTimer
 } from './action';
 import dbs from '../../dbs';
-import { PomodoroRecord } from '../../monitor';
 import { generateRandomName } from '../../utils';
 import { getAllSession } from '../../monitor/sessionManager';
 import { dbPaths } from '../../../config';
 import { existsSync, unlinkSync } from 'fs';
+import { PomodoroRecord } from '../../monitor/type';
 const { projectDBPath } = dbPaths;
 
 describe('Reducer', () => {

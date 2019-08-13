@@ -1,5 +1,3 @@
-const path = require('path');
-const webpack = require('webpack');
 const merge = require('webpack-merge');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
@@ -36,7 +34,7 @@ module.exports = merge.smart(baseConfig, {
             },
             {
                 test: /\.worker\.js$/,
-                use: { loader: 'worker-loader' }
+                use: { loader: 'index-loader' }
             }
         ]
     },

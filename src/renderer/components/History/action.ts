@@ -1,7 +1,7 @@
-import { PomodoroRecord } from '../../monitor';
 import { createActionCreator, createReducer } from 'deox';
 import { getAllSession } from '../../monitor/sessionManager';
 import { Dispatch } from 'redux';
+import { PomodoroRecord } from '../../monitor/type';
 
 export interface HistoryState {
     records: PomodoroRecord[];

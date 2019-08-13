@@ -2,7 +2,7 @@ import { addSession, removeSession, getAllSession } from './sessionManager';
 import { dbPaths } from '../../config';
 import { existsSync, unlinkSync } from 'fs';
 import { generateRandomName } from '../utils';
-import { PomodoroRecord } from './index';
+import { PomodoroRecord } from './type';
 const { sessionDBPath } = dbPaths;
 
 describe('sessionManager', () => {

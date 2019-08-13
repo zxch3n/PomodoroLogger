@@ -1,4 +1,7 @@
-import { remote, screen } from 'electron';
+import * as electron from 'electron';
+
+const remote = electron.remote;
+const screen = electron.screen || remote.screen;
 
 const currentWindow = remote.getCurrentWindow();
 const getCurrentScreen = () => {

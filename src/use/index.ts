@@ -84,7 +84,7 @@ async function loadWeights(
         weightSpecs.push(...entry.weights);
     }
 
-    // FIXME: current worker's path solution can only run in dev env
+    // FIXME: current index's path solution can only run in dev env
     let weightsPath: string = '';
     if (process.env.NODE_ENV === 'test') {
         weightsPath = './src/res/weights.dat';
@@ -150,7 +150,7 @@ export class UniversalSentenceEncoder {
     /**
      *
      * Returns a 2D Tensor of shape [input.length, 512] that contains the
-     * Universal Sentence Encoder embeddings for each input.
+     * Universal Sentence NameEncoder embeddings for each input.
      *
      * @param inputs A string or an array of strings to embed.
      */

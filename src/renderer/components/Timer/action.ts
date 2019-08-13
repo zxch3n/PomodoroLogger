@@ -1,11 +1,12 @@
 import { createActionCreator, createReducer } from 'deox';
-import { PomodoroRecord } from '../../monitor';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
 import { actions as projectActions } from '../Project/action';
 import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
-import dbs from '../../dbs';
+import dbs, { getNameFromProjectId } from '../../dbs';
+import { PomodoroRecord } from '../../monitor/type';
+import { workers } from '../../workers';
 
 export interface Setting {
     focusDuration: number;
@@ -75,6 +76,10 @@ export const actions = {
         const settings: Partial<Setting> = await promisify(
             dbs.settingDB.findOne.bind(dbs.settingDB)
         )({ name: 'setting' });
+        if (settings == null) {
+            return;
+        }
+
         const settingKeywords = [
             ['focusDuration', setFocusDuration],
             ['restDuration', setRestDuration],
@@ -125,13 +130,26 @@ export const actions = {
             throwError
         );
     },
-    timerFinished: (sessionData?: PomodoroRecord, project?: string) => async (
+    timerFinished: (sessionData?: PomodoroRecord, project?: string | undefined) => async (
         dispatch: Dispatch
     ) => {
         dispatch(timerFinished());
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
-            if (project) {
+            if (project === undefined) {
+                // Predict session's project
+                const newProjectId = (await workers.knn.predict(sessionData).catch(err => {
+                    console.error('predicting error', err);
+                    return undefined;
+                })) as string | undefined;
+
+                if (newProjectId !== undefined) {
+                    const newProject = await getNameFromProjectId(newProjectId);
+                    console.log('predicted type', newProject);
+                    projectActions.updateOnTimerFinished(newProject, sessionData)(dispatch);
+                    dispatch(setProject(newProject));
+                }
+            } else {
                 projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
             }
 
