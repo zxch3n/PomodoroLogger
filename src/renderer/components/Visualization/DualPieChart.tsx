@@ -124,7 +124,9 @@ interface TimeSpentData {
     appData: { name: string; value: number }[];
 }
 
-const getTimeSpentDataFromRecords = async (pomodoros: PomodoroRecord[]): Promise<TimeSpentData> => {
+export const getTimeSpentDataFromRecords = async (
+    pomodoros: PomodoroRecord[]
+): Promise<TimeSpentData> => {
     const appTimeCounter = new Counter();
     const projectTimeCounter = new Counter();
     const UNK = 'UNK[qqwe]';

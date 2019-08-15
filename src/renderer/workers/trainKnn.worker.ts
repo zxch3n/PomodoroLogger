@@ -14,7 +14,22 @@ function log(info: string) {
 
 async function getRecords() {
     const sessionDB = new nedb({ filename: dbPaths.sessionDBPath, autoload: false });
-    sessionDB.loadDatabase(err => (err ? console.error('Worker...', err) : undefined));
+    let reloadTimes = 0;
+    const loadDatabase = () => {
+        sessionDB.loadDatabase(err => {
+            if (err) {
+                reloadTimes += 1;
+                if (reloadTimes > 10) {
+                    console.error(err);
+                    return;
+                }
+
+                return setTimeout(loadDatabase, 200);
+            }
+        });
+    };
+
+    loadDatabase();
     const records: PomodoroRecord[] = await new Promise((resolve, reject) => {
         sessionDB.find({}, {}, (err, docs) => {
             if (err) {
@@ -41,6 +56,7 @@ async function train(isTest = false) {
             return;
         }
 
+        console.log(`Training ${records.length} samples`);
         let train;
         let test;
         if (isTest) {
@@ -147,6 +163,7 @@ ctx.addEventListener('message', async ({ data: { type, payload } }) => {
             predict(payload);
         }
     } catch (e) {
+        console.error(e);
         ctx.postMessage({
             type: 'error',
             payload: JSON.stringify(e)

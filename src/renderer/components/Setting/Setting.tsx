@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
-import { Slider, Switch, notification, Icon } from 'antd';
+import { Slider, Switch, notification, Icon, Button } from 'antd';
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -9,6 +9,10 @@ const Container = styled.div`
 
 const SliderContainer = styled.div`
     padding: 4px 24px;
+`;
+
+const ButtonWrapper = styled.div`
+    margin: 0.6em;
 `;
 
 const marks = {
@@ -85,6 +89,15 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
 
             <h4>Idle Detection (Need Screenshot) </h4>
             <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />
+
+            <h4>Data Management</h4>
+            <ButtonWrapper>
+                <Button>Export Data</Button>
+                <br />
+            </ButtonWrapper>
+            <ButtonWrapper>
+                <Button type="danger">Delete All Data</Button>
+            </ButtonWrapper>
         </Container>
     );
 };

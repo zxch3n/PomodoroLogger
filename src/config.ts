@@ -45,3 +45,5 @@ export const env = {
 export const modelPath = {
     knnPath: join(dbBaseDir, 'modelKnn.json')
 };
+
+export const DEBUG_TIME_SCALE = 120;

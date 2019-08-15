@@ -7,6 +7,7 @@ import { promisify } from 'util';
 import dbs, { getNameFromProjectId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
+import { DEBUG_TIME_SCALE } from '../../../config';
 
 export interface Setting {
     focusDuration: number;
@@ -136,24 +137,24 @@ export const actions = {
         dispatch(timerFinished());
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
-            if (project === undefined) {
-                // Predict session's project
-                const newProjectId = (await workers.knn.predict(sessionData).catch(err => {
-                    console.error('predicting error', err);
-                    return undefined;
-                })) as string | undefined;
-
-                if (newProjectId !== undefined) {
-                    const newProject = await getNameFromProjectId(newProjectId);
-                    console.log('predicted type', newProject);
-                    projectActions.updateOnTimerFinished(newProject, sessionData)(dispatch);
-                    dispatch(setProject(newProject));
-                }
-            } else {
+            if (project !== undefined) {
                 projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
             }
 
             historyActions.addRecordToHistory(sessionData)(dispatch);
+        }
+    },
+    inferProject: (sessionData: PomodoroRecord) => async (dispatch: Dispatch) => {
+        // Predict session's project
+        const newProjectId = (await workers.knn.predict(sessionData).catch(err => {
+            console.error('predicting error', err);
+            return undefined;
+        })) as string | undefined;
+
+        if (newProjectId !== undefined) {
+            const newProject = await getNameFromProjectId(newProjectId);
+            console.log('predicted type', newProject);
+            dispatch(setProject(newProject));
         }
     }
 };
@@ -164,7 +165,11 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         const duration: number = state.isFocusing ? state.focusDuration : state.restDuration;
         const now = new Date().getTime();
         if (process.env.NODE_ENV !== 'production') {
-            return { ...state, isRunning: true, targetTime: now + (duration * 1000) / 60 };
+            return {
+                ...state,
+                isRunning: true,
+                targetTime: now + (duration * 1000) / DEBUG_TIME_SCALE
+            };
         }
 
         return { ...state, isRunning: true, targetTime: now + duration * 1000 };
@@ -182,19 +187,6 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     })),
     handle(clearTimer, state => ({ ...state, isRunning: false, targetTime: undefined })),
     handle(timerFinished, (state: TimerState) => {
-        if (!state.isRunning) {
-            throw new Error('is not running');
-        }
-
-        if (process.env.NODE_ENV !== 'production') {
-            return {
-                ...state,
-                isRunning: false,
-                targetTime: undefined,
-                isFocusing: !state.isFocusing
-            };
-        }
-
         return {
             ...state,
             isRunning: false,

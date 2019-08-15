@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Divider, Icon, Layout, message, Row } from 'antd';
+import { Divider, Icon, Layout, message } from 'antd';
 import Progress from './Progress';
 import { ProjectActionTypes, ProjectItem } from '../Project/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
@@ -19,38 +19,11 @@ import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
+import { TimerMask } from './SeesionEndingMask';
+import { DEBUG_TIME_SCALE } from '../../../config';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
-
-const Mask = styled.div`
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    background-color: #dd5339;
-    text-align: center;
-    color: white !important;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-`;
-
-const MaskInnerContainer = styled.div`
-    max-width: 500px;
-`;
-
-const ProjectName = styled.span`
-    transition: color 0.4s;
-    color: black;
-    cursor: pointer;
-    :hover {
-        color: white;
-    }
-`;
 
 const ProgressTextContainer = styled.div`
     padding: 12px;
@@ -118,11 +91,11 @@ function joinDict<T>(maps: { [key: string]: T }[]): { [key: string]: T } {
 
 interface State {
     leftTime: string;
-    currentAppName?: string;
     percent: number;
     more: boolean;
     pomodorosToday: PomodoroRecord[];
     showMask: boolean;
+    pomodoroNum: number;
 }
 
 class Timer extends Component<Props, State> {
@@ -130,6 +103,7 @@ class Timer extends Component<Props, State> {
     monitor?: Monitor;
     win?: BrowserWindow;
     mainDiv: React.RefObject<HTMLDivElement>;
+    private stagedSession?: PomodoroRecord;
 
     constructor(props: Props) {
         super(props);
@@ -138,23 +112,21 @@ class Timer extends Component<Props, State> {
             percent: 0,
             more: false,
             pomodorosToday: [],
-            showMask: false
+            showMask: false,
+            pomodoroNum: 0
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
     }
-
-    activeWinListener = (appName: string, data: PomodoroRecord, imgUrl?: string) => {
-        this.setState({
-            currentAppName: appName
-        });
-    };
 
     componentDidMount(): void {
         this.interval = setInterval(this.updateLeftTime, 500);
         this.win = remote.getCurrentWindow();
         this.updateLeftTime();
         getTodaySessions().then(finishedSessions => {
-            this.setState({ pomodorosToday: finishedSessions });
+            this.setState({
+                pomodorosToday: finishedSessions,
+                pomodoroNum: finishedSessions.length
+            });
         });
 
         this.addMenuItems();
@@ -277,11 +249,7 @@ class Timer extends Component<Props, State> {
 
     onStart = () => {
         if (this.props.timer.isFocusing) {
-            this.monitor = new Monitor(
-                this.activeWinListener,
-                1000,
-                this.props.timer.screenShotInterval
-            );
+            this.monitor = new Monitor(() => {}, 1000, this.props.timer.screenShotInterval);
             this.monitor.start();
         }
 
@@ -304,7 +272,6 @@ class Timer extends Component<Props, State> {
     private clearStat = () => {
         setTrayImageWithMadeIcon(undefined).catch(console.error);
         this.setState((_, props) => ({
-            currentAppName: undefined,
             leftTime: this.defaultLeftTime(props.timer.isFocusing),
             percent: 0
         }));
@@ -322,45 +289,72 @@ class Timer extends Component<Props, State> {
 
     onDone = async () => {
         if (this.props.timer.isFocusing) {
-            if (this.monitor) {
-                const finishedSessions = await getTodaySessions();
-                const thisSession = this.monitor.sessionData;
-                if (this.props.timer.project) {
-                    thisSession.projectId = await getIdFromProjectName(
-                        this.props.timer.project
-                    ).catch(() => undefined);
-                }
-                finishedSessions.push(thisSession);
-                this.setState({ pomodorosToday: finishedSessions });
-                this.props.timerFinished(thisSession, this.props.timer.project);
-
-                const notification = new remote.Notification({
-                    title: 'Focusing finished. Start resting.',
-                    body: `Completed ${finishedSessions.length} sessions today. \n\n`,
-                    icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
-                });
-                notification.show();
-                this.monitor.stop();
-                this.monitor.clear();
-                this.monitor = undefined;
-            } else {
-                console.error('No monitor');
-                this.props.timerFinished();
-            }
+            await this.onFocusingSessionDone();
         } else {
             const notification = new remote.Notification({
-                title: 'Focusing finished. Start resting.',
-                body: `Completed ${this.state.pomodorosToday.length} sessions today. \n\n`,
+                title: 'Resting session ended',
+                body: `Completed ${this.state.pomodoroNum} sessions today. \n\n`,
                 icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
             });
             notification.show();
-            this.onStart();
-            this.props.timerFinished();
         }
 
         this.focusOnCurrentWindow();
+        this.setState({
+            showMask: true
+        });
+        this.props.stopTimer();
         this.clearStat();
-        this.setState({ showMask: true });
+    };
+
+    private onFocusingSessionDone = async () => {
+        if (!this.monitor) {
+            throw new Error('No monitor');
+        }
+
+        const notification = new remote.Notification({
+            title: 'Focusing finished. Start resting.',
+            body: `Completed ${this.state.pomodoroNum + 1} sessions today. \n\n`,
+            icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
+        });
+        notification.show();
+
+        const thisSession = this.monitor.sessionData;
+        this.stagedSession = thisSession;
+        this.monitor.stop();
+        this.monitor.clear();
+        this.monitor = undefined;
+        if (this.props.timer.project === undefined) {
+            this.props.inferProject(thisSession);
+        }
+
+        this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
+    };
+
+    private onSessionConfirmed = async () => {
+        if (this.stagedSession === undefined) {
+            // Resting session
+            this.props.timerFinished();
+            return;
+        }
+
+        if (process.env.NODE_ENV === 'development') {
+            this.stagedSession.spentTimeInHour *= DEBUG_TIME_SCALE;
+            for (const app in this.stagedSession.apps) {
+                this.stagedSession.apps[app].spentTimeInHour *= DEBUG_TIME_SCALE;
+            }
+        }
+
+        if (this.props.timer.project !== undefined) {
+            this.stagedSession.projectId = await getIdFromProjectName(
+                this.props.timer.project
+            ).catch(() => undefined);
+        }
+
+        const finishedSessions = this.state.pomodorosToday.concat([this.stagedSession]);
+        this.setState({ pomodorosToday: finishedSessions });
+        await this.props.timerFinished(this.stagedSession, this.props.timer.project);
+        this.stagedSession = undefined;
     };
 
     private focusOnCurrentWindow() {
@@ -398,11 +392,16 @@ class Timer extends Component<Props, State> {
 
     private onMaskClick = () => {
         this.setState({ showMask: false });
+        this.onSessionConfirmed().catch(console.error);
     };
 
     private onMaskButtonClick = () => {
         this.setState({ showMask: false });
-        this.onStart();
+        this.onSessionConfirmed()
+            .then(() => {
+                this.onStart();
+            })
+            .catch(console.error);
     };
 
     render() {
@@ -437,27 +436,15 @@ class Timer extends Component<Props, State> {
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
         return (
             <Layout style={{ backgroundColor: 'white' }}>
-                <Mask style={{ display: showMask ? 'flex' : 'none' }} onClick={this.onMaskClick}>
-                    <MaskInnerContainer>
-                        <Row>
-                            <h1 style={{ color: 'white', fontSize: '4em' }}>
-                                <ProjectName>{this.props.timer.project} </ProjectName>
-                                Session Finished
-                            </h1>
-                        </Row>
-                        <Button size="large" onClick={this.onMaskButtonClick}>
-                            Start {this.props.timer.isFocusing ? 'Focusing' : 'Resting'}
-                        </Button>
-                        <Row style={{ marginTop: '2em' }}>
-                            <h1 style={{ color: 'white' }}>Today Pomodoros</h1>
-                            <PomodoroNumView
-                                num={this.state.pomodorosToday.length}
-                                color={'#f9ec52'}
-                                showNum={false}
-                            />
-                        </Row>
-                    </MaskInnerContainer>
-                </Mask>
+                <TimerMask
+                    showMask={showMask}
+                    onCancel={this.onMaskClick}
+                    timer={this.props.timer}
+                    onStart={this.onMaskButtonClick}
+                    pomodoroNum={this.state.pomodoroNum}
+                    projects={Object.keys(this.props.project.projectList)}
+                    setProject={this.props.setProject}
+                />
 
                 <Sider
                     breakpoint="md"
