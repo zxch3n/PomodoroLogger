@@ -1,11 +1,11 @@
 import { dbPaths, env, modelPath } from '../../config';
-env.isWorker = true;
-
-import { ApplicationSpentTime, PomodoroRecord } from '../monitor/type';
+import { PomodoroRecord } from '../monitor/type';
 import { KNN } from '../../main/learner/appKnn';
 import { sample } from '../../utils/random';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import nedb from 'nedb';
+
+env.isWorker = true;
 
 const ctx: Worker = self as any;
 function log(info: string) {
@@ -56,7 +56,6 @@ async function train(isTest = false) {
             return;
         }
 
-        console.log(`Training ${records.length} samples`);
         let train;
         let test;
         if (isTest) {
