@@ -1,6 +1,8 @@
 import dbs from '../dbs';
 import { promisify } from 'util';
 import { PomodoroRecord } from './type';
+import { dbBaseDir, dbPaths } from '../../config';
+import * as fs from 'fs';
 
 const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.sessionDB.remove].map(
     m => promisify(m.bind(dbs.sessionDB))
@@ -89,4 +91,44 @@ export async function getAllSession(): Promise<PomodoroRecord[]> {
 
 export async function getDailyCount() {
     // TODO:
+}
+
+const deleteFolderRecursive = (path: string) => {
+    if (fs.existsSync(path)) {
+        fs.readdirSync(path).forEach((file, index) => {
+            const curPath = path + '/' + file;
+            if (fs.lstatSync(curPath).isDirectory()) {
+                // recurse
+                deleteFolderRecursive(curPath);
+            } else {
+                // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
+
+export async function deleteAllUserData() {
+    if (fs.existsSync(dbBaseDir)) {
+        deleteFolderRecursive(dbBaseDir);
+    }
+}
+
+export async function exportDBData() {
+    const [projectDB, sessionDB, settingDB] = await Promise.all([
+        promisify(dbs.projectDB.find.bind(dbs.projectDB, {}, {}))(),
+        promisify(dbs.sessionDB.find.bind(dbs.sessionDB, {}, {}))(),
+        promisify(dbs.settingDB.find.bind(dbs.settingDB, {}, {}))()
+    ]);
+
+    return {
+        projectDB,
+        sessionDB,
+        settingDB
+    };
+}
+
+export async function loadDBData() {
+    // TODO
 }

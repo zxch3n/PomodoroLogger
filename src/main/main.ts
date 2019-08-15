@@ -45,6 +45,7 @@ const createWindow = async () => {
         }
     });
 
+    win.removeMenu();
     if (process.env.NODE_ENV === 'development') {
         console.log('dev url');
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';

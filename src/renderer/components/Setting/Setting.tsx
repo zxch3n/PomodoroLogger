@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
-import { Slider, Switch, notification, Icon, Button } from 'antd';
+import { Button, Icon, message, notification, Popconfirm, Slider, Switch } from 'antd';
+import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
+import { writeFile } from 'fs';
+import { remote, FileFilter } from 'electron';
+import { promisify } from 'util';
+const dialog = remote.dialog;
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -61,6 +66,32 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
         });
     };
 
+    function onDeleteData() {
+        deleteAllUserData().then(() => {
+            message.info('All user data is removed. Pomodoro needs to restart.');
+        });
+    }
+
+    async function onExportingData() {
+        const { canceled, filePath } = await dialog.showSaveDialog(remote.getCurrentWindow(), {
+            title: 'Pomodoro Data Export',
+            defaultPath: 'pomodoroDB.dat',
+            filters: [
+                {
+                    name: 'Data File',
+                    extensions: ['dat']
+                }
+            ]
+        });
+
+        if (!canceled && filePath) {
+            console.log(filePath);
+            const data = await exportDBData();
+            await promisify(writeFile)(filePath, JSON.stringify(data), { encoding: 'utf-8' });
+            message.success('Data Exported');
+        }
+    }
+
     return (
         <Container>
             <h4>Focus Duration</h4>
@@ -88,15 +119,19 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
             </SliderContainer>
 
             <h4>Idle Detection (Need Screenshot) </h4>
-            <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />
+            <ButtonWrapper>
+                <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />
+            </ButtonWrapper>
 
             <h4>Data Management</h4>
             <ButtonWrapper>
-                <Button>Export Data</Button>
+                <Button onClick={onExportingData}>Export Data</Button>
                 <br />
             </ButtonWrapper>
             <ButtonWrapper>
-                <Button type="danger">Delete All Data</Button>
+                <Popconfirm title={'Sure to delete?'} onConfirm={onDeleteData}>
+                    <Button type="danger">Delete All Data</Button>
+                </Popconfirm>
             </ButtonWrapper>
         </Container>
     );
