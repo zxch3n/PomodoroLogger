@@ -36,4 +36,6 @@ module.exports = {
     "moduleDirectories": [
         "node_modules"
     ],
+    // For Circle CI
+    reporters: ["default", "jest-junit"],
 };
