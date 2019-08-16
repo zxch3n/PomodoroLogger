@@ -5,6 +5,7 @@ import { promisify } from 'util';
 import { join } from 'path';
 import nedb from 'nedb';
 import { ApplicationSpentTime, PomodoroRecord } from '../../src/renderer/monitor/type';
+import { loadDBSync } from '../../src/renderer/monitor/sessionManager';
 
 // TODO: Refactor this and record upper bound changes
 const projectNum = 10;
@@ -130,8 +131,8 @@ export function generate() {
 
 export async function generateAndSave(dirPath: string) {
     const { projects, records } = generate();
-    const projectDB = new nedb({ filename: join(dirPath, 'projects.nedb'), autoload: true });
-    const sessionDB = new nedb({ filename: join(dirPath, 'session.nedb'), autoload: true });
+    const projectDB = loadDBSync(join(dirPath, 'project.nedb'));
+    const sessionDB = loadDBSync(join(dirPath, 'session.nedb'));
     await Promise.all([
         promisify(projectDB.insert.bind(projectDB))(projects),
         promisify(sessionDB.insert.bind(sessionDB))(records)
