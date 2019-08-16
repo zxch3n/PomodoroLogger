@@ -2,8 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.16.1
-    working_directory: ~
+      - image: electronuserland/builder:wine
+    working_directory: ~/pomodoro
     steps:
       - checkout # special step to check out source code to working directory
       - restore_cache:
