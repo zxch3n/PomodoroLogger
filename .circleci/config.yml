@@ -10,20 +10,17 @@ jobs:
           keys:
             - v2-dependencies-{{ checksum "package.json" }}
             - v2-dependencies-
-      - run: yarn install
+      - run: npm install
       - save_cache:
           paths:
             - node_modules
           key: v2-dependencies-{{ checksum "package.json" }}
       - run:
-          name: "JavaScript Linter"
-          command: yarn lint -- --format junit -o reports/junit/js-lint-results.xml
-      - run:
           name: build
-          command: yarn build
+          command: npm run build
       - run: # run tests
           name: test
-          command: yarn test -- --ci --runInBand --reporters=default --reporters=jest-junit
+          command: npm test -- --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
       - store_test_results:
