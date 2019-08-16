@@ -1,7 +1,7 @@
 import dbs from '../dbs';
 import { promisify } from 'util';
 import { PomodoroRecord } from './type';
-import { dbBaseDir, dbPaths } from '../../config';
+import { dbBaseDir } from '../../config';
 import * as fs from 'fs';
 
 const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.sessionDB.remove].map(

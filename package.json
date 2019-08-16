@@ -6,6 +6,7 @@
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
     "build-renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
+    "prebuild": "rm -rf ./dist",
     "build": "npm run build-main && npm run build-renderer",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config webpack.renderer.dev.config.js",
     "start-main-dev": "webpack --config webpack.main.config.js &&cross-env NODE_OPTIONS=--experimental-worker electron ./dist/main.js",
@@ -111,6 +112,7 @@
     "husky": "^2.3.0",
     "image-webpack-loader": "^4.6.0",
     "jest": "^24.8.0",
+    "jest-junit": "^7.0.0",
     "lint-staged": "^8.1.7",
     "native-ext-loader": "^2.3.0",
     "node-sass": "^4.12.0",

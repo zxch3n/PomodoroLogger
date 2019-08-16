@@ -44,7 +44,6 @@ describe('Main Window', () => {
         const { client } = app;
         await client.waitUntilWindowLoaded();
         await client.$('#start-timer-button').click();
-        await new Promise(resolve => setTimeout(resolve, 100));
         const text = await client.getText('#left-time-text');
         expect(text).toBe('25:00');
         await new Promise(resolve => {
