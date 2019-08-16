@@ -181,6 +181,7 @@ describe('Project thunk actionCreator', () => {
                 expect(counter['0'].reduce((l: number, r: number) => r + l, 0)).toBe(0);
 
                 expect(counter['1'].reduce((l: number, r: number) => r + l, 0)).toBe(1);
+                console.log(counter['4']);
                 expect(
                     counter['4'].reduce((l: number, r: number) => (Number.isNaN(r) ? l : r + l), 0)
                 ).toBe(4);
