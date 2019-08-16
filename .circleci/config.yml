@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: electronuserland/builder:wine
+      - image: circleci/node:latest-browsers
     working_directory: ~/pomodoro
     steps:
       - checkout # special step to check out source code to working directory
