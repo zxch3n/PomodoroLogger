@@ -2,26 +2,25 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.16.1
-    working_directory: ~
+      - image: circleci/node:latest-browsers
+    working_directory: ~/pomodoro-logger
     steps:
       - checkout # special step to check out source code to working directory
-      - restore_cache: # special step to restore the dependency cache
-          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: dependency-cache-{{ checksum "package.json" }}
-      - run:
-          name: install-npm-wee
-          command: yarn
-      - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "package.json" }}
+      - restore_cache:
+          keys:
+            - v2-dependencies-{{ checksum "package.json" }}
+            - v2-dependencies-
+      - run: npm install
+      - save_cache:
           paths:
-            - ./node_modules
+            - node_modules
+          key: v2-dependencies-{{ checksum "package.json" }}
       - run:
           name: build
-          command: yarn build
+          command: npm run build
       - run: # run tests
           name: test
-          command: yarn test -- --ci --runInBand --reporters=default --reporters=jest-junit
+          command: npm test -- --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
       - store_test_results:

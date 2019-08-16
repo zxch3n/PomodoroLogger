@@ -478,7 +478,11 @@ class Timer extends Component<Props, State> {
                             }}
                         >
                             <ProgressTextContainer>
-                                <div style={{ marginBottom: 12 }} key="leftTime" id="leftTime">
+                                <div
+                                    style={{ marginBottom: 12 }}
+                                    key="leftTime"
+                                    id="left-time-text"
+                                >
                                     {shownLeftTime}
                                 </div>
                                 <div
@@ -493,9 +497,6 @@ class Timer extends Component<Props, State> {
                                 </div>
                             </ProgressTextContainer>
                         </Progress>
-                        <span style={{ display: 'none' }} id="left-time-text">
-                            {leftTime}
-                        </span>
                     </ProgressContainer>
 
                     <div style={{ margin: '2em auto', textAlign: 'center' }}>

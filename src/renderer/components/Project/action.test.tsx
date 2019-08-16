@@ -141,7 +141,7 @@ describe('Project thunk actionCreator', () => {
         const createRecord = (id: string, day: number): PomodoroRecord => {
             return {
                 projectId: id,
-                startTime: now - day * 24 * 3600 * 1000,
+                startTime: now - day * 24 * 3600 * 1000 - 1000 * 60,
                 spentTimeInHour: 0.3,
                 apps: {},
                 screenStaticDuration: 0,
@@ -181,7 +181,9 @@ describe('Project thunk actionCreator', () => {
                 expect(counter['0'].reduce((l: number, r: number) => r + l, 0)).toBe(0);
 
                 expect(counter['1'].reduce((l: number, r: number) => r + l, 0)).toBe(1);
-                expect(counter['4'].reduce((l: number, r: number) => r + l, 0)).toBe(4);
+                expect(
+                    counter['4'].reduce((l: number, r: number) => (Number.isNaN(r) ? l : r + l), 0)
+                ).toBe(4);
 
                 expect(counter['4'].length).toBe(30);
                 expect(counter['4'].reverse()[0]).toBe(2);

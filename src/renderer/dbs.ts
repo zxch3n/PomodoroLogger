@@ -1,6 +1,5 @@
 import { remote } from 'electron';
 import { DBs } from '../main/db';
-import { env } from '../config';
 
 let dbs: typeof DBs;
 if (remote) {

@@ -1,8 +1,9 @@
 import dbs from '../dbs';
 import { promisify } from 'util';
 import { PomodoroRecord } from './type';
-import { dbBaseDir, dbPaths } from '../../config';
+import { dbBaseDir } from '../../config';
 import * as fs from 'fs';
+import nedb from 'nedb';
 
 const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.sessionDB.remove].map(
     m => promisify(m.bind(dbs.sessionDB))
@@ -87,6 +88,50 @@ export async function getTodaySessions(): Promise<PomodoroRecord[]> {
 
 export async function getAllSession(): Promise<PomodoroRecord[]> {
     return (await find({})) as PomodoroRecord[];
+}
+
+export async function loadDB(path: string): Promise<nedb> {
+    const db = new nedb({ filename: path });
+    return new Promise((resolve, reject) => {
+        let times = 0;
+        const load = () => {
+            db.loadDatabase(err => {
+                if (!err) {
+                    resolve(db);
+                    return;
+                }
+
+                times += 1;
+                if (times > 3) {
+                    reject(err);
+                    return;
+                }
+
+                setTimeout(load, 0);
+            });
+        };
+    });
+}
+
+export function loadDBSync(path: string) {
+    const db = new nedb({ filename: path });
+    let times = 0;
+    const load = () => {
+        db.loadDatabase(err => {
+            if (!err) {
+                return;
+            }
+
+            times += 1;
+            if (times > 3) {
+                throw err;
+            }
+
+            return setTimeout(load, 0);
+        });
+    };
+
+    return db;
 }
 
 export async function getDailyCount() {
