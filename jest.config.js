@@ -20,9 +20,7 @@ module.exports = {
     ...common,
     collectCoverage: true,
     testMatch: ['**/*.(spec|test).[jt]s?(x)'],
-    transformIgnorePatterns: [
-        // "/.*@tensorflow\\/.*\\.ts/",
-    ],
+    transformIgnorePatterns: [ ],
     globals: {
         'ts-jest': {
             diagnostics: false
