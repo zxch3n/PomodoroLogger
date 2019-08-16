@@ -45,13 +45,14 @@ const createWindow = async () => {
         }
     });
 
-    win.removeMenu();
     if (process.env.NODE_ENV === 'development') {
-        console.log('dev url');
-        process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
         win.loadURL(`http://localhost:2003`);
+
+        // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready
+        win.webContents.once('dom-ready', () => {
+            win!.webContents.openDevTools();
+        });
     } else {
-        console.log('file');
         win.loadURL(
             url.format({
                 pathname: path.join(__dirname, 'index.html'),
@@ -61,11 +62,8 @@ const createWindow = async () => {
         );
     }
 
-    if (process.env.NODE_ENV !== 'production') {
-        // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready
-        win.webContents.once('dom-ready', () => {
-            win!.webContents.openDevTools();
-        });
+    if (process.env.NODE_ENV === 'production') {
+        win.removeMenu();
     }
 
     win.on('close', (event: Event) => {
