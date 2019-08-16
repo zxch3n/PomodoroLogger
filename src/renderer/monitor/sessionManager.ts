@@ -90,7 +90,7 @@ export async function getAllSession(): Promise<PomodoroRecord[]> {
     return (await find({})) as PomodoroRecord[];
 }
 
-export async function loadDB(path: string) {
+export async function loadDB(path: string): Promise<nedb> {
     const db = new nedb({ filename: path });
     return new Promise((resolve, reject) => {
         let times = 0;
@@ -102,7 +102,7 @@ export async function loadDB(path: string) {
                 }
 
                 times += 1;
-                if (times > 10) {
+                if (times > 3) {
                     reject(err);
                     return;
                 }
@@ -123,11 +123,11 @@ export function loadDBSync(path: string) {
             }
 
             times += 1;
-            if (times > 10) {
+            if (times > 3) {
                 throw err;
             }
 
-            setTimeout(load, 0);
+            return setTimeout(load, 0);
         });
     };
 

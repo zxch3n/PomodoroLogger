@@ -45,14 +45,19 @@ const createWindow = async () => {
         }
     });
 
-    if (process.env.NODE_ENV === 'development') {
-        win.loadURL(`http://localhost:2003`);
+    if (process.env.NODE_ENV === 'production') {
+        win.removeMenu();
+    }
 
+    if (process.env.NODE_ENV === 'development') {
+        console.log('Dev from localhost');
+        win.loadURL(`http://localhost:2003`);
         // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready
         win.webContents.once('dom-ready', () => {
             win!.webContents.openDevTools();
         });
     } else {
+        console.log('Prod or test from file');
         win.loadURL(
             url.format({
                 pathname: path.join(__dirname, 'index.html'),
@@ -60,10 +65,6 @@ const createWindow = async () => {
                 slashes: true
             })
         );
-    }
-
-    if (process.env.NODE_ENV === 'production') {
-        win.removeMenu();
     }
 
     win.on('close', (event: Event) => {

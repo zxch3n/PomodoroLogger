@@ -9,19 +9,24 @@ import { generateAndSave } from './fakeDataGenerator';
 import { existsSync } from 'fs';
 import { getAllSession } from '../../src/renderer/monitor/sessionManager';
 
-jest.setTimeout(30 * 1000);
-beforeAll(async () => {
+jest.setTimeout(15 * 1000);
+beforeAll(async done => {
     if (!existsSync(dirPath)) {
         await generateAndSave(dirPath);
     }
+
+    console.log('gen done');
+    done();
 });
 
 describe('Records Agg in History', () => {
     it('Calendar Agg is fast enough', async () => {
         const startTime = new Date().getTime();
+        console.log('Start');
         const sessions = await getAllSession();
-        console.log(sessions.length);
+        console.log('perftest session length', sessions.length);
         getPomodoroCalendarData(sessions);
         expect(new Date().getTime() - startTime).toBeLessThan(5000);
+        console.log('Done');
     });
 });

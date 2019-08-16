@@ -35,8 +35,6 @@ describe('Main.Learner', () => {
     });
 
     it('can be trained (overfit)', async () => {
-        // TODO: test data
-        return;
         const v = await getTitlesProjectMapFromDB();
         const { model, invertEncode } = await trainTitlesProjectPair(v, { epochs: 40 });
         let t = 0;
