@@ -14,7 +14,7 @@
 
 # Pomodoro Logger :clock930:
 
-**Manage your desktop work easily**
+> **Manage your desktop works easily**
 
 
 <img align="right" src="https://i.postimg.cc/0j8FJ70x/image.png" height="280"/>
