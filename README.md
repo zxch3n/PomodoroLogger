@@ -1,8 +1,4 @@
 
-<p align="center" style="font-size: 3em; font-weight: 800">
-Pomodoro Logger
-</p>
-
 <p align="center">
   <img src="https://i.postimg.cc/hvjXfB94/icon.png" width="360"/>
 </p>
@@ -16,28 +12,47 @@ Pomodoro Logger
 
 
 
-# Introduction :clock930:
+# Pomodoro Logger :clock930:
+
+**Manage your desktop work easily**
 
 
-- Manage your time spent on your projects
-- Collect and visualize your working activities **locally**
-- [TODO] Kanban board. 
-- [TODO] Weekly report & Project report 
-- [TODO] Analysis about your focus rate, application spent time and more
+<img align="right" src="https://i.postimg.cc/0j8FJ70x/image.png" height="280"/>
 
-# What's pomodoro?
-
-# Why Pomodoro Logger?
+- Use [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) to manage your time
+- Collect and visualize your desktop working activities **locally**
 
 
-## Privacy
+# Data :chart_with_upwards_trend:
 
-It only records your application activities and low resolution (30 x 30) screenshot. 
-You can dis
-All the data is saved and process locally.
+Pomodoro Logger records your desktop activities when you are in a working session of Pomodoro. 
+
+It only records your application activities, including the name and title of the focused application, and low resolution (30 x 30) screenshot. You can disable monitor features in the settings.
+
+You can export / delete all your data in the settings. 
+
+All the data is saved and processed **locally**.
+
+# Download
 
 
-# Usage
+# Development
+
+
+# Screenshot
+
+
+<p align="center">
+  <img src="https://i.postimg.cc/J4dZyJNL/image.png" width="360"/>
+  <img src="https://i.postimg.cc/L8cPDpQQ/image.png" width="360"/>
+  <img src="https://i.postimg.cc/05S76rtM/image.png" width="360"/>
+</p>
 
 
 
+# License
+
+
+[GPL-3.0 License](./LICENSE)
+
+Copyright © 2019 Zixuan Chen.

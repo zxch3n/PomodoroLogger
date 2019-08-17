@@ -4,6 +4,7 @@ release/
 *db/
 .idea/
 .vscode/
-build/
+build/*
 coverage/
 yarn.error
+!build/icon.png
