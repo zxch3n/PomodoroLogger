@@ -44,7 +44,11 @@ All the data is saved and processed **locally**.
 
 <p align="center">
   <img src="https://i.postimg.cc/J4dZyJNL/image.png" width="360"/>
+</p>
+<p align="center">
   <img src="https://i.postimg.cc/L8cPDpQQ/image.png" width="360"/>
+</p>
+<p align="center">
   <img src="https://i.postimg.cc/05S76rtM/image.png" width="360"/>
 </p>
 
