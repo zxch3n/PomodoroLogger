@@ -5,8 +5,8 @@
 
 
 <p align="center">
-  <a href="https://circleci.com/gh/rem2016/TimeLogger">
-    <img src="https://circleci.com/gh/rem2016/TimeLogger.svg?style=svg"/>
+  <a href="https://circleci.com/gh/rem2016/PomodoroLogger">
+    <img src="https://circleci.com/gh/rem2016/PomodoroLogger.svg?style=svg"/>
   </a>
 </p>
 
