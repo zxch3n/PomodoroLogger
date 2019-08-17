@@ -2,7 +2,7 @@ import { nativeImage, app, Tray, BrowserWindow, Notification, Menu } from 'elect
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
-import logo from '../res/TimeLogger.png';
+import logo from '../res/icon.png';
 import { build } from '../../package.json';
 import * as learner from './learner/learner';
 

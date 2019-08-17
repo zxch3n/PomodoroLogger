@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { BrowserWindow, nativeImage, remote } from 'electron';
 import RestIcon from '../../../res/rest.svg';
 import WorkIcon from '../../../res/work.svg';
-import AppIcon from '../../../res/TimeLogger.png';
+import AppIcon from '../../../res/icon.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
 import { TodoList } from '../Project/Project';

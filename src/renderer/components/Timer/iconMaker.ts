@@ -1,4 +1,4 @@
-import AppIcon from '../../../res/TimeLogger.png';
+import AppIcon from '../../../res/icon.png';
 import { remote } from 'electron';
 const { nativeImage } = remote;
 const path = remote.require('path');

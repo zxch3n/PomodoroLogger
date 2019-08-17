@@ -1,8 +1,22 @@
-[LOGO]
 
-[![CircleCI](https://circleci.com/gh/rem2016/TimeLogger.svg?style=svg)](https://circleci.com/gh/rem2016/TimeLogger)
+<p align="center" style="font-size: 3em; font-weight: 800">
+Pomodoro Logger
+</p>
 
-# Pomodoro Logger :clock930:
+<p align="center">
+  <img src="https://i.postimg.cc/hvjXfB94/icon.png" width="360"/>
+</p>
+
+
+<p align="center">
+  <a href="https://circleci.com/gh/rem2016/TimeLogger">
+    <img src="https://circleci.com/gh/rem2016/TimeLogger.svg?style=svg"/>
+  </a>
+</p>
+
+
+
+# Introduction :clock930:
 
 
 - Manage your time spent on your projects
