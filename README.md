@@ -8,6 +8,9 @@
   <a href="https://circleci.com/gh/rem2016/PomodoroLogger">
     <img src="https://circleci.com/gh/rem2016/PomodoroLogger.svg?style=svg"/>
   </a>
+  <a href="https://deepscan.io/dashboard#view=project&tid=5098&pid=6887&bid=60495">
+    <img src="https://deepscan.io/api/teams/5098/projects/6887/branches/60495/badge/grade.svg"/>
+  </a>
 </p>
 
 

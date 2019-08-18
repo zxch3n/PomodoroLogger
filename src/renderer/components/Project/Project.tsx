@@ -4,8 +4,6 @@ import { ProjectActionTypes, ProjectItem } from './action';
 import { TodoItem } from '../TODO/action';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import styled from 'styled-components';
-// @ts-ignore
-import Trend from 'react-trend';
 import { ProjectTrend } from './ProjectTrend';
 import { RootState } from '../../reducers';
 
