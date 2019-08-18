@@ -27,3 +27,5 @@ jobs:
           path: reports/junit
       - store_artifacts:
           path: reports/junit
+      - run: ./node_modules/.bin/codecov
+
