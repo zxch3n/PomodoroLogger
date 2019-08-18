@@ -35,8 +35,20 @@ All the data is saved and processed **locally**.
 
 # Download
 
+This project currently only supports Windows.
+
+To download, go to [release page](https://github.com/rem2016/PomodoroLogger/releases).
+
 
 # Development
+
+To build the project, issue
+
+```
+yarn
+
+yarn build
+```
 
 
 # Screenshot
