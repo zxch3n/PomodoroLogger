@@ -18,7 +18,10 @@
     "pretest:e2e": "npm run build",
     "test:e2e": "jest '(\\/test\\/e2e/).*'",
     "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder",
+    "dist-win": "npm run build && electron-builder --windows",
+    "dist-mac": "npm run build && electron-builder --mac",
+    "dist-linux": "npm run build && electron-builder --linux",
+    "dist-all": "npm run build && electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps"
   },
   "husky": {
@@ -40,7 +43,8 @@
     "productName": "Pomodoro Logger",
     "appId": "com.electron.time-logger",
     "mac": {
-      "category": "your.app.category.type"
+      "category": "public.app-category.productivity",
+      "target": "dmg"
     },
     "directories": {
       "output": "release"
