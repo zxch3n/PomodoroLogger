@@ -3,7 +3,7 @@ import { PomodoroRecord } from '../../monitor/type';
 
 export const getPomodoroCalendarData = (pomodoros: PomodoroRecord[]) => {
     const counter = new Counter();
-    pomodoros.map(v => {
+    pomodoros.forEach(v => {
         const date = _getDateFromTimestamp(v.startTime).getTime();
         counter.add(date);
     });

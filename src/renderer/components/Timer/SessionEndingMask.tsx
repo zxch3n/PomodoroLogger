@@ -1,6 +1,5 @@
 import { TimerState } from './action';
-import { PomodoroRecord } from '../../monitor/type';
-import { Button, Row, Popover, List } from 'antd';
+import { Button, List, Popover, Row } from 'antd';
 import { PomodoroNumView } from './PomodoroNumView';
 import React from 'react';
 import styled from 'styled-components';

@@ -1,7 +1,6 @@
 import AppIcon from '../../../res/icon.png';
 import { remote } from 'electron';
 const { nativeImage } = remote;
-const path = remote.require('path');
 
 async function makeIcon(leftTime?: string): Promise<string> {
     const canvas = document.createElement('canvas');

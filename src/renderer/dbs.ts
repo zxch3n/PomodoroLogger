@@ -21,6 +21,7 @@ export async function getIdFromProjectName(name: string) {
 
             if (!doc) {
                 reject(new Error(`cannot find name=${name}`));
+                return;
             }
 
             resolve(doc._id);
@@ -38,6 +39,7 @@ export async function getNameFromProjectId(_id: string) {
 
             if (!doc) {
                 reject(new Error(`cannot find _id=${_id}`));
+                return;
             }
 
             resolve(doc.name);

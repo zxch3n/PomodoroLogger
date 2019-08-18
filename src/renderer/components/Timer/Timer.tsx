@@ -19,7 +19,7 @@ import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
-import { TimerMask } from './SeesionEndingMask';
+import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
 
 const { Sider } = Layout;
@@ -179,7 +179,11 @@ class Timer extends Component<Props, State> {
     }
 
     componentWillUnmount(): void {
-        this.onClear();
+        if (this.monitor) {
+            this.monitor.stop();
+            this.monitor.clear();
+        }
+
         if (this.interval) {
             clearInterval(this.interval);
         }

@@ -8,3 +8,4 @@ build/*
 coverage/
 yarn.error
 !build/icon.png
+junit.xml

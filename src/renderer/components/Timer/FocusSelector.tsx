@@ -1,8 +1,9 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import { Select, Divider } from 'antd';
+import React, { FunctionComponent, useEffect } from 'react';
+import { Select } from 'antd';
 import { ProjectActionTypes } from '../Project/action';
 import { TimerActionTypes as TimerActions } from './action';
 import { RootState } from '../../reducers';
+
 const { Option } = Select;
 
 interface Props extends ProjectActionTypes, TimerActions, RootState {

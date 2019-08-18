@@ -4,8 +4,9 @@ import styled from 'styled-components';
 import { Button, Icon, message, notification, Popconfirm, Slider, Switch } from 'antd';
 import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
 import { writeFile } from 'fs';
-import { remote, FileFilter } from 'electron';
+import { remote } from 'electron';
 import { promisify } from 'util';
+
 const dialog = remote.dialog;
 
 const Container = styled.div`

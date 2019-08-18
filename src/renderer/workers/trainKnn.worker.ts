@@ -8,9 +8,6 @@ import nedb from 'nedb';
 env.isWorker = true;
 
 const ctx: Worker = self as any;
-function log(info: string) {
-    ctx.postMessage({ payload: info, type: 'log' });
-}
 
 async function getRecords() {
     const sessionDB = new nedb({ filename: dbPaths.sessionDBPath, autoload: false });

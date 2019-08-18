@@ -15,37 +15,6 @@ const Container = styled.div`
     padding: 20px;
 `;
 
-const mock = () => {
-    let time = new Date().getTime();
-    const ans: { [time: number]: { count: number } } = {};
-    for (let i = 0; i < 365; i += 1, time -= 3600 * 1000 * 24) {
-        ans[time] = {
-            count: Math.floor(Math.random() * 10)
-        };
-    }
-
-    return ans;
-};
-
-const mockTimeSpentData = () => {
-    return {
-        projectData: [
-            { name: 'A', value: 10 },
-            { name: 'B', value: 20 },
-            { name: 'C', value: 30 },
-            { name: 'D', value: 40 },
-            { name: 'E', value: 50 }
-        ],
-        appData: [
-            { name: 'A0', value: 10 },
-            { name: 'B0', value: 20 },
-            { name: 'C0', value: 30 },
-            { name: 'D0', value: 40 },
-            { name: 'E0', value: 50 }
-        ]
-    };
-};
-
 interface Props extends RootState, HistoryActionCreatorTypes {}
 export const History: React.FunctionComponent<Props> = (props: Props) => {
     const container = useRef<HTMLDivElement>();

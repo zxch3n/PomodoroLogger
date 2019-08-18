@@ -38,7 +38,6 @@ export class Monitor {
         const data = await activeWin();
         if (data) {
             this.listener(data);
-        } else {
         }
     };
 

@@ -2,10 +2,7 @@ import { generateRandomName } from '../../src/renderer/utils';
 import { ProjectItem } from '../../src/renderer/components/Project/action';
 import { TodoItem } from '../../src/renderer/components/TODO/action';
 import { promisify } from 'util';
-import { join } from 'path';
-import nedb from 'nedb';
 import { ApplicationSpentTime, PomodoroRecord } from '../../src/renderer/monitor/type';
-import { loadDB, loadDBSync } from '../../src/renderer/monitor/sessionManager';
 import dbs from '../../src/renderer/dbs';
 
 // TODO: Refactor this and record upper bound changes

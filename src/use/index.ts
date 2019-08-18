@@ -27,7 +27,7 @@ import {
 import vocab from '../res/vocab.json';
 import modelJson from '../res/model.json';
 import weights from '../res/weights.dat';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import fs from 'fs';
 import { Tokenizer } from './tokenizer';
 
@@ -76,9 +76,6 @@ function toArrayBuffer(buf: Buffer): ArrayBuffer {
 async function loadWeights(
     weightsManifest: WeightsManifestConfig
 ): Promise<[WeightsManifestEntry[], ArrayBuffer]> {
-    const [prefix, suffix] = [BASE_PATH, ''];
-    const pathPrefix = prefix;
-
     const weightSpecs = [];
     for (const entry of weightsManifest) {
         weightSpecs.push(...entry.weights);
