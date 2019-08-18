@@ -4,7 +4,6 @@ import * as url from 'url';
 import * as db from './db';
 import logo from '../res/icon.png';
 import { build } from '../../package.json';
-import * as learner from './learner/learner';
 
 const mGlobal: typeof global & {
     sharedDB?: typeof db.DBs;
@@ -13,7 +12,6 @@ const mGlobal: typeof global & {
     learner?: any;
 } = global;
 mGlobal.sharedDB = db.DBs;
-mGlobal.learner = learner;
 if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
 }
