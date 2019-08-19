@@ -41,7 +41,7 @@ All the data is saved and processed **locally**.
 
 # Download
 
-This project currently only supports Windows.
+This project currently supports Windows and macOS.
 
 To download, go to [release page](https://github.com/rem2016/PomodoroLogger/releases).
 
