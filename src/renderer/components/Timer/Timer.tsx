@@ -226,13 +226,13 @@ class Timer extends Component<Props, State> {
     };
 
     onStopResumeOrStart = () => {
-        if (this.state.percent === 0) {
-            return this.onStart();
-        }
-
         if (this.props.timer.isRunning) {
             this.onStop();
         } else {
+            if (this.props.timer.targetTime == null) {
+                return this.onStart();
+            }
+
             this.onResume();
         }
     };

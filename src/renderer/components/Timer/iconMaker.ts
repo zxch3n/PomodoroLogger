@@ -4,8 +4,8 @@ const { nativeImage } = remote;
 
 async function makeIcon(leftTime?: string): Promise<string> {
     const canvas = document.createElement('canvas');
-    canvas.width = 200;
-    canvas.height = 200;
+    canvas.width = 32;
+    canvas.height = 32;
     const ctx = canvas.getContext('2d');
     if (!ctx) {
         throw new Error('cannot get context2d');
@@ -20,13 +20,13 @@ async function makeIcon(leftTime?: string): Promise<string> {
         img.addEventListener('load', e => {
             if (leftTime !== undefined) {
                 ctx.fillStyle = 'rgb(255, 255, 255)';
-                ctx.font = '150px Arial';
+                ctx.font = '24 Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.textAlign = 'center';
-                ctx.fillText(leftTime, 100, 100);
+                ctx.fillText(leftTime, 16, 16);
             } else {
-                ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 200, 200);
+                ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 32, 32);
             }
 
             resolve(canvas.toDataURL('image/png'));

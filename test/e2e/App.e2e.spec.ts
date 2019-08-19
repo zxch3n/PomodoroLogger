@@ -48,9 +48,15 @@ describe('Main Window', () => {
         expect(text).toBe('25:00');
         await new Promise(resolve => {
             setTimeout(async () => {
+                // Click again to stop timer
+                await client.$('#start-timer-button').click();
                 const text = await client.getText('#left-time-text');
                 expect(text).toBe('24:59');
-                resolve();
+                setTimeout(async () => {
+                    const text = await client.getText('#left-time-text');
+                    expect(text).toBe('24:59');
+                    resolve();
+                }, 2000);
             }, 1000);
         });
     });
