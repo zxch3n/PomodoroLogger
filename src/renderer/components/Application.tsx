@@ -12,6 +12,7 @@ import { actions as timerActions, TimerActionTypes } from './Timer/action';
 import { actions as projectActions, ProjectActionTypes } from './Project/action';
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { genMapDispatchToProp } from '../utils';
+import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
 
 const { TabPane } = Tabs;
 
@@ -22,6 +23,7 @@ const Application = (props: Props) => {
         props.fetchAll();
         props.fetchSettings();
         props.fetchHistoryFromDisk();
+        setTrayImageWithMadeIcon(undefined);
     }, []);
 
     return (
