@@ -5,14 +5,14 @@
 
 
 <p align="center">
-  <a href="https://circleci.com/gh/rem2016/PomodoroLogger">
-    <img src="https://circleci.com/gh/rem2016/PomodoroLogger.svg?style=svg"/>
+  <a href="https://circleci.com/gh/zxch3n/PomodoroLogger">
+    <img src="https://circleci.com/gh/zxch3n/PomodoroLogger.svg?style=svg"/>
   </a>
   <a href="https://deepscan.io/dashboard#view=project&tid=5098&pid=6887&bid=60495">
     <img src="https://deepscan.io/api/teams/5098/projects/6887/branches/60495/badge/grade.svg"/>
   </a>
-  <a href="https://codecov.io/gh/rem2016/PomodoroLogger">
-    <img src="https://codecov.io/gh/rem2016/PomodoroLogger/branch/master/graph/badge.svg" />
+  <a href="https://codecov.io/gh/zxch3n/PomodoroLogger">
+    <img src="https://codecov.io/gh/zxch3n/PomodoroLogger/branch/master/graph/badge.svg" />
   </a>
 </p>
 

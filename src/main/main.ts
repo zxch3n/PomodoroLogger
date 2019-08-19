@@ -75,6 +75,7 @@ const createWindow = async () => {
 
 app.on('ready', async () => {
     const img = nativeImage.createFromPath(path.join(__dirname, logo));
+    img.resize({ width: 32, height: 32 });
     mGlobal.tray = new Tray(img);
     const menuItems = [
         {
