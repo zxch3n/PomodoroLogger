@@ -63,18 +63,12 @@ const createWindow = async () => {
 
     win.on('close', (event: Event) => {
         if (win) {
-            win.hide();
-            event.preventDefault();
-            const notification = new Notification({
-                title: 'Pomodoro Logger is running in the background',
-                body: 'You can close or open Pomodoro Logger in tray.'
-            });
-            notification.on('click', () => {
-                if (win) {
-                    win.show();
-                }
-            });
-            notification.show();
+            if (process.platform === 'win32') {
+                win.hide();
+                event.preventDefault();
+            } else {
+                win = undefined;
+            }
         }
     });
 };
@@ -130,7 +124,7 @@ function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
 
 mGlobal.setMenuItems = setMenuItems;
 app.on('window-all-closed', () => {
-    if (!win) {
+    if (process.platform !== 'darwin') {
         app.exit();
     }
 });

@@ -1,11 +1,15 @@
 import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 
-export const baseDir =
+const appdataDir =
     process.env.APPDATA ||
     (process.platform === 'darwin'
-        ? process.env.HOME + 'Library/Preferences'
+        ? process.env.HOME + '/Library/Preferences'
         : process.env.HOME + '/.local/share');
+export const baseDir = join(appdataDir, 'PomodoroLogger');
+if (!existsSync(baseDir)) {
+    mkdirSync(baseDir);
+}
 
 const dbDir = process.env.NODE_ENV !== 'test' ? 'db' : '__test__db';
 export const dbBaseDir = process.env.NODE_ENV === 'production' ? join(baseDir, dbDir) : dbDir;
