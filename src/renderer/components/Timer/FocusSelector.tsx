@@ -15,7 +15,7 @@ export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
     };
 
     const options = Object.values(props.project.projectList).map(v => (
-        <Option key={v.name} value={v.name}>
+        <Option key={v.name} value={v.name} className="focus-option">
             {v.name}
         </Option>
     ));
@@ -41,9 +41,15 @@ export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
             style={style}
             placeholder="Choose Your Focus"
             onChange={onChange}
+            id="focus-selector"
         >
             {options}
-            <Option key="undefined" value={undefined} style={{ color: '#bfbfbf' }}>
+            <Option
+                key="undefined"
+                value={undefined}
+                style={{ color: '#bfbfbf' }}
+                className="focus-option"
+            >
                 No Focusing Project
             </Option>
         </Select>

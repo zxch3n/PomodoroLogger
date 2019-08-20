@@ -60,4 +60,25 @@ describe('Main Window', () => {
             }, 1000);
         });
     });
+
+    it('timer can be cleared', async () => {
+        const { client } = app;
+        await client.waitUntilWindowLoaded();
+        await client.$('#start-timer-button').click();
+        await new Promise(r => setTimeout(r, 1500));
+        await client.$('#start-timer-button').click();
+        await new Promise(r => setTimeout(r, 1500));
+        await client.$('#clear-timer-button').click();
+        const newText = await client.getText('#left-time-text');
+        expect(newText).toBe('25:00');
+    });
+
+    it('timer can choose focusing project', async () => {
+        const { client } = app;
+        await client.waitUntilWindowLoaded();
+        await client.$('#focus-selector').click();
+        const texts = await client.getText('.focus-option');
+        console.log(texts);
+        expect(texts.length).toBeGreaterThanOrEqual(1);
+    });
 });

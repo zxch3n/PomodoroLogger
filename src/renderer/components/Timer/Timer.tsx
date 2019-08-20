@@ -522,7 +522,9 @@ class Timer extends Component<Props, State> {
                                 />
                             )}
                         </div>
-                        <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                        <div id="clear-timer-button" style={{ lineHeight: 0 }}>
+                            <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                        </div>
                         <Icon type="more" title="Show More" onClick={this.toggleMode} />
                     </ButtonRow>
 
