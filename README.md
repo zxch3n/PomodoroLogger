@@ -20,7 +20,10 @@
 
 # Pomodoro Logger :clock930:
 
-> **Manage your desktop works easily**
+
+> **Invest your time easily**
+
+[中文README](https://github.com/zxch3n/PomodoroLogger/wiki/中文README)
 
 
 <img align="right" src="https://i.postimg.cc/0j8FJ70x/image.png" height="280"/>
