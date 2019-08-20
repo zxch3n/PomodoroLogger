@@ -5,6 +5,10 @@ import * as db from './db';
 import logo from '../res/icon.png';
 import { build } from '../../package.json';
 
+// Fix setTimeout not reliable problem
+// See https://github.com/electron/electron/issues/7079#issuecomment-325706135
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+
 const mGlobal: typeof global & {
     sharedDB?: typeof db.DBs;
     tray?: Tray;
