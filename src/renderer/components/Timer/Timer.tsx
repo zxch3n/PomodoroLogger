@@ -213,7 +213,11 @@ class Timer extends Component<Props, State> {
                     ? this.props.timer.focusDuration
                     : this.props.timer.restDuration);
         if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
-            setTrayImageWithMadeIcon(leftTime.slice(0, 2)).catch(console.error);
+            setTrayImageWithMadeIcon(
+                leftTime.slice(0, 2),
+                percent / 100,
+                this.props.timer.isFocusing
+            ).catch(console.error);
         }
 
         if (leftTime !== this.state.leftTime) {
