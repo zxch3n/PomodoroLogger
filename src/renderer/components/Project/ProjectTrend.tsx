@@ -23,6 +23,7 @@ export const ProjectTrend: React.FC<Props> = (props: Props) => {
                 radius={10.1}
                 strokeWidth={1.5}
                 strokeLinecap={'butt'}
+                maxData={16}
             />
         </Container>
     );
