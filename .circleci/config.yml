@@ -10,17 +10,17 @@ jobs:
           keys:
             - v2-dependencies-{{ checksum "package.json" }}
             - v2-dependencies-
-      - run: npm install
+      - run: yarn
       - save_cache:
           paths:
             - node_modules
           key: v2-dependencies-{{ checksum "package.json" }}
       - run:
           name: build
-          command: npm run build
+          command: yarn build
       - run: # run tests
           name: test
-          command: npm test -- --ci --runInBand --reporters=default --reporters=jest-junit
+          command: yarn test -- --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
       - store_test_results:
