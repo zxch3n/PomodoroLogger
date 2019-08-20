@@ -312,6 +312,7 @@ class Timer extends Component<Props, State> {
             showMask: true
         });
         this.props.stopTimer();
+        this.props.changeAppTab('timer');
         this.clearStat();
     };
 

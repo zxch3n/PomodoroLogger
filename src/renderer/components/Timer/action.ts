@@ -22,6 +22,8 @@ export interface TimerState extends Setting {
     isFocusing: boolean;
     isRunning: boolean;
     project?: string;
+
+    currentTab: string;
 }
 
 export const defaultState: TimerState = {
@@ -32,7 +34,8 @@ export const defaultState: TimerState = {
     isFocusing: true,
 
     monitorInterval: 1000,
-    screenShotInterval: undefined
+    screenShotInterval: undefined,
+    currentTab: 'timer'
 };
 
 export const startTimer = createActionCreator('[Timer]START_TIMER');
@@ -60,6 +63,9 @@ export const setScreenShotInterval = createActionCreator(
     resolve => (interval?: number) => resolve(interval)
 );
 export const switchFocusRestMode = createActionCreator('[Timer]SWITCH_FOCUS_MODE');
+export const changeAppTab = createActionCreator('[App]CHANGE_APP_TAB', resolve => (tab: string) =>
+    resolve(tab)
+);
 
 const throwError = (err: Error) => {
     if (err) {
@@ -73,6 +79,7 @@ export const actions = {
     setProject,
     startTimer,
     switchFocusRestMode,
+    changeAppTab,
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
             dbs.settingDB.findOne.bind(dbs.settingDB)
@@ -217,5 +224,6 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isFocusing: !state.isFocusing
     })),
 
-    handle(setProject, (state, { payload }) => ({ ...state, project: payload }))
+    handle(setProject, (state, { payload }) => ({ ...state, project: payload })),
+    handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload }))
 ]);

@@ -13,10 +13,13 @@ import { actions as projectActions, ProjectActionTypes } from './Project/action'
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { genMapDispatchToProp } from '../utils';
 import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
+import { RootState } from '../reducers';
 
 const { TabPane } = Tabs;
 
-interface Props extends TimerActionTypes, ProjectActionTypes, HistoryActionCreatorTypes {}
+interface Props extends TimerActionTypes, ProjectActionTypes, HistoryActionCreatorTypes {
+    currentTab: string;
+}
 
 const Application = (props: Props) => {
     React.useEffect(() => {
@@ -27,7 +30,7 @@ const Application = (props: Props) => {
     }, []);
 
     return (
-        <Tabs defaultActiveKey="timer">
+        <Tabs activeKey={props.currentTab} onChange={props.changeAppTab}>
             <TabPane
                 tab={
                     <span>
@@ -95,7 +98,7 @@ const Application = (props: Props) => {
 };
 
 const ApplicationContainer = connect(
-    undefined,
+    (state: RootState) => ({ currentTab: state.timer.currentTab }),
     genMapDispatchToProp<TimerActionTypes & ProjectActionTypes & HistoryActionCreatorTypes>({
         ...timerActions,
         ...projectActions,
