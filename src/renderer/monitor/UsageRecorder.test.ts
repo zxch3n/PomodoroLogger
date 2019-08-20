@@ -10,10 +10,6 @@ function mockDate(targetDate: string | number) {
     global.Date.now = realDate.now;
 }
 
-afterEach(() => {
-    global.Date = realDate;
-});
-
 function createResult(appName: string, title: string = appName) {
     return {
         title,
@@ -29,6 +25,10 @@ function createResult(appName: string, title: string = appName) {
 }
 
 describe('monitor/UsageRecorder', () => {
+    afterAll(() => {
+        global.Date = realDate;
+    });
+
     it('app spent hours are recorded correctly', async () => {
         const recorder = new UsageRecorder(() => {});
         mockDate(0);
@@ -48,18 +48,56 @@ describe('monitor/UsageRecorder', () => {
         expect(sessionData.apps.a.switchTimes).toBe(2);
     });
 
-    it('app spent hours are recorded correctly (complicated case)', async () => {
+    it('app spent hours are recorded correctly (complicated case 0)', async () => {
         const recorder = new UsageRecorder(() => {});
         let aSum = 0;
         let i = 0;
-        for (; i < 3000000; i += 3001) {
+        for (; i < 3000 * 1000; i += 3000) {
             mockDate(i);
             if (Math.random() > 0.5) {
                 await recorder.listener(createResult('b'));
             } else {
                 await recorder.listener(createResult('a'));
-                aSum += 3001;
+                aSum += 3000;
             }
+        }
+
+        mockDate(i);
+        await recorder.stop();
+        const sessionData = recorder.sessionData;
+        expect(sessionData.apps.a.spentTimeInHour).toBeCloseTo(aSum / 1000 / 3600, 5);
+    });
+
+    it('app spent hours are recorded correctly (complicated case 1)', async () => {
+        const recorder = new UsageRecorder(() => {});
+        let aSum = 0;
+        let i = 0;
+        const a = createResult('a');
+        const b = createResult('b');
+        for (; i < 3000 * 1000; i += 3000) {
+            mockDate(i);
+            await recorder.listener(a);
+            mockDate(i + 1500);
+            await recorder.listener(b);
+            aSum += 1500;
+        }
+
+        mockDate(i);
+        await recorder.stop();
+        const sessionData = recorder.sessionData;
+        expect(sessionData.apps.a.spentTimeInHour).toBeCloseTo(aSum / 1000 / 3600, 5);
+        expect(sessionData.apps.b.spentTimeInHour).toBeCloseTo(aSum / 1000 / 3600, 5);
+    });
+
+    it('app spent hours are recorded correctly (complicated case 2)', async () => {
+        const recorder = new UsageRecorder(() => {});
+        let aSum = 0;
+        let i = 0;
+        const a = createResult('a');
+        for (; i < 3000 * 1000; i += 3000) {
+            mockDate(i);
+            await recorder.listener(a);
+            aSum += 3000;
         }
 
         mockDate(i);

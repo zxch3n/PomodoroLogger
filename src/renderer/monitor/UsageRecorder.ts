@@ -143,7 +143,7 @@ export class UsageRecorder {
         }
         row.titleSpentTime[title].occurrence += 1;
 
-        if (row.lastUpdateTime) {
+        if (row.lastUpdateTime != null) {
             const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
             row.spentTimeInHour += spentTimeInHour;
             this.record.spentTimeInHour += spentTimeInHour;

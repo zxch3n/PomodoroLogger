@@ -63,12 +63,8 @@ const createWindow = async () => {
 
     win.on('close', (event: Event) => {
         if (win) {
-            if (process.platform === 'win32') {
-                win.hide();
-                event.preventDefault();
-            } else {
-                win = undefined;
-            }
+            win.hide();
+            event.preventDefault();
         }
     });
 };
@@ -125,9 +121,7 @@ function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
 
 mGlobal.setMenuItems = setMenuItems;
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.exit();
-    }
+    app.exit();
 });
 
 app.on('activate', () => {

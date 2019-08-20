@@ -77,6 +77,7 @@ describe('Main Window', () => {
         const { client } = app;
         await client.waitUntilWindowLoaded();
         await client.$('#focus-selector').click();
+        await new Promise(r => setTimeout(r, 1500));
         const texts = await client.getText('.focus-option');
         console.log(texts);
         expect(texts.length).toBeGreaterThanOrEqual(1);
