@@ -143,7 +143,7 @@ export const getTimeSpentDataFromRecords = async (
         }
     }
 
-    const projectData = projectTimeCounter.getNameValuePairs({ toFixed: 2 });
+    const projectData = projectTimeCounter.getNameValuePairs({ toFixed: 2, topK: 10 });
     for (const v of projectData) {
         if (v.name === UNK) {
             v.name = 'Unknown';

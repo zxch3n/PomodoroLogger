@@ -1,19 +1,29 @@
 import * as electron from 'electron';
 
 const remote = electron.remote;
-const screen = electron.screen || remote.screen;
 
-const currentWindow = remote.getCurrentWindow();
 const getCurrentScreen = () => {
-    const { x, y } = currentWindow.getBounds();
-    return screen.getAllDisplays().filter(d => {
-        return (
-            x <= d.bounds.x + d.bounds.width &&
-            x >= d.bounds.x &&
-            y <= d.bounds.y + d.bounds.height &&
-            y >= d.bounds.y
-        );
-    })[0];
+    try {
+        const screen = electron.screen || remote.screen;
+        const currentWindow = remote.getCurrentWindow();
+        const { x, y } = currentWindow.getBounds();
+        return screen.getAllDisplays().filter(d => {
+            return (
+                x <= d.bounds.x + d.bounds.width &&
+                x >= d.bounds.x &&
+                y <= d.bounds.y + d.bounds.height &&
+                y >= d.bounds.y
+            );
+        })[0];
+    } catch (e) {
+        if (process.env.NODE_ENV === 'test') {
+            // Test env may not have electron
+            console.warn(e);
+            return { id: undefined };
+        }
+
+        throw e;
+    }
 };
 
 const curScreen = getCurrentScreen();

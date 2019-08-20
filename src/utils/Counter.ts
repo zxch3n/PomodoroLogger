@@ -31,7 +31,7 @@ export class Counter {
         }
 
         if (topK) {
-            ans.sort((a, b) => a.value - b.value);
+            ans.sort((a, b) => -a.value + b.value);
             ans = ans.slice(0, topK);
         }
 
