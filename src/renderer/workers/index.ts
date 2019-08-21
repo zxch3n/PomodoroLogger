@@ -6,7 +6,9 @@
  */
 
 import { KnnWorker } from './knnWorker';
+import { Tokenizer } from './tokenizer';
 
 export const workers = {
-    knn: new KnnWorker()
+    knn: new KnnWorker(),
+    tokenizer: new Tokenizer()
 };

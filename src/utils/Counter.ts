@@ -39,7 +39,7 @@ export class Counter {
             }
         }
 
-        if (topK) {
+        if (topK && ans.length > topK) {
             ans.sort((a, b) => -a.value + b.value);
             ans = ans.slice(0, topK);
         }

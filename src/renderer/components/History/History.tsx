@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { RootState } from '../../reducers';
 import { getPomodoroCalendarData, getPomodoroCount } from './op';
-import { getWeightsFromPomodoros, WordCloud } from '../Visualization/WordCloud';
+import { AsyncWordCloud } from '../Visualization/WordCloud';
 
 const { Option } = Select;
 
@@ -122,8 +122,8 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                         width={calendarWidth}
                         onProjectClick={onProjectClick}
                     />
-                    <WordCloud
-                        weights={getWeightsFromPomodoros(pomodoros)}
+                    <AsyncWordCloud
+                        records={pomodoros}
                         width={calendarWidth}
                         height={calendarWidth * 0.6}
                     />

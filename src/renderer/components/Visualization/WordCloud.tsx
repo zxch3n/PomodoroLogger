@@ -2,8 +2,9 @@ import * as React from 'react';
 // @ts-ignore
 import WordCloud2 from 'wordcloud';
 import { PomodoroRecord } from '../../monitor/type';
-import { Counter } from '../../../utils/Counter';
-import { Tokenizer } from '../../../utils/tokenizer';
+import { workers } from '../../workers';
+
+const tokenizer = workers.tokenizer;
 
 interface Props {
     weights: [string, number][];
@@ -14,11 +15,12 @@ export const WordCloud: React.FC<MProps> = (props: MProps) => {
     const canvas = React.useRef<HTMLCanvasElement>();
     const { weights, ...restProps } = props;
     React.useEffect(() => {
-        if (canvas.current === undefined) {
+        if (canvas.current === undefined || props.weights.length === 0) {
             return;
         }
 
-        const width = canvas.current.clientWidth;
+        console.log('weights update', weights);
+        const width = canvas.current.clientWidth || props.width || 800;
         WordCloud2(canvas.current, {
             list: weights,
             gridSize: Math.round((8 * width) / 800),
@@ -39,24 +41,19 @@ export const WordCloud: React.FC<MProps> = (props: MProps) => {
     return <canvas ref={canvas} {...restProps} />;
 };
 
-export const getWeightsFromPomodoros = (records: PomodoroRecord[]) => {
-    const tokenWeights = new Counter();
-    const tokenizer = new Tokenizer();
-    for (const record of records) {
-        for (const app in record.apps) {
-            const appRecord = record.apps[app];
-            for (const title in appRecord.titleSpentTime) {
-                const weight = appRecord.titleSpentTime[title].normalizedWeight;
-                const tokens = tokenizer.tokenize(title);
-                for (const token of tokens) {
-                    tokenWeights.add(token, weight);
-                }
-            }
-        }
-    }
+interface AsyncProps {
+    records: PomodoroRecord[];
+}
 
-    const weights = tokenWeights.getNameValuePairs({ topK: 100 });
-    const max = weights.reduce((prev, cur) => Math.max(prev, cur.value), 0);
-    const min = weights.reduce((prev, cur) => Math.min(prev, cur.value), 0);
-    return weights.map(v => [v.name, ((v.value - min) / (max - min)) * 30 + 12]);
+type MAsyncProps = AsyncProps & { [name: string]: any };
+export const AsyncWordCloud: React.FC<MAsyncProps> = (props: MAsyncProps) => {
+    const { records, ...restProps } = props;
+    const [weights, setWeights] = React.useState<[string, number][]>([]);
+    React.useEffect(() => {
+        tokenizer.tokenize(records).then(weights => {
+            console.log(records, weights);
+            setWeights(weights);
+        });
+    }, [records]);
+    return <WordCloud weights={weights} {...restProps} />;
 };

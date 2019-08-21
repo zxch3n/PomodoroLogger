@@ -42,11 +42,12 @@ async function getRecords() {
 }
 
 let knn = new KNN();
-async function train(isTest = false) {
+async function train(isTest: boolean, code: number) {
     try {
         const records = await getRecords();
         if (records.length === 0) {
             ctx.postMessage({
+                code,
                 type: 'error',
                 payload: 'Training array is empty'
             });
@@ -62,11 +63,13 @@ async function train(isTest = false) {
         }
 
         ctx.postMessage({
+            code,
             type: 'setProgress',
             payload: 20
         });
         knn.fit(train);
         ctx.postMessage({
+            code,
             type: 'setProgress',
             payload: 80
         });
@@ -84,83 +87,91 @@ async function train(isTest = false) {
         }
 
         ctx.postMessage({
+            code,
             type: 'setAcc',
             payload: t / (t + f)
         });
         ctx.postMessage({
+            code,
             type: 'setProgress',
             payload: 100
         });
     } catch (e) {
         console.error(e);
         ctx.postMessage({
+            code,
             type: 'error',
             payload: e.toString()
         });
     }
 }
 
-function saveModel() {
+function saveModel(code: number) {
     const json = knn.toJson();
     try {
         writeFileSync(modelPath.knnPath, JSON.stringify(json), { encoding: 'utf-8' });
         ctx.postMessage({
+            code,
             type: 'onDone'
         });
     } catch (e) {
         ctx.postMessage({
+            code,
             type: 'error',
             payload: e
         });
     }
 }
 
-async function loadModel(dbSize: number = 0) {
+async function loadModel(dbSize: number, code: number) {
     if (!existsSync(modelPath.knnPath)) {
-        await train();
-        saveModel();
+        await train(false, code);
+        saveModel(code);
     } else {
         const json = JSON.parse(readFileSync(modelPath.knnPath, { encoding: 'utf-8' }));
         knn = KNN.fromJson(json);
     }
 
     if (!knn.isTrained || dbSize - knn.length > 20 || dbSize / knn.length > 1.5) {
-        await train();
-        saveModel();
+        await train(false, code);
+        saveModel(code);
     }
 
     ctx.postMessage({
+        code,
         type: 'onDone'
     });
 }
 
-function predict(payload: PomodoroRecord[]) {
+function predict(payload: PomodoroRecord[], code: number) {
     const record = payload as PomodoroRecord[];
     const ans = knn.predict(record);
     ctx.postMessage({
+        code,
         type: 'predict',
         payload: ans
     });
 }
 
-ctx.addEventListener('message', async ({ data: { type, payload } }) => {
+ctx.addEventListener('message', async ({ data: { type, payload, code } }) => {
     try {
         if (type === 'trainModel') {
             knn = new KNN();
-            await train(false);
+            await train(false, code);
         } else if (type === 'testModel') {
             knn = new KNN();
-            await train(true);
+            await train(true, code);
         } else if (type === 'saveModel') {
-            saveModel();
+            saveModel(code);
         } else if (type === 'loadModel') {
-            await loadModel(payload.dbSize);
+            await loadModel(payload.dbSize, code);
         } else if (type === 'predict') {
-            predict(payload);
+            predict(payload, code);
         }
     } catch (e) {
         console.error(e);
         ctx.postMessage({
+            code,
             type: 'error',
             payload: JSON.stringify(e)
         });

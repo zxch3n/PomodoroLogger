@@ -1,3 +1,6 @@
+import { PomodoroRecord } from '../renderer/monitor/type';
+import { Counter } from './Counter';
+
 export class Tokenizer {
     private rules: [string, RegExp][] = [
         ['appWithSuffix', /^\w[\.\w-]*/],
@@ -32,3 +35,25 @@ export class Tokenizer {
         return ans;
     }
 }
+
+export const getWeightsFromPomodoros = (records: PomodoroRecord[]) => {
+    const tokenWeights = new Counter();
+    const tokenizer = new Tokenizer();
+    for (const record of records) {
+        for (const app in record.apps) {
+            const appRecord = record.apps[app];
+            for (const title in appRecord.titleSpentTime) {
+                const weight = appRecord.titleSpentTime[title].normalizedWeight;
+                const tokens = tokenizer.tokenize(title);
+                for (const token of tokens) {
+                    tokenWeights.add(token, weight);
+                }
+            }
+        }
+    }
+
+    const weights = tokenWeights.getNameValuePairs({ topK: 100 });
+    const max = weights.reduce((prev, cur) => Math.max(prev, cur.value), 0);
+    const min = weights.reduce((prev, cur) => Math.min(prev, cur.value), 0);
+    return weights.map(v => [v.name, ((v.value - min) / (max - min)) * 30 + 12]);
+};

@@ -21,7 +21,7 @@ import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
-import { getWeightsFromPomodoros, WordCloud } from '../Visualization/WordCloud';
+import { AsyncWordCloud } from '../Visualization/WordCloud';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
@@ -541,8 +541,8 @@ class Timer extends Component<Props, State> {
                         <Divider />
 
                         <h2>Word Cloud</h2>
-                        <WordCloud
-                            weights={getWeightsFromPomodoros(this.state.pomodorosToday)}
+                        <AsyncWordCloud
+                            records={this.state.pomodorosToday}
                             width={800}
                             height={400}
                             style={{ margin: '0 auto' }}
