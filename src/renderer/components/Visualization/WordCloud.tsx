@@ -11,10 +11,28 @@ interface Props {
 
 type MProps = Props & { [other: string]: any };
 export const WordCloud: React.FC<MProps> = (props: MProps) => {
-    const canvas = React.useRef();
+    const canvas = React.useRef<HTMLCanvasElement>();
     const { weights, ...restProps } = props;
     React.useEffect(() => {
-        WordCloud2(canvas.current, { list: weights });
+        if (canvas.current === undefined) {
+            return;
+        }
+
+        const width = canvas.current.clientWidth;
+        WordCloud2(canvas.current, {
+            list: weights,
+            gridSize: Math.round((8 * width) / 800),
+            weightFactor: (size: number) => {
+                return (Math.pow(size, 1.1) * width) / 800;
+            },
+            fontFamily: 'Times, serif',
+            color: (word: string, weight: number) => {
+                return weight >= 38 ? '#f02222' : '#c09292';
+            },
+            rotateRatio: 0.5,
+            rotationSteps: 2,
+            backgroundColor: '#ffe0e0'
+        });
     }, [weights]);
 
     // @ts-ignore
@@ -37,9 +55,11 @@ export const getWeightsFromPomodoros = (records: PomodoroRecord[]) => {
         }
     }
 
-    const weights = tokenWeights.list;
-    const max = weights.reduce((prev, cur) => Math.max(prev, cur[1]), 0);
-    const min = weights.reduce((prev, cur) => Math.min(prev, cur[1]), 0);
-    weights.map(v => (v[1] = (v[1] / max) * 50));
-    return weights;
+    const weights = tokenWeights.getNameValuePairs({ topK: 100 });
+    const max = weights.reduce((prev, cur) => Math.max(prev, cur.value), 0);
+    const min = weights.reduce((prev, cur) => Math.min(prev, cur.value), 0);
+    const ans = weights.map(v => [v.name, ((v.value - min) / (max - min)) * 30 + 12]);
+
+    console.log(ans);
+    return ans;
 };

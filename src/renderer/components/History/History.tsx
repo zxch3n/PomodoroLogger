@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { RootState } from '../../reducers';
 import { getPomodoroCalendarData, getPomodoroCount } from './op';
+import { getWeightsFromPomodoros, WordCloud } from '../Visualization/WordCloud';
 
 const { Option } = Select;
 
@@ -120,6 +121,11 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                         pomodoros={pomodoros}
                         width={calendarWidth}
                         onProjectClick={onProjectClick}
+                    />
+                    <WordCloud
+                        weights={getWeightsFromPomodoros(pomodoros)}
+                        width={calendarWidth}
+                        height={calendarWidth * 0.6}
                     />
                 </React.Fragment>
             ) : (
