@@ -21,6 +21,7 @@ import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
+import { getWeightsFromPomodoros, WordCloud } from '../Visualization/WordCloud';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
@@ -377,14 +378,6 @@ class Timer extends Component<Props, State> {
         this.setState(state => {
             // TODO: need better control
             const more = !state.more;
-            const win = remote.getCurrentWindow();
-            const [w, h] = win.getSize();
-            if (more) {
-                win.setSize(w, h + 300, true);
-            } else {
-                win.setSize(w, h - 300, true);
-            }
-
             return { more };
         });
     };
@@ -546,6 +539,14 @@ class Timer extends Component<Props, State> {
                         <h2>Time Spent</h2>
                         <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={800} />
                         <Divider />
+
+                        <h2>Word Cloud</h2>
+                        <WordCloud
+                            weights={getWeightsFromPomodoros(this.state.pomodorosToday)}
+                            width={800}
+                            height={400}
+                            style={{ margin: '0 auto' }}
+                        />
                     </MoreInfo>
                 </TimerLayout>
             </Layout>

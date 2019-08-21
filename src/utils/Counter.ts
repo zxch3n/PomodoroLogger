@@ -13,6 +13,15 @@ export class Counter {
         return this._dict;
     }
 
+    get list(): [string, number][] {
+        const ans: [string, number][] = [];
+        for (const name in this._dict) {
+            ans.push([name, this._dict[name]]);
+        }
+
+        return ans;
+    }
+
     getNameValuePairs({
         toFixed = undefined,
         topK = undefined

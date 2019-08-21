@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { WordCloud } from '../Visualization/WordCloud';
 import { Button, Card, Col, Progress, Row, Statistic } from 'antd';
 import { RootState } from '../../reducers';
 import { HistoryActionCreatorTypes } from '../History/action';
@@ -34,6 +35,14 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             }, setProgress)
             .catch(console.error);
     };
+
+    const weights: [string, number][] = [
+        ['Hate', 100],
+        ['Fate', 1],
+        ['Test', 3],
+        ['Behavior', 10],
+        ['Logger', 20]
+    ];
 
     return (
         <Container>
