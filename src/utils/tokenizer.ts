@@ -10,7 +10,6 @@ export class Tokenizer {
     public tokenize(s: string): string[] {
         const ans = [];
         const ss = s.split(this.unwantedSymbol);
-        console.log(ss);
         for (let str of ss) {
             while (str.length) {
                 let found = false;

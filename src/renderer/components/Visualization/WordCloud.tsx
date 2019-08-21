@@ -58,8 +58,5 @@ export const getWeightsFromPomodoros = (records: PomodoroRecord[]) => {
     const weights = tokenWeights.getNameValuePairs({ topK: 100 });
     const max = weights.reduce((prev, cur) => Math.max(prev, cur.value), 0);
     const min = weights.reduce((prev, cur) => Math.min(prev, cur.value), 0);
-    const ans = weights.map(v => [v.name, ((v.value - min) / (max - min)) * 30 + 12]);
-
-    console.log(ans);
-    return ans;
+    return weights.map(v => [v.name, ((v.value - min) / (max - min)) * 30 + 12]);
 };
