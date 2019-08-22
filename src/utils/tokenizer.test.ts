@@ -1,4 +1,5 @@
-import { Tokenizer } from './tokenizer';
+import { getWeightsFromPomodoros, Tokenizer } from './tokenizer';
+import { PomodoroRecord, TitleSpentTimeDict } from '../renderer/monitor/type';
 
 const tokenizer = new Tokenizer();
 
@@ -47,7 +48,8 @@ describe('Tokenizer', () => {
             'b',
             'c-d',
             'circleci',
-            'configyml'
+            'config.yml',
+            'WebStorm'
         ]);
     });
 
@@ -82,5 +84,92 @@ describe('Tokenizer', () => {
             'RGB',
             '8'
         ]);
+    });
+});
+
+function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
+    const record: PomodoroRecord = {
+        apps: {},
+        switchTimes: 10,
+        startTime: 100,
+        spentTimeInHour: 0.3
+    };
+
+    for (let i = 0; i < pairs.length; i += 10) {
+        const titleSpentTime: TitleSpentTimeDict = {};
+        for (let j = i; j < pairs.length && j < i + 10; j += 1) {
+            const pair = pairs[j];
+            titleSpentTime[pair[0]] = {
+                normalizedWeight: pair[1],
+                occurrence: pair[1] * 100
+            };
+        }
+
+        record.apps[i.toString()] = {
+            titleSpentTime,
+            spentTimeInHour: 0.1,
+            switchTimes: 1,
+            appName: i.toString()
+        };
+    }
+
+    return record;
+}
+
+function pairToDict(pairs: [string, number][]): { [name: string]: number } {
+    const ans: { [n: string]: number } = {};
+    for (const pair of pairs) {
+        ans[pair[0]] = pair[1];
+    }
+
+    return ans;
+}
+
+function expectWeights(records: PomodoroRecord[], weights: { [n: string]: number }) {
+    const pred = getWeightsFromPomodoros(records);
+    expect(pairToDict(pred)).toStrictEqual(weights);
+}
+
+describe('Tokenizer.getTokenWeightsFromRecords', () => {
+    it('aggregates empty data correctly', () => {
+        expect(getWeightsFromPomodoros([])).toStrictEqual([]);
+    });
+
+    it('aggregates one record correctly', () => {
+        const record = createRecordFromTitlesAndWeights([
+            ['expect(getWeightsFromPomodoros([])).toStrictEqual([]);', 1]
+        ]);
+
+        expectWeights([record], {
+            expect: 42,
+            getWeightsFromPomodoros: 42,
+            toStrictEqual: 42
+        });
+    });
+
+    it('aggregates records correctly', () => {
+        const records = [
+            createRecordFromTitlesAndWeights([
+                ['const weight normalizedWeight;', 3],
+                ['Math.min--;', 1]
+            ]),
+            createRecordFromTitlesAndWeights([
+                ['targetMin: number = 12', 3],
+                ['MiddleSize', 2],
+                ['targetMax', 1]
+            ])
+        ];
+
+        expectWeights(records, {
+            const: 42,
+            weight: 42,
+            normalizedWeight: 42,
+            'Math.min': 12,
+            targetMin: 42,
+            number: 42,
+            '12': 42,
+            targetMax: 12,
+            MiddleSize: (12 + 42) / 2
+        });
     });
 });

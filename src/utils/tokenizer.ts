@@ -3,7 +3,7 @@ import { Counter } from './Counter';
 
 export class Tokenizer {
     private rules: [string, RegExp][] = [
-        ['appWithSuffix', /^\w[\.\w-]*/],
+        ['appWithSuffix', /^((\w[\.-])?\w)+/],
         ['word', /^\w[\w-]*/],
         ['number', /^\d\d*\.?\d*/]
     ];
@@ -19,7 +19,7 @@ export class Tokenizer {
                 for (const [_, reg] of this.rules) {
                     const match = str.match(reg);
                     if (match != null) {
-                        const matched = match.toString();
+                        const matched = match.entries().next().value[1];
                         ans.push(matched);
                         str = str.slice(matched.length);
                         found = true;
@@ -36,7 +36,11 @@ export class Tokenizer {
     }
 }
 
-export const getWeightsFromPomodoros = (records: PomodoroRecord[]) => {
+export const getWeightsFromPomodoros = (
+    records: PomodoroRecord[],
+    targetMax: number = 42,
+    targetMin: number = 12
+): [string, number][] => {
     const tokenWeights = new Counter();
     const tokenizer = new Tokenizer();
     for (const record of records) {
@@ -54,6 +58,13 @@ export const getWeightsFromPomodoros = (records: PomodoroRecord[]) => {
 
     const weights = tokenWeights.getNameValuePairs({ topK: 100 });
     const max = weights.reduce((prev, cur) => Math.max(prev, cur.value), 0);
-    const min = weights.reduce((prev, cur) => Math.min(prev, cur.value), 0);
-    return weights.map(v => [v.name, ((v.value - min) / (max - min)) * 30 + 12]);
+    let min = weights.reduce((prev, cur) => Math.min(prev, cur.value), 10000);
+    if (max === min) {
+        min = max - 1;
+    }
+
+    return weights.map(v => [
+        v.name,
+        ((v.value - min) / (max - min)) * (targetMax - targetMin) + targetMin
+    ]);
 };
