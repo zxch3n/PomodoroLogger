@@ -8,8 +8,6 @@ import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
 import styled from 'styled-components';
 import { BrowserWindow, nativeImage, remote } from 'electron';
-import RestIcon from '../../../res/rest.svg';
-import WorkIcon from '../../../res/work.svg';
 import AppIcon from '../../../res/icon.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
@@ -22,11 +20,13 @@ import { workers } from '../../workers';
 import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
+import { WorkRestIcon } from './WorkRestIcon';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
 const ProgressTextContainer = styled.div`
+    margin-top: -50px;
     padding: 12px;
     text-align: center;
     transform: translateY(0.4em);
@@ -487,16 +487,10 @@ class Timer extends Component<Props, State> {
                                 >
                                     {shownLeftTime}
                                 </div>
-                                <div
-                                    style={{ fontSize: '0.6em', cursor: 'pointer' }}
+                                <WorkRestIcon
+                                    isWorking={this.props.timer.isFocusing}
                                     onClick={this.switchMode}
-                                >
-                                    {this.props.timer.isFocusing ? (
-                                        <Icon component={WorkIcon} />
-                                    ) : (
-                                        <Icon component={RestIcon} />
-                                    )}
-                                </div>
+                                />
                             </ProgressTextContainer>
                         </Progress>
                     </ProgressContainer>
