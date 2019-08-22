@@ -15,8 +15,7 @@ describe('Counter', () => {
         });
 
         const list = counter.list;
-        const fromList = {};
-        // @ts-ignore
+        const fromList: { [n: string]: number } = {};
         list.forEach(v => {
             fromList[v[0]] = v[1];
         });
