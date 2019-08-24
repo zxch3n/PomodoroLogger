@@ -97,6 +97,7 @@
     "@types/react-redux": "^7.0.9",
     "@types/react-test-renderer": "^16.8.2",
     "@types/redux-thunk": "^2.1.0",
+    "@types/shortid": "^0.0.29",
     "@types/styled-components": "^4.1.16",
     "@types/webdriverio": "^4.8.7",
     "@types/webpack-env": "^1.13.3",
@@ -153,11 +154,13 @@
     "lodash": "^4.17.14",
     "nedb": "^1.8.0",
     "react": "^16.8.6",
+    "react-beautiful-dnd": "^11.0.5",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
     "react-trend": "zxch3n/react-trend",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "shortid": "^2.2.14",
     "styled-components": "^4.3.2",
     "wordcloud": "^1.1.0"
   }
