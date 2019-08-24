@@ -58,6 +58,13 @@ export const listReducer = createReducer<ListsState, any>({}, handle => [
     handle(moveCard, (state, { payload: { fromListId, toListId, fromIndex, toIndex } }) => {
         const newState = { ...state };
         const fromCards = Array.from(newState[fromListId].cards);
+        if (fromListId === toListId) {
+            const [del] = fromCards.splice(fromIndex, 1);
+            fromCards.splice(toIndex, 0, del);
+            newState[fromListId].cards = fromCards;
+            return newState;
+        }
+
         const toCards = Array.from(newState[toListId].cards);
         const [del] = fromCards.splice(fromIndex, 1);
         toCards.splice(toIndex, 0, del);
