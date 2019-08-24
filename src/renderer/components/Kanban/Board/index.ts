@@ -1,15 +1,16 @@
 import { connect } from 'react-redux';
-import { List, InputProps } from './List';
+import { Board, InputProps } from './Board';
 import { RootState } from '../../../reducers';
-import { ListActionTypes, actions } from './action';
+import { BoardActionTypes, actions } from './action';
 import { genMapDispatchToProp } from '../../../utils';
 
 const mapStateToProps = (state: RootState, props: InputProps) => {
-    return { ...state.kanban.lists[props.listId] };
+    const board = state.kanban.boards[props.boardId];
+    return { ...board };
 };
 
-const mapDispatchToProps = genMapDispatchToProp<ListActionTypes>(actions);
+const mapDispatchToProps = genMapDispatchToProp<BoardActionTypes>(actions);
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(List);
+)(Board);

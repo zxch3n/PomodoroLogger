@@ -15,7 +15,7 @@ export interface Card {
     };
 }
 
-export type CardMap = { [_id: string]: Card };
+export type CardsState = { [_id: string]: Card };
 
 const addSession = createActionCreator(
     '[Card]ADD_SESSION',
@@ -50,11 +50,20 @@ const deleteCard = createActionCreator('[Card]DELETE_CARD', resolve => (_id: str
     resolve({ _id })
 );
 
-const setCards = createActionCreator('[Card]SET_CARDS', resolve => (cards: CardMap) =>
+const setCards = createActionCreator('[Card]SET_CARDS', resolve => (cards: CardsState) =>
     resolve(cards)
 );
 
 export const actions = {
+    fetchCards: () => async (dispatch: Dispatch) => {
+        const cards: Card[] = await db.find({}, {});
+        const cardMap: CardsState = {};
+        for (const card of cards) {
+            cardMap[card._id] = card;
+        }
+
+        dispatch(setCards(cardMap));
+    },
     renameCard: (_id: string, title: string) => async (dispatch: Dispatch) => {
         dispatch(renameCard(_id, title));
         await db.update({ _id }, { $set: { title } });
@@ -90,7 +99,7 @@ export const actions = {
     }
 };
 
-export const cardReducer = createReducer<CardMap, any>({}, handle => [
+export const cardReducer = createReducer<CardsState, any>({}, handle => [
     handle(addCard, (state, { payload: { _id, title = '' } }) => {
         return {
             ...state,
@@ -175,3 +184,5 @@ export const cardReducer = createReducer<CardMap, any>({}, handle => [
         };
     })
 ]);
+
+export type CardActionTypes = { [key in keyof typeof actions]: typeof actions[key] };

@@ -14,6 +14,7 @@ import { actions as historyActions, HistoryActionCreatorTypes } from './History/
 import { genMapDispatchToProp } from '../utils';
 import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
 import { RootState } from '../reducers';
+import Kanban from './Kanban';
 
 const { TabPane } = Tabs;
 
@@ -40,7 +41,7 @@ const Application = (props: Props) => {
                 }
                 key="timer"
             >
-                <Timer />
+                <Kanban />
             </TabPane>
 
             <TabPane
@@ -52,7 +53,7 @@ const Application = (props: Props) => {
                 }
                 key="project"
             >
-                <Project />
+                <Kanban />
             </TabPane>
 
             <TabPane
