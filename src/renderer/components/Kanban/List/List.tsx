@@ -6,22 +6,23 @@ import Card from '../Card';
 import { Button } from 'antd';
 
 const Container = styled.div`
-    padding: 8px;
-    margin: 12px;
-    border-radius: 8px;
+    padding: 4px;
+    margin: 6px;
+    border-radius: 6px;
     background-color: white;
 `;
 
 const ListHead = styled.div`
-    width: 180px;
+    width: 250px;
+    padding: 4px 12px;
     background-color: white;
-    border-radius: 8px;
+    border-radius: 6px;
 `;
 
 const Cards = styled.div`
-    padding: 12px 4px;
+    padding: 2px 2px;
     background-color: #dedede;
-    border-radius: 6px;
+    border-radius: 4px;
 `;
 
 export interface InputProps {
@@ -37,11 +38,7 @@ export const List: FC<Props> = (props: Props) => {
     };
 
     return (
-        <Draggable
-            draggableId={props.listId}
-            index={props.index}
-            disableInteractiveElementBlocking={true}
-        >
+        <Draggable draggableId={props.listId} index={props.index}>
             {(provided, { draggingOver }) => (
                 <div>
                     <Container ref={provided.innerRef} {...provided.draggableProps}>

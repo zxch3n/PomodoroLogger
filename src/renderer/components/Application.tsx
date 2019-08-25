@@ -2,8 +2,6 @@ import { hot } from 'react-hot-loader/root';
 import { Icon, Tabs } from 'antd';
 import * as React from 'react';
 import 'antd/dist/antd.css';
-import Timer from './Timer';
-import Project from './Project';
 import Setting from './Setting';
 import History from './History';
 import Analyser from './Analyser';
@@ -15,6 +13,13 @@ import { genMapDispatchToProp } from '../utils';
 import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
 import { RootState } from '../reducers';
 import Kanban from './Kanban';
+import styled from 'styled-components';
+
+const Main = styled.div`
+    .ant-tabs-bar {
+        margin: 0;
+    }
+`;
 
 const { TabPane } = Tabs;
 
@@ -31,70 +36,72 @@ const Application = (props: Props) => {
     }, []);
 
     return (
-        <Tabs activeKey={props.currentTab} onChange={props.changeAppTab}>
-            <TabPane
-                tab={
-                    <span>
-                        <Icon type="clock-circle" />
-                        Pomodoro
-                    </span>
-                }
-                key="timer"
-            >
-                <Kanban />
-            </TabPane>
+        <Main>
+            <Tabs activeKey={props.currentTab} onChange={props.changeAppTab}>
+                <TabPane
+                    tab={
+                        <span>
+                            <Icon type="clock-circle" />
+                            Pomodoro
+                        </span>
+                    }
+                    key="timer"
+                >
+                    <Kanban />
+                </TabPane>
 
-            <TabPane
-                tab={
-                    <span>
-                        <Icon type="project" />
-                        Project
-                    </span>
-                }
-                key="project"
-            >
-                <Kanban />
-            </TabPane>
+                <TabPane
+                    tab={
+                        <span>
+                            <Icon type="project" />
+                            Project
+                        </span>
+                    }
+                    key="project"
+                >
+                    <Kanban />
+                </TabPane>
 
-            <TabPane
-                tab={
-                    <span>
-                        <Icon type="history" />
-                        History
-                    </span>
-                }
-                key="history"
-            >
-                <History />
-            </TabPane>
+                <TabPane
+                    tab={
+                        <span>
+                            <Icon type="history" />
+                            History
+                        </span>
+                    }
+                    key="history"
+                >
+                    <History />
+                </TabPane>
 
-            <TabPane
-                tab={
-                    <span>
-                        <Icon type="setting" />
-                        Setting
-                    </span>
-                }
-                key="setting"
-            >
-                <Setting />
-            </TabPane>
-            {/*{process.env.NODE_ENV !== 'production' ? (*/}
-            <TabPane
-                tab={
-                    <span>
-                        <Icon type="bar-chart" />
-                        Analyser
-                    </span>
-                }
-                key="analyser"
-            >
-                <Analyser />
-            </TabPane>
-            {/*) : (*/}
-            {/*    undefined*/}
-            {/*)}*/}
-        </Tabs>
+                <TabPane
+                    tab={
+                        <span>
+                            <Icon type="setting" />
+                            Setting
+                        </span>
+                    }
+                    key="setting"
+                >
+                    <Setting />
+                </TabPane>
+                {/*{process.env.NODE_ENV !== 'production' ? (*/}
+                <TabPane
+                    tab={
+                        <span>
+                            <Icon type="bar-chart" />
+                            Analyser
+                        </span>
+                    }
+                    key="analyser"
+                >
+                    <Analyser />
+                </TabPane>
+                {/*) : (*/}
+                {/*    undefined*/}
+                {/*)}*/}
+            </Tabs>
+        </Main>
     );
 };
 

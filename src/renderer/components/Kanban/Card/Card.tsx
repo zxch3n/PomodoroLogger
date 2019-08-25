@@ -6,7 +6,7 @@ import formatMarkdown from './formatMarkdown';
 
 const CardContainer = styled.div`
     background-color: white;
-    margin: 8px;
+    margin: 8px 4px;
     border-radius: 6px;
 
     h1 {

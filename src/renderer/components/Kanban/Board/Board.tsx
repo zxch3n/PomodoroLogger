@@ -6,9 +6,8 @@ import List from '../List';
 import { Button } from 'antd';
 
 const Container = styled.div`
-    height: 500px;
-    width: 1800px;
-    border: 1px solid #0074d9;
+    height: 100%;
+    width: 100%;
 `;
 
 const ListContainer = styled.div`
@@ -66,11 +65,11 @@ export const Board: FC<Props> = (props: Props) => {
                                 />
                             ))}
                             {provided.placeholder}
+                            <Button onClick={addList}>Add List</Button>
                         </ListContainer>
                     )}
                 </Droppable>
             </DragDropContext>
-            <Button onClick={addList}>Add List</Button>
         </Container>
     );
 };
