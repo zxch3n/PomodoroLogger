@@ -23,13 +23,13 @@ for (const db in DBs) {
                 return;
             }
 
-            if (times > 10) {
+            if (times > 13) {
                 throw new Error(
                     `Cannot load database ${db} after 10 times tries. (${err.toString()})`
                 );
             }
 
-            setTimeout(load, 0);
+            setTimeout(load, 100);
             times += 1;
         });
     };
