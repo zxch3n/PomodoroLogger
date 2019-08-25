@@ -8,8 +8,8 @@ import dbs from '../../../dbs';
 
 const db = new AsyncDB(dbs.cardsDB);
 beforeEach(async () => {
-    if (existsSync(dbPaths.cardsDBPath)) {
-        await promisify(unlink)(dbPaths.cardsDBPath).catch(() => {});
+    if (existsSync(dbPaths.cardsDB)) {
+        await promisify(unlink)(dbPaths.cardsDB).catch(() => {});
     }
 
     if (!existsSync(dbBaseDir)) {

@@ -19,12 +19,12 @@ if (!existsSync(dbBaseDir)) {
 }
 
 export const dbPaths = {
-    projectDBPath: join(dbBaseDir, 'projects.nedb'),
-    sessionDBPath: join(dbBaseDir, 'session.nedb'),
-    settingDBPath: join(dbBaseDir, 'setting.nedb'),
-    kanbanDBPath: join(dbBaseDir, 'kanban.nedb'),
-    cardsDBPath: join(dbBaseDir, 'cards.nedb'),
-    listsDBPath: join(dbBaseDir, 'lists.nedb')
+    projectDB: join(dbBaseDir, 'projects.nedb'),
+    sessionDB: join(dbBaseDir, 'session.nedb'),
+    settingDB: join(dbBaseDir, 'setting.nedb'),
+    kanbanDB: join(dbBaseDir, 'kanban.nedb'),
+    cardsDB: join(dbBaseDir, 'cards.nedb'),
+    listsDB: join(dbBaseDir, 'lists.nedb')
 };
 
 let asarDirName;
@@ -44,7 +44,6 @@ if (dir.endsWith('.asar')) {
 }
 
 export const env = {
-    isWorker: false,
     electronAsarDir: asarDirName ? join(asarDirName, 'electron.asar') : undefined,
     appAsarDir: asarDirName ? join(asarDirName, 'app.asar') : undefined
 };

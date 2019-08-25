@@ -53,7 +53,9 @@ export abstract class BaseWorker {
             if (timeout !== undefined) {
                 setTimeout(() => {
                     if (isDone) return;
-                    reject(new Error(`Timeout for ${JSON.stringify(postMsg)}`));
+                    reject(
+                        new Error(`Timeout ${timeout} ms after message ${JSON.stringify(postMsg)}`)
+                    );
                 }, timeout);
             }
         });

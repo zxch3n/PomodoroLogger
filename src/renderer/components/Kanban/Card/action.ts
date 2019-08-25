@@ -2,7 +2,8 @@ import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { AsyncDB } from '../../../../utils/dbHelper';
 import dbs from '../../../dbs';
-const db = new AsyncDB(dbs.cardsDB);
+import { DBWorker } from '../../../workers/DBWorker';
+const db = new DBWorker('cardsDB');
 
 export interface Card {
     _id: string;

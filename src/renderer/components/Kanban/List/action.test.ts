@@ -10,8 +10,8 @@ import { Dispatch } from 'redux';
 
 jest.setTimeout(10000);
 beforeEach(async () => {
-    if (existsSync(dbPaths.listsDBPath)) {
-        await promisify(unlink)(dbPaths.listsDBPath).catch(() => {});
+    if (existsSync(dbPaths.listsDB)) {
+        await promisify(unlink)(dbPaths.listsDB).catch(() => {});
     }
 
     if (!existsSync(dbBaseDir)) {

@@ -12,7 +12,7 @@ import { dbPaths } from '../../../config';
 import { existsSync, unlinkSync } from 'fs';
 import { PomodoroRecord } from '../../monitor/type';
 
-const { projectDBPath } = dbPaths;
+const { projectDB } = dbPaths;
 
 describe('Reducer', () => {
     it('has default state', () => {
@@ -43,8 +43,8 @@ describe('Reducer', () => {
 
 describe('On timerFinished', () => {
     beforeAll(() => {
-        if (existsSync(projectDBPath)) {
-            unlinkSync(projectDBPath);
+        if (existsSync(projectDB)) {
+            unlinkSync(projectDB);
         }
     });
 

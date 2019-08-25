@@ -17,11 +17,11 @@ import { existsSync, mkdir, unlink } from 'fs';
 import { dbBaseDir, dbPaths } from '../../../config';
 import { promisify } from 'util';
 import { PomodoroRecord } from '../../monitor/type';
-const { projectDBPath } = dbPaths;
+const { projectDB } = dbPaths;
 
 beforeEach(async () => {
-    if (existsSync(projectDBPath)) {
-        await promisify(unlink)(projectDBPath).catch(() => {});
+    if (existsSync(projectDB)) {
+        await promisify(unlink)(projectDB).catch(() => {});
     }
 
     if (!existsSync(dbBaseDir)) {

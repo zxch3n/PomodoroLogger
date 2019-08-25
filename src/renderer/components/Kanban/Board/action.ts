@@ -1,12 +1,11 @@
 import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
-import { AsyncDB } from '../../../../utils/dbHelper';
 import { actions as listActions } from '../List/action';
 import { actions as cardActions } from '../Card/action';
-import dbs from '../../../dbs';
+import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
 
-const db = new AsyncDB(dbs.kanbanDB);
+const db = new DBWorker('kanbanDB');
 type ListId = string;
 
 export interface KanbanBoard {

@@ -9,8 +9,8 @@ import { AsyncDB } from '../../../../utils/dbHelper';
 
 const db = new AsyncDB(dbs.kanbanDB);
 beforeEach(async () => {
-    if (existsSync(dbPaths.kanbanDBPath)) {
-        await promisify(unlink)(dbPaths.kanbanDBPath).catch(() => {});
+    if (existsSync(dbPaths.kanbanDB)) {
+        await promisify(unlink)(dbPaths.kanbanDB).catch(() => {});
     }
 
     if (!existsSync(dbBaseDir)) {

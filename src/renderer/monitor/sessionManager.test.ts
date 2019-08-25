@@ -3,13 +3,13 @@ import { dbPaths } from '../../config';
 import { existsSync, unlinkSync } from 'fs';
 import { generateRandomName } from '../utils';
 import { PomodoroRecord } from './type';
-const { sessionDBPath } = dbPaths;
+const { sessionDB } = dbPaths;
 
 describe('sessionManager', () => {
     beforeAll(() => {
-        if (existsSync(sessionDBPath)) {
+        if (existsSync(sessionDB)) {
             try {
-                unlinkSync(sessionDBPath);
+                unlinkSync(sessionDB);
             } catch (e) {}
         }
     });
