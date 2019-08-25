@@ -55,11 +55,11 @@ export const Card: FC<Props> = (props: Props) => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                         >
-                            <CardContent
-                                dangerouslySetInnerHTML={{
-                                    __html: formatMarkdown(`# title\n${content}`)
-                                }}
-                            />
+                            <CardContent>
+                                <h1>{props.title}</h1>
+                                <p>{props._id}</p>
+                                <p>{props.content}</p>
+                            </CardContent>
                         </CardContainer>
                         {isDraggingOver && provided.placeholder}
                     </>

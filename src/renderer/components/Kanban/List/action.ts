@@ -119,17 +119,19 @@ export const actions = {
     ) => {
         dispatch(moveCard(fromListId, toListId, fromIndex, toIndex));
         const from: List = await db.findOne({ _id: fromListId });
-        const [rm] = from.cards.splice(fromIndex, 1);
+        const fromCards = from.cards;
+        const [rm] = fromCards.splice(fromIndex, 1);
         if (fromListId === toListId) {
-            from.cards.splice(toIndex, 0, rm);
-            await db.update({ _id: fromListId }, { $set: { cards: from.cards } }, {});
+            fromCards.splice(toIndex, 0, rm);
+            await db.update({ _id: fromListId }, { $set: { cards: fromCards } }, {});
             return;
         }
 
         const dest: List = await db.findOne({ _id: toListId });
-        dest.cards.splice(toIndex, 0, rm);
-        await db.update({ _id: fromListId }, { $set: { cards: from.cards } }, {});
-        await db.update({ _id: toListId }, { $set: { cards: dest.cards } }, {});
+        const destCards = dest.cards;
+        destCards.splice(toIndex, 0, rm);
+        await db.update({ _id: fromListId }, { $set: { cards: fromCards } }, {});
+        await db.update({ _id: toListId }, { $set: { cards: destCards } }, {});
     },
     renameList: (_id: string, title: string) => async (dispatch: Dispatch) => {
         dispatch(renameList(_id, title));

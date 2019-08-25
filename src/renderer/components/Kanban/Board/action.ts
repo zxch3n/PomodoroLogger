@@ -114,9 +114,10 @@ export const actions = {
     moveList: (_id: string, fromIndex: number, toIndex: number) => async (dispatch: Dispatch) => {
         dispatch(moveList(_id, fromIndex, toIndex));
         const board: KanbanBoard = await db.findOne({ _id });
-        const [del] = board.lists.splice(fromIndex, 1);
-        board.lists.splice(toIndex, 0, del);
-        await db.update({ _id }, { $set: { lists: board.lists } });
+        const lists = board.lists;
+        const [del] = lists.splice(fromIndex, 1);
+        lists.splice(toIndex, 0, del);
+        await db.update({ _id }, { $set: { lists } });
     },
     renameBoard: (_id: string, name: string) => async (dispatch: Dispatch) => {
         dispatch(renameBoard(_id, name));

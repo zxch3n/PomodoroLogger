@@ -9,16 +9,20 @@ const Container = styled.div`
     padding: 8px;
     margin: 12px;
     border-radius: 8px;
-    background-color: blue;
+    background-color: white;
 `;
 
 const ListHead = styled.div`
-    width: 145px;
+    width: 180px;
     background-color: white;
     border-radius: 8px;
 `;
 
-const Cards = styled.div``;
+const Cards = styled.div`
+    padding: 12px 4px;
+    background-color: #dedede;
+    border-radius: 6px;
+`;
 
 export interface InputProps {
     listId: string;
@@ -60,10 +64,12 @@ export const List: FC<Props> = (props: Props) => {
                                         />
                                     ))}
                                     {provided.placeholder}
+                                    <div style={{ margin: '0 auto', textAlign: 'center' }}>
+                                        <Button onClick={addCard} shape={'circle'} icon="plus" />
+                                    </div>
                                 </Cards>
                             )}
                         </Droppable>
-                        <Button onClick={addCard}>Add Card</Button>
                     </Container>
                     {provided.placeholder}
                 </div>
