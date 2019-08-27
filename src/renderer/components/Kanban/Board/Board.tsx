@@ -8,13 +8,25 @@ import { Button } from 'antd';
 const Container = styled.div`
     height: 100%;
     width: 100%;
+    overflow-x: auto;
 `;
 
 const ListContainer = styled.div`
-    padding: 12px;
     display: flex;
     flex-direction: row;
     align-content: space-around;
+`;
+
+const ListPlaceholder = styled.div`
+    margin: 4px;
+    max-height: 4em;
+    min-width: 200px;
+    border-radius: 8px;
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 export interface InputProps {
@@ -65,7 +77,9 @@ export const Board: FC<Props> = (props: Props) => {
                                 />
                             ))}
                             {provided.placeholder}
-                            <Button onClick={addList}>Add List</Button>
+                            <ListPlaceholder>
+                                <Button onClick={addList} icon={'plus'} shape="circle-outline" />
+                            </ListPlaceholder>
                         </ListContainer>
                     )}
                 </Droppable>

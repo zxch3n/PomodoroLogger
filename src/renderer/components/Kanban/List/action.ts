@@ -136,10 +136,12 @@ export const actions = {
         dispatch(renameList(_id, title));
         await db.update({ _id }, { $set: { title } });
     },
-    addCard: (_id: string, cardTitle: string) => async (dispatch: Dispatch) => {
+    addCard: (_id: string, cardTitle: string, cardContent?: string) => async (
+        dispatch: Dispatch
+    ) => {
         const cardId = shortid.generate();
         dispatch(addCard(_id, cardId));
-        await cardAction.addCard(cardId, cardTitle)(dispatch);
+        await cardAction.addCard(cardId, cardTitle, cardContent)(dispatch);
         await db.update({ _id }, { $push: { cards: cardId } }, {});
     },
     addCardById: (_id: string, cardId: string) => async (dispatch: Dispatch) => {

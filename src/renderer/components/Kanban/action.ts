@@ -8,7 +8,7 @@ const defaultState: KanbanState = {};
 
 const setChosenBoardId = createActionCreator(
     '[BOARD]SET_CHOSEN_BOARD_ID',
-    resolve => (_id: string) => resolve({ _id })
+    resolve => (_id?: string) => resolve({ _id })
 );
 
 export const actions = {

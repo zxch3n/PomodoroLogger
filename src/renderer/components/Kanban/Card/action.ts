@@ -24,8 +24,9 @@ const addSession = createActionCreator(
         resolve({ _id, sessionId, spentTime })
 );
 
-const addCard = createActionCreator('[Card]ADD', resolve => (_id: string, title?: string) =>
-    resolve({ _id, title })
+const addCard = createActionCreator(
+    '[Card]ADD',
+    resolve => (_id: string, title?: string, content?: string) => resolve({ _id, title, content })
 );
 
 const renameCard = createActionCreator('[Card]RENAME', resolve => (_id: string, title: string) =>
@@ -85,12 +86,12 @@ export const actions = {
         dispatch(deleteCard(_id));
         await db.remove({ _id });
     },
-    addCard: (_id: string, title: string) => async (dispatch: Dispatch) => {
-        dispatch(addCard(_id, title));
+    addCard: (_id: string, title: string, content: string = '') => async (dispatch: Dispatch) => {
+        dispatch(addCard(_id, title, content));
         await db.insert({
             _id,
             title,
-            content: '',
+            content,
             sessionIds: [],
             spentTimeInHour: {
                 estimated: 0,
@@ -101,13 +102,13 @@ export const actions = {
 };
 
 export const cardReducer = createReducer<CardsState, any>({}, handle => [
-    handle(addCard, (state, { payload: { _id, title = '' } }) => {
+    handle(addCard, (state, { payload: { _id, title = '', content = '' } }) => {
         return {
             ...state,
             [_id]: {
                 _id,
                 title,
-                content: '',
+                content,
                 sessionIds: [],
                 spentTimeInHour: {
                     actual: 0,

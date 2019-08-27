@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
-import { Button } from 'antd';
+import { Button, Icon } from 'antd';
 
 const Container = styled.div`
     padding: 4px;
@@ -13,16 +13,50 @@ const Container = styled.div`
 `;
 
 const ListHead = styled.div`
+    height: 4em;
     width: 250px;
     padding: 4px 12px;
     background-color: white;
     border-radius: 6px;
+    position: relative;
+
+    h1 {
+        position: absolute;
+        top: 20px;
+        transform: translateY(-50%);
+        left: 8px;
+    }
+
+    .list-head-icon {
+        position: absolute;
+        top: 20px;
+        transform: translateY(-50%);
+        right: 8px;
+        cursor: pointer;
+    }
+
+    .list-head-icon:hover {
+        color: #0074d9;
+    }
 `;
 
 const Cards = styled.div`
-    padding: 2px 2px;
+    padding: 0 2px;
     background-color: #dedede;
     border-radius: 4px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+`;
+
+const ButtonWrapper = styled.div`
+    textalign: center;
+    position: sticky;
+    left: 50%;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    background-color: #dedede;
+    border-radius: 0 0 4px 4px;
 `;
 
 export interface InputProps {
@@ -34,7 +68,7 @@ export interface InputProps {
 interface Props extends ListType, InputProps, ListActionTypes {}
 export const List: FC<Props> = (props: Props) => {
     const addCard = () => {
-        props.addCard(props._id, 'TestCard');
+        props.addCard(props._id, 'TestCard', 'testConetn saf sf 1 2 3 4 test 0 1 2 3 4');
     };
 
     return (
@@ -44,9 +78,9 @@ export const List: FC<Props> = (props: Props) => {
                     <Container ref={provided.innerRef} {...provided.draggableProps}>
                         <ListHead {...provided.dragHandleProps}>
                             <h1>{props.title} </h1>
-                            <p>
-                                {props.listId} {props._id} {props.index}
-                            </p>
+                            <span className="list-head-icon">
+                                <Icon type="menu" />
+                            </span>
                         </ListHead>
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => (
@@ -61,9 +95,9 @@ export const List: FC<Props> = (props: Props) => {
                                         />
                                     ))}
                                     {provided.placeholder}
-                                    <div style={{ margin: '0 auto', textAlign: 'center' }}>
+                                    <ButtonWrapper>
                                         <Button onClick={addCard} shape={'circle'} icon="plus" />
-                                    </div>
+                                    </ButtonWrapper>
                                 </Cards>
                             )}
                         </Droppable>
