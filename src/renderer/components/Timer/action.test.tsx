@@ -50,9 +50,9 @@ describe('On timerFinished', () => {
 
     it('will add data to DB', async () => {
         const record: PomodoroRecord = {
+            _id: '_id',
             startTime: new Date().getTime(),
-            todoId: generateRandomName(),
-            projectId: generateRandomName(),
+            boardId: generateRandomName(),
             spentTimeInHour: 10,
             apps: {
                 Chrome: {
@@ -70,9 +70,7 @@ describe('On timerFinished', () => {
         const thunk = actions.timerFinished(record);
         await thunk(x => x);
         const sessions = await getAllSession();
-        const found = sessions.find(
-            v => v.startTime === record.startTime && v.todoId === record.todoId
-        );
+        const found = sessions.find(v => v.startTime === record.startTime);
         expect(found).not.toBeUndefined();
     });
 });

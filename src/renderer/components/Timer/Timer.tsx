@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Divider, Icon, Layout, message } from 'antd';
 import Progress from './Progress';
-import { ProjectActionTypes, ProjectItem } from '../Project/action';
+import { KanbanActionTypes } from '../Kanban/action';
+import { KanbanBoard, BoardActionTypes } from '../Kanban/Board/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
@@ -11,7 +12,6 @@ import { BrowserWindow, nativeImage, remote } from 'electron';
 import AppIcon from '../../../res/icon.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
-import { TodoList } from '../Project/Project';
 import { getIdFromProjectName } from '../../dbs';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
@@ -21,6 +21,7 @@ import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
+import List from '../Kanban/List';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
@@ -69,7 +70,7 @@ const MoreInfo = styled.div`
     margin: 10px auto;
 `;
 
-export interface Props extends ThisActionTypes, ProjectActionTypes, RootState {}
+export interface Props extends ThisActionTypes, KanbanActionTypes, RootState, BoardActionTypes {}
 
 function to2digits(num: number) {
     if (num < 10) {
@@ -334,7 +335,7 @@ class Timer extends Component<Props, State> {
         this.monitor.stop();
         this.monitor.clear();
         this.monitor = undefined;
-        if (this.props.timer.project === undefined) {
+        if (this.props.timer.boardId === undefined) {
             this.props.inferProject(thisSession);
         }
 
@@ -355,15 +356,18 @@ class Timer extends Component<Props, State> {
             }
         }
 
-        if (this.props.timer.project !== undefined) {
-            this.stagedSession.projectId = await getIdFromProjectName(
-                this.props.timer.project
-            ).catch(() => undefined);
+        if (this.props.timer.boardId !== undefined) {
+            this.stagedSession.boardId = this.props.timer.boardId;
+            const kanban = this.props.kanban;
+            const cards: string[] =
+                kanban.lists[kanban.boards[this.props.timer.boardId].focusedList].cards;
+            await this.props.timerFinished(this.stagedSession, cards, this.props.timer.boardId);
+        } else {
+            await this.props.timerFinished(this.stagedSession);
         }
 
         const finishedSessions = this.state.pomodorosToday.concat([this.stagedSession]);
         this.setState({ pomodorosToday: finishedSessions });
-        await this.props.timerFinished(this.stagedSession, this.props.timer.project);
         this.stagedSession = undefined;
     };
 
@@ -410,17 +414,9 @@ class Timer extends Component<Props, State> {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
-        const projectItem: ProjectItem = this.props.timer.project
-            ? this.props.project.projectList[this.props.timer.project]
-            : {
-                spentHours: 0,
-                name: 'All TODOs',
-                applicationSpentTime: {},
-                todoList: joinDict(
-                      Object.values(this.props.project.projectList).map(v => v.todoList)
-                  ),
-                _id: 'All TODOs'
-            };
+        const kanbanBoard: KanbanBoard | undefined = this.props.timer.boardId
+            ? this.props.kanban.boards[this.props.timer.boardId]
+            : undefined;
         for (const pomodoro of pomodorosToday) {
             for (const appName in pomodoro.apps) {
                 if (!(appName in apps)) {
@@ -436,6 +432,9 @@ class Timer extends Component<Props, State> {
 
         const shownLeftTime =
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
+        const boardId = this.props.kanban.kanban.chosenBoardId;
+        const listId =
+            boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
         return (
             <Layout style={{ backgroundColor: 'white' }}>
                 <TimerMask
@@ -455,14 +454,18 @@ class Timer extends Component<Props, State> {
                     style={{
                         border: '1px solid rgb(240, 240, 240)',
                         borderRadius: 8,
-                        display: this.props.timer.project ? undefined : 'none'
+                        display: this.props.timer.boardId ? undefined : 'none'
                     }}
                 >
                     <div style={{ padding: 12 }}>
                         <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
-                            {this.props.timer.project}
+                            {this.props.timer.boardId}
                         </h1>
-                        <TodoList {...this.props} project={projectItem} />
+                        {listId === undefined || boardId === undefined ? (
+                            undefined
+                        ) : (
+                            <List index={0} boardId={boardId} listId={listId} />
+                        )}
                     </div>
                 </Sider>
                 <TimerLayout ref={this.mainDiv}>
@@ -496,7 +499,7 @@ class Timer extends Component<Props, State> {
                     </ProgressContainer>
 
                     <div style={{ margin: '2em auto', textAlign: 'center' }}>
-                        <FocusSelector {...this.props} width={240} />
+                        <FocusSelector width={240} />
                     </div>
                     <ButtonRow>
                         <div id="start-timer-button" style={{ lineHeight: 0 }}>

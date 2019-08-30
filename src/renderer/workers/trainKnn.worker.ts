@@ -36,7 +36,7 @@ async function getRecords() {
         });
     });
 
-    return records.filter(r => r.projectId !== undefined);
+    return records.filter(r => r.boardId !== undefined);
 }
 
 let knn = new KNN();

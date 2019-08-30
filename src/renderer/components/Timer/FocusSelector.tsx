@@ -1,30 +1,32 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { Select } from 'antd';
+import { actions as kanbanActions } from '../Kanban/action';
+import { KanbanState } from '../Kanban/reducer';
 import { ProjectActionTypes } from '../Project/action';
 import { TimerActionTypes as TimerActions } from './action';
 import { RootState } from '../../reducers';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 const { Option } = Select;
 
-interface Props extends ProjectActionTypes, TimerActions, RootState {
+interface Props {
     width?: number;
+    chosenId: string | undefined;
+    kanban: KanbanState;
+    setId: (id?: string) => any;
 }
-export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
+
+const mFocusSelector: FunctionComponent<Props> = (props: Props) => {
     const onChange = (value?: string) => {
-        props.setProject(value);
+        props.setId(value);
     };
 
-    const options = Object.values(props.project.projectList).map(v => (
-        <Option key={v.name} value={v.name} className="focus-option">
+    const options = Object.values(props.kanban.boards).map(v => (
+        <Option key={v._id} value={v._id} className="focus-option">
             {v.name}
         </Option>
     ));
-
-    useEffect(() => {
-        if (options.length === 0) {
-            props.fetchAll();
-        }
-    }, []);
 
     let style: any = {
         minWidth: 100,
@@ -37,7 +39,7 @@ export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
 
     return (
         <Select
-            value={props.timer.project}
+            value={props.chosenId}
             style={style}
             placeholder="Choose Your Focus"
             onChange={onChange}
@@ -55,3 +57,13 @@ export const FocusSelector: FunctionComponent<Props> = (props: Props) => {
         </Select>
     );
 };
+
+export const FocusSelector = connect(
+    (state: RootState) => ({
+        chosenId: state.kanban.kanban.chosenBoardId,
+        kanban: state.kanban
+    }),
+    (dispatch: Dispatch) => ({
+        setId: (id?: string) => dispatch(kanbanActions.setChosenBoardId(id))
+    })
+)(mFocusSelector);

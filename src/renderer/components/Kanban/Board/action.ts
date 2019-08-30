@@ -7,19 +7,41 @@ import shortid from 'shortid';
 
 const db = new DBWorker('kanbanDB');
 type ListId = string;
+type SessionId = string;
+
+export interface AggInfo {
+    lastUpdatedTime: number;
+    spentTime: number;
+    appSpentTime: { [app: string]: number };
+    keywordWeights: { [key: string]: number };
+}
 
 export interface KanbanBoard {
     _id: string;
     name: string;
     spentHours: number;
     lists: ListId[]; // lists id in order
+    focusedList: string;
+    relatedSessions: SessionId[];
+    aggInfo?: AggInfo;
 }
+
+const defaultBoard: KanbanBoard = {
+    _id: '',
+    lists: [],
+    name: '',
+    focusedList: '',
+
+    relatedSessions: [],
+    spentHours: 0
+};
 
 export type KanbanBoardState = { [_id: string]: KanbanBoard };
 
 const addBoard = createActionCreator(
     '[Board]ADD',
-    resolve => (_id: string, name: string, lists: string[]) => resolve({ _id, name, lists })
+    resolve => (_id: string, name: string, lists: string[], focusedList: string) =>
+        resolve({ _id, name, lists, focusedList })
 );
 
 const setBoardMap = createActionCreator(
@@ -47,14 +69,26 @@ const deleteList = createActionCreator('[Board]DEL_LIST', resolve => (_id, listI
     resolve({ _id, listId })
 );
 
+const onTimerFinished = createActionCreator(
+    '[Board]ON_TIMER_FINISHED',
+    resolve => (_id: string, sessionId: string) => resolve({ _id, sessionId })
+);
+
+const updateAggInfo = createActionCreator(
+    '[Board]UPDATE_AGG_INFO',
+    resolve => (_id: string, aggInfo: AggInfo) => resolve({ _id, aggInfo })
+);
+
 export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
-    handle(addBoard, (state, { payload: { _id, name, lists = [] } }) => ({
+    handle(addBoard, (state, { payload: { _id, name, lists, focusedList } }) => ({
         ...state,
         [_id]: {
             _id,
             name,
             lists,
-            spentHours: 0
+            focusedList,
+            spentHours: 0,
+            relatedSessions: []
         }
     })),
 
@@ -95,6 +129,16 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         const newState = { ...state };
         newState[_id].lists = newState[_id].lists.filter(v => v !== listId);
         return newState;
+    }),
+
+    handle(onTimerFinished, (state, { payload: { _id, sessionId } }) => {
+        return {
+            ...state,
+            [_id]: {
+                ...state[_id],
+                relatedSessions: state[_id].relatedSessions.concat([sessionId])
+            }
+        };
     })
 ]);
 
@@ -149,13 +193,14 @@ export const actions = {
             await listActions.addList(listId, name)(dispatch);
             lists.push(listId);
         }
-        dispatch(addBoard(_id, name, lists));
+        dispatch(addBoard(_id, name, lists, lists[1]));
 
         await db.insert({
+            ...defaultBoard,
             _id,
             name,
             lists,
-            spentHours: 0
+            focusedList: lists[1]
         } as KanbanBoard);
     },
 
@@ -163,6 +208,19 @@ export const actions = {
         dispatch: Dispatch
     ) => {
         await listActions.moveCard(fromListId, toListId, fromIndex, toIndex)(dispatch);
+    },
+
+    onTimerFinished: (
+        _id: string,
+        sessionId: string,
+        timeSpent: number,
+        cardIds: string[]
+    ) => async (dispatch: Dispatch) => {
+        dispatch(onTimerFinished(_id, sessionId));
+        await db.update({ _id }, { $push: { relatedSessions: sessionId } });
+        for (const cardId of cardIds) {
+            await cardActions.onTimerFinished(cardId, sessionId, timeSpent)(dispatch);
+        }
     }
 };
 

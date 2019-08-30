@@ -2,6 +2,7 @@ import { ApplicationSpentTime, PomodoroRecord } from './type';
 import { ActiveWinListener } from './activeWinMonitor';
 import { BaseResult } from 'active-win';
 import { getScreen } from './screenshot';
+import shortid from 'shortid';
 
 function removeAppSuffix(name: string) {
     return name.replace(/\.exe$/g, '');
@@ -21,6 +22,7 @@ export class UsageRecorder {
 
     constructor(monitorListener: Listener, screenShotInterval?: number) {
         this.record = {
+            _id: shortid.generate(),
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
@@ -39,6 +41,7 @@ export class UsageRecorder {
 
     clear = () => {
         this.record = {
+            _id: shortid.generate(),
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,

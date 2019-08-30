@@ -131,8 +131,8 @@ export const getTimeSpentDataFromRecords = async (
     const projectTimeCounter = new Counter();
     const UNK = 'UNK[qqwe]';
     for (const pomodoro of pomodoros) {
-        if (pomodoro.projectId) {
-            projectTimeCounter.add(pomodoro.projectId, pomodoro.spentTimeInHour);
+        if (pomodoro.boardId) {
+            projectTimeCounter.add(pomodoro.boardId, pomodoro.spentTimeInHour);
         } else {
             projectTimeCounter.add(UNK, pomodoro.spentTimeInHour);
         }

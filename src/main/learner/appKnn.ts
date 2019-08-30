@@ -67,7 +67,7 @@ export function getAppProjectPairs(records: PomodoroRecord[]): AppProjectPair[] 
             });
         }
 
-        const project: string | undefined = v.projectId;
+        const project: string | undefined = v.boardId;
         return {
             project,
             apps: pairs

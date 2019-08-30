@@ -17,6 +17,7 @@ import { existsSync, mkdir, unlink } from 'fs';
 import { dbBaseDir, dbPaths } from '../../../config';
 import { promisify } from 'util';
 import { PomodoroRecord } from '../../monitor/type';
+import shortid from 'shortid';
 const { projectDB } = dbPaths;
 
 beforeEach(async () => {
@@ -140,7 +141,8 @@ describe('Project thunk actionCreator', () => {
         const now = new Date().getTime();
         const createRecord = (id: string, day: number): PomodoroRecord => {
             return {
-                projectId: id,
+                _id: shortid.generate(),
+                boardId: id,
                 startTime: now - day * 24 * 3600 * 1000 - 1000 * 60,
                 spentTimeInHour: 0.3,
                 apps: {},

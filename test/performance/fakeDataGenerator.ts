@@ -97,8 +97,9 @@ export function generate() {
         const apps = genApps(0.5);
         const record: PomodoroRecord = {
             apps,
+            _id: generateRandomName(),
             startTime: current - Math.random() * 24 * 3600 * 1000 * 365 * 3,
-            projectId: chosenProject._id,
+            boardId: chosenProject._id,
             switchTimes: Math.floor(Math.random() * 300),
             spentTimeInHour: 0.5
         };

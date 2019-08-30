@@ -90,7 +90,7 @@ export const TimerMask = (props: MaskProps) => {
                 <Row onClick={onProjectClick}>
                     {props.timer.isFocusing ? (
                         <Popover title="Project Name" content={content}>
-                            <ProjectName>{props.timer.project}</ProjectName>
+                            <ProjectName>{props.timer.boardId}</ProjectName>
                         </Popover>
                     ) : (
                         <ProjectName>Resting</ProjectName>

@@ -70,7 +70,7 @@ function consistencyCheck(record: PomodoroRecord) {
 }
 
 export async function addSession(record: PomodoroRecord) {
-    if (!record.projectId) {
+    if (!record.boardId) {
         // TODO: invoke ML inference
     }
     consistencyCheck(record);

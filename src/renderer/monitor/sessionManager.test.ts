@@ -16,39 +16,36 @@ describe('sessionManager', () => {
 
     it('addSession', async () => {
         const record: PomodoroRecord = {
-            projectId: generateRandomName(),
+            _id: generateRandomName(),
+            boardId: generateRandomName(),
             startTime: new Date().getTime(),
             apps: {},
             switchTimes: 0,
             screenStaticDuration: 0,
-            spentTimeInHour: 0,
-            todoId: generateRandomName()
+            spentTimeInHour: 0
         };
 
         await addSession(record);
         const sessions = await getAllSession();
-        const ans = sessions.find(v => v.projectId === record.projectId);
+        const ans = sessions.find(v => v.boardId === record.boardId);
         expect(ans).toBeTruthy();
-        if (ans) {
-            expect(ans.todoId).toBe(record.todoId);
-        }
     });
 
     it('removeSession', async () => {
         const record: PomodoroRecord = {
-            projectId: generateRandomName(),
+            _id: generateRandomName(),
+            boardId: generateRandomName(),
             startTime: new Date().getTime(),
             apps: {},
             switchTimes: 0,
             screenStaticDuration: 0,
-            spentTimeInHour: 0,
-            todoId: generateRandomName()
+            spentTimeInHour: 0
         };
 
         await addSession(record);
         await removeSession(record.startTime);
         const sessions = await getAllSession();
-        const ans = sessions.find(v => v.projectId === record.projectId);
+        const ans = sessions.find(v => v.boardId === record.boardId);
         expect(ans).toBeUndefined();
     });
 });

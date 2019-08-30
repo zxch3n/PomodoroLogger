@@ -4,13 +4,12 @@ import { actions as cardAction } from '../Card/action';
 import shortid from 'shortid';
 import { DBWorker } from '../../../workers/DBWorker';
 
-type CardId = string;
 const db = new DBWorker('listsDB');
 
 export interface List {
     _id: string;
     title: string;
-    cards: CardId[]; // lists id in order
+    cards: string[]; // lists id in order
 }
 
 export type ListsState = { [_id: string]: List };

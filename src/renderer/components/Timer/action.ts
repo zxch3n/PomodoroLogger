@@ -1,7 +1,7 @@
 import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
-import { actions as projectActions } from '../Project/action';
+import { actions as boardActions } from '../Kanban/Board/action';
 import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
 import dbs, { getNameFromProjectId } from '../../dbs';
@@ -21,7 +21,7 @@ export interface TimerState extends Setting {
     leftTime?: number;
     isFocusing: boolean;
     isRunning: boolean;
-    project?: string;
+    boardId?: string;
 
     currentTab: string;
 }
@@ -138,14 +138,21 @@ export const actions = {
             throwError
         );
     },
-    timerFinished: (sessionData?: PomodoroRecord, project?: string | undefined) => async (
-        dispatch: Dispatch
-    ) => {
+    timerFinished: (
+        sessionData?: PomodoroRecord,
+        cardIds: string[] = [],
+        boardId?: string | undefined
+    ) => async (dispatch: Dispatch) => {
         dispatch(timerFinished());
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
-            if (project !== undefined) {
-                projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
+            if (boardId !== undefined) {
+                boardActions.onTimerFinished(
+                    boardId,
+                    sessionData._id,
+                    sessionData.spentTimeInHour,
+                    cardIds
+                )(dispatch);
             }
 
             historyActions.addRecordToHistory(sessionData)(dispatch);

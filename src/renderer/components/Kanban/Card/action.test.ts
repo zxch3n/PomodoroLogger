@@ -26,7 +26,8 @@ describe("Cards' actions", () => {
             type: '[Card]ADD',
             payload: {
                 _id,
-                title: 'abc'
+                title: 'abc',
+                content: ''
             }
         });
 
