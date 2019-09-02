@@ -2,6 +2,7 @@ import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { actions as listActions } from '../List/action';
 import { actions as cardActions } from '../Card/action';
+import { actions as kanbanActions } from '../action';
 import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
 
@@ -177,6 +178,7 @@ export const actions = {
         await db.update({ _id }, { $push: { lists: listId } });
     },
     deleteBoard: (_id: string) => async (dispatch: Dispatch) => {
+        dispatch(kanbanActions.setChosenBoardId(undefined));
         dispatch(deleteBoard(_id));
         await db.remove({ _id });
     },

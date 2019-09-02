@@ -73,20 +73,35 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         <span>Overview</span>
                     </Menu.Item>
                     {Object.values(props.boards).map(board => {
-                        const onDelete = (event: any) => {
+                        const onDelete = () => {
                             props.deleteBoard(board._id);
-                            event.stopPropagation();
                         };
 
                         const onEdit = () => {
                             // TODO: Imp
                         };
 
+                        const stopPropagation = (event: any) => {
+                            event.stopPropagation();
+                        };
+
+                        const menu = (
+                            <Menu onClick={stopPropagation}>
+                                <Menu.Item>
+                                    <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
+                                        Delete
+                                    </Popconfirm>
+                                </Menu.Item>
+                            </Menu>
+                        );
+
                         return (
                             <Menu.Item key={board._id}>
                                 <MenuNameSpan>{board.name}</MenuNameSpan>
                                 <MenuIconSpan>
-                                    <Icon type={'menu'} />
+                                    <Dropdown overlay={menu}>
+                                        <Icon type={'menu'} />
+                                    </Dropdown>
                                 </MenuIconSpan>
                             </Menu.Item>
                         );
