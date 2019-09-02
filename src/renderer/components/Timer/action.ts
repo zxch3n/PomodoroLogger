@@ -51,7 +51,7 @@ export const setRestDuration = createActionCreator(
     '[Timer]SET_REST_DURATION',
     resolve => (duration: number) => resolve(duration)
 );
-export const setProject = createActionCreator('[Timer]SET_PROJECT', resolve => (project?: string) =>
+export const setBoardId = createActionCreator('[Timer]SET_PROJECT', resolve => (project?: string) =>
     resolve(project)
 );
 export const setMonitorInterval = createActionCreator(
@@ -76,9 +76,9 @@ export const actions = {
     stopTimer,
     continueTimer,
     clearTimer,
-    setProject,
     startTimer,
     switchFocusRestMode,
+    setBoardId,
     changeAppTab,
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
@@ -168,7 +168,7 @@ export const actions = {
         if (newProjectId !== undefined) {
             const newProject = await getNameFromProjectId(newProjectId);
             console.log('predicted type', newProject);
-            dispatch(setProject(newProject));
+            dispatch(setBoardId(newProject));
         }
     }
 };
@@ -231,6 +231,6 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isFocusing: !state.isFocusing
     })),
 
-    handle(setProject, (state, { payload }) => ({ ...state, project: payload })),
+    handle(setBoardId, (state, { payload }) => ({ ...state, boardId: payload })),
     handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload }))
 ]);

@@ -13,6 +13,7 @@ const CardContainer = styled.div`
 
 const CardContent = styled.div`
     padding: 0 12px 0 12px;
+    font-size: 14px;
 
     .card-icon {
         float: right;

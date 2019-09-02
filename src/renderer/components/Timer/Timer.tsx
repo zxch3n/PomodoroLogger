@@ -432,7 +432,7 @@ class Timer extends Component<Props, State> {
 
         const shownLeftTime =
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
-        const boardId = this.props.kanban.kanban.chosenBoardId;
+        const boardId = this.props.timer.boardId;
         const listId =
             boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
         return (
@@ -444,7 +444,7 @@ class Timer extends Component<Props, State> {
                     onStart={this.onMaskButtonClick}
                     pomodoroNum={this.state.pomodoroNum}
                     projects={Object.keys(this.props.project.projectList)}
-                    setProject={this.props.setProject}
+                    setProject={this.props.setBoardId}
                 />
 
                 <Sider

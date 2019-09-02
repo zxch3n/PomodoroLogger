@@ -1,9 +1,7 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Select } from 'antd';
-import { actions as kanbanActions } from '../Kanban/action';
 import { KanbanState } from '../Kanban/reducer';
-import { ProjectActionTypes } from '../Project/action';
-import { TimerActionTypes as TimerActions } from './action';
+import { actions as timerActions } from './action';
 import { RootState } from '../../reducers';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -60,10 +58,10 @@ const mFocusSelector: FunctionComponent<Props> = (props: Props) => {
 
 export const FocusSelector = connect(
     (state: RootState) => ({
-        chosenId: state.kanban.kanban.chosenBoardId,
+        chosenId: state.timer.boardId,
         kanban: state.kanban
     }),
     (dispatch: Dispatch) => ({
-        setId: (id?: string) => dispatch(kanbanActions.setChosenBoardId(id))
+        setId: (id?: string) => dispatch(timerActions.setBoardId(id))
     })
 )(mFocusSelector);

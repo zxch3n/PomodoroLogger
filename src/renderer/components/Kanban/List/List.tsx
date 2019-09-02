@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
-import { Button, Icon } from 'antd';
+import { Button, Icon, Dropdown, Menu, Popconfirm } from 'antd';
 
 const Container = styled.div`
     padding: 4px;
@@ -70,6 +70,28 @@ export const List: FC<Props> = (props: Props) => {
     const addCard = () => {
         props.addCard(props._id, 'TestCard', 'testConetn saf sf 1 2 3 4 test 0 1 2 3 4');
     };
+
+    const onDelete = () => {
+        props.deleteList(props._id);
+    };
+
+    const onEdit = () => {
+        // TODO:
+    };
+
+    const menu = (
+        <Menu>
+            <Menu.Item key="1" onClick={onEdit}>
+                Edit
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item key="3">
+                <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
+                    Delete
+                </Popconfirm>
+            </Menu.Item>
+        </Menu>
+    );
 
     return (
         <Draggable draggableId={props.listId} index={props.index}>

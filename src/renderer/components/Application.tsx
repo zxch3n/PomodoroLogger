@@ -7,13 +7,14 @@ import History from './History';
 import Analyser from './Analyser';
 import { connect } from 'react-redux';
 import { actions as timerActions, TimerActionTypes } from './Timer/action';
-import { actions as projectActions, ProjectActionTypes } from './Project/action';
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
+import { kanbanActions } from './Kanban/reducer';
 import { genMapDispatchToProp } from '../utils';
 import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
 import { RootState } from '../reducers';
 import Kanban from './Kanban';
 import styled from 'styled-components';
+import Timer from './Timer';
 
 const Main = styled.div`
     .ant-tabs-bar {
@@ -23,15 +24,17 @@ const Main = styled.div`
 
 const { TabPane } = Tabs;
 
-interface Props extends TimerActionTypes, ProjectActionTypes, HistoryActionCreatorTypes {
+interface Props extends TimerActionTypes, HistoryActionCreatorTypes {
     currentTab: string;
+
+    fetchKanban: () => void;
 }
 
 const Application = (props: Props) => {
     React.useEffect(() => {
-        props.fetchAll();
         props.fetchSettings();
         props.fetchHistoryFromDisk();
+        props.fetchKanban();
         setTrayImageWithMadeIcon(undefined);
     }, []);
 
@@ -47,14 +50,14 @@ const Application = (props: Props) => {
                     }
                     key="timer"
                 >
-                    <Kanban />
+                    <Timer />
                 </TabPane>
 
                 <TabPane
                     tab={
                         <span>
                             <Icon type="project" />
-                            Project
+                            Kanban
                         </span>
                     }
                     key="project"
@@ -107,10 +110,10 @@ const Application = (props: Props) => {
 
 const ApplicationContainer = connect(
     (state: RootState) => ({ currentTab: state.timer.currentTab }),
-    genMapDispatchToProp<TimerActionTypes & ProjectActionTypes & HistoryActionCreatorTypes>({
+    genMapDispatchToProp<TimerActionTypes & HistoryActionCreatorTypes>({
         ...timerActions,
-        ...projectActions,
-        ...historyActions
+        ...historyActions,
+        fetchKanban: kanbanActions.boardActions.fetchBoards
     })
 )(Application);
 
