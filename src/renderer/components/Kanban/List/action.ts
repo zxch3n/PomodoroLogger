@@ -1,6 +1,7 @@
 import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { actions as cardAction } from '../Card/action';
+import { actions as boardActions } from '../Board/action';
 import shortid from 'shortid';
 import { DBWorker } from '../../../workers/DBWorker';
 
@@ -147,7 +148,12 @@ export const actions = {
         dispatch(addCard(_id, cardId));
         await db.update({ _id }, { $push: { cards: cardId } }, {});
     },
-    deleteList: (_id: string) => async (dispatch: Dispatch) => {
+    deleteList: (_id: string, boardId?: string) => async (dispatch: Dispatch) => {
+        if (boardId !== undefined) {
+            await boardActions.deleteList(boardId, _id)(dispatch);
+            return;
+        }
+
         dispatch(deleteList(_id));
         await db.remove({ _id });
     },

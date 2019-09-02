@@ -182,7 +182,7 @@ export const actions = {
     },
     deleteList: (_id: string, listId: string) => async (dispatch: Dispatch) => {
         dispatch(deleteList(_id, listId));
-        await listActions.deleteCard(_id, listId)(dispatch);
+        await listActions.deleteList(listId)(dispatch);
         await db.update({ _id }, { $pull: { lists: listId } });
     },
 

@@ -72,7 +72,7 @@ export const List: FC<Props> = (props: Props) => {
     };
 
     const onDelete = () => {
-        props.deleteList(props._id);
+        props.deleteList(props._id, props.boardId);
     };
 
     const onEdit = () => {
@@ -100,9 +100,11 @@ export const List: FC<Props> = (props: Props) => {
                     <Container ref={provided.innerRef} {...provided.draggableProps}>
                         <ListHead {...provided.dragHandleProps}>
                             <h1>{props.title} </h1>
-                            <span className="list-head-icon">
-                                <Icon type="menu" />
-                            </span>
+                            <Dropdown overlay={menu} trigger={['click']}>
+                                <span className="list-head-icon">
+                                    <Icon type="menu" />
+                                </span>
+                            </Dropdown>
                         </ListHead>
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => (
