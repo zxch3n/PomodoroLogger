@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Icon, Layout, message } from 'antd';
+import { Divider, Icon, message } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { KanbanBoard, BoardActionTypes } from '../Kanban/Board/action';
@@ -23,7 +23,6 @@ import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
 import Board from '../Kanban/Board';
 
-const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
 const ProgressTextContainer = styled.div`
@@ -36,6 +35,22 @@ const ProgressTextContainer = styled.div`
 const TimerLayout = styled.div`
     max-width: 1080px;
     margin: 10px auto;
+`;
+
+const MyLayout = styled.div`
+    display: flex;
+    flex: auto;
+    flex-direction: row;
+`;
+
+const MySider = styled.aside`
+    flex: 0 0 300px;
+    padding: 6px;
+    border-right: 1px solid #dfdfdf;
+    background-color: #eaeaea;
+    height: calc(100vh - 45px);
+    float: left;
+    display: inline-block;
 `;
 
 const ProgressContainer = styled.div`
@@ -436,7 +451,7 @@ class Timer extends Component<Props, State> {
         const listId =
             boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
         return (
-            <Layout style={{ backgroundColor: 'white' }}>
+            <MyLayout style={{ backgroundColor: 'white' }}>
                 <TimerMask
                     showMask={showMask}
                     onCancel={this.onMaskClick}
@@ -450,24 +465,12 @@ class Timer extends Component<Props, State> {
                 {listId === undefined || boardId === undefined ? (
                     undefined
                 ) : (
-                    <Sider
-                        breakpoint="md"
-                        collapsedWidth="0"
-                        theme="light"
-                        style={{
-                            border: '1px solid rgb(240, 240, 240)',
-                            borderRadius: 8,
-                            display: this.props.timer.boardId ? undefined : 'none',
-                            flex: '0 0 300px'
-                        }}
-                    >
-                        <div style={{ padding: 12 }}>
-                            <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
-                                {this.props.kanban.boards[boardId].name}
-                            </h1>
-                            <Board boardId={boardId} doesOnlyShowFocusedList={true} />
-                        </div>
-                    </Sider>
+                    <MySider>
+                        <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
+                            {this.props.kanban.boards[boardId].name}
+                        </h1>
+                        <Board boardId={boardId} doesOnlyShowFocusedList={true} />
+                    </MySider>
                 )}
                 <TimerLayout ref={this.mainDiv}>
                     <ProgressContainer>
@@ -547,7 +550,7 @@ class Timer extends Component<Props, State> {
                         />
                     </MoreInfo>
                 </TimerLayout>
-            </Layout>
+            </MyLayout>
         );
     }
 }
