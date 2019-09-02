@@ -21,7 +21,7 @@ import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
-import List from '../Kanban/List';
+import Board from '../Kanban/Board';
 
 const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
@@ -447,27 +447,28 @@ class Timer extends Component<Props, State> {
                     setProject={this.props.setBoardId}
                 />
 
-                <Sider
-                    breakpoint="md"
-                    collapsedWidth="0"
-                    theme="light"
-                    style={{
-                        border: '1px solid rgb(240, 240, 240)',
-                        borderRadius: 8,
-                        display: this.props.timer.boardId ? undefined : 'none'
-                    }}
-                >
-                    <div style={{ padding: 12 }}>
-                        <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
-                            {this.props.timer.boardId}
-                        </h1>
-                        {listId === undefined || boardId === undefined ? (
-                            undefined
-                        ) : (
-                            <List index={0} boardId={boardId} listId={listId} />
-                        )}
-                    </div>
-                </Sider>
+                {listId === undefined || boardId === undefined ? (
+                    undefined
+                ) : (
+                    <Sider
+                        breakpoint="md"
+                        collapsedWidth="0"
+                        theme="light"
+                        style={{
+                            border: '1px solid rgb(240, 240, 240)',
+                            borderRadius: 8,
+                            display: this.props.timer.boardId ? undefined : 'none',
+                            flex: '0 0 300px'
+                        }}
+                    >
+                        <div style={{ padding: 12 }}>
+                            <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
+                                {this.props.kanban.boards[boardId].name}
+                            </h1>
+                            <Board boardId={boardId} doesOnlyShowFocusedList={true} />
+                        </div>
+                    </Sider>
+                )}
                 <TimerLayout ref={this.mainDiv}>
                     <ProgressContainer>
                         <Progress

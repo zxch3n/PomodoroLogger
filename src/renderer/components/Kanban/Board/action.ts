@@ -84,12 +84,11 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
     handle(addBoard, (state, { payload: { _id, name, lists, focusedList } }) => ({
         ...state,
         [_id]: {
+            ...defaultBoard,
             _id,
             name,
             lists,
-            focusedList,
-            spentHours: 0,
-            relatedSessions: []
+            focusedList
         }
     })),
 

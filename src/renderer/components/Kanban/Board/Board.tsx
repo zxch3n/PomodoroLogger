@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { KanbanBoard, BoardActionTypes } from './action';
 import styled from 'styled-components';
 import List from '../List';
@@ -31,6 +31,7 @@ const ListPlaceholder = styled.div`
 
 export interface InputProps {
     boardId: string;
+    doesOnlyShowFocusedList?: boolean;
 }
 
 interface Props extends KanbanBoard, BoardActionTypes, InputProps {}
@@ -62,26 +63,34 @@ export const Board: FC<Props> = (props: Props) => {
         await props.addList(props._id, 'TestList');
     };
 
+    const { doesOnlyShowFocusedList = false } = props;
+    let lists;
+    if (doesOnlyShowFocusedList) {
+        lists = (provided: any) => (
+            <ListContainer ref={provided.innerRef}>
+                <List listId={props.focusedList} index={0} key={0} boardId={props.boardId} />
+                {provided.placeholder}
+            </ListContainer>
+        );
+    } else {
+        lists = (provided: any) => (
+            <ListContainer ref={provided.innerRef}>
+                {props.lists.map((listId, index) => (
+                    <List listId={listId} index={index} key={listId} boardId={props.boardId} />
+                ))}
+                {provided.placeholder}
+                <ListPlaceholder>
+                    <Button onClick={addList} icon={'plus'} shape="circle-outline" />
+                </ListPlaceholder>
+            </ListContainer>
+        );
+    }
+
     return (
         <Container>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId={props._id} type="COLUMN" direction="horizontal">
-                    {provided => (
-                        <ListContainer ref={provided.innerRef}>
-                            {props.lists.map((listId, index) => (
-                                <List
-                                    listId={listId}
-                                    index={index}
-                                    key={listId}
-                                    boardId={props.boardId}
-                                />
-                            ))}
-                            {provided.placeholder}
-                            <ListPlaceholder>
-                                <Button onClick={addList} icon={'plus'} shape="circle-outline" />
-                            </ListPlaceholder>
-                        </ListContainer>
-                    )}
+                    {lists}
                 </Droppable>
             </DragDropContext>
         </Container>
