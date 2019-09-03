@@ -21,6 +21,7 @@ export interface KanbanBoard {
     _id: string;
     name: string;
     spentHours: number;
+    description: string;
     lists: ListId[]; // lists id in order
     focusedList: string;
     relatedSessions: SessionId[];
@@ -32,6 +33,7 @@ const defaultBoard: KanbanBoard = {
     lists: [],
     name: '',
     focusedList: '',
+    description: '',
 
     relatedSessions: [],
     spentHours: 0
@@ -41,8 +43,13 @@ export type KanbanBoardState = { [_id: string]: KanbanBoard };
 
 const addBoard = createActionCreator(
     '[Board]ADD',
-    resolve => (_id: string, name: string, lists: string[], focusedList: string) =>
-        resolve({ _id, name, lists, focusedList })
+    resolve => (
+        _id: string,
+        name: string,
+        description: string,
+        lists: string[],
+        focusedList: string
+    ) => resolve({ _id, name, description, lists, focusedList })
 );
 
 const setBoardMap = createActionCreator(
@@ -76,17 +83,24 @@ const onTimerFinished = createActionCreator(
         resolve({ _id, sessionId, spentTime })
 );
 
+const editBoard = createActionCreator(
+    '[Board]EDIT',
+    resolve => (_id: string, name: string, description: string) =>
+        resolve({ _id, name, description })
+);
+
 const updateAggInfo = createActionCreator(
     '[Board]UPDATE_AGG_INFO',
     resolve => (_id: string, aggInfo: AggInfo) => resolve({ _id, aggInfo })
 );
 
 export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
-    handle(addBoard, (state, { payload: { _id, name, lists, focusedList } }) => ({
+    handle(addBoard, (state, { payload: { _id, name, description, lists, focusedList } }) => ({
         ...state,
         [_id]: {
             ...defaultBoard,
             _id,
+            description,
             name,
             lists,
             focusedList
@@ -141,7 +155,16 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
                 spentHours: state[_id].spentHours + spentTime
             }
         };
-    })
+    }),
+
+    handle(editBoard, (state, { payload: { _id, name, description } }) => ({
+        ...state,
+        [_id]: {
+            ...state[_id],
+            name,
+            description
+        }
+    }))
 ]);
 
 export const actions = {
@@ -189,18 +212,21 @@ export const actions = {
         await db.update({ _id }, { $pull: { lists: listId } });
     },
 
-    addBoard: (_id: string, name: string) => async (dispatch: Dispatch) => {
+    addBoard: (_id: string, name: string, description: string = '') => async (
+        dispatch: Dispatch
+    ) => {
         const lists = [];
         for (const name of ['TODO', 'In Progress', 'Done']) {
             const listId = shortid.generate();
             await listActions.addList(listId, name)(dispatch);
             lists.push(listId);
         }
-        dispatch(addBoard(_id, name, lists, lists[1]));
+        dispatch(addBoard(_id, name, description, lists, lists[1]));
 
         await db.insert({
             ...defaultBoard,
             _id,
+            description,
             name,
             lists,
             focusedList: lists[1]
@@ -227,6 +253,11 @@ export const actions = {
         for (const cardId of cardIds) {
             await cardActions.onTimerFinished(cardId, sessionId, timeSpent)(dispatch);
         }
+    },
+
+    editBoard: (_id: string, name: string, description: string) => async (dispatch: Dispatch) => {
+        dispatch(editBoard(_id, name, description));
+        await db.update({ _id }, { $set: { name, description } });
     }
 };
 
