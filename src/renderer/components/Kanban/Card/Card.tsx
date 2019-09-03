@@ -5,6 +5,8 @@ import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
 import { Icon, Divider, Dropdown, Menu } from 'antd';
 import formatMarkdown from './formatMarkdown';
+import { Badge } from './Badge';
+import { formatTime } from '../../../utils';
 
 const CardContainer = styled.div`
     background-color: white;
@@ -13,7 +15,7 @@ const CardContainer = styled.div`
 `;
 
 const CardContent = styled.div`
-    padding: 0 12px 0 12px;
+    padding: 2px 12px 4px 12px;
     font-size: 14px;
 
     .card-icon {
@@ -49,6 +51,7 @@ const CardContent = styled.div`
 
 const BadgerHolder = styled.div`
     min-height: 20px;
+    line-height: 12px;
 `;
 
 export interface InputProps {
@@ -104,7 +107,26 @@ export const Card: FC<Props> = (props: Props) => {
                                     }}
                                 />
                                 <Divider style={{ margin: 4 }} />
-                                <BadgerHolder>TODO:</BadgerHolder>
+                                <BadgerHolder>
+                                    {props.spentTimeInHour.estimated ? (
+                                        <Badge
+                                            type={'estimated'}
+                                            value={formatTime(props.spentTimeInHour.estimated)}
+                                            color={'#97ca00'}
+                                        />
+                                    ) : (
+                                        undefined
+                                    )}
+                                    {props.spentTimeInHour.actual ? (
+                                        <Badge
+                                            type={'actual'}
+                                            value={formatTime(props.spentTimeInHour.actual)}
+                                            color={'#007ec6'}
+                                        />
+                                    ) : (
+                                        undefined
+                                    )}
+                                </BadgerHolder>
                             </CardContent>
                         </CardContainer>
                         {isDraggingOver && provided.placeholder}

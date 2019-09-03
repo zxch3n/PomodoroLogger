@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import Card from '../Card';
 import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm } from 'antd';
 import { KanbanActionTypes } from '../action';
+import { CardsState } from '../Card/action';
 
 const Container = styled.div`
     padding: 4px;
@@ -16,7 +17,7 @@ const Container = styled.div`
 
 const ListHead = styled.div`
     height: 4em;
-    width: 250px;
+    min-width: 250px;
     padding: 4px 12px;
     background-color: white;
     border-radius: 6px;
@@ -48,6 +49,7 @@ const Cards = styled.div`
     border-radius: 4px;
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+    max-width: 270px;
 `;
 
 const ButtonWrapper = styled.div`
@@ -68,9 +70,21 @@ export interface InputProps {
     focused?: boolean;
 }
 
-interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes {}
+interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes {
+    searchReg?: string;
+    cardsState: CardsState;
+}
+
 export const List: FC<Props> = (props: Props) => {
-    const { focused = false } = props;
+    const { focused = false, searchReg, cards, cardsState } = props;
+    const filteredCards =
+        searchReg === undefined
+            ? cards
+            : cards.filter(id => {
+                const card = cardsState[id];
+                return card.title.match(searchReg) || card.content.match(searchReg);
+            });
+
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState('');
     const inputRef = useRef<Input>();
@@ -162,7 +176,7 @@ export const List: FC<Props> = (props: Props) => {
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => (
                                 <Cards ref={provided.innerRef}>
-                                    {props.cards.map((cardId, index) => (
+                                    {filteredCards.map((cardId, index) => (
                                         <Card
                                             cardId={cardId}
                                             index={index}

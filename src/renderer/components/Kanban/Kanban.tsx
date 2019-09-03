@@ -21,6 +21,7 @@ import Board from './Board';
 import styled from 'styled-components';
 import { SelectParam } from 'antd/lib/menu';
 import TextArea from 'antd/es/input/TextArea';
+import { SearchBar } from './SearchBar';
 
 const { Option } = Select;
 const { Sider, Content } = Layout;
@@ -220,6 +221,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                 />
             }
             <CardInDetail />
+            <SearchBar />
         </Layout>
     );
 };

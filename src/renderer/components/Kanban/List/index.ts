@@ -6,7 +6,11 @@ import { ListActionTypes, actions } from './action';
 import { genMapDispatchToProp } from '../../../utils';
 
 const mapStateToProps = (state: RootState, props: InputProps) => {
-    return { ...state.kanban.lists[props.listId] };
+    return {
+        ...state.kanban.lists[props.listId],
+        searchReg: state.kanban.kanban.searchReg,
+        cardsState: state.kanban.cards
+    };
 };
 
 const mapDispatchToProps = genMapDispatchToProp<ListActionTypes & KanbanActionTypes>({
