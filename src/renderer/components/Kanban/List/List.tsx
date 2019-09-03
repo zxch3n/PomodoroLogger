@@ -1,11 +1,11 @@
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FocusIcon from '../../../../res/Focus.svg';
-import React, { ChangeEvent, FC, useRef, useState } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
-import { Button, Icon, Dropdown, Menu, Popconfirm, Form, Modal, Input, message } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
+import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm } from 'antd';
+import { KanbanActionTypes } from '../action';
 
 const Container = styled.div`
     padding: 4px;
@@ -68,7 +68,7 @@ export interface InputProps {
     focused?: boolean;
 }
 
-interface Props extends ListType, InputProps, ListActionTypes {}
+interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes {}
 export const List: FC<Props> = (props: Props) => {
     const { focused = false } = props;
     const [isEditing, setIsEditing] = useState(false);
@@ -76,7 +76,7 @@ export const List: FC<Props> = (props: Props) => {
     const inputRef = useRef<Input>();
 
     const addCard = () => {
-        props.addCard(props._id, 'TestCard', 'testConetn saf sf 1 2 3 4 test 0 1 2 3 4');
+        props.setEditCard(true, props.listId, undefined);
     };
 
     const onDelete = () => {

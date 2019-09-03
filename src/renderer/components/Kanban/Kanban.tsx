@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useState, useRef } from 'react';
 import { KanbanActionTypes } from './action';
 import { KanbanState } from './reducer';
 import { BoardActionTypes, KanbanBoard } from './Board/action';
+import { CardInDetail } from './Card/CardInDetail';
 import {
     Button,
     Select,
@@ -218,6 +219,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                     isCreating={!editingBoardId}
                 />
             }
+            <CardInDetail />
         </Layout>
     );
 };

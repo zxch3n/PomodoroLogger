@@ -1,7 +1,6 @@
 import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
-import { AsyncDB } from '../../../../utils/dbHelper';
-import dbs from '../../../dbs';
+import { actions as listActions } from '../List/action';
 import { DBWorker } from '../../../workers/DBWorker';
 const db = new DBWorker('cardsDB');
 
@@ -96,7 +95,8 @@ export const actions = {
         dispatch(addActualTime(_id, plus));
         await db.update({ _id }, { $inc: { 'spentTimeInHour.actual': plus } });
     },
-    deleteCard: (_id: string) => async (dispatch: Dispatch) => {
+    deleteCard: (_id: string, listId: string) => async (dispatch: Dispatch) => {
+        await listActions.deleteCard(listId, _id)(dispatch);
         dispatch(deleteCard(_id));
         await db.remove({ _id });
     },
@@ -107,8 +107,11 @@ export const actions = {
         await db.update({ _id }, { $push: { sessionIds: sessionId } });
         await actions.addActualTime(_id, spentTimeInHour)(dispatch);
     },
-    addCard: (_id: string, title: string, content: string = '') => async (dispatch: Dispatch) => {
+    addCard: (_id: string, listId: string, title: string, content: string = '') => async (
+        dispatch: Dispatch
+    ) => {
         dispatch(addCard(_id, title, content));
+        await listActions.addCardById(listId, _id)(dispatch);
         await db.insert({
             _id,
             title,

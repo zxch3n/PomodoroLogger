@@ -141,8 +141,7 @@ export const actions = {
     ) => {
         const cardId = shortid.generate();
         dispatch(addCard(_id, cardId));
-        await cardAction.addCard(cardId, cardTitle, cardContent)(dispatch);
-        await db.update({ _id }, { $push: { cards: cardId } }, {});
+        await cardAction.addCard(cardId, _id, cardTitle, cardContent)(dispatch);
     },
     addCardById: (_id: string, cardId: string) => async (dispatch: Dispatch) => {
         dispatch(addCard(_id, cardId));
@@ -159,7 +158,6 @@ export const actions = {
     },
     deleteCard: (_id: string, cardId: string) => async (dispatch: Dispatch) => {
         dispatch(deleteCard(_id, cardId));
-        actions.deleteCard(_id, cardId)(dispatch);
         await db.update({ _id }, { $pull: { cards: cardId } }, {});
     },
     addList: (_id: string, title: string) => async (dispatch: Dispatch) => {

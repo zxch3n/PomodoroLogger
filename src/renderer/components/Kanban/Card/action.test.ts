@@ -21,7 +21,7 @@ describe("Cards' actions", () => {
     it('add card', async () => {
         const _id = shortid.generate();
         const dispatch = jest.fn();
-        await actions.addCard(_id, 'abc')(dispatch);
+        await actions.addCard(_id, '', 'abc')(dispatch);
         expect(dispatch.mock.calls[0][0]).toStrictEqual({
             type: '[Card]ADD',
             payload: {
@@ -39,8 +39,8 @@ describe("Cards' actions", () => {
     it('remove card', async () => {
         const _id = shortid.generate();
         const dispatch = jest.fn();
-        await actions.addCard(_id, 'abc')(dispatch);
-        await actions.deleteCard(_id)(dispatch);
+        await actions.addCard(_id, '', 'abc')(dispatch);
+        await actions.deleteCard(_id, '')(dispatch);
         expect(dispatch.mock.calls[1][0]).toStrictEqual({
             type: '[Card]DELETE_CARD',
             payload: {

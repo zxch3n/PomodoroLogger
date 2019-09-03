@@ -1,8 +1,9 @@
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import React, { FC } from 'react';
-import { Card as CardType } from './action';
+import { Card as CardType, CardActionTypes } from './action';
+import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
-import { Icon, Divider } from 'antd';
+import { Icon, Divider, Dropdown, Menu } from 'antd';
 import formatMarkdown from './formatMarkdown';
 
 const CardContainer = styled.div`
@@ -57,11 +58,24 @@ export interface InputProps {
     isDraggingOver: boolean;
 }
 
-interface Props extends CardType, InputProps {}
+interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {}
 export const Card: FC<Props> = (props: Props) => {
     const { index, listId, title, content, _id, isDraggingOver } = props;
-    const onMoreClick = () => {
-        // TODO:
+
+    const onDelete = () => {
+        props.deleteCard(props._id, props.listId);
+    };
+
+    const menu = (
+        <Menu>
+            <Menu.Item onClick={onDelete}>
+                <Icon type={'delete'} /> Delete
+            </Menu.Item>
+        </Menu>
+    );
+
+    const onClick = () => {
+        props.setEditCard(true, props.listId, props._id);
     };
 
     return (
@@ -73,15 +87,22 @@ export const Card: FC<Props> = (props: Props) => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            onClick={onClick}
                         >
                             <CardContent>
-                                <span className="card-icon">
-                                    <h1>
-                                        <Icon type="more" onClick={onMoreClick} />
-                                    </h1>
-                                </span>
+                                <Dropdown overlay={menu} trigger={['click']}>
+                                    <span className="card-icon">
+                                        <h1>
+                                            <Icon type="more" />
+                                        </h1>
+                                    </span>
+                                </Dropdown>
                                 <h1>{props.title}</h1>
-                                <p>{props.content}</p>
+                                <p
+                                    dangerouslySetInnerHTML={{
+                                        __html: formatMarkdown(props.content)
+                                    }}
+                                />
                                 <Divider style={{ margin: 4 }} />
                                 <BadgerHolder>TODO:</BadgerHolder>
                             </CardContent>
