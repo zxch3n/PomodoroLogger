@@ -1,9 +1,10 @@
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import React, { FC } from 'react';
+import React, { ChangeEvent, FC, useRef, useState } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
-import { Button, Icon, Dropdown, Menu, Popconfirm } from 'antd';
+import { Button, Icon, Dropdown, Menu, Popconfirm, Form, Modal, Input } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
 
 const Container = styled.div`
     padding: 4px;
@@ -67,6 +68,10 @@ export interface InputProps {
 
 interface Props extends ListType, InputProps, ListActionTypes {}
 export const List: FC<Props> = (props: Props) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [value, setValue] = useState('');
+    const inputRef = useRef<Input>();
+
     const addCard = () => {
         props.addCard(props._id, 'TestCard', 'testConetn saf sf 1 2 3 4 test 0 1 2 3 4');
     };
@@ -75,19 +80,34 @@ export const List: FC<Props> = (props: Props) => {
         props.deleteList(props._id, props.boardId);
     };
 
+    const onSave = () => {
+        props.renameList(props._id, value);
+        setIsEditing(false);
+    };
+
+    const onValueChange = (e: any) => {
+        setValue(e.target.value);
+    };
+
     const onEdit = () => {
-        // TODO:
+        setValue(props.title);
+        setIsEditing(true);
+        if (!inputRef.current) {
+            return;
+        }
+
+        inputRef.current.focus();
     };
 
     const menu = (
         <Menu>
             <Menu.Item key="1" onClick={onEdit}>
-                Edit
+                <Icon type={'setting'} /> Edit
             </Menu.Item>
             <Menu.Divider />
             <Menu.Item key="3">
                 <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
-                    Delete
+                    <Icon type={'delete'} /> Delete
                 </Popconfirm>
             </Menu.Item>
         </Menu>
@@ -99,12 +119,27 @@ export const List: FC<Props> = (props: Props) => {
                 <div>
                     <Container ref={provided.innerRef} {...provided.draggableProps}>
                         <ListHead {...provided.dragHandleProps}>
-                            <h1>{props.title} </h1>
-                            <Dropdown overlay={menu} trigger={['click']}>
-                                <span className="list-head-icon">
-                                    <Icon type="menu" />
-                                </span>
-                            </Dropdown>
+                            {isEditing ? (
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between'
+                                    }}
+                                >
+                                    <Input maxLength={25} value={value} onChange={onValueChange} />
+                                    <Button onClick={onSave}>Save</Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <h1>{props.title}</h1>
+                                    <Dropdown overlay={menu} trigger={['click']}>
+                                        <span className="list-head-icon">
+                                            <Icon type="menu" />
+                                        </span>
+                                    </Dropdown>
+                                </>
+                            )}
                         </ListHead>
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => (
