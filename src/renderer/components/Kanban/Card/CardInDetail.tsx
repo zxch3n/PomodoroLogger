@@ -4,9 +4,10 @@ import { Card, CardActionTypes, actions } from './action';
 import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
 import { genMapDispatchToProp } from '../../../utils';
-import { Form, Input, Modal } from 'antd';
+import { Form, Input, Modal, TimePicker } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
+import moment from 'moment';
 
 interface Props extends CardActionTypes {
     visible: boolean;
@@ -19,6 +20,7 @@ interface Props extends CardActionTypes {
 interface FormData {
     title: string;
     content: string;
+    estimatedTime?: moment.Moment;
 }
 
 const _CardInDetail: FC<Props> = (props: Props) => {
@@ -29,14 +31,17 @@ const _CardInDetail: FC<Props> = (props: Props) => {
         return <span style={{ display: 'none' }} />;
     }
 
-    const saveValues = ({ title, content }: FormData) => {
+    const saveValues = ({ title, content, estimatedTime }: FormData) => {
         if (!card) {
             // Creating
-            props.addCard(shortid.generate(), listId, title, content);
+            const _id = shortid.generate();
+            props.addCard(_id, listId, title, content);
+            props.setEstimatedTime(_id, estimatedTime ? estimatedTime.hours() : 0);
         } else {
             // Edit
             props.renameCard(card._id, title);
             props.setContent(card._id, content);
+            props.setEstimatedTime(card._id, estimatedTime ? estimatedTime.hours() : 0);
         }
     };
 
@@ -54,15 +59,18 @@ const _CardInDetail: FC<Props> = (props: Props) => {
 
     useEffect(() => {
         if (card) {
+            const time = card.spentTimeInHour.estimated;
             setFieldsValue({
                 title: card.title,
-                content: card.content
-            });
+                content: card.content,
+                estimatedTime: time ? moment(time.toString(), 'HH') : undefined
+            } as FormData);
         } else {
             setFieldsValue({
                 title: '',
-                content: ''
-            });
+                content: '',
+                estimatedTime: undefined
+            } as FormData);
         }
     }, [card]);
 
@@ -84,6 +92,9 @@ const _CardInDetail: FC<Props> = (props: Props) => {
                     {getFieldDecorator('content')(
                         <TextArea autosize={{ minRows: 3, maxRows: 5 }} />
                     )}
+                </Form.Item>
+                <Form.Item label="Estimated Time">
+                    {getFieldDecorator('estimatedTime')(<TimePicker format={'HH'} />)}
                 </Form.Item>
             </Form>
         </Modal>
