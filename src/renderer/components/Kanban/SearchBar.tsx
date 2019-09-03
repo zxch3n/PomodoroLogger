@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, ChangeEvent } from 'react';
+import React, { FC, useState, useRef, useEffect, ChangeEvent } from 'react';
 import { actions } from './action';
 import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
@@ -8,11 +8,13 @@ import Search from 'antd/es/input/Search';
 
 const Bar = styled.div`
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 60px;
+    right: 30px;
     z-index: 10000;
-    box-shadow: 0 0 10000px 10000px rgba(0, 0, 0, 0.4);
+
+    input {
+        box-shadow: 2px 2px 4px 4px rgba(40, 40, 40, 0.2);
+    }
 `;
 
 interface Props {
@@ -22,6 +24,7 @@ interface Props {
 
 const _SearchBar: FC<Props> = (props: Props) => {
     const [visible, setVisible] = useState(false);
+    const ref = useRef<Search>();
     useEffect(() => {
         window.addEventListener('keydown', event => {
             if (
@@ -30,6 +33,9 @@ const _SearchBar: FC<Props> = (props: Props) => {
             ) {
                 // Ctrl + F: Search
                 setVisible(true);
+                if (ref.current) {
+                    ref.current.focus();
+                }
             } else if (event.key === 'Escape' || event.which === 27 || event.code === 'Escape') {
                 setVisible(false);
             }
@@ -47,8 +53,9 @@ const _SearchBar: FC<Props> = (props: Props) => {
     return (
         <Bar style={{ display: visible ? undefined : 'none' }}>
             <Search
+                // @ts-ignore
+                ref={ref}
                 placeholder="input search text"
-                enterButton={true}
                 onSearch={onSearch}
                 onChange={onChange}
                 value={props.reg}
