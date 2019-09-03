@@ -76,7 +76,13 @@ export const Board: FC<Props> = (props: Props) => {
         lists = (provided: any) => (
             <ListContainer ref={provided.innerRef}>
                 {props.lists.map((listId, index) => (
-                    <List listId={listId} index={index} key={listId} boardId={props.boardId} />
+                    <List
+                        listId={listId}
+                        index={index}
+                        key={listId}
+                        boardId={props.boardId}
+                        focused={listId === props.focusedList}
+                    />
                 ))}
                 {provided.placeholder}
                 <ListPlaceholder>

@@ -1,9 +1,10 @@
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import FocusIcon from '../../../../res/Focus.svg';
 import React, { ChangeEvent, FC, useRef, useState } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
-import { Button, Icon, Dropdown, Menu, Popconfirm, Form, Modal, Input } from 'antd';
+import { Button, Icon, Dropdown, Menu, Popconfirm, Form, Modal, Input, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 
 const Container = styled.div`
@@ -64,10 +65,12 @@ export interface InputProps {
     listId: string;
     index: number;
     boardId: string;
+    focused?: boolean;
 }
 
 interface Props extends ListType, InputProps, ListActionTypes {}
 export const List: FC<Props> = (props: Props) => {
+    const { focused = false } = props;
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState('');
     const inputRef = useRef<Input>();
@@ -77,6 +80,11 @@ export const List: FC<Props> = (props: Props) => {
     };
 
     const onDelete = () => {
+        if (props.focused) {
+            message.warn('Cannot delete the focused list.');
+            return;
+        }
+
         props.deleteList(props._id, props.boardId);
     };
 
@@ -133,11 +141,21 @@ export const List: FC<Props> = (props: Props) => {
                             ) : (
                                 <>
                                     <h1>{props.title}</h1>
-                                    <Dropdown overlay={menu} trigger={['click']}>
-                                        <span className="list-head-icon">
+                                    <div className="list-head-icon">
+                                        {focused ? (
+                                            <span
+                                                style={{ color: 'red', marginRight: 8 }}
+                                                title={'Focused List'}
+                                            >
+                                                <Icon component={FocusIcon} />
+                                            </span>
+                                        ) : (
+                                            undefined
+                                        )}
+                                        <Dropdown overlay={menu} trigger={['click']}>
                                             <Icon type="menu" />
-                                        </span>
-                                    </Dropdown>
+                                        </Dropdown>
+                                    </div>
                                 </>
                             )}
                         </ListHead>
