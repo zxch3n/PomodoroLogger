@@ -4,7 +4,7 @@ import { addSession } from '../../monitor/sessionManager';
 import { actions as boardActions } from '../Kanban/Board/action';
 import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
-import dbs, { getNameFromProjectId } from '../../dbs';
+import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE } from '../../../config';
@@ -51,8 +51,9 @@ export const setRestDuration = createActionCreator(
     '[Timer]SET_REST_DURATION',
     resolve => (duration: number) => resolve(duration)
 );
-export const setBoardId = createActionCreator('[Timer]SET_PROJECT', resolve => (project?: string) =>
-    resolve(project)
+export const setBoardId = createActionCreator(
+    '[Timer]SET_BOARD_ID',
+    resolve => (boardId?: string) => resolve({ boardId })
 );
 export const setMonitorInterval = createActionCreator(
     '[Timer]SET_MONITOR_INTERVAL',
@@ -147,7 +148,7 @@ export const actions = {
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
             if (boardId !== undefined) {
-                boardActions.onTimerFinished(
+                await boardActions.onTimerFinished(
                     boardId,
                     sessionData._id,
                     sessionData.spentTimeInHour,
@@ -166,7 +167,7 @@ export const actions = {
         })) as string | undefined;
 
         if (newProjectId !== undefined) {
-            const newProject = await getNameFromProjectId(newProjectId);
+            const newProject = await getNameFromBoardId(newProjectId);
             console.log('predicted type', newProject);
             dispatch(setBoardId(newProject));
         }
@@ -231,6 +232,6 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isFocusing: !state.isFocusing
     })),
 
-    handle(setBoardId, (state, { payload }) => ({ ...state, boardId: payload })),
+    handle(setBoardId, (state, { payload: { boardId } }) => ({ ...state, boardId })),
     handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload }))
 ]);

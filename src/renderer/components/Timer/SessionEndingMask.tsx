@@ -1,8 +1,12 @@
-import { TimerState } from './action';
 import { Button, List, Popover, Row } from 'antd';
+import { actions } from '../Timer/action';
 import { PomodoroNumView } from './PomodoroNumView';
 import React from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
+import { RootState } from '../../reducers';
+import { KanbanBoardState } from '../Kanban/Board/action';
+import { Dispatch } from 'redux';
 
 const Mask = styled.div`
     left: 0;
@@ -45,21 +49,25 @@ const ListItem = styled.span`
     }
 `;
 
-export interface MaskProps {
+export interface InputProps {
     showMask: boolean;
     onCancel: () => void;
-    timer: TimerState;
     onStart: () => void;
     pomodoroNum: number;
-    setProject?: (project: string) => any;
-    projects?: string[];
 }
 
-export const TimerMask = (props: MaskProps) => {
-    const { projects = [], setProject = () => {} } = props;
+export interface MaskProps extends InputProps {
+    setBoard: any;
+    isFocusing: boolean;
+    boardId?: string;
+    boards: KanbanBoardState;
+}
+
+const _TimerMask = (props: MaskProps) => {
+    const { boards = [], setBoard = () => {} } = props;
     const renderItem = (item: string) => {
         const onClick = (event: React.MouseEvent) => {
-            setProject(item);
+            setBoard(item);
             event.stopPropagation();
             event.preventDefault();
         };
@@ -70,8 +78,13 @@ export const TimerMask = (props: MaskProps) => {
         );
     };
 
-    const content = projects.length ? (
-        <List size="small" bordered={true} dataSource={projects} renderItem={renderItem} />
+    const content = boards.length ? (
+        <List
+            size="small"
+            bordered={true}
+            dataSource={Object.values(boards).map(b => b.name)}
+            renderItem={renderItem}
+        />
     ) : (
         undefined
     );
@@ -88,9 +101,13 @@ export const TimerMask = (props: MaskProps) => {
         <Mask style={{ display: props.showMask ? 'flex' : 'none' }} onClick={props.onCancel}>
             <MaskInnerContainer>
                 <Row onClick={onProjectClick}>
-                    {props.timer.isFocusing ? (
+                    {props.isFocusing ? (
                         <Popover title="Project Name" content={content}>
-                            <ProjectName>{props.timer.boardId}</ProjectName>
+                            <ProjectName>
+                                {props.boardId === undefined
+                                    ? undefined
+                                    : props.boards[props.boardId].name}
+                            </ProjectName>
                         </Popover>
                     ) : (
                         <ProjectName>Resting</ProjectName>
@@ -100,7 +117,7 @@ export const TimerMask = (props: MaskProps) => {
                     </h1>
                 </Row>
                 <Button size="large" onClick={onStartClick}>
-                    Start {props.timer.isFocusing ? 'Resting' : 'Focusing'}
+                    Start {props.isFocusing ? 'Resting' : 'Focusing'}
                 </Button>
                 <Row style={{ marginTop: '2em' }}>
                     <h1 style={{ color: 'white' }}>Today Pomodoros</h1>
@@ -110,3 +127,14 @@ export const TimerMask = (props: MaskProps) => {
         </Mask>
     );
 };
+
+export const TimerMask = connect(
+    (state: RootState, props: InputProps) => ({
+        isFocusing: state.timer.isFocusing,
+        boardId: state.timer.boardId,
+        boards: state.kanban.boards
+    }),
+    (dispatch: Dispatch) => ({
+        setBoard: (_id?: string) => dispatch(actions.setBoardId(_id))
+    })
+)(_TimerMask);

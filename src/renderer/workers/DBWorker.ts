@@ -7,7 +7,7 @@ import { dbPaths } from '../../config';
 class TrueDBWorker extends BaseWorker {
     protected worker = new Worker();
 
-    constructor(private dbType: string) {
+    constructor(private dbType: keyof typeof dbPaths) {
         super();
     }
 

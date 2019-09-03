@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import echarts, { ECharts, EChartOption } from 'echarts';
 import { getBetterAppName } from '../../utils';
-import { getNameFromProjectId } from '../../dbs';
+import { getNameFromBoardId } from '../../dbs';
 import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
 
@@ -150,7 +150,7 @@ export const getTimeSpentDataFromRecords = async (
             continue;
         }
 
-        v.name = await getNameFromProjectId(v.name).catch(() => 'Unknown');
+        v.name = await getNameFromBoardId(v.name).catch(() => 'Unknown');
     }
 
     const appData = appTimeCounter

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Divider, Icon, message } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
-import { KanbanBoard, BoardActionTypes } from '../Kanban/Board/action';
+import { BoardActionTypes, KanbanBoard } from '../Kanban/Board/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
@@ -12,7 +12,6 @@ import { BrowserWindow, nativeImage, remote } from 'electron';
 import AppIcon from '../../../res/icon.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
-import { getIdFromProjectName } from '../../dbs';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
@@ -33,8 +32,16 @@ const ProgressTextContainer = styled.div`
 `;
 
 const TimerLayout = styled.div`
-    max-width: 1080px;
-    margin: 10px auto;
+    padding: 0 24px 0 24px;
+    height: calc(100vh - 45px);
+    overflow-y: auto;
+    width: 100%;
+`;
+
+const TimerInnerLayout = styled.div`
+    overflow-x: auto;
+    max-width: 850px;
+    margin: 0 auto;
 `;
 
 const MyLayout = styled.div`
@@ -455,11 +462,8 @@ class Timer extends Component<Props, State> {
                 <TimerMask
                     showMask={showMask}
                     onCancel={this.onMaskClick}
-                    timer={this.props.timer}
                     onStart={this.onMaskButtonClick}
                     pomodoroNum={this.state.pomodoroNum}
-                    projects={Object.keys(this.props.project.projectList)}
-                    setProject={this.props.setBoardId}
                 />
 
                 {listId === undefined || boardId === undefined ? (
@@ -473,82 +477,87 @@ class Timer extends Component<Props, State> {
                     </MySider>
                 )}
                 <TimerLayout ref={this.mainDiv}>
-                    <ProgressContainer>
-                        <Progress
-                            type="circle"
-                            strokeColor={{
-                                '0%': '#108ee9',
-                                '100%': '#87d068'
-                            }}
-                            percent={percent}
-                            width={300}
+                    <TimerInnerLayout>
+                        <ProgressContainer>
+                            <Progress
+                                type="circle"
+                                strokeColor={{
+                                    '0%': '#108ee9',
+                                    '100%': '#87d068'
+                                }}
+                                percent={percent}
+                                width={300}
+                                style={{
+                                    margin: '0 auto'
+                                }}
+                            >
+                                <ProgressTextContainer>
+                                    <div
+                                        style={{ marginBottom: 12 }}
+                                        key="leftTime"
+                                        id="left-time-text"
+                                    >
+                                        {shownLeftTime}
+                                    </div>
+                                    <WorkRestIcon
+                                        isWorking={this.props.timer.isFocusing}
+                                        onClick={this.switchMode}
+                                    />
+                                </ProgressTextContainer>
+                            </Progress>
+                        </ProgressContainer>
+
+                        <div style={{ margin: '2em auto', textAlign: 'center' }}>
+                            <FocusSelector width={240} />
+                        </div>
+                        <ButtonRow>
+                            <div id="start-timer-button" style={{ lineHeight: 0 }}>
+                                {isRunning ? (
+                                    <Icon
+                                        type="pause-circle"
+                                        title="Pause"
+                                        onClick={this.onStopResumeOrStart}
+                                    />
+                                ) : (
+                                    <Icon
+                                        type="play-circle"
+                                        title="Start"
+                                        onClick={this.onStopResumeOrStart}
+                                    />
+                                )}
+                            </div>
+                            <div id="clear-timer-button" style={{ lineHeight: 0 }}>
+                                <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                            </div>
+                            <Icon type="more" title="Show More" onClick={this.toggleMode} />
+                        </ButtonRow>
+
+                        <MoreInfo>
+                            <h2>Pomodoros Today</h2>
+                            <PomodoroNumView num={this.state.pomodorosToday.length} />
+                        </MoreInfo>
+
+                        <MoreInfo
                             style={{
-                                margin: '0 auto'
+                                display: more ? 'block' : 'none'
                             }}
                         >
-                            <ProgressTextContainer>
-                                <div
-                                    style={{ marginBottom: 12 }}
-                                    key="leftTime"
-                                    id="left-time-text"
-                                >
-                                    {shownLeftTime}
-                                </div>
-                                <WorkRestIcon
-                                    isWorking={this.props.timer.isFocusing}
-                                    onClick={this.switchMode}
-                                />
-                            </ProgressTextContainer>
-                        </Progress>
-                    </ProgressContainer>
+                            <h2>Time Spent</h2>
+                            <PomodoroDualPieChart
+                                pomodoros={this.state.pomodorosToday}
+                                width={800}
+                            />
+                            <Divider />
 
-                    <div style={{ margin: '2em auto', textAlign: 'center' }}>
-                        <FocusSelector width={240} />
-                    </div>
-                    <ButtonRow>
-                        <div id="start-timer-button" style={{ lineHeight: 0 }}>
-                            {isRunning ? (
-                                <Icon
-                                    type="pause-circle"
-                                    title="Pause"
-                                    onClick={this.onStopResumeOrStart}
-                                />
-                            ) : (
-                                <Icon
-                                    type="play-circle"
-                                    title="Start"
-                                    onClick={this.onStopResumeOrStart}
-                                />
-                            )}
-                        </div>
-                        <div id="clear-timer-button" style={{ lineHeight: 0 }}>
-                            <Icon type="close-circle" title="Clear" onClick={this.onClear} />
-                        </div>
-                        <Icon type="more" title="Show More" onClick={this.toggleMode} />
-                    </ButtonRow>
-
-                    <MoreInfo>
-                        <h2>Pomodoros Today</h2>
-                        <PomodoroNumView num={this.state.pomodorosToday.length} />
-                    </MoreInfo>
-
-                    <MoreInfo
-                        style={{
-                            display: more ? 'block' : 'none'
-                        }}
-                    >
-                        <h2>Time Spent</h2>
-                        <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={800} />
-                        <Divider />
-
-                        <h2>Word Cloud</h2>
-                        <AsyncWordCloud
-                            records={this.state.pomodorosToday}
-                            width={800}
-                            height={400}
-                            style={{ margin: '0 auto' }}
-                        />
-                    </MoreInfo>
+                            <h2>Word Cloud</h2>
+                            <AsyncWordCloud
+                                records={this.state.pomodorosToday}
+                                width={800}
+                                height={400}
+                                style={{ margin: '0 auto' }}
+                            />
+                        </MoreInfo>
+                    </TimerInnerLayout>
                 </TimerLayout>
             </MyLayout>
         );

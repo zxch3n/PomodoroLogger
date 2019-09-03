@@ -72,7 +72,8 @@ const deleteList = createActionCreator('[Board]DEL_LIST', resolve => (_id, listI
 
 const onTimerFinished = createActionCreator(
     '[Board]ON_TIMER_FINISHED',
-    resolve => (_id: string, sessionId: string) => resolve({ _id, sessionId })
+    resolve => (_id: string, sessionId: string, spentTime: number) =>
+        resolve({ _id, sessionId, spentTime })
 );
 
 const updateAggInfo = createActionCreator(
@@ -131,12 +132,13 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         return newState;
     }),
 
-    handle(onTimerFinished, (state, { payload: { _id, sessionId } }) => {
+    handle(onTimerFinished, (state, { payload: { _id, sessionId, spentTime } }) => {
         return {
             ...state,
             [_id]: {
                 ...state[_id],
-                relatedSessions: state[_id].relatedSessions.concat([sessionId])
+                relatedSessions: state[_id].relatedSessions.concat([sessionId]),
+                spentHours: state[_id].spentHours + spentTime
             }
         };
     })
@@ -217,8 +219,11 @@ export const actions = {
         timeSpent: number,
         cardIds: string[]
     ) => async (dispatch: Dispatch) => {
-        dispatch(onTimerFinished(_id, sessionId));
-        await db.update({ _id }, { $push: { relatedSessions: sessionId } });
+        dispatch(onTimerFinished(_id, sessionId, timeSpent));
+        await db.update(
+            { _id },
+            { $push: { relatedSessions: sessionId }, $inc: { spentHours: timeSpent } }
+        );
         for (const cardId of cardIds) {
             await cardActions.onTimerFinished(cardId, sessionId, timeSpent)(dispatch);
         }
