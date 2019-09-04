@@ -1,14 +1,47 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import React, { FC } from 'react';
-import { KanbanBoard, BoardActionTypes } from './action';
+import { BoardActionTypes, KanbanBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
+import { IdTrend } from '../../Project/ProjectTrend';
 
 const Container = styled.div`
     height: 100%;
     width: 100%;
     overflow-x: auto;
+`;
+
+const Header = styled.div`
+    margin: 6px;
+    display: flex;
+    flex-display: row;
+    justify-content: space-around;
+    align-content: flex-end;
+`;
+
+const TrendContainer = styled.div`
+    flex: available;
+`;
+
+const Description = styled.div`
+    flex: auto;
+    position: relative;
+    height: 45px;
+
+    p:hover {
+        background-color: rgba(40, 70, 250, 0.07);
+    }
+
+    p {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 8px;
+        background-color: rgba(40, 70, 250, 0.04);
+        line-height: calc(1em + 4px);
+        width: 100%;
+    }
 `;
 
 const ListContainer = styled.div`
@@ -94,6 +127,14 @@ export const Board: FC<Props> = (props: Props) => {
 
     return (
         <Container>
+            <Header>
+                <Description title={`Board ${props.name} description`}>
+                    <p>{props.description || <i>No description provided</i>}</p>
+                </Description>
+                <TrendContainer>
+                    <IdTrend boardId={props.boardId} height={40} />
+                </TrendContainer>
+            </Header>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId={props._id} type="COLUMN" direction="horizontal">
                     {lists}

@@ -68,7 +68,10 @@ describe('On timerFinished', () => {
         };
 
         const thunk = actions.timerFinished(record);
-        await thunk(x => x);
+        await thunk(x => {
+            console.log(x);
+            return x;
+        });
         const sessions = await getAllSession();
         const found = sessions.find(v => v.startTime === record.startTime);
         expect(found).not.toBeUndefined();

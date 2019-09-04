@@ -33,6 +33,7 @@ class TrueDBWorker extends BaseWorker {
     insert = this.genHandler('insert');
     update = this.genHandler('update');
     remove = this.genHandler('remove');
+    count = this.genHandler('count');
 }
 
 /**
