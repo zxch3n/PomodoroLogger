@@ -24,8 +24,12 @@ const ListHead = styled.div`
     position: relative;
 
     h1 {
+        margin: 0;
+    }
+
+    .list-head-text {
         position: absolute;
-        top: 20px;
+        top: 24px;
         transform: translateY(-50%);
         left: 8px;
     }
@@ -77,6 +81,16 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
 
 export const List: FC<Props> = (props: Props) => {
     const { focused = false, searchReg, cards, cardsState } = props;
+    const [estimatedTimeSum, actualTimeSum] = props.cards.reduce(
+        (l: [number, number], r: string) => {
+            return [
+                l[0] + props.cardsState[r].spentTimeInHour.estimated,
+                l[1] + props.cardsState[r].spentTimeInHour.actual
+            ] as [number, number];
+        },
+        [0, 0] as [number, number]
+    );
+    const overallTimeInfo = `${actualTimeSum.toFixed(1)}h / ${estimatedTimeSum.toFixed(1)}h`;
     const filteredCards =
         searchReg === undefined
             ? cards
@@ -154,7 +168,10 @@ export const List: FC<Props> = (props: Props) => {
                                 </div>
                             ) : (
                                 <>
-                                    <h1>{props.title}</h1>
+                                    <span className="list-head-text">
+                                        <h1>{props.title}</h1>
+                                        <span>{overallTimeInfo}</span>
+                                    </span>
                                     <div className="list-head-icon">
                                         {focused ? (
                                             <span
