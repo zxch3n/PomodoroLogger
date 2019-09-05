@@ -42,6 +42,12 @@ You can export / delete all your data in the settings.
 
 All the data is saved and processed **locally**.
 
+# Kanban Board
+
+Pomodoro Logger has integrated [Kanban Board](https://en.wikipedia.org/wiki/Kanban_board) to help you organize and estimate the time spent of your todos easily. 
+
+When creating a new todo card, you can set the estimated time spent. Pomodoro Logger will track the actual time spent for you by the **focused column** of Kanban Board. Every board has a focused column. When you finished a Pomodoro session of this board, this session will be connected to the cards of this focused column.
+
 # Download
 
 This project currently supports Windows and macOS.
@@ -63,16 +69,23 @@ yarn build
 # Screenshot
 
 
-<p align="center">
-  <img src="https://i.postimg.cc/J4dZyJNL/image.png" width="360"/>
-</p>
-<p align="center">
-  <img src="https://i.postimg.cc/L8cPDpQQ/image.png" width="360"/>
-</p>
-<p align="center">
-  <img src="https://i.postimg.cc/05S76rtM/image.png" width="360"/>
-</p>
+| **Pomodoro** |**Show Countdown in Tray**|
+|:-|:-|
+| <img src="https://i.postimg.cc/Fs87Gx0w/choose-Focuse.gif" width="256"/>|<img src="https://i.postimg.cc/LsMhF6CT/tray.png" width="256"/>|
+|**Session Finished**|**Switch Mode**|
+|<img src="https://i.postimg.cc/fT9wWQ0g/session-Finished.gif" height="256"/>|<img src="https://i.postimg.cc/DZp202gR/switch-Mode.gif" height="256"/>|
 
+| **Kanban Board**| **Draggable Card** |
+|:-| :- |
+| <img src="https://i.postimg.cc/rs136CfV/Kanban-Board.png" height="256"/>|  <img src="https://i.postimg.cc/7Zrqft3P/moving-Around.gif" height="256"/>|
+| **Estimate Your Time Spent**| **Search Your Cards**|
+| <img src="https://i.postimg.cc/HxRzScHp/todo.png" height="256"/>|  <img src="https://i.postimg.cc/CLBKZf97/search-Card.gif" height="256"/>|
+
+| **Visulization**|
+|:-|
+| <img src="https://i.postimg.cc/CKH5hT9V/vis.png" width="512"/>|
+| <img src="https://i.postimg.cc/d150CRqH/vis1.png" width="512"/>|
+  
 
 
 # License

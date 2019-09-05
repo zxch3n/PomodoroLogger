@@ -474,7 +474,11 @@ class Timer extends Component<Props, State> {
                         <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
                             {this.props.kanban.boards[boardId].name}
                         </h1>
-                        <Board boardId={boardId} doesOnlyShowFocusedList={true} />
+                        <Board
+                            boardId={boardId}
+                            doesOnlyShowFocusedList={true}
+                            showHeader={false}
+                        />
                     </MySider>
                 )}
                 <TimerLayout ref={this.mainDiv}>

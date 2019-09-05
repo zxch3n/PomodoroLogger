@@ -65,10 +65,12 @@ const ListPlaceholder = styled.div`
 export interface InputProps {
     boardId: string;
     doesOnlyShowFocusedList?: boolean;
+    showHeader?: boolean;
 }
 
 interface Props extends KanbanBoard, BoardActionTypes, InputProps {}
 export const Board: FC<Props> = (props: Props) => {
+    const { showHeader = true } = props;
     const handleDragEnd = ({ source, destination, type }: DropResult) => {
         // dropped outside the list
         if (!destination) {
@@ -127,14 +129,18 @@ export const Board: FC<Props> = (props: Props) => {
 
     return (
         <Container>
-            <Header>
-                <Description title={`Board ${props.name} description`}>
-                    <p>{props.description || <i>No description provided</i>}</p>
-                </Description>
-                <TrendContainer>
-                    <IdTrend boardId={props.boardId} height={40} />
-                </TrendContainer>
-            </Header>
+            {showHeader ? (
+                <Header>
+                    <Description title={`Board ${props.name} description`}>
+                        <p>{props.description || <i>No description provided</i>}</p>
+                    </Description>
+                    <TrendContainer>
+                        <IdTrend boardId={props.boardId} height={40} />
+                    </TrendContainer>
+                </Header>
+            ) : (
+                undefined
+            )}
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId={props._id} type="COLUMN" direction="horizontal">
                     {lists}
