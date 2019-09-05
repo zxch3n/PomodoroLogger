@@ -33,7 +33,6 @@ interface Props extends TimerActionTypes, HistoryActionCreatorTypes {
 const Application = (props: Props) => {
     React.useEffect(() => {
         props.fetchSettings();
-        props.fetchHistoryFromDisk();
         props.fetchKanban();
         setTrayImageWithMadeIcon(undefined);
     }, []);

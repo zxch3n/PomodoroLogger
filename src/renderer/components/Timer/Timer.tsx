@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Icon, message } from 'antd';
+import { Divider, Icon, message, Tooltip } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes, KanbanBoard } from '../Kanban/Board/action';
@@ -57,7 +57,6 @@ const MySider = styled.aside`
     background-color: #eaeaea;
     height: calc(100vh - 45px);
     float: left;
-    display: inline-block;
 `;
 
 const ProgressContainer = styled.div`
@@ -154,7 +153,9 @@ class Timer extends Component<Props, State> {
         });
 
         this.addMenuItems();
-        workers.knn.loadModel(this.props.history.records.length).catch(console.error);
+        workers.dbWorkers.sessionDB.count({}).then(size => {
+            workers.knn.loadModel(size).catch(console.error);
+        });
     }
 
     addMenuItems(): void {
@@ -533,30 +534,35 @@ class Timer extends Component<Props, State> {
                         </ButtonRow>
 
                         <MoreInfo>
-                            <h2>Pomodoros Today</h2>
-                            <PomodoroNumView num={this.state.pomodorosToday.length} />
+                            <Tooltip title="Pomodoros Today">
+                                <PomodoroNumView
+                                    num={this.state.pomodorosToday.length}
+                                    showNum={false}
+                                    animation={isRunning}
+                                />
+                            </Tooltip>
                         </MoreInfo>
 
-                        <MoreInfo
-                            style={{
-                                display: more ? 'block' : 'none'
-                            }}
-                        >
-                            <h2>Time Spent</h2>
-                            <PomodoroDualPieChart
-                                pomodoros={this.state.pomodorosToday}
-                                width={800}
-                            />
-                            <Divider />
+                        {more ? (
+                            <MoreInfo>
+                                <h2>Time Spent</h2>
+                                <PomodoroDualPieChart
+                                    pomodoros={this.state.pomodorosToday}
+                                    width={800}
+                                />
+                                <Divider />
 
-                            <h2>Word Cloud</h2>
-                            <AsyncWordCloud
-                                records={this.state.pomodorosToday}
-                                width={800}
-                                height={400}
-                                style={{ margin: '0 auto' }}
-                            />
-                        </MoreInfo>
+                                <h2>Word Cloud</h2>
+                                <AsyncWordCloud
+                                    records={this.state.pomodorosToday}
+                                    width={800}
+                                    height={400}
+                                    style={{ margin: '0 auto' }}
+                                />
+                            </MoreInfo>
+                        ) : (
+                            undefined
+                        )}
                     </TimerInnerLayout>
                 </TimerLayout>
             </MyLayout>

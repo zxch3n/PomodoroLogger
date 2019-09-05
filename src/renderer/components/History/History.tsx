@@ -3,10 +3,19 @@ import { Card, Col, Row, Select, Statistic } from 'antd';
 import { HistoryActionCreatorTypes } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
-import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
+import { DualPieChart, PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { RootState } from '../../reducers';
-import { getPomodoroCalendarData, getPomodoroCount } from './op';
-import { AsyncWordCloud } from '../Visualization/WordCloud';
+import {
+    AggPomodoroInfo,
+    getAggPomodoroInfo,
+    getPomodoroCalendarData,
+    getPomodoroCount,
+    TimeSpentData
+} from './op';
+import { AsyncWordCloud, WordCloud } from '../Visualization/WordCloud';
+import { PomodoroRecord } from '../../monitor/type';
+import { KanbanBoardState } from '../Kanban/Board/action';
+import { workers } from '../../workers';
 
 const { Option } = Select;
 
@@ -16,8 +25,25 @@ const Container = styled.div`
     padding: 20px;
 `;
 
-interface Props extends RootState, HistoryActionCreatorTypes {}
+interface Props extends HistoryActionCreatorTypes {
+    chosenId?: string;
+    boards: KanbanBoardState;
+}
+
 export const History: React.FunctionComponent<Props> = (props: Props) => {
+    const [aggInfo, setAggInfo] = useState<AggPomodoroInfo>({
+        count: {
+            day: 0,
+            month: 0,
+            week: 0
+        },
+        calendarCount: 0,
+        pieChart: {
+            appData: [],
+            projectData: []
+        },
+        wordWeights: []
+    });
     const container = useRef<HTMLDivElement>();
     const [calendarWidth, setCalendarWidth] = useState(800);
 
@@ -37,23 +63,37 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
         };
     };
 
-    useEffect(() => {
-        props.fetchHistoryFromDisk();
-    }, []);
     useEffect(resizeEffect, []);
+    useEffect(() => {
+        if (props.chosenId === undefined) {
+            workers.dbWorkers.sessionDB
+                .find({}, {})
+                .then(docs => {
+                    return getAggPomodoroInfo(docs);
+                })
+                .then((ans: AggPomodoroInfo) => {
+                    setAggInfo(ans);
+                });
+        } else {
+            workers.dbWorkers.sessionDB
+                .find({ boardId: props.chosenId }, {})
+                .then(docs => {
+                    return getAggPomodoroInfo(docs);
+                })
+                .then((ans: AggPomodoroInfo) => {
+                    setAggInfo(ans);
+                });
+        }
+    }, [props.chosenId]);
 
     const onChange = (v: string) => {
         props.setChosenProjectId(v);
     };
-    let pomodoros = props.history.records;
-    if (props.history.chosenProjectId !== undefined) {
-        // tslint:disable-next-line:no-parameter-reassignment
-        pomodoros = pomodoros.filter(v => v.boardId === props.history.chosenProjectId);
-    }
 
     const onProjectClick = (name: string) => {
-        if (name in props.project.projectList) {
-            props.setChosenProjectId(props.project.projectList[name]._id);
+        const v = Object.values(props.boards).find(v => v.name === name);
+        if (v) {
+            props.setChosenProjectId(v._id);
         }
     };
 
@@ -63,14 +103,14 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             <Row style={{ marginBottom: 20 }}>
                 <Select
                     onChange={onChange}
-                    value={props.history.chosenProjectId}
+                    value={props.chosenId}
                     style={{ width: 200 }}
                     placeholder={'Set Project Filter'}
                 >
                     <Option value={undefined} key="All Projects">
                         All Projects
                     </Option>
-                    {Object.values(props.project.projectList).map(v => {
+                    {Object.values(props.boards).map(v => {
                         return (
                             <Option value={v._id} key={v._id}>
                                 {v.name}
@@ -84,7 +124,7 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                     <Card>
                         <Statistic
                             title="Pomodoros Today"
-                            value={getPomodoroCount(0, props.history.records)}
+                            value={aggInfo.count.day}
                             precision={0}
                             valueStyle={{ color: '#3f8600' }}
                         />
@@ -94,7 +134,7 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                     <Card>
                         <Statistic
                             title="Pomodoros This Week"
-                            value={getPomodoroCount(new Date().getDay(), props.history.records)}
+                            value={aggInfo.count.week}
                             precision={0}
                             valueStyle={{ color: '#3f8600' }}
                         />
@@ -104,10 +144,7 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                     <Card>
                         <Statistic
                             title="Pomodoros This Month"
-                            value={getPomodoroCount(
-                                new Date().getDate() - 1,
-                                props.history.records
-                            )}
+                            value={aggInfo.count.month}
                             precision={0}
                             valueStyle={{ color: '#cf1322' }}
                         />
@@ -116,14 +153,14 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             </Row>
             {calendarWidth > 670 ? (
                 <React.Fragment>
-                    <GridCalendar data={getPomodoroCalendarData(pomodoros)} width={calendarWidth} />
-                    <PomodoroDualPieChart
-                        pomodoros={pomodoros}
+                    <GridCalendar data={aggInfo.calendarCount} width={calendarWidth} />
+                    <DualPieChart
+                        {...aggInfo.pieChart}
                         width={calendarWidth}
                         onProjectClick={onProjectClick}
                     />
-                    <AsyncWordCloud
-                        records={pomodoros}
+                    <WordCloud
+                        weights={aggInfo.wordWeights}
                         width={calendarWidth}
                         height={calendarWidth * 0.6}
                     />

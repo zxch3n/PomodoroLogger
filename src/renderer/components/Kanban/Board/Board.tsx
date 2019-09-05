@@ -4,7 +4,7 @@ import { BoardActionTypes, KanbanBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
-import { IdTrend } from '../../Project/ProjectTrend';
+import { IdTrend } from '../../Visualization/ProjectTrend';
 
 const Container = styled.div`
     height: 100%;
@@ -15,7 +15,7 @@ const Container = styled.div`
 const Header = styled.div`
     margin: 6px;
     display: flex;
-    flex-display: row;
+    flex-direction: row;
     justify-content: space-around;
     align-content: flex-end;
 `;

@@ -155,8 +155,6 @@ export const actions = {
                     cardIds
                 )(dispatch);
             }
-
-            historyActions.addRecordToHistory(sessionData)(dispatch);
         }
     },
     inferProject: (sessionData: PomodoroRecord) => async (dispatch: Dispatch) => {
