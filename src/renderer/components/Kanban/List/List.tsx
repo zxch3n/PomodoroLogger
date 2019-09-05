@@ -1,5 +1,6 @@
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FocusIcon from '../../../../res/Focus.svg';
+import DoneIcon from '../../../../res/done.svg';
 import React, { FC, useRef, useState } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
@@ -72,6 +73,7 @@ export interface InputProps {
     index: number;
     boardId: string;
     focused?: boolean;
+    done?: boolean;
 }
 
 interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes {
@@ -80,7 +82,7 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
 }
 
 export const List: FC<Props> = (props: Props) => {
-    const { focused = false, searchReg, cards, cardsState } = props;
+    const { focused = false, searchReg, cards, cardsState, done = false } = props;
     const [estimatedTimeSum, actualTimeSum] = props.cards.reduce(
         (l: [number, number], r: string) => {
             return [
@@ -177,6 +179,15 @@ export const List: FC<Props> = (props: Props) => {
                                             <Tooltip title={'Focused column'}>
                                                 <span style={{ color: 'red', marginRight: 8 }}>
                                                     <Icon component={FocusIcon} />
+                                                </span>
+                                            </Tooltip>
+                                        ) : (
+                                            undefined
+                                        )}
+                                        {done ? (
+                                            <Tooltip title={'Done column'}>
+                                                <span style={{ color: 'red', marginRight: 8 }}>
+                                                    <Icon component={DoneIcon} />
                                                 </span>
                                             </Tooltip>
                                         ) : (
