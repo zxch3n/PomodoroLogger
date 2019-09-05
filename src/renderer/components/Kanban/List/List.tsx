@@ -57,7 +57,7 @@ const Cards = styled.div`
 `;
 
 const ButtonWrapper = styled.div`
-    textalign: center;
+    text-align: center;
     position: sticky;
     left: 50%;
     bottom: 0;
@@ -174,12 +174,7 @@ export const List: FC<Props> = (props: Props) => {
                                     </span>
                                     <div className="list-head-icon">
                                         {focused ? (
-                                            <Tooltip
-                                                title={
-                                                    'Focused Column. Try to keep the cards of this column as few as ' +
-                                                    'possible to get a more precise insight.'
-                                                }
-                                            >
+                                            <Tooltip title={'Focused column'}>
                                                 <span style={{ color: 'red', marginRight: 8 }}>
                                                     <Icon component={FocusIcon} />
                                                 </span>

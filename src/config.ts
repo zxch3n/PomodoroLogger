@@ -24,7 +24,8 @@ export const dbPaths = {
     settingDB: join(dbBaseDir, 'setting.nedb'),
     kanbanDB: join(dbBaseDir, 'kanban.nedb'),
     cardsDB: join(dbBaseDir, 'cards.nedb'),
-    listsDB: join(dbBaseDir, 'lists.nedb')
+    listsDB: join(dbBaseDir, 'lists.nedb'),
+    moveDB: join(dbBaseDir, 'moveCard.nedb')
 };
 
 let asarDirName;

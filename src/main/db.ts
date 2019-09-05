@@ -1,14 +1,15 @@
 import nedb from 'nedb';
 import { dbPaths } from '../config';
 
-const { projectDB, sessionDB, settingDB, kanbanDB, cardsDB, listsDB } = dbPaths;
+const { projectDB, sessionDB, settingDB, kanbanDB, cardsDB, listsDB, moveDB } = dbPaths;
 export const DBs = {
     projectDB: new nedb({ filename: projectDB }),
     sessionDB: new nedb({ filename: sessionDB }),
     settingDB: new nedb({ filename: settingDB }),
     kanbanDB: new nedb({ filename: kanbanDB }),
     cardsDB: new nedb({ filename: cardsDB }),
-    listsDB: new nedb({ filename: listsDB })
+    listsDB: new nedb({ filename: listsDB }),
+    moveDB: new nedb({ filename: moveDB })
 };
 
 // Avoid nedb init error
