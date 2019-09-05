@@ -15,7 +15,7 @@ const Container = styled.div`
 const Header = styled.div`
     margin: 6px;
     display: flex;
-    flex-display: row;
+    flex-direction: row;
     justify-content: space-around;
     align-content: flex-end;
 `;
