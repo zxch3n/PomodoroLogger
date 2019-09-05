@@ -4,7 +4,7 @@ import { BoardActionTypes, KanbanBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
-import { IdTrend } from '../../Project/ProjectTrend';
+import { IdTrend } from '../../Visualization/ProjectTrend';
 
 const Container = styled.div`
     height: 100%;

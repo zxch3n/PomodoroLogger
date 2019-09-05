@@ -24,7 +24,6 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             return;
         }
 
-        console.log(`Training ${props.history.records.length} samples`);
         setIsTraining(true);
         setProgress(0);
         worker

@@ -1,5 +1,4 @@
 import { Dispatch } from 'redux';
-import { actions } from './components/Project/action';
 
 export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => (
     dispatch: Dispatch
@@ -25,10 +24,6 @@ export const generateRandomName = () => {
 
     return output.join('') as string;
 };
-
-export async function addProjectToDB(name: string) {
-    await executeThunkAction(actions.addItem(name));
-}
 
 export async function executeThunkAction(action: (dispatch: Dispatch) => void) {
     await new Promise(resolve => {
