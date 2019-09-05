@@ -53,6 +53,12 @@ export function formatTime(timeInHour: number) {
     return `${to2digits(hour)}h ${to2digits(minute)}m`;
 }
 
+export function formatTimeWithoutZero(timeInHour: number) {
+    const hour = Math.floor(timeInHour);
+    const minute = Math.floor((timeInHour - hour) * 60 + 0.5);
+    return `${hour}h ${minute}m`;
+}
+
 export function parseTime(formattedTime: string) {
     const matchedH = formattedTime.match(/(\d+)h/);
     const matchedM = formattedTime.match(/(\d+)m/);

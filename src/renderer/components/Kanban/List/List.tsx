@@ -186,7 +186,7 @@ export const List: FC<Props> = (props: Props) => {
                                         )}
                                         {done ? (
                                             <Tooltip title={'Done column'}>
-                                                <span style={{ color: 'red', marginRight: 8 }}>
+                                                <span style={{ color: 'green', marginRight: 8 }}>
                                                     <Icon component={DoneIcon} />
                                                 </span>
                                             </Tooltip>

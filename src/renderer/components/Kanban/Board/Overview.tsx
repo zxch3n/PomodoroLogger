@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { Card, CardsState } from '../Card/action';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import styled from 'styled-components';
+import { formatTime, formatTimeWithoutZero } from '../../../utils';
 
 const Container = styled.div``;
 
@@ -20,10 +21,10 @@ interface Props {
 interface AggBoardInfo {
     _id: string;
     name: string;
-    estimatedTimeSum: number | string;
-    actualTimeSum: number | string;
-    pomodoroCount: number | string;
-    meanPercentageError: number | string;
+    estimatedLeftTimeSum: number;
+    actualTimeSum: number;
+    pomodoroCount: number;
+    meanPercentageError?: number;
 }
 
 const columns = [
@@ -34,24 +35,42 @@ const columns = [
         key: 'name'
     },
     {
-        title: 'Estimated Hours',
-        dataIndex: 'estimatedTimeSum',
-        key: 'estimatedTimeSum'
+        title: 'Estimated Left Time',
+        dataIndex: 'estimatedLeftTimeSum',
+        key: 'estimatedLeftTimeSum',
+        render: formatTimeWithoutZero,
+        sorter: (a: AggBoardInfo, b: AggBoardInfo) =>
+            a.estimatedLeftTimeSum - b.estimatedLeftTimeSum
     },
     {
-        title: 'Actual Hours',
+        title: 'Spent Time',
         dataIndex: 'actualTimeSum',
-        key: 'actualTimeSum'
+        key: 'actualTimeSum',
+        render: formatTimeWithoutZero,
+        sorter: (a: AggBoardInfo, b: AggBoardInfo) => a.actualTimeSum - b.actualTimeSum
     },
     {
         title: 'Pomodoros',
         dataIndex: 'pomodoroCount',
-        key: 'pomodoroCount'
+        key: 'pomodoroCount',
+        sorter: (a: AggBoardInfo, b: AggBoardInfo) => a.pomodoroCount - b.pomodoroCount
     },
     {
         title: 'Mean Estimate Error',
         dataIndex: 'meanPercentageError',
-        key: 'meanPercentageError'
+        key: 'meanPercentageError',
+        render: (text?: number) => {
+            if (text === undefined) {
+                return ``;
+            }
+
+            return `${text.toFixed(2)}%`;
+        },
+        sorter: (a: AggBoardInfo, b: AggBoardInfo) => {
+            const va = a.meanPercentageError === undefined ? 1e8 : a.meanPercentageError;
+            const vb = b.meanPercentageError === undefined ? 1e8 : b.meanPercentageError;
+            return va - vb;
+        }
     },
     {
         title: 'Trend',
@@ -63,31 +82,34 @@ const columns = [
     }
 ];
 
+type NewCard = Card & { isDone?: boolean };
 const _Overview: FC<Props> = (props: Props) => {
     const { boards, lists: listsById, cards: cardsById } = props;
     const boardRows = Object.values(boards);
 
     const aggInfo: AggBoardInfo[] = boardRows.map(board => {
         const { name, lists, relatedSessions, _id } = board;
-        const cards: Card[] = lists.reduce((l: Card[], r) => {
-            for (const cardId of listsById[r].cards) {
-                l.push(cardsById[cardId]);
+        const cards: NewCard[] = lists.reduce((l: NewCard[], listId) => {
+            for (const cardId of listsById[listId].cards) {
+                const card: NewCard = cardsById[cardId];
+                card.isDone = listId === board.doneList;
+                l.push(card);
             }
             return l;
         }, []);
-        const [estimatedTimeSum, actualTimeSum, errorSum, n] = cards.reduce(
-            (l: number[], r: Card) => {
+        const [estimatedLeftTimeSum, actualTimeSum, errorSum, n] = cards.reduce(
+            (l: number[], r: NewCard) => {
                 let err = 0;
                 const { actual, estimated } = r.spentTimeInHour;
-                if (actual !== 0 && estimated !== 0) {
+                if (r.isDone && actual !== 0 && estimated !== 0) {
                     err = (Math.abs(estimated - actual) / actual) * 100;
                 }
 
                 return [
-                    l[0] + r.spentTimeInHour.estimated,
-                    l[1] + r.spentTimeInHour.actual,
+                    l[0] + (r.isDone ? 0 : Math.max(0, estimated - actual)),
+                    l[1] + actual,
                     l[2] + err,
-                    l[3] + 1
+                    l[3] + (r.isDone ? 1 : 0)
                 ];
             },
             [0, 0, 0, 0]
@@ -95,9 +117,9 @@ const _Overview: FC<Props> = (props: Props) => {
         return {
             _id,
             name,
-            estimatedTimeSum: estimatedTimeSum.toFixed(2),
-            actualTimeSum: actualTimeSum.toFixed(2),
-            meanPercentageError: (errorSum / n).toFixed(2),
+            estimatedLeftTimeSum,
+            actualTimeSum,
+            meanPercentageError: n ? errorSum / n : undefined,
             pomodoroCount: relatedSessions.length
         };
     });

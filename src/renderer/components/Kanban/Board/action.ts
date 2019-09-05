@@ -108,7 +108,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
                 description,
                 name,
                 lists,
-                focusedList
+                focusedList,
+                doneList
             }
         })
     ),
