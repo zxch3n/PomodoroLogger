@@ -1,11 +1,15 @@
 import nedb from 'nedb';
 import { dbPaths } from '../config';
 
-const { projectDBPath, sessionDBPath, settingDBPath } = dbPaths;
+const { projectDB, sessionDB, settingDB, kanbanDB, cardsDB, listsDB, moveDB } = dbPaths;
 export const DBs = {
-    projectDB: new nedb({ filename: projectDBPath }),
-    sessionDB: new nedb({ filename: sessionDBPath }),
-    settingDB: new nedb({ filename: settingDBPath })
+    projectDB: new nedb({ filename: projectDB }),
+    sessionDB: new nedb({ filename: sessionDB }),
+    settingDB: new nedb({ filename: settingDB }),
+    kanbanDB: new nedb({ filename: kanbanDB }),
+    cardsDB: new nedb({ filename: cardsDB }),
+    listsDB: new nedb({ filename: listsDB }),
+    moveDB: new nedb({ filename: moveDB })
 };
 
 // Avoid nedb init error
@@ -20,13 +24,13 @@ for (const db in DBs) {
                 return;
             }
 
-            if (times > 10) {
+            if (times > 13) {
                 throw new Error(
                     `Cannot load database ${db} after 10 times tries. (${err.toString()})`
                 );
             }
 
-            setTimeout(load, 0);
+            setTimeout(load, 100);
             times += 1;
         });
     };

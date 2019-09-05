@@ -57,13 +57,13 @@ function generateRecord(
     }
 
     return {
-        projectId,
         apps,
+        _id: generateRandomName(),
+        boardId: projectId,
         screenStaticDuration: undefined,
         spentTimeInHour: 0.4,
         startTime: 0,
-        switchTimes: 9,
-        todoId: undefined
+        switchTimes: 9
     };
 }
 

@@ -1,8 +1,8 @@
 import { join } from 'path';
 const dirPath = './__test__perf_db/';
 import * as config from '../../src/config';
-config.dbPaths.projectDBPath = join(dirPath, 'projects.nedb');
-config.dbPaths.sessionDBPath = join(dirPath, 'session.nedb');
+config.dbPaths.projectDB = join(dirPath, 'projects.nedb');
+config.dbPaths.sessionDB = join(dirPath, 'session.nedb');
 
 import { getPomodoroCalendarData } from '../../src/renderer/components/History/op';
 import { generateAndSave } from './fakeDataGenerator';

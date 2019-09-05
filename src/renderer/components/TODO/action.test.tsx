@@ -18,7 +18,7 @@ import { dbPaths } from '../../../config';
 import { promisify } from 'util';
 import { ProjectItem } from '../Project/action';
 import { addProjectToDB, executeThunkAction, generateRandomName } from '../../utils';
-const { projectDBPath } = dbPaths;
+const { projectDB } = dbPaths;
 
 describe('TODO reducer', () => {
     it('starts with empty state', () => {
@@ -77,9 +77,9 @@ describe('Combiner Handler', () => {
 
 describe('TODO thunk action creator', () => {
     beforeEach(() => {
-        if (existsSync(projectDBPath)) {
+        if (existsSync(projectDB)) {
             try {
-                unlinkSync(projectDBPath);
+                unlinkSync(projectDB);
             } catch (error) {}
         }
     });

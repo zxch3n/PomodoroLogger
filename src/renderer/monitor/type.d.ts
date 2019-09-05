@@ -21,6 +21,7 @@ export interface ApplicationSpentTime {
 }
 
 export interface PomodoroRecord {
+    _id: string;
     apps: {
         [appName: string]: ApplicationSpentTime;
     };
@@ -28,6 +29,5 @@ export interface PomodoroRecord {
     switchTimes: number;
     startTime: number;
     screenStaticDuration?: number;
-    todoId?: string;
-    projectId?: string;
+    boardId?: string;
 }

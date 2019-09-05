@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Divider, Icon, Layout, message } from 'antd';
+import { Divider, Icon, message } from 'antd';
 import Progress from './Progress';
-import { ProjectActionTypes, ProjectItem } from '../Project/action';
+import { KanbanActionTypes } from '../Kanban/action';
+import { BoardActionTypes, KanbanBoard } from '../Kanban/Board/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
@@ -11,8 +12,6 @@ import { BrowserWindow, nativeImage, remote } from 'electron';
 import AppIcon from '../../../res/icon.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
-import { TodoList } from '../Project/Project';
-import { getIdFromProjectName } from '../../dbs';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
@@ -21,8 +20,8 @@ import { TimerMask } from './SessionEndingMask';
 import { DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
+import Board from '../Kanban/Board';
 
-const { Sider } = Layout;
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
 const ProgressTextContainer = styled.div`
@@ -33,8 +32,32 @@ const ProgressTextContainer = styled.div`
 `;
 
 const TimerLayout = styled.div`
-    max-width: 1080px;
-    margin: 10px auto;
+    padding: 0 24px 0 24px;
+    height: calc(100vh - 45px);
+    overflow-y: auto;
+    width: 100%;
+`;
+
+const TimerInnerLayout = styled.div`
+    overflow-x: auto;
+    max-width: 850px;
+    margin: 0 auto;
+`;
+
+const MyLayout = styled.div`
+    display: flex;
+    flex: auto;
+    flex-direction: row;
+`;
+
+const MySider = styled.aside`
+    flex: 0 0 300px;
+    padding: 6px;
+    border-right: 1px solid #dfdfdf;
+    background-color: #eaeaea;
+    height: calc(100vh - 45px);
+    float: left;
+    display: inline-block;
 `;
 
 const ProgressContainer = styled.div`
@@ -69,7 +92,7 @@ const MoreInfo = styled.div`
     margin: 10px auto;
 `;
 
-export interface Props extends ThisActionTypes, ProjectActionTypes, RootState {}
+export interface Props extends ThisActionTypes, KanbanActionTypes, RootState, BoardActionTypes {}
 
 function to2digits(num: number) {
     if (num < 10) {
@@ -330,11 +353,12 @@ class Timer extends Component<Props, State> {
         notification.show();
 
         const thisSession = this.monitor.sessionData;
+        thisSession.spentTimeInHour = this.props.timer.focusDuration / 3600;
         this.stagedSession = thisSession;
         this.monitor.stop();
         this.monitor.clear();
         this.monitor = undefined;
-        if (this.props.timer.project === undefined) {
+        if (this.props.timer.boardId === undefined) {
             this.props.inferProject(thisSession);
         }
 
@@ -349,21 +373,23 @@ class Timer extends Component<Props, State> {
         }
 
         if (process.env.NODE_ENV === 'development') {
-            this.stagedSession.spentTimeInHour *= DEBUG_TIME_SCALE;
             for (const app in this.stagedSession.apps) {
                 this.stagedSession.apps[app].spentTimeInHour *= DEBUG_TIME_SCALE;
             }
         }
 
-        if (this.props.timer.project !== undefined) {
-            this.stagedSession.projectId = await getIdFromProjectName(
-                this.props.timer.project
-            ).catch(() => undefined);
+        if (this.props.timer.boardId !== undefined) {
+            this.stagedSession.boardId = this.props.timer.boardId;
+            const kanban = this.props.kanban;
+            const cards: string[] =
+                kanban.lists[kanban.boards[this.props.timer.boardId].focusedList].cards;
+            await this.props.timerFinished(this.stagedSession, cards, this.props.timer.boardId);
+        } else {
+            await this.props.timerFinished(this.stagedSession);
         }
 
         const finishedSessions = this.state.pomodorosToday.concat([this.stagedSession]);
         this.setState({ pomodorosToday: finishedSessions });
-        await this.props.timerFinished(this.stagedSession, this.props.timer.project);
         this.stagedSession = undefined;
     };
 
@@ -410,17 +436,9 @@ class Timer extends Component<Props, State> {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
-        const projectItem: ProjectItem = this.props.timer.project
-            ? this.props.project.projectList[this.props.timer.project]
-            : {
-                spentHours: 0,
-                name: 'All TODOs',
-                applicationSpentTime: {},
-                todoList: joinDict(
-                      Object.values(this.props.project.projectList).map(v => v.todoList)
-                  ),
-                _id: 'All TODOs'
-            };
+        const kanbanBoard: KanbanBoard | undefined = this.props.timer.boardId
+            ? this.props.kanban.boards[this.props.timer.boardId]
+            : undefined;
         for (const pomodoro of pomodorosToday) {
             for (const appName in pomodoro.apps) {
                 if (!(appName in apps)) {
@@ -436,114 +454,112 @@ class Timer extends Component<Props, State> {
 
         const shownLeftTime =
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
+        const boardId = this.props.timer.boardId;
+        const listId =
+            boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
         return (
-            <Layout style={{ backgroundColor: 'white' }}>
+            <MyLayout style={{ backgroundColor: 'white' }}>
                 <TimerMask
                     showMask={showMask}
                     onCancel={this.onMaskClick}
-                    timer={this.props.timer}
                     onStart={this.onMaskButtonClick}
                     pomodoroNum={this.state.pomodoroNum}
-                    projects={Object.keys(this.props.project.projectList)}
-                    setProject={this.props.setProject}
                 />
 
-                <Sider
-                    breakpoint="md"
-                    collapsedWidth="0"
-                    theme="light"
-                    style={{
-                        border: '1px solid rgb(240, 240, 240)',
-                        borderRadius: 8,
-                        display: this.props.timer.project ? undefined : 'none'
-                    }}
-                >
-                    <div style={{ padding: 12 }}>
+                {listId === undefined || boardId === undefined ? (
+                    undefined
+                ) : (
+                    <MySider>
                         <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
-                            {this.props.timer.project}
+                            {this.props.kanban.boards[boardId].name}
                         </h1>
-                        <TodoList {...this.props} project={projectItem} />
-                    </div>
-                </Sider>
+                        <Board boardId={boardId} doesOnlyShowFocusedList={true} />
+                    </MySider>
+                )}
                 <TimerLayout ref={this.mainDiv}>
-                    <ProgressContainer>
-                        <Progress
-                            type="circle"
-                            strokeColor={{
-                                '0%': '#108ee9',
-                                '100%': '#87d068'
-                            }}
-                            percent={percent}
-                            width={300}
+                    <TimerInnerLayout>
+                        <ProgressContainer>
+                            <Progress
+                                type="circle"
+                                strokeColor={{
+                                    '0%': '#108ee9',
+                                    '100%': '#87d068'
+                                }}
+                                percent={percent}
+                                width={300}
+                                style={{
+                                    margin: '0 auto'
+                                }}
+                            >
+                                <ProgressTextContainer>
+                                    <div
+                                        style={{ marginBottom: 12 }}
+                                        key="leftTime"
+                                        id="left-time-text"
+                                    >
+                                        {shownLeftTime}
+                                    </div>
+                                    <WorkRestIcon
+                                        isWorking={this.props.timer.isFocusing}
+                                        onClick={this.switchMode}
+                                    />
+                                </ProgressTextContainer>
+                            </Progress>
+                        </ProgressContainer>
+
+                        <div style={{ margin: '2em auto', textAlign: 'center' }}>
+                            <FocusSelector width={240} />
+                        </div>
+                        <ButtonRow>
+                            <div id="start-timer-button" style={{ lineHeight: 0 }}>
+                                {isRunning ? (
+                                    <Icon
+                                        type="pause-circle"
+                                        title="Pause"
+                                        onClick={this.onStopResumeOrStart}
+                                    />
+                                ) : (
+                                    <Icon
+                                        type="play-circle"
+                                        title="Start"
+                                        onClick={this.onStopResumeOrStart}
+                                    />
+                                )}
+                            </div>
+                            <div id="clear-timer-button" style={{ lineHeight: 0 }}>
+                                <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                            </div>
+                            <Icon type="more" title="Show More" onClick={this.toggleMode} />
+                        </ButtonRow>
+
+                        <MoreInfo>
+                            <h2>Pomodoros Today</h2>
+                            <PomodoroNumView num={this.state.pomodorosToday.length} />
+                        </MoreInfo>
+
+                        <MoreInfo
                             style={{
-                                margin: '0 auto'
+                                display: more ? 'block' : 'none'
                             }}
                         >
-                            <ProgressTextContainer>
-                                <div
-                                    style={{ marginBottom: 12 }}
-                                    key="leftTime"
-                                    id="left-time-text"
-                                >
-                                    {shownLeftTime}
-                                </div>
-                                <WorkRestIcon
-                                    isWorking={this.props.timer.isFocusing}
-                                    onClick={this.switchMode}
-                                />
-                            </ProgressTextContainer>
-                        </Progress>
-                    </ProgressContainer>
+                            <h2>Time Spent</h2>
+                            <PomodoroDualPieChart
+                                pomodoros={this.state.pomodorosToday}
+                                width={800}
+                            />
+                            <Divider />
 
-                    <div style={{ margin: '2em auto', textAlign: 'center' }}>
-                        <FocusSelector {...this.props} width={240} />
-                    </div>
-                    <ButtonRow>
-                        <div id="start-timer-button" style={{ lineHeight: 0 }}>
-                            {isRunning ? (
-                                <Icon
-                                    type="pause-circle"
-                                    title="Pause"
-                                    onClick={this.onStopResumeOrStart}
-                                />
-                            ) : (
-                                <Icon
-                                    type="play-circle"
-                                    title="Start"
-                                    onClick={this.onStopResumeOrStart}
-                                />
-                            )}
-                        </div>
-                        <div id="clear-timer-button" style={{ lineHeight: 0 }}>
-                            <Icon type="close-circle" title="Clear" onClick={this.onClear} />
-                        </div>
-                        <Icon type="more" title="Show More" onClick={this.toggleMode} />
-                    </ButtonRow>
-
-                    <MoreInfo>
-                        <h2>Pomodoros Today</h2>
-                        <PomodoroNumView num={this.state.pomodorosToday.length} />
-                    </MoreInfo>
-
-                    <MoreInfo
-                        style={{
-                            display: more ? 'block' : 'none'
-                        }}
-                    >
-                        <h2>Time Spent</h2>
-                        <PomodoroDualPieChart pomodoros={this.state.pomodorosToday} width={800} />
-                        <Divider />
-
-                        <h2>Word Cloud</h2>
-                        <AsyncWordCloud
-                            records={this.state.pomodorosToday}
-                            width={800}
-                            height={400}
-                            style={{ margin: '0 auto' }}
-                        />
-                    </MoreInfo>
+                            <h2>Word Cloud</h2>
+                            <AsyncWordCloud
+                                records={this.state.pomodorosToday}
+                                width={800}
+                                height={400}
+                                style={{ margin: '0 auto' }}
+                            />
+                        </MoreInfo>
+                    </TimerInnerLayout>
                 </TimerLayout>
-            </Layout>
+            </MyLayout>
         );
     }
 }

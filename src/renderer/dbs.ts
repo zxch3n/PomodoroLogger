@@ -1,5 +1,7 @@
 import { remote } from 'electron';
 import { DBs } from '../main/db';
+import { DBWorker } from './workers/DBWorker';
+import { KanbanBoard } from './components/Kanban/Board/action';
 
 let dbs: typeof DBs;
 if (remote) {
@@ -29,22 +31,10 @@ export async function getIdFromProjectName(name: string) {
     });
 }
 
-export async function getNameFromProjectId(_id: string) {
-    return await new Promise<string>((resolve, reject) => {
-        dbs.projectDB.findOne({ _id }, (err, doc) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            if (!doc) {
-                reject(new Error(`cannot find _id=${_id}`));
-                return;
-            }
-
-            resolve(doc.name);
-        });
-    });
+export async function getNameFromBoardId(_id: string) {
+    const worker = new DBWorker('kanbanDB');
+    const board: KanbanBoard = await worker.findOne({ _id });
+    return board.name;
 }
 
 export default dbs;

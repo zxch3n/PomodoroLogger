@@ -1,10 +1,10 @@
 import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
-import { actions as projectActions } from '../Project/action';
+import { actions as boardActions } from '../Kanban/Board/action';
 import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
-import dbs, { getNameFromProjectId } from '../../dbs';
+import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE } from '../../../config';
@@ -21,7 +21,7 @@ export interface TimerState extends Setting {
     leftTime?: number;
     isFocusing: boolean;
     isRunning: boolean;
-    project?: string;
+    boardId?: string;
 
     currentTab: string;
 }
@@ -51,8 +51,9 @@ export const setRestDuration = createActionCreator(
     '[Timer]SET_REST_DURATION',
     resolve => (duration: number) => resolve(duration)
 );
-export const setProject = createActionCreator('[Timer]SET_PROJECT', resolve => (project?: string) =>
-    resolve(project)
+export const setBoardId = createActionCreator(
+    '[Timer]SET_BOARD_ID',
+    resolve => (boardId?: string) => resolve({ boardId })
 );
 export const setMonitorInterval = createActionCreator(
     '[Timer]SET_MONITOR_INTERVAL',
@@ -76,9 +77,9 @@ export const actions = {
     stopTimer,
     continueTimer,
     clearTimer,
-    setProject,
     startTimer,
     switchFocusRestMode,
+    setBoardId,
     changeAppTab,
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
@@ -138,14 +139,21 @@ export const actions = {
             throwError
         );
     },
-    timerFinished: (sessionData?: PomodoroRecord, project?: string | undefined) => async (
-        dispatch: Dispatch
-    ) => {
+    timerFinished: (
+        sessionData?: PomodoroRecord,
+        cardIds: string[] = [],
+        boardId?: string | undefined
+    ) => async (dispatch: Dispatch) => {
         dispatch(timerFinished());
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
-            if (project !== undefined) {
-                projectActions.updateOnTimerFinished(project, sessionData)(dispatch);
+            if (boardId !== undefined) {
+                await boardActions.onTimerFinished(
+                    boardId,
+                    sessionData._id,
+                    sessionData.spentTimeInHour,
+                    cardIds
+                )(dispatch);
             }
 
             historyActions.addRecordToHistory(sessionData)(dispatch);
@@ -159,9 +167,9 @@ export const actions = {
         })) as string | undefined;
 
         if (newProjectId !== undefined) {
-            const newProject = await getNameFromProjectId(newProjectId);
+            const newProject = await getNameFromBoardId(newProjectId);
             console.log('predicted type', newProject);
-            dispatch(setProject(newProject));
+            dispatch(setBoardId(newProject));
         }
     }
 };
@@ -224,6 +232,6 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isFocusing: !state.isFocusing
     })),
 
-    handle(setProject, (state, { payload }) => ({ ...state, project: payload })),
+    handle(setBoardId, (state, { payload: { boardId } }) => ({ ...state, boardId })),
     handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload }))
 ]);

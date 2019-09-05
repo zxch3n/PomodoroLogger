@@ -43,3 +43,28 @@ export function getBetterAppName(appName: string) {
     const name = appName.replace(/\.exe$/g, '');
     return name[0].toUpperCase() + name.slice(1);
 }
+
+export function to2digits(num: number) {
+    if (num < 10) {
+        return `0${num}`;
+    }
+
+    return num;
+}
+
+export function formatTime(timeInHour: number) {
+    const hour = Math.floor(timeInHour);
+    const minute = Math.floor((timeInHour - hour) * 60 + 0.5);
+    return `${to2digits(hour)}h ${to2digits(minute)}m`;
+}
+
+export function parseTime(formattedTime: string) {
+    const matchedH = formattedTime.match(/(\d+)h/);
+    const matchedM = formattedTime.match(/(\d+)m/);
+    if (matchedH == null || matchedM == null) {
+        throw new Error();
+    }
+    const hour = parseInt(matchedH.entries().next().value[1], 10);
+    const minute = parseInt(matchedH.entries().next().value[1], 10);
+    return hour + minute / 60;
+}

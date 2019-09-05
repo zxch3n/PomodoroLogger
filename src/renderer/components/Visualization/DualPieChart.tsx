@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import echarts, { ECharts, EChartOption } from 'echarts';
 import { getBetterAppName } from '../../utils';
-import { getNameFromProjectId } from '../../dbs';
+import { getNameFromBoardId } from '../../dbs';
 import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
 
@@ -131,8 +131,8 @@ export const getTimeSpentDataFromRecords = async (
     const projectTimeCounter = new Counter();
     const UNK = 'UNK[qqwe]';
     for (const pomodoro of pomodoros) {
-        if (pomodoro.projectId) {
-            projectTimeCounter.add(pomodoro.projectId, pomodoro.spentTimeInHour);
+        if (pomodoro.boardId) {
+            projectTimeCounter.add(pomodoro.boardId, pomodoro.spentTimeInHour);
         } else {
             projectTimeCounter.add(UNK, pomodoro.spentTimeInHour);
         }
@@ -150,7 +150,7 @@ export const getTimeSpentDataFromRecords = async (
             continue;
         }
 
-        v.name = await getNameFromProjectId(v.name).catch(() => 'Unknown');
+        v.name = await getNameFromBoardId(v.name).catch(() => 'Unknown');
     }
 
     const appData = appTimeCounter

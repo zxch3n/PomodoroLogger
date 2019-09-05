@@ -48,7 +48,7 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
     let pomodoros = props.history.records;
     if (props.history.chosenProjectId !== undefined) {
         // tslint:disable-next-line:no-parameter-reassignment
-        pomodoros = pomodoros.filter(v => v.projectId === props.history.chosenProjectId);
+        pomodoros = pomodoros.filter(v => v.boardId === props.history.chosenProjectId);
     }
 
     const onProjectClick = (name: string) => {

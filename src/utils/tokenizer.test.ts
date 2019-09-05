@@ -1,5 +1,6 @@
 import { getWeightsFromPomodoros, Tokenizer } from './tokenizer';
 import { PomodoroRecord, TitleSpentTimeDict } from '../renderer/monitor/type';
+import { generateRandomName } from '../renderer/utils';
 
 const tokenizer = new Tokenizer();
 
@@ -89,6 +90,7 @@ describe('Tokenizer', () => {
 
 function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
     const record: PomodoroRecord = {
+        _id: generateRandomName(),
         apps: {},
         switchTimes: 10,
         startTime: 100,

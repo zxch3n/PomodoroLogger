@@ -5,12 +5,10 @@ import { sample } from '../../utils/random';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import nedb from 'nedb';
 
-env.isWorker = true;
-
 const ctx: Worker = self as any;
 
 async function getRecords() {
-    const sessionDB = new nedb({ filename: dbPaths.sessionDBPath, autoload: false });
+    const sessionDB = new nedb({ filename: dbPaths.sessionDB, autoload: false });
     let reloadTimes = 0;
     const loadDatabase = () => {
         sessionDB.loadDatabase(err => {
@@ -38,7 +36,7 @@ async function getRecords() {
         });
     });
 
-    return records.filter(r => r.projectId !== undefined);
+    return records.filter(r => r.boardId !== undefined);
 }
 
 let knn = new KNN();

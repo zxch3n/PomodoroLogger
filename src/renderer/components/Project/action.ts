@@ -126,12 +126,12 @@ export const actions = {
         let i = 0;
         for (const record of records) {
             i += 1;
-            if (!record.projectId) {
+            if (!record.boardId) {
                 continue;
             }
 
-            if (!(record.projectId in counter)) {
-                counter[record.projectId] = Array(spanInDay).fill(0);
+            if (!(record.boardId in counter)) {
+                counter[record.boardId] = Array(spanInDay).fill(0);
             }
 
             const dayCountTillToday = (now - record.startTime) / 1000 / 3600 / 24;
@@ -140,7 +140,7 @@ export const actions = {
             }
 
             const countIndex = Math.floor(spanInDay - dayCountTillToday);
-            counter[record.projectId][countIndex] += 1;
+            counter[record.boardId][countIndex] += 1;
             if (i % 15 === 0) {
                 await new Promise(r => setTimeout(r, 0));
             }
