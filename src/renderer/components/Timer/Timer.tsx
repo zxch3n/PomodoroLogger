@@ -57,7 +57,6 @@ const MySider = styled.aside`
     background-color: #eaeaea;
     height: calc(100vh - 45px);
     float: left;
-    display: inline-block;
 `;
 
 const ProgressContainer = styled.div`
@@ -154,7 +153,9 @@ class Timer extends Component<Props, State> {
         });
 
         this.addMenuItems();
-        workers.knn.loadModel(this.props.history.records.length).catch(console.error);
+        workers.dbWorkers.sessionDB.count({}).then(size => {
+            workers.knn.loadModel(size).catch(console.error);
+        });
     }
 
     addMenuItems(): void {

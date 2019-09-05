@@ -79,3 +79,4 @@ class FakeDBWorker {
 // @ts-ignore
 export const DBWorker: typeof TrueDBWorker =
     process.env.NODE_ENV === 'test' ? FakeDBWorker : TrueDBWorker;
+export type DBWorker = TrueDBWorker;

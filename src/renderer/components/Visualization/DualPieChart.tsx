@@ -5,6 +5,7 @@ import { getBetterAppName } from '../../utils';
 import { getNameFromBoardId } from '../../dbs';
 import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
+import { getTimeSpentDataFromRecords, TimeSpentData } from '../History/op';
 
 const Container = styled.div`
     margin: 0 auto;
@@ -118,50 +119,6 @@ export const DualPieChart: React.FC<Props> = (props: Props) => {
 interface PomodoroPieChartProps extends Partial<Props> {
     pomodoros: PomodoroRecord[];
 }
-
-interface TimeSpentData {
-    projectData: { name: string; value: number }[];
-    appData: { name: string; value: number }[];
-}
-
-export const getTimeSpentDataFromRecords = async (
-    pomodoros: PomodoroRecord[]
-): Promise<TimeSpentData> => {
-    const appTimeCounter = new Counter();
-    const projectTimeCounter = new Counter();
-    const UNK = 'UNK[qqwe]';
-    for (const pomodoro of pomodoros) {
-        if (pomodoro.boardId) {
-            projectTimeCounter.add(pomodoro.boardId, pomodoro.spentTimeInHour);
-        } else {
-            projectTimeCounter.add(UNK, pomodoro.spentTimeInHour);
-        }
-
-        const apps = pomodoro.apps;
-        for (const app in apps) {
-            appTimeCounter.add(apps[app].appName, apps[app].spentTimeInHour);
-        }
-    }
-
-    const projectData = projectTimeCounter.getNameValuePairs({ toFixed: 2, topK: 10 });
-    for (const v of projectData) {
-        if (v.name === UNK) {
-            v.name = 'Unknown';
-            continue;
-        }
-
-        v.name = await getNameFromBoardId(v.name).catch(() => 'Unknown');
-    }
-
-    const appData = appTimeCounter
-        .getNameValuePairs({ toFixed: 2, topK: 10 })
-        .map(v => ({ ...v, name: getBetterAppName(v.name) }));
-
-    return {
-        projectData,
-        appData
-    };
-};
 
 export const PomodoroDualPieChart: React.FC<PomodoroPieChartProps> = (
     props: PomodoroPieChartProps
