@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
+import shortid = require('shortid');
 
 const appdataDir =
     process.env.APPDATA ||
@@ -27,6 +28,13 @@ export const dbPaths = {
     listsDB: join(dbBaseDir, 'lists.nedb'),
     moveDB: join(dbBaseDir, 'moveCard.nedb')
 };
+
+if (process.env.NODE_ENV === 'test') {
+    for (const key in dbPaths) {
+        // @ts-ignore
+        dbPaths[key] = `${dbPaths[key]}${shortid.generate()}`;
+    }
+}
 
 let asarDirName;
 let dir = __dirname;

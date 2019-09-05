@@ -15,6 +15,7 @@
     "start": "electron .",
     "lint": "tslint '{src,test,mocks}/**/*.{ts,tsx}' --project ./tsconfig.json",
     "test": "jest --forceExit --detectOpenHandles",
+    "posttest": "rm -rf ./__test__db",
     "pretest:e2e": "npm run build",
     "test:e2e": "jest '(\\/test\\/e2e/).*'",
     "pack": "npm run build && electron-builder --dir",
