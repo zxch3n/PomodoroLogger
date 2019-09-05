@@ -4,6 +4,7 @@ import { actions as listActions } from '../List/action';
 import { DBWorker } from '../../../workers/DBWorker';
 const db = new DBWorker('cardsDB');
 
+type History = { listId: string; time: number }[];
 export interface Card {
     _id: string;
     content: string;
@@ -60,11 +61,6 @@ const setCards = createActionCreator('[Card]SET_CARDS', resolve => (cards: Cards
     resolve(cards)
 );
 
-const onTimerFinished = createActionCreator(
-    '[Card]TIMER_FINISHED',
-    resolve => (_id: string, sessionId: string) => resolve({ _id, sessionId })
-);
-
 export const actions = {
     fetchCards: () => async (dispatch: Dispatch) => {
         const cards: Card[] = await db.find({}, {});
@@ -103,9 +99,14 @@ export const actions = {
     onTimerFinished: (_id: string, sessionId: string, spentTimeInHour: number) => async (
         dispatch: Dispatch
     ) => {
-        dispatch(onTimerFinished(_id, sessionId));
-        await db.update({ _id }, { $push: { sessionIds: sessionId } });
-        await actions.addActualTime(_id, spentTimeInHour)(dispatch);
+        dispatch(addSession(_id, sessionId, spentTimeInHour));
+        await db.update(
+            { _id },
+            {
+                $push: { sessionIds: sessionId },
+                $inc: { 'spentTimeInHour.actual': spentTimeInHour }
+            }
+        );
     },
     addCard: (_id: string, listId: string, title: string, content: string = '') => async (
         dispatch: Dispatch

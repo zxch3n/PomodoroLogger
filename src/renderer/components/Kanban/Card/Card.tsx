@@ -12,6 +12,7 @@ const CardContainer = styled.div`
     background-color: white;
     margin: 8px 4px;
     border-radius: 6px;
+    cursor: grab;
 `;
 
 const CardContent = styled.div`
@@ -122,6 +123,15 @@ export const Card: FC<Props> = (props: Props) => {
                                             type={'actual'}
                                             value={formatTime(props.spentTimeInHour.actual)}
                                             color={'#007ec6'}
+                                        />
+                                    ) : (
+                                        undefined
+                                    )}
+                                    {props.sessionIds.length > 0 ? (
+                                        <Badge
+                                            type={'pomodoros'}
+                                            value={props.sessionIds.length.toString()}
+                                            color={'#ca6129'}
                                         />
                                     ) : (
                                         undefined

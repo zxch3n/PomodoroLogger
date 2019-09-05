@@ -2,27 +2,29 @@ import React from 'react';
 
 export interface Props {
     type: string;
-    color: '#007ec6' | '#97ca00';
+    color: string;
     value: string;
 }
 
 export const Badge = (props: Props) => {
     const { color, type, value } = props;
-    const textSize = props.type.length * 8;
-    const timeSize = 60;
+    const textSize = Math.floor(props.type.length * 6.5 + 10);
+    const timeSize = Math.floor(value.length * 6.5 + 10);
+    const idA = `${type.length},${value.length}a`;
+    const idB = `${type.length},${value.length}b`;
     return (
         <svg width={textSize + timeSize} height="20" style={{ margin: '1px 4px 1px 4px' }}>
-            <linearGradient id="b" x2="0" y2="100%">
+            <linearGradient id={idB} x2="0" y2="100%">
                 <stop offset="0" stopColor="#bbb" stopOpacity=".1" />
                 <stop offset="1" stopOpacity=".1" />
             </linearGradient>
-            <clipPath id="a">
+            <clipPath id={idA}>
                 <rect width={textSize + timeSize} height="20" rx="3" fill="#fff" />
             </clipPath>
-            <g clipPath="url(#a)">
+            <g clipPath={`url(#${idA})`}>
                 <path fill="#555" d={`M0 0h${textSize}v20H0z`} />
                 <path fill={color} d={`M${textSize} 0h${timeSize}v20H${textSize}z`} />
-                <path fill="url(#b)" d={`M0 0h${textSize + timeSize}v20H0z`} />
+                <path fill={`url(#${idB})`} d={`M0 0h${textSize + timeSize}v20H0z`} />
             </g>
             <g
                 fill="#fff"

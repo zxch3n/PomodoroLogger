@@ -4,7 +4,7 @@ import React, { FC, useRef, useState } from 'react';
 import { List as ListType, ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
-import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm } from 'antd';
+import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm, Tooltip } from 'antd';
 import { KanbanActionTypes } from '../action';
 import { CardsState } from '../Card/action';
 
@@ -42,7 +42,7 @@ const ListHead = styled.div`
         cursor: pointer;
     }
 
-    .list-head-icon:hover {
+    .list-head-icon i:hover {
         color: #0074d9;
     }
 `;
@@ -174,12 +174,16 @@ export const List: FC<Props> = (props: Props) => {
                                     </span>
                                     <div className="list-head-icon">
                                         {focused ? (
-                                            <span
-                                                style={{ color: 'red', marginRight: 8 }}
-                                                title={'Focused List'}
+                                            <Tooltip
+                                                title={
+                                                    'Focused Column. Try to keep the cards of this column as few as ' +
+                                                    'possible to get a more precise insight.'
+                                                }
                                             >
-                                                <Icon component={FocusIcon} />
-                                            </span>
+                                                <span style={{ color: 'red', marginRight: 8 }}>
+                                                    <Icon component={FocusIcon} />
+                                                </span>
+                                            </Tooltip>
                                         ) : (
                                             undefined
                                         )}

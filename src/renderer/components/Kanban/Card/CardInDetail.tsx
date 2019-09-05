@@ -1,13 +1,12 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Card, CardActionTypes, actions } from './action';
+import { actions, Card, CardActionTypes } from './action';
 import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
-import { formatTime, genMapDispatchToProp, parseTime } from '../../../utils';
-import { Form, Input, Modal, TimePicker, InputNumber } from 'antd';
+import { genMapDispatchToProp } from '../../../utils';
+import { Button, Form, Input, InputNumber, Modal, Switch } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
-import moment from 'moment';
 
 interface Props extends CardActionTypes {
     visible: boolean;
@@ -28,6 +27,31 @@ const _CardInDetail: FC<Props> = (props: Props) => {
     const { card, visible, form, onCancel, listId } = props;
     const isCreating = !card;
     const { getFieldDecorator, setFieldsValue, validateFields, resetFields } = form;
+    useEffect(() => {
+        if (card) {
+            const time = card.spentTimeInHour.estimated;
+            const actual = card.spentTimeInHour.actual;
+            setFieldsValue({
+                title: card.title,
+                content: card.content,
+                estimatedTime: time ? time : undefined,
+                actualTime: actual ? actual : undefined
+            } as FormData);
+        } else {
+            setFieldsValue({
+                title: '',
+                content: '',
+                estimatedTime: undefined,
+                actualTime: undefined
+            } as FormData);
+        }
+    }, [card]);
+
+    const [isEditingActualTime, setIsEditingActualTime] = useState(false);
+    const onSwitchIsEditing = () => {
+        setIsEditingActualTime(!isEditingActualTime);
+    };
+
     if (!visible) {
         return <span style={{ display: 'none' }} />;
     }
@@ -61,26 +85,6 @@ const _CardInDetail: FC<Props> = (props: Props) => {
             onCancel();
         });
     };
-
-    useEffect(() => {
-        if (card) {
-            const time = card.spentTimeInHour.estimated;
-            const actual = card.spentTimeInHour.actual;
-            setFieldsValue({
-                title: card.title,
-                content: card.content,
-                estimatedTime: time ? time : undefined,
-                actualTime: actual ? actual : undefined
-            } as FormData);
-        } else {
-            setFieldsValue({
-                title: '',
-                content: '',
-                estimatedTime: undefined,
-                actualTime: undefined
-            } as FormData);
-        }
-    }, [card]);
 
     return (
         <Modal
@@ -121,13 +125,19 @@ const _CardInDetail: FC<Props> = (props: Props) => {
                     <Form.Item label="Actual Spent Time In Hour">
                         {getFieldDecorator('actualTime')(
                             <InputNumber
-                                disabled={true}
+                                disabled={!isEditingActualTime}
                                 precision={2}
                                 min={0}
                                 step={0.2}
                                 placeholder={'Actual Time In Hour'}
                             />
                         )}
+                        <Button
+                            style={{ marginLeft: 4 }}
+                            icon={isEditingActualTime ? 'unlock' : 'lock'}
+                            shape={'circle-outline'}
+                            onClick={onSwitchIsEditing}
+                        />
                     </Form.Item>
                 )}
             </Form>

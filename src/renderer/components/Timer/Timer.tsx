@@ -353,6 +353,7 @@ class Timer extends Component<Props, State> {
         notification.show();
 
         const thisSession = this.monitor.sessionData;
+        thisSession.spentTimeInHour = this.props.timer.focusDuration / 3600;
         this.stagedSession = thisSession;
         this.monitor.stop();
         this.monitor.clear();
@@ -372,7 +373,6 @@ class Timer extends Component<Props, State> {
         }
 
         if (process.env.NODE_ENV === 'development') {
-            this.stagedSession.spentTimeInHour *= DEBUG_TIME_SCALE;
             for (const app in this.stagedSession.apps) {
                 this.stagedSession.apps[app].spentTimeInHour *= DEBUG_TIME_SCALE;
             }
