@@ -132,7 +132,7 @@ export const actions = {
         destCards.splice(toIndex, 0, rm);
         await db.update({ _id: fromListId }, { $set: { cards: fromCards } }, {});
         await db.update({ _id: toListId }, { $set: { cards: destCards } }, {});
-        await moveDB.insert({ fromListId, toListId, cardId: rm });
+        await moveDB.insert({ fromListId, toListId, cardId: rm, time: new Date().getTime() });
     },
     renameList: (_id: string, title: string) => async (dispatch: Dispatch) => {
         dispatch(renameList(_id, title));
