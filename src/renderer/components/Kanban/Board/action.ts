@@ -24,6 +24,7 @@ export interface KanbanBoard {
     description: string;
     lists: ListId[]; // lists id in order
     focusedList: string;
+    doneList: string;
     relatedSessions: SessionId[];
     aggInfo?: AggInfo;
 }
@@ -33,6 +34,7 @@ const defaultBoard: KanbanBoard = {
     lists: [],
     name: '',
     focusedList: '',
+    doneList: '',
     description: '',
 
     relatedSessions: [],
@@ -48,8 +50,9 @@ const addBoard = createActionCreator(
         name: string,
         description: string,
         lists: string[],
-        focusedList: string
-    ) => resolve({ _id, name, description, lists, focusedList })
+        focusedList: string,
+        doneList: string
+    ) => resolve({ _id, name, description, lists, focusedList, doneList })
 );
 
 const setBoardMap = createActionCreator(
@@ -95,17 +98,21 @@ const updateAggInfo = createActionCreator(
 );
 
 export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
-    handle(addBoard, (state, { payload: { _id, name, description, lists, focusedList } }) => ({
-        ...state,
-        [_id]: {
-            ...defaultBoard,
-            _id,
-            description,
-            name,
-            lists,
-            focusedList
-        }
-    })),
+    handle(
+        addBoard,
+        (state, { payload: { _id, name, description, lists, focusedList, doneList } }) => ({
+            ...state,
+            [_id]: {
+                ...defaultBoard,
+                _id,
+                description,
+                name,
+                lists,
+                focusedList,
+                doneList
+            }
+        })
+    ),
 
     handle(setBoardMap, (state, { payload }) => payload),
     handle(moveList, (state, { payload: { _id, fromIndex, toIndex } }) => {
@@ -221,7 +228,7 @@ export const actions = {
             await listActions.addList(listId, name)(dispatch);
             lists.push(listId);
         }
-        dispatch(addBoard(_id, name, description, lists, lists[1]));
+        dispatch(addBoard(_id, name, description, lists, lists[1], lists[2]));
 
         await db.insert({
             ...defaultBoard,
@@ -229,7 +236,8 @@ export const actions = {
             description,
             name,
             lists,
-            focusedList: lists[1]
+            focusedList: lists[1],
+            doneList: lists[2]
         } as KanbanBoard);
     },
 

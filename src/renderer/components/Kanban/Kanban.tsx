@@ -22,6 +22,7 @@ import styled from 'styled-components';
 import { SelectParam } from 'antd/lib/menu';
 import TextArea from 'antd/es/input/TextArea';
 import { SearchBar } from './SearchBar';
+import { Overview } from './Board/Overview';
 
 const { Option } = Select;
 const { Sider, Content } = Layout;
@@ -205,7 +206,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                 }}
             >
                 {props.kanban.chosenBoardId === undefined ? (
-                    undefined
+                    <Overview />
                 ) : (
                     <Board boardId={props.kanban.chosenBoardId} key={props.kanban.chosenBoardId} />
                 )}

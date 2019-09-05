@@ -117,6 +117,7 @@ export const Board: FC<Props> = (props: Props) => {
                         key={listId}
                         boardId={props.boardId}
                         focused={listId === props.focusedList}
+                        done={listId === props.doneList}
                     />
                 ))}
                 {provided.placeholder}
