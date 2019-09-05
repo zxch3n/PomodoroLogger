@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import shortid = require('shortid');
+import shortid from 'shortid';
 
 const appdataDir =
     process.env.APPDATA ||
