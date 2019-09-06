@@ -37,6 +37,7 @@ export const DualPieChart: React.FC<Props> = (props: Props) => {
             },
             legend: {
                 orient: 'vertical',
+                // @ts-ignore
                 x: 'left',
                 data: props.appData.map(v => v.name).concat(props.projectData.map(v => v.name))
             },

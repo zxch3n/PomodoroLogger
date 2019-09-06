@@ -74,19 +74,23 @@ export async function addSession(record: PomodoroRecord) {
         // TODO: invoke ML inference
     }
     consistencyCheck(record);
+    // @ts-ignore
     await insert(record).catch(err => console.log(err));
 }
 
 export async function removeSession(startTime: number) {
+    // @ts-ignore
     await remove({ startTime });
 }
 
 export async function getTodaySessions(): Promise<PomodoroRecord[]> {
     const todayStartTime = new Date(new Date().toDateString()).getTime();
+    // @ts-ignore
     return ((await find({ startTime: { $gt: todayStartTime } })) as unknown) as PomodoroRecord[];
 }
 
 export async function getAllSession(): Promise<PomodoroRecord[]> {
+    // @ts-ignore
     return (await find({})) as PomodoroRecord[];
 }
 

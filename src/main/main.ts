@@ -2,7 +2,7 @@ import { nativeImage, app, Tray, BrowserWindow, Notification, Menu } from 'elect
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
-import logo from '../res/icon.png';
+import logo from '../res/icon_sm.png';
 import { build } from '../../package.json';
 
 // Fix setTimeout not reliable problem
@@ -88,7 +88,7 @@ app.on('ready', async () => {
     ];
     // @ts-ignore
     const contextMenu = Menu.buildFromTemplate(menuItems);
-    mGlobal.tray.setToolTip('Time Logger');
+    mGlobal.tray.setToolTip('Pomodoro Logger');
     mGlobal.tray.setContextMenu(contextMenu);
 
     mGlobal.tray.on('double-click', async () => {
@@ -102,12 +102,21 @@ app.on('ready', async () => {
     await createWindow();
 });
 
-function setMenuItems(items: [{ label: string; type: string; click: any }][]) {
+function setMenuItems(items: { label: string; type: string; click: any }[]) {
     if (!mGlobal.tray) {
         return;
     }
 
     const menuItems = items.concat([
+        {
+            label: 'Open',
+            type: 'normal',
+            click: () => {
+                if (win) {
+                    win.show();
+                }
+            }
+        },
         {
             label: 'Quit',
             type: 'normal',
@@ -132,5 +141,7 @@ app.on('activate', () => {
     if (!win) {
         app.setName(build.productName);
         createWindow();
+    } else {
+        win.show();
     }
 });
