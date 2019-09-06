@@ -29,7 +29,21 @@
 <img align="right" src="https://i.postimg.cc/0j8FJ70x/image.png" height="280"/>
 
 - Use [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) to manage your time
-- Collect and visualize your desktop working activities **locally**
+- Collect and visualize your desktop working activities, i.e., the names and titles of the using apps, **locally**
+- Use integrated Kanban Board to make your schedule control easier
+
+## Pomodoro Technique :tomato:
+
+The working loop in the Pomodoro Technique is split into a 25-minute focus session and a 5-minute rest session. During a work session, the user focuses on one todo item and should not do anything irrelevant. The Pomodoro Technique can greatly improve the efficiency of work and study and alleviate work fatigue.
+
+In the Pomodoro Logger, the app will record the names and titles of the apps you use on your PC during the working sessions. The titles of apps contain rich semantic information. For example, the browser title includes the title of the website being viewed, and the IDE often provides the project path or project name.
+
+- `Pomodoro Technique - Wikipedia - Google Chrome`
+- `DeepMind (@DeepMindAI) | Twitter - Google Chrome`
+- `pomodoro-logger [C:\code\pomodoro-logger] .\src\renderer\components\src\Application.tsx - WebStorm`
+
+
+By connecting your todo items with the corresponding recorded Pomodoro sessions, you can analyze how often you are interrupted by email and social software, the time distribution of the application and application title used to complete the task. It will help you have a more comprehensive understanding of your working hours on PC.
 
 
 # Data :chart_with_upwards_trend:
@@ -38,15 +52,18 @@ Pomodoro Logger records your desktop activities when you are in a working sessio
 
 It only records your application activities, including the name and title of the focused application, and low resolution (30 x 30) screenshot. You can disable monitor features in the settings.
 
-You can export / delete all your data in the settings. 
+You can import / export / delete all your data in the settings. 
 
 All the data is saved and processed **locally**.
 
 # Kanban Board
 
-Pomodoro Logger has integrated [Kanban Board](https://en.wikipedia.org/wiki/Kanban_board) to help you organize and estimate the time spent of your todos easily. 
+Pomodoro Logger has integrated [Kanban Board](https://en.wikipedia.org/wiki/Kanban_board) to help you organize and estimate the time spent of your todos easily with confidence.
 
-When creating a new todo card, you can set the estimated time spent. Pomodoro Logger will track the actual time spent for you by the **focused column** of Kanban Board. Every board has a focused column. When you finished a Pomodoro session of this board, this session will be connected to the cards of this focused column.
+The lists in Kanban are divided into `Todo`, `In Progress`, and `Done`. Though lists customization is possible, you are required to preserve `In Progress` list and `Done` list in order to track, estimate and analyse your project time spent. You can set the estimated time cost on each todo card. Pomodoro Logger will assist you with the corresponding actual time spent record. i.e., When you are focusing on a Kanban board, it will automatically associate your Pomodoro session with the todo cards of `In Progress` list in the Kanban, which makes the further analysis possible.
+
+To make the statistics more accurate, you can keep the cards of the `In Progress` list as few as possible to precisely reflect the tasks you are focusing on.
+
 
 # Download
 
@@ -57,7 +74,7 @@ To download, go to [release page](https://github.com/rem2016/PomodoroLogger/rele
 
 # Development
 
-To build the project, issue
+To build the project, issue the following commands
 
 ```
 yarn
