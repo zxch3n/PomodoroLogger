@@ -26,11 +26,11 @@ const BriefCard = styled.div`
     width: 260px;
     min-height: 100px;
     cursor: pointer;
-    transition: box-shadow 0.8s, transform 0.5s;
+    transition: box-shadow 0.5s, transform 0.5s;
     
     :hover {
       box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.14);
-      transform: translateY(20px);
+      transform: translate(-3px -3px);
       z-index: 100;
     }
 `;
@@ -55,14 +55,14 @@ const AnimTrend = styled.div`
     position: absolute;
     width: 100%;
     height: 40px;
-    z-index: 100;
-    top: -80px;
+    z-index: -1;
+    opacity: 0.5;
+    bottom: 16px;
     
     svg {
       animation: ${clipAnimation} 3s linear infinite;
       animation-delay: 0.4s;
       clip-path: inset(100%);
-      transform: scaleY(1.5);
     }
 `;
 
@@ -186,6 +186,13 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                     )
                 }
                 <ListsCountBar boardId={props._id} height={40}/>
+                {
+                    props.relatedSessions.length? (
+                        <AnimTrend style={{display: hover? undefined : 'none'}}>
+                            <IdTrend boardId={props._id}/>
+                        </AnimTrend>
+                    ) : undefined
+                }
             </Content>
             <Divider style={{margin: '6px '}}/>
             <BadgeHolder>
@@ -201,14 +208,6 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                     ) : undefined
                 }
             </BadgeHolder>
-            {
-                props.relatedSessions.length? (
-                    <AnimTrend style={{display: hover? undefined : 'none'}}>
-                        <IdTrend boardId={props._id}/>
-                        <div/>
-                    </AnimTrend>
-                ) : undefined
-            }
         </BriefCard>
     )
 };
