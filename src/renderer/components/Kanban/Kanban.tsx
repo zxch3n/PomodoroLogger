@@ -135,7 +135,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
     };
 
     return (
-        <Layout style={{ padding: 4 }}>
+        <Layout style={{ padding: 4, height: 'calc(100vh - 45px)'}}>
             <Header>
                 <Select
                     onChange={onSelectChange}
@@ -254,7 +254,9 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                             !isCreating? (
                                 <Form.Item>
                                     <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
-                                        <Button shape={'circle'} type={'danger'} icon={'delete'}/>
+                                        <Button type={'danger'} icon={'delete'}>
+                                            Delete
+                                        </Button>
                                     </Popconfirm>
                                 </Form.Item>
                             ) : undefined

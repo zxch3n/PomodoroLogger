@@ -5,6 +5,7 @@ import { Button, Card, Col, Progress, Row, Statistic } from 'antd';
 import { RootState } from '../../reducers';
 import { HistoryActionCreatorTypes } from '../History/action';
 import { workers } from '../../workers';
+import { Bar } from '../Visualization/Bar';
 
 const Container = styled.div`
     position: relative;
@@ -61,6 +62,9 @@ export const Analyser: React.FC<Props> = (props: Props) => {
                 Train
             </Button>
             <Progress percent={progress} size="small" />
+            <div style={{height: 50, width: 280}}>
+                <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']}/>
+            </div>
         </Container>
     );
 };

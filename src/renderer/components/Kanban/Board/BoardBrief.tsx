@@ -14,6 +14,7 @@ import formatMarkdown from '../Card/formatMarkdown';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
+import { ListsCountBar } from '../../Visualization/Bar';
 
 const BriefCard = styled.div`
     display: inline-block;
@@ -33,7 +34,7 @@ const BriefCard = styled.div`
 `;
 
 const Content = styled.div`
-  
+  padding: 8px;
 `;
 
 const Header = styled.div`
@@ -62,7 +63,7 @@ interface Props extends KanbanBoard, InputProps{
 
 type NewCard = Card & { isDone?: boolean };
 const _BoardBrief: React.FC<Props> = (props: Props) => {
-    const { name, lists, relatedSessions, _id, listsById, doneList, cardsById, onClick } = props;
+    const { name, lists, relatedSessions, _id, listsById, doneList, cardsById, onClick, spentHours } = props;
     const cards: NewCard[] = lists.reduce((l: NewCard[], listId) => {
         for (const cardId of listsById[listId].cards) {
             const card: NewCard = cardsById[cardId];
@@ -149,6 +150,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                     ) : undefined
                 }
             </Content>
+            <ListsCountBar boardId={props._id} height={40}/>
             <Divider style={{margin: '6px '}}/>
             <BadgeHolder>
                 {
@@ -156,7 +158,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                         <Badge type={'left'} value={formatTime(estimatedLeftTimeSum)}/>
                     ) : undefined
                 }
-                <Badge type={'spent-time'} value={formatTime(actualTimeSum)}/>
+                <Badge type={'spent-time'} value={formatTime(spentHours)}/>
                 {
                     showErr? (
                         <Badge type={'accuracy'} value={acc} color={accColor} title={'Estimate accuracy'}/>
