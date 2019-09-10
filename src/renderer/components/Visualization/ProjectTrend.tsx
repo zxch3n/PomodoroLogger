@@ -29,20 +29,29 @@ const Container = styled.div`
   }
 `;
 
+const NoHover = styled.div``;
+
 interface Props {
     width?: number;
     height?: number;
     data: number[];
+    hoverEffect?: boolean;
 }
 
 export const ProjectTrend: React.FC<Props> = (props: Props) => {
+    const {hoverEffect=false} = props;
     const ref = useRef();
+    const C = hoverEffect? Container : NoHover;
     return (
         // @ts-ignore
-        <Container ref={ref}>
+        <C ref={ref}>
             {props.data.length > 0 ? (
                 <>
-                    <h1>TREND</h1>
+                    {
+                        hoverEffect? (
+                            <h1>TREND</h1>
+                        ) : undefined
+                    }
                     <Trend
                         width={props.width}
                         height={props.height}
@@ -56,7 +65,7 @@ export const ProjectTrend: React.FC<Props> = (props: Props) => {
                     />
                 </>
             ) : undefined}
-        </Container>
+        </C>
     );
 };
 

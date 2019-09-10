@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import { connect } from 'react-redux';
 import { RootState } from '../../../reducers';
 import { actions, KanbanBoard } from './action';
 import { actions as kanbanActions } from '../action';
 import { Dispatch } from 'redux';
-import styled from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import { Card, CardsState } from '../Card/action';
 import { ListsState } from '../List/action';
 import { Button, Divider } from 'antd';
@@ -17,6 +17,7 @@ import { Markdown } from '../style/Markdown';
 import { ListsCountBar } from '../../Visualization/Bar';
 
 const BriefCard = styled.div`
+    position: relative;
     display: inline-block;
     padding: 6px;
     background-color: white;
@@ -25,15 +26,48 @@ const BriefCard = styled.div`
     width: 260px;
     min-height: 100px;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: box-shadow 0.8s, transform 0.5s;
     
     :hover {
       box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.14);
-      transform: translate(-3px, -3px);
+      transform: translateY(20px);
+      z-index: 100;
+    }
+`;
+
+const clipAnimation = keyframes`
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  20% {
+    clip-path: inset(0 0 0 0);
+  }
+  85% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+`;
+
+
+const AnimTrend = styled.div`
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    z-index: 100;
+    top: -80px;
+    
+    svg {
+      animation: ${clipAnimation} 3s linear infinite;
+      animation-delay: 0.4s;
+      clip-path: inset(100%);
+      transform: scaleY(1.5);
     }
 `;
 
 const Content = styled.div`
+  position: relative;
   padding: 8px;
 `;
 
@@ -64,6 +98,13 @@ interface Props extends KanbanBoard, InputProps{
 type NewCard = Card & { isDone?: boolean };
 const _BoardBrief: React.FC<Props> = (props: Props) => {
     const { name, lists, relatedSessions, _id, listsById, doneList, cardsById, onClick, spentHours } = props;
+    const [ hover, setHover ] = useState(false);
+    const onMouseEnter = () => {
+        setHover(true);
+    };
+    const onMouseLeave = () => {
+        setHover(false);
+    };
     const cards: NewCard[] = lists.reduce((l: NewCard[], listId) => {
         for (const cardId of listsById[listId].cards) {
             const card: NewCard = cardsById[cardId];
@@ -120,7 +161,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
 
     return (
 
-        <BriefCard onClick={onClick}>
+        <BriefCard onClick={onClick} onMouseLeave={onMouseLeave} onMouseEnter={onMouseEnter}>
             <Header>
                 <h1>{name}</h1>
                 <span>
@@ -144,13 +185,8 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                         <i>No description provided</i>
                     )
                 }
-                {
-                    props.relatedSessions.length? (
-                        <IdTrend boardId={props._id}/>
-                    ) : undefined
-                }
+                <ListsCountBar boardId={props._id} height={40}/>
             </Content>
-            <ListsCountBar boardId={props._id} height={40}/>
             <Divider style={{margin: '6px '}}/>
             <BadgeHolder>
                 {
@@ -165,6 +201,14 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                     ) : undefined
                 }
             </BadgeHolder>
+            {
+                props.relatedSessions.length? (
+                    <AnimTrend style={{display: hover? undefined : 'none'}}>
+                        <IdTrend boardId={props._id}/>
+                        <div/>
+                    </AnimTrend>
+                ) : undefined
+            }
         </BriefCard>
     )
 };
