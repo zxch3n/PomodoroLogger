@@ -7,6 +7,8 @@ import { Icon, Divider, Dropdown, Menu } from 'antd';
 import formatMarkdown from './formatMarkdown';
 import { Badge } from './Badge';
 import { formatTime } from '../../../utils';
+import { BadgeHolder } from '../style/Badge';
+import { Markdown } from '../style/Markdown';
 
 const CardContainer = styled.div`
     background-color: white;
@@ -23,36 +25,6 @@ const CardContent = styled.div`
         float: right;
         cursor: pointer;
     }
-
-    h1 {
-        font-size: 1.5em;
-        font-weight: 700;
-    }
-    h2 {
-        font-size: 1.4em;
-    }
-    h3 {
-        font-size: 1.2em;
-    }
-    h4 {
-        font-size: 1.1em;
-    }
-
-    h5,
-    h6,
-    h7 {
-        font-size: 1.05em;
-        font-weight: 700;
-    }
-
-    p {
-        margin: 0;
-    }
-`;
-
-const BadgerHolder = styled.div`
-    min-height: 20px;
-    line-height: 12px;
 `;
 
 export interface InputProps {
@@ -102,13 +74,13 @@ export const Card: FC<Props> = (props: Props) => {
                                     </span>
                                 </Dropdown>
                                 <h1>{props.title}</h1>
-                                <p
+                                <Markdown
                                     dangerouslySetInnerHTML={{
                                         __html: formatMarkdown(props.content)
                                     }}
                                 />
-                                <Divider style={{ margin: 4 }} />
-                                <BadgerHolder>
+                                <Divider style={{ margin: '4px 0' }} />
+                                <BadgeHolder>
                                     {props.spentTimeInHour.estimated ? (
                                         <Badge
                                             type={'estimated'}
@@ -136,7 +108,7 @@ export const Card: FC<Props> = (props: Props) => {
                                     ) : (
                                         undefined
                                     )}
-                                </BadgerHolder>
+                                </BadgeHolder>
                             </CardContent>
                         </CardContainer>
                         {isDraggingOver && provided.placeholder}

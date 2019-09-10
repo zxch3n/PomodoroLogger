@@ -2,18 +2,20 @@ import React from 'react';
 
 export interface Props {
     type: string;
-    color: string;
+    color?: string;
     value: string;
+    title?: string;
 }
 
 export const Badge = (props: Props) => {
-    const { color, type, value } = props;
+    const { color="#32d31f", type, value, title } = props;
     const textSize = Math.floor(props.type.length * 6.5 + 10);
     const timeSize = Math.floor(value.length * 6.5 + 10);
     const idA = `${type.length},${value.length}a`;
     const idB = `${type.length},${value.length}b`;
     return (
-        <svg width={textSize + timeSize} height="20" style={{ margin: '1px 4px 1px 4px' }}>
+        <svg width={textSize + timeSize} height="20" style={{ margin: '1px 4px 1px 4px' }} >
+            <title>{title}</title>
             <linearGradient id={idB} x2="0" y2="100%">
                 <stop offset="0" stopColor="#bbb" stopOpacity=".1" />
                 <stop offset="1" stopOpacity=".1" />

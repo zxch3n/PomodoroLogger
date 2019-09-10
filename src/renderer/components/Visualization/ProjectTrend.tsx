@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Trend from 'react-trend';
 import { DBWorker } from '../../workers/DBWorker';
 import { PomodoroRecord } from '../../monitor/type';
+import { workers } from '../../workers';
 
 const Container = styled.div``;
 
@@ -56,15 +57,14 @@ export function countRecordNum(records: PomodoroRecord[], spanInDay: number = 30
 }
 
 export const IdTrend: React.FC<InputProps> = (props: InputProps) => {
-    const [data, setData] = useState([0, 0, 0, 0]);
+    const [data, setData] = useState([0, 0, 0, 0, 0]);
     const { boardId, ...restProps } = props;
     useEffect(() => {
-        const worker = new DBWorker('sessionDB');
+        const worker = workers.dbWorkers.sessionDB;
         worker.find({ boardId: props.boardId }, {}).then((values: PomodoroRecord[]) => {
             const counter = countRecordNum(values);
-            if (counter.length > 0) {
-                setData(counter);
-            }
+            counter[counter.length - 1] += 0.001;
+            setData(counter);
         });
     }, [props.boardId]);
 

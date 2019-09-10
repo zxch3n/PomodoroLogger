@@ -4,44 +4,11 @@ import { BoardActionTypes, KanbanBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
-import { IdTrend } from '../../Visualization/ProjectTrend';
 
 const Container = styled.div`
     height: 100%;
     width: 100%;
     overflow-x: auto;
-`;
-
-const Header = styled.div`
-    margin: 6px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-content: flex-end;
-`;
-
-const TrendContainer = styled.div`
-    flex: available;
-`;
-
-const Description = styled.div`
-    flex: auto;
-    position: relative;
-    height: 45px;
-
-    p:hover {
-        background-color: rgba(40, 70, 250, 0.07);
-    }
-
-    p {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 8px;
-        background-color: rgba(40, 70, 250, 0.04);
-        line-height: calc(1em + 4px);
-        width: 100%;
-    }
 `;
 
 const ListContainer = styled.div`
@@ -70,7 +37,6 @@ export interface InputProps {
 
 interface Props extends KanbanBoard, BoardActionTypes, InputProps {}
 export const Board: FC<Props> = (props: Props) => {
-    const { showHeader = true } = props;
     const handleDragEnd = ({ source, destination, type }: DropResult) => {
         // dropped outside the list
         if (!destination) {
@@ -130,18 +96,6 @@ export const Board: FC<Props> = (props: Props) => {
 
     return (
         <Container>
-            {showHeader ? (
-                <Header>
-                    <Description title={`Board ${props.name} description`}>
-                        <p>{props.description || <i>No description provided</i>}</p>
-                    </Description>
-                    <TrendContainer>
-                        <IdTrend boardId={props.boardId} height={40} />
-                    </TrendContainer>
-                </Header>
-            ) : (
-                undefined
-            )}
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId={props._id} type="COLUMN" direction="horizontal">
                     {lists}

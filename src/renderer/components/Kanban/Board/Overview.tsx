@@ -9,10 +9,12 @@ import { Card, CardsState } from '../Card/action';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import styled from 'styled-components';
 import { formatTime, formatTimeWithoutZero } from '../../../utils';
+import { BoardBrief } from './BoardBrief';
+import { actions } from '../action';
 
 const Container = styled.div``;
 
-interface Props {
+interface Props{
     boards: KanbanBoardState;
     lists: ListsState;
     cards: CardsState;
@@ -83,7 +85,7 @@ const columns = [
 ];
 
 type NewCard = Card & { isDone?: boolean };
-const _Overview: FC<Props> = (props: Props) => {
+const _OverviewTable: FC<Props> = (props: Props) => {
     const { boards, lists: listsById, cards: cardsById } = props;
     const boardRows = Object.values(boards);
 
@@ -131,11 +133,57 @@ const _Overview: FC<Props> = (props: Props) => {
     );
 };
 
-export const Overview = connect(
+
+interface InputProps {
+    showTable?: boolean;
+    showConfigById?: (boardId: string)=>void;
+}
+
+const OverviewTable = connect(
     (state: RootState) => ({
         boards: state.kanban.boards,
         lists: state.kanban.lists,
         cards: state.kanban.cards
     }),
-    (dispatch: Dispatch) => ({})
-)(_Overview);
+)(_OverviewTable);
+
+const BriefContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+`;
+
+interface OverviewCardsProps {
+    boards: string[];
+    setId: (_id: string)=>void;
+    showConfigById?: (boardId: string)=>void;
+}
+
+const OverviewCards = connect(
+    (state: RootState) => ({
+        boards: Object.keys(state.kanban.boards)
+    }),
+    (dispatch: Dispatch) => ({
+        setId: (_id: string) => dispatch(actions.setChosenBoardId(_id))
+    })
+)(((props: OverviewCardsProps)=>{
+    const {boards, setId} = props;
+
+    return (
+        <BriefContainer>
+            {boards.map(_id=>{
+                const onClick = ()=>setId(_id);
+                const onSettingClick = props.showConfigById? (()=>{
+                    props.showConfigById!(_id);
+                }) : undefined;
+                return (
+                    <BoardBrief key={_id} boardId={_id} onClick={onClick} onSettingClick={onSettingClick}/>
+                )
+            }) }
+        </BriefContainer>
+    );
+}) as FC<OverviewCardsProps>);
+
+export const Overview: FC<InputProps> = ({showTable = false, showConfigById}: InputProps)=> (
+    showTable? <OverviewTable/> : <OverviewCards showConfigById={showConfigById}/>
+);
