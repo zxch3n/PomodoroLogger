@@ -88,8 +88,8 @@ interface InputProps {
 }
 
 interface Props extends KanbanBoard, InputProps{
-    delete: ()=>void,
     choose: ()=>void,
+    configure: ()=>void,
     listsById: ListsState,
     cardsById: CardsState,
 }
@@ -156,6 +156,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
     const onSettingClick = (event: any)=>{
         event.preventDefault();
         event.stopPropagation();
+        props.configure();
         props.onSettingClick!();
     };
 
@@ -226,8 +227,8 @@ export const BoardBrief = connect(
         cardsById: state.kanban.cards,
     }),
     (dispatch: Dispatch, props: InputProps) => ({
-        delete: () => actions.deleteBoard(props.boardId)(dispatch),
-        choose: () => dispatch(kanbanActions.setChosenBoardId(props.boardId))
+        choose: () => dispatch(kanbanActions.setChosenBoardId(props.boardId)),
+        configure: () => dispatch(kanbanActions.setConfiguringBoardId(props.boardId)),
     })
 
 )(_BoardBrief);

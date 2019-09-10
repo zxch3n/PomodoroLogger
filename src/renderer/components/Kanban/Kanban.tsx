@@ -124,7 +124,9 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
 
     const onDelete = () => {
         if (props.kanban.chosenBoardId) {
-            props.deleteBoard(props.kanban.chosenBoardId)
+            props.deleteBoard(props.kanban.chosenBoardId);
+        } else if (props.kanban.configuringBoardId){
+            props.deleteBoard(props.kanban.configuringBoardId);
         }
 
         setVisible(false);
@@ -216,7 +218,7 @@ interface FormProps {
 const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
     class extends React.Component<FormProps> {
         validator = (rule: any, name: string, callback: Function) => {
-            if (this.props.nameValidator(name)) {
+            if (this.props.isCreating || this.props.nameValidator(name)) {
                 callback();
                 return;
             }

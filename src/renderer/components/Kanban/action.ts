@@ -8,6 +8,7 @@ export interface KanbanState {
         listId: string;
     };
     searchReg?: string;
+    configuringBoardId?: string;
 }
 
 const defaultState: KanbanState = {
@@ -16,6 +17,12 @@ const defaultState: KanbanState = {
         listId: ''
     }
 };
+
+
+const setConfiguringBoardId = createActionCreator(
+    '[KANBAN]CONFIGURING_BOARD_ID',
+    resolve => (_id?: string) => resolve({ _id })
+);
 
 const setChosenBoardId = createActionCreator(
     '[KANBAN]SET_CHOSEN_BOARD_ID',
@@ -35,7 +42,8 @@ const setSearchReg = createActionCreator('[KANBAN]SET_SEARCH_REG', resolve => (r
 export const actions = {
     setChosenBoardId,
     setEditCard,
-    setSearchReg
+    setSearchReg,
+    setConfiguringBoardId
 };
 
 export type KanbanActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
@@ -60,5 +68,9 @@ export const reducer = createReducer<KanbanState, any>(defaultState, handle => [
     handle(setSearchReg, (state, { payload: { reg } }) => ({
         ...state,
         searchReg: reg
+    })),
+    handle(setConfiguringBoardId, (state, {payload: {_id}})=>({
+        ...state,
+        configuringBoardId: _id
     }))
 ]);
