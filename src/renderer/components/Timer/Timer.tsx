@@ -25,6 +25,17 @@ import { HelpIcon } from '../UserGuide/HelpIcon';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
+const KanbanName = styled.h1`
+    font-size: 2em;
+    padding-left: 12px;
+    transition: color 0.2s;
+    user-select: none;
+    cursor: pointer;
+    :hover {
+        color: rgb(85, 87, 240);
+    }
+`;
+
 const ProgressTextContainer = styled.div`
     margin-top: -50px;
     padding: 12px;
@@ -435,6 +446,12 @@ class Timer extends Component<Props, State> {
             .catch(console.error);
     };
 
+    private switchToKanban = () => {
+        if (this.props.timer.boardId) {
+            this.props.switchToKanban(this.props.timer.boardId);
+        }
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
@@ -472,9 +489,9 @@ class Timer extends Component<Props, State> {
                     undefined
                 ) : (
                     <MySider>
-                        <h1 style={{ fontSize: '2em', paddingLeft: 12 }}>
+                        <KanbanName onClick={this.switchToKanban}>
                             {this.props.kanban.boards[boardId].name}
-                        </h1>
+                        </KanbanName>
                         <Board
                             boardId={boardId}
                             doesOnlyShowFocusedList={true}

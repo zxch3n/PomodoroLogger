@@ -60,7 +60,7 @@ const Application = (props: Props) => {
                             Kanban
                         </span>
                     }
-                    key="project"
+                    key="kanban"
                 >
                     <Kanban />
                 </TabPane>

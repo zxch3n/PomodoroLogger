@@ -26,6 +26,7 @@ export interface KanbanBoard {
     focusedList: string;
     doneList: string;
     relatedSessions: SessionId[];
+    dueTime?: number; // TODO: Add due time setting
     aggInfo?: AggInfo;
 }
 

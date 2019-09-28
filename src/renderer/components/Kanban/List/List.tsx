@@ -25,6 +25,7 @@ const ListHead = styled.div`
     position: relative;
 
     h1 {
+        font-size: 18px;
         margin: 0;
     }
 

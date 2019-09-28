@@ -53,7 +53,7 @@ export const Card: FC<Props> = (props: Props) => {
                             onClick={onClick}
                         >
                             <CardContent>
-                                <h1>{props.title}</h1>
+                                <h1 style={{ margin: 0 }}>{props.title}</h1>
                                 <Markdown
                                     dangerouslySetInnerHTML={{
                                         __html: formatMarkdown(props.content)

@@ -2,7 +2,7 @@ import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
 import { actions as boardActions } from '../Kanban/Board/action';
-import { actions as historyActions } from '../History/action';
+import { actions as kanbanActions } from '../Kanban/action';
 import { promisify } from 'util';
 import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
@@ -169,6 +169,10 @@ export const actions = {
             console.log('predicted type', newProject);
             dispatch(setBoardId(newProject));
         }
+    },
+    switchToKanban: (kanbanId: string) => (dispatch: Dispatch) => {
+        dispatch(actions.changeAppTab('kanban'));
+        dispatch(kanbanActions.setChosenBoardId(kanbanId));
     }
 };
 

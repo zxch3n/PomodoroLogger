@@ -1,6 +1,8 @@
 import { createActionCreator, createReducer } from 'deox';
 
+export type SortType = 'recent' | 'alpha' | 'due' | 'spent' | 'remaining';
 export interface KanbanState {
+    sortedBy: SortType;
     chosenBoardId?: string;
     editCard: {
         isEditing: boolean;
@@ -12,12 +14,12 @@ export interface KanbanState {
 }
 
 const defaultState: KanbanState = {
+    sortedBy: 'recent',
     editCard: {
         isEditing: false,
         listId: ''
     }
 };
-
 
 const setConfiguringBoardId = createActionCreator(
     '[KANBAN]CONFIGURING_BOARD_ID',
@@ -27,6 +29,10 @@ const setConfiguringBoardId = createActionCreator(
 const setChosenBoardId = createActionCreator(
     '[KANBAN]SET_CHOSEN_BOARD_ID',
     resolve => (_id?: string) => resolve({ _id })
+);
+
+const setSortedBy = createActionCreator('[KANBAN]SET_SORTED_BY', resolve => (sortedBy: SortType) =>
+    resolve({ sortedBy })
 );
 
 const setEditCard = createActionCreator(
@@ -42,6 +48,7 @@ const setSearchReg = createActionCreator('[KANBAN]SET_SEARCH_REG', resolve => (r
 export const actions = {
     setChosenBoardId,
     setEditCard,
+    setSortedBy,
     setSearchReg,
     setConfiguringBoardId
 };
@@ -65,11 +72,15 @@ export const reducer = createReducer<KanbanState, any>(defaultState, handle => [
             }
         };
     }),
+    handle(setSortedBy, (state, { payload: { sortedBy } }) => ({
+        ...state,
+        sortedBy
+    })),
     handle(setSearchReg, (state, { payload: { reg } }) => ({
         ...state,
         searchReg: reg
     })),
-    handle(setConfiguringBoardId, (state, {payload: {_id}})=>({
+    handle(setConfiguringBoardId, (state, { payload: { _id } }) => ({
         ...state,
         configuringBoardId: _id
     }))

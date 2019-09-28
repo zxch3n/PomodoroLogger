@@ -3,20 +3,7 @@ import { KanbanActionTypes } from './action';
 import { KanbanState } from './reducer';
 import { BoardActionTypes } from './Board/action';
 import { CardInDetail } from './Card/CardInDetail';
-import {
-    Switch,
-    Button,
-    Divider,
-    Form,
-    Icon,
-    Input,
-    Layout,
-    Modal,
-    Popconfirm,
-    Select,
-    Row,
-    Col
-} from 'antd';
+import { Switch, Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select } from 'antd';
 import shortid from 'shortid';
 import Board from './Board';
 import styled from 'styled-components';
@@ -24,18 +11,28 @@ import TextArea from 'antd/es/input/TextArea';
 import { SearchBar } from './SearchBar';
 import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
-import { HelpIcon } from '../UserGuide/HelpIcon';
+import backIcon from '../../../res/back.svg';
+import { Label } from './style/Form';
 
 const { Option } = Select;
 const { Content } = Layout;
 
+const Title = styled.h1`
+    user-select: none;
+    display: inline-block;
+    margin: 0;
+    font-size: 22px;
+    vertical-align: bottom;
+`;
+
 const Header = styled.div`
+    margin: 0 16px;
     position: relative;
 
     .header-right {
         position: absolute;
-        top: 0px;
-        right: 0px;
+        top: 0;
+        right: 0;
     }
 `;
 
@@ -149,31 +146,43 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
         return -1 === Object.values(props.boards).findIndex(v => v.name === name);
     };
 
+    const goBack = () => {
+        props.setChosenBoardId(undefined);
+    };
+
     return (
         <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
             <Header>
-                <Select
-                    onChange={onSelectChange}
-                    value={props.kanban.chosenBoardId}
-                    style={{
-                        width: 200
-                    }}
-                    placeholder={'Choose your board'}
-                >
-                    <Option value={overviewId} key={overviewId}>
-                        [Overview]
-                    </Option>
-                    {Object.values(props.boards).map(v => {
-                        return (
-                            <Option value={v._id} key={v._id}>
-                                {v.name}
-                            </Option>
-                        );
-                    })}
-                </Select>
-                <Button style={{ paddingLeft: 10, paddingRight: 10 }} onClick={addBoard}>
-                    <Icon type={'plus'} />
-                </Button>
+                {props.kanban.chosenBoardId ? (
+                    <>
+                        <Title>{props.boards[props.kanban.chosenBoardId].name}</Title>
+                        <Button
+                            style={{ paddingLeft: 10, paddingRight: 10, marginLeft: 10 }}
+                            onClick={goBack}
+                        >
+                            <Icon component={backIcon} />
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Title>Kanban Boards Overview</Title>
+                        <Button
+                            style={{ paddingLeft: 10, paddingRight: 10, margin: '0 4px 0 16px' }}
+                            onClick={addBoard}
+                        >
+                            <Icon type={'plus'} />
+                        </Button>
+
+                        <Label>Sorted by:</Label>
+                        <Select value={props.kanban.sortedBy} onChange={props.setSortedBy}>
+                            <Option value="recent">Last Visit</Option>
+                            <Option value="alpha">Alphabet</Option>
+                            <Option value="due">Due Time</Option>
+                            <Option value="spent">Spent Time</Option>
+                            <Option value="remaining">Remaining Time</Option>
+                        </Select>
+                    </>
+                )}
                 <div className="header-right">
                     {props.kanban.chosenBoardId ? (
                         <Button shape={'circle'} icon={'setting'} onClick={showBoardSettingMenu} />
