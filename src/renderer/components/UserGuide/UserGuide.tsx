@@ -3,6 +3,7 @@ import React, {useEffect} from 'react';
 import styled from 'styled-components';
 import { Pointer } from './Pointer';
 import { Dialog } from './Dialog';
+import registerMap = echarts.registerMap;
 
 const Container = styled.div``;
 export interface UserGuideProps {
@@ -21,8 +22,27 @@ export const UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
     } = props.story;
 
     const {next} = props;
+    useEffect(()=>{
+        
+    }, [setUpRootState]);
 
     // TODO: register all the required events
+    useEffect(()=>{
+        if (confirmElementId == null) {
+            return;
+        }
+
+        const node = document.getElementById(confirmElementId);
+        if (node == null) {
+            return;
+        }
+
+        node.addEventListener('click', onConfirm);
+
+        return () => {
+            node.removeEventListener('click', onConfirm);
+        };
+    }, [confirmElementId]);
 
     useEffect(()=>{
 
@@ -31,6 +51,11 @@ export const UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
     const onConfirm = () => {
         next();
     };
+
+    if (reactNode) {
+        const Node = reactNode;
+        return <Node/>
+    }
 
     return (
         <>
