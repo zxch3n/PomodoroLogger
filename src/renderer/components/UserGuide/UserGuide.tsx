@@ -94,8 +94,6 @@ const _UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
         };
     };
 
-    // TODO: register all the required events
-
     useEffect(setConfirmListener, [confirmElementId]);
     useEffect(setZ, [pointerTargetSelector]);
     return (
