@@ -23,18 +23,18 @@ if (process.platform === 'win32') {
 let win: BrowserWindow | undefined;
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
-    const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+    // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+    const forceDownload = true;
+    console.log('forcedownload', forceDownload);
     const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+    console.log('react', installer[extensions[0]]);
+    console.log('redux', installer[extensions[1]]);
     return Promise.all(
         extensions.map(name => installer.default(installer[name], forceDownload))
     ).catch(console.log);
 };
 
 const createWindow = async () => {
-    if (process.env.NODE_ENV !== 'production') {
-        await installExtensions();
-    }
-
     win = new BrowserWindow({
         width: 1080,
         height: 800,
@@ -46,6 +46,12 @@ const createWindow = async () => {
             nodeIntegration: true
         }
     });
+
+    console.log('create window');
+    if (process.env.NODE_ENV !== 'production') {
+        await installExtensions();
+    }
+    console.log('installed extensions');
 
     if (process.env.NODE_ENV === 'production') {
         win.removeMenu();
@@ -65,6 +71,7 @@ const createWindow = async () => {
         );
     }
 
+    console.log('loaded url');
     win.on('close', (event: Event) => {
         if (win) {
             win.hide();

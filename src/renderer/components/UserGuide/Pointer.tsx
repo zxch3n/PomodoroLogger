@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import PointerIcon from '../../../res/pointer-left.svg';
-import styled, {keyframes} from 'styled-components';
-import { getElementAbsoluteOffsetById } from './utils';
+import styled, { keyframes, css } from 'styled-components';
+import { getElementAbsoluteOffsetBySelector } from './utils';
 
 const animation = keyframes`
   0% {
@@ -15,56 +15,61 @@ const animation = keyframes`
   }
 `;
 
-const AnimationG = styled.g`
-  animation: ${animation} 1s infinite;
+const Animation = styled.div`
+    animation: ${animation} 1s infinite;
 `;
 
-const NormalG = styled.g``;
-
-
+const Normal = styled.div``;
 export interface PointerProps {
     direction?: number; // radian
     show?: boolean;
     animate?: boolean;
-    targetDomId: string;
+    targetSelector: string;
 }
 
-
 export const Pointer: FC<PointerProps> = (props: PointerProps) => {
-    const {direction=0, show=true, animate=true, targetDomId} = props;
+    const { direction = 0, show = true, animate = true, targetSelector } = props;
     const [xy, setXy] = useState([0, 0]);
     const [wh, setWh] = useState([0, 0]);
     const ref = useRef<SVGElement>();
     const updatePosition = () => {
-        const [x, y, w, h] = getElementAbsoluteOffsetById(targetDomId);
+        const [x, y, w, h] = getElementAbsoluteOffsetBySelector(targetSelector);
+        console.log('xywh', x, y, w, h);
         setWh([w, h]);
-        setXy([x + w/2, y + h/2]);
+        setXy([x + w / 2, y + h / 2]);
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         updatePosition();
         window.addEventListener('resize', updatePosition);
-        return ()=>{
+        return () => {
             window.removeEventListener('resize', updatePosition);
-        }
-    }, []);
+        };
+    }, [targetSelector]);
 
-    const Wrapper = animate? AnimationG : NormalG;
+    const Wrapper = animate ? Animation : Normal;
     return (
-        <svg
+        <div
             // @ts-ignore
             ref={ref}
             style={{
                 position: 'fixed',
                 left: xy[0],
                 top: xy[1],
-                display: show? undefined : 'none'
+                display: show ? undefined : 'none',
+                zIndex: 103,
+                transform: `rotate(${direction}rad)`
             }}
-            transform={`rotate(${direction}rad) translate(${wh[0] + wh[1]} 0)`}
         >
             <Wrapper>
-                <PointerIcon/>
+                <PointerIcon
+                    style={{
+                        fontSize: 48,
+                        fill: 'white',
+                        transform: `translate(16px, ${Math.cos(direction * 2) * -16}px)`
+                    }}
+                />
             </Wrapper>
-        </svg>
-    )
+        </div>
+    );
 };

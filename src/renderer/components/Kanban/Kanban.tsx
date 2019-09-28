@@ -3,7 +3,20 @@ import { KanbanActionTypes } from './action';
 import { KanbanState } from './reducer';
 import { BoardActionTypes } from './Board/action';
 import { CardInDetail } from './Card/CardInDetail';
-import { Switch, Button, Divider, Form, Icon, Input, Layout, Modal, Popconfirm, Select, Row, Col } from 'antd';
+import {
+    Switch,
+    Button,
+    Divider,
+    Form,
+    Icon,
+    Input,
+    Layout,
+    Modal,
+    Popconfirm,
+    Select,
+    Row,
+    Col
+} from 'antd';
 import shortid from 'shortid';
 import Board from './Board';
 import styled from 'styled-components';
@@ -11,13 +24,14 @@ import TextArea from 'antd/es/input/TextArea';
 import { SearchBar } from './SearchBar';
 import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
+import { HelpIcon } from '../UserGuide/HelpIcon';
 
 const { Option } = Select;
 const { Content } = Layout;
 
 const Header = styled.div`
     position: relative;
-    
+
     .header-right {
         position: absolute;
         top: 0px;
@@ -30,15 +44,14 @@ interface FormValue {
     description: string;
 }
 
-interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes {
-}
+interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes {}
 
 export const Kanban: FunctionComponent<Props> = (props: Props) => {
     const ref = useRef<Form>();
     const [visible, setVisible] = useState(false);
     const [showTable, setShowTable] = useState(false);
     const [editingBoardId, setEditingBoardId] = useState<string | undefined>('');
-    const onShowTableChange = (value: boolean)=>{
+    const onShowTableChange = (value: boolean) => {
         setShowTable(value);
     };
     const valueHandler: (values: FormValue) => void = ({ name, description }: FormValue) => {
@@ -125,7 +138,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
     const onDelete = () => {
         if (props.kanban.chosenBoardId) {
             props.deleteBoard(props.kanban.chosenBoardId);
-        } else if (props.kanban.configuringBoardId){
+        } else if (props.kanban.configuringBoardId) {
             props.deleteBoard(props.kanban.configuringBoardId);
         }
 
@@ -133,11 +146,11 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
     };
 
     const boardNameValidator = (name: string) => {
-        return -1 === Object.values(props.boards).findIndex(v=>v.name === name);
+        return -1 === Object.values(props.boards).findIndex(v => v.name === name);
     };
 
     return (
-        <Layout style={{ padding: 4, height: 'calc(100vh - 45px)'}}>
+        <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
             <Header>
                 <Select
                     onChange={onSelectChange}
@@ -158,21 +171,18 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         );
                     })}
                 </Select>
-                <Button style={{paddingLeft: 10, paddingRight: 10}} onClick={addBoard}>
-                    <Icon type={'plus'}/>
+                <Button style={{ paddingLeft: 10, paddingRight: 10 }} onClick={addBoard}>
+                    <Icon type={'plus'} />
                 </Button>
-                <div className='header-right'>
-                    {
-                        props.kanban.chosenBoardId ? (
-                            <Button shape={'circle'} icon={'setting'} onClick={showBoardSettingMenu}/>
-                        ) : (
-                            <LabelButton>
-                                <label>Show Table: </label>
-                                <Switch onChange={onShowTableChange} checked={showTable}/>
-                            </LabelButton>
-                        )
-                    }
-
+                <div className="header-right">
+                    {props.kanban.chosenBoardId ? (
+                        <Button shape={'circle'} icon={'setting'} onClick={showBoardSettingMenu} />
+                    ) : (
+                        <LabelButton>
+                            <label>Show Table: </label>
+                            <Switch onChange={onShowTableChange} checked={showTable} />
+                        </LabelButton>
+                    )}
                 </div>
             </Header>
             <Content
@@ -182,9 +192,9 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                 }}
             >
                 {props.kanban.chosenBoardId === undefined ? (
-                    <Overview showConfigById={showConfigById} showTable={showTable}/>
+                    <Overview showConfigById={showConfigById} showTable={showTable} />
                 ) : (
-                    <Board boardId={props.kanban.chosenBoardId} key={props.kanban.chosenBoardId}/>
+                    <Board boardId={props.kanban.chosenBoardId} key={props.kanban.chosenBoardId} />
                 )}
             </Content>
             {
@@ -199,8 +209,8 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                     nameValidator={boardNameValidator}
                 />
             }
-            <CardInDetail/>
-            <SearchBar/>
+            <CardInDetail />
+            <SearchBar />
         </Layout>
     );
 };
@@ -211,8 +221,8 @@ interface FormProps {
     form: any;
     visible: boolean;
     isCreating: boolean;
-    onDelete: ()=>void;
-    nameValidator: (name: string)=>boolean;
+    onDelete: () => void;
+    nameValidator: (name: string) => boolean;
 }
 
 const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
@@ -223,7 +233,7 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                 return;
             }
 
-            callback(`Board "${name}" already exists`)
+            callback(`Board "${name}" already exists`);
         };
 
         render() {
@@ -242,27 +252,27 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                             {getFieldDecorator('name', {
                                 rules: [
                                     { required: true, message: 'Please input the name of board!' },
-                                    { max: 24, message: 'Max length of name is 24'},
-                                    { validator: this.validator}
+                                    { max: 24, message: 'Max length of name is 24' },
+                                    { validator: this.validator }
                                 ]
-                            })(<Input/>)}
+                            })(<Input />)}
                         </Form.Item>
                         <Form.Item label="Description">
                             {getFieldDecorator('description')(
-                                <TextArea autosize={{ minRows: 3, maxRows: 5 }}/>
+                                <TextArea autosize={{ minRows: 3, maxRows: 5 }} />
                             )}
                         </Form.Item>
-                        {
-                            !isCreating? (
-                                <Form.Item>
-                                    <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
-                                        <Button type={'danger'} icon={'delete'}>
-                                            Delete
-                                        </Button>
-                                    </Popconfirm>
-                                </Form.Item>
-                            ) : undefined
-                        }
+                        {!isCreating ? (
+                            <Form.Item>
+                                <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
+                                    <Button type={'danger'} icon={'delete'}>
+                                        Delete
+                                    </Button>
+                                </Popconfirm>
+                            </Form.Item>
+                        ) : (
+                            undefined
+                        )}
                     </Form>
                 </Modal>
             );

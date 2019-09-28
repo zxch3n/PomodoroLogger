@@ -1,18 +1,17 @@
 import { RootState } from '../../reducers';
 
 export interface Position {
-    left?: number|string;
-    right?: number|string;
-    top?: number|string;
-    bottom?: number|string;
+    left?: number | string;
+    right?: number | string;
+    top?: number | string;
+    bottom?: number | string;
 }
 
 export interface Story {
     name: string;
-    setUpRootState?: Partial<RootState>;
-    pointerTargetDomId?: string;
+    pointerTargetSelector?: string;
     pointerDirection?: number;
-    targetJumping?: boolean; // let the target jump
+    targetJumping?: boolean; // whether jumping up and down
 
     blurId?: string;
 

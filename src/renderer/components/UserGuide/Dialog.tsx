@@ -1,58 +1,50 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { getElementAbsoluteOffsetById } from './utils';
+import { getElementAbsoluteOffsetBySelector } from './utils';
 import { Position } from './type';
-import { Button } from 'antd';
-
-const Mask = styled.div`
-  background-color: rgba(0, 0, 0, 0.2);
-  position: fixed;
-  height: 100vh;
-  width: 100vw;
-`;
-
+import { Button, Card } from 'antd';
 
 const Container = styled.div`
-  position: fixed;
+    z-index: 101;
+    user-select: none;
+    position: fixed;
+    font-family: sans-serif, 'Lucida Sans', 'Microsoft YaHei';
+    color: white;
 `;
-
 
 export interface DialogProps {
     text?: string;
     position?: Position;
-    targetId?: string;
+    targetSelector?: string;
     hasConfirm?: boolean;
-    onConfirm?: ()=>void;
+    onConfirm?: () => void;
 }
 
-
 export const Dialog: React.FC<DialogProps> = (props: DialogProps) => {
-    const {text, position={bottom: 12, right: 12}, targetId, hasConfirm=true, onConfirm} = props;
-    useEffect(()=>{
-        if (targetId == null) {
+    const {
+        text,
+        position = { bottom: 24, right: 36 },
+        targetSelector,
+        hasConfirm = true,
+        onConfirm
+    } = props;
+    useEffect(() => {
+        if (targetSelector == null) {
             return;
         }
 
-        const [x, y, w, h] = getElementAbsoluteOffsetById(targetId);
-    } , [targetId]);
+        const [x, y, w, h] = getElementAbsoluteOffsetBySelector(targetSelector);
+    }, [targetSelector]);
     return (
-        <>
-            <Container
-                style={{
-                    ...position
-                }}
-            >
-                <p>
-                    {text}
-                </p>
-                {
-                    hasConfirm? (
-                        <Button onClick={onConfirm}>Confirm</Button>
-                    ) : undefined
-                }
-            </Container>
-
-            <Mask/>
-        </>
+        <Container
+            style={{
+                ...position
+            }}
+        >
+            <Card style={{ borderRadius: 4 }}>
+                <p style={{ fontSize: 18 }}>{text}</p>
+            </Card>
+            {hasConfirm ? <Button onClick={onConfirm}>Confirm</Button> : undefined}
+        </Container>
     );
 };

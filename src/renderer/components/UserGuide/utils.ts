@@ -1,13 +1,27 @@
-export const getElementAbsoluteOffsetById = (_id: string) => {
-    let target = document.getElementById(_id);
+export const getElementAbsoluteOffsetBySelector = (selector: string) => {
+    let target = document.querySelector<HTMLElement>(selector);
     let x = 0;
     let y = 0;
     if (target == null) {
-        throw new Error()
+        throw new Error();
     }
 
-    const w = target.clientWidth;
-    const h = target.clientHeight;
+    let w;
+    let h;
+    const computedStyle = getComputedStyle(target);
+    h = target.clientHeight; // height with padding
+    w = target.clientWidth; // width with padding
+    console.log(w, h);
+    try {
+        // @ts-ignore
+        h -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
+        // @ts-ignore
+        w -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight);
+    } catch (e) {
+        console.log('sub failed');
+    }
+
+    console.log(w, h);
     while (target) {
         if (target.offsetLeft == null) {
             throw new Error('Imp assumption error');
@@ -18,5 +32,5 @@ export const getElementAbsoluteOffsetById = (_id: string) => {
         target = target.offsetParent as HTMLElement;
     }
 
-    return [x, y, w, h]
+    return [x, y, w, h];
 };

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Divider, Icon, message, Tooltip } from 'antd';
+import { Button, Divider, Icon, message, Tooltip } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes, KanbanBoard } from '../Kanban/Board/action';
@@ -21,6 +21,7 @@ import { DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
 import Board from '../Kanban/Board';
+import { HelpIcon } from '../UserGuide/HelpIcon';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -32,6 +33,7 @@ const ProgressTextContainer = styled.div`
 `;
 
 const TimerLayout = styled.div`
+    position: relative;
     padding: 0 24px 0 24px;
     height: calc(100vh - 45px);
     overflow-y: auto;
@@ -466,7 +468,6 @@ class Timer extends Component<Props, State> {
                     onStart={this.onMaskButtonClick}
                     pomodoroNum={this.state.pomodoroNum}
                 />
-
                 {listId === undefined || boardId === undefined ? (
                     undefined
                 ) : (
@@ -482,6 +483,14 @@ class Timer extends Component<Props, State> {
                     </MySider>
                 )}
                 <TimerLayout ref={this.mainDiv}>
+                    <HelpIcon
+                        storyName={'allStories'}
+                        style={{
+                            position: 'absolute',
+                            top: 14,
+                            right: 14
+                        }}
+                    />
                     <TimerInnerLayout>
                         <ProgressContainer>
                             <Progress
@@ -518,23 +527,36 @@ class Timer extends Component<Props, State> {
                         <ButtonRow>
                             <div id="start-timer-button" style={{ lineHeight: 0 }}>
                                 {isRunning ? (
-                                    <Icon
-                                        type="pause-circle"
+                                    <Button
+                                        icon="pause"
                                         title="Pause"
+                                        shape={'circle'}
                                         onClick={this.onStopResumeOrStart}
                                     />
                                 ) : (
-                                    <Icon
-                                        type="play-circle"
+                                    <Button
+                                        icon="caret-right"
                                         title="Start"
+                                        shape={'circle'}
                                         onClick={this.onStopResumeOrStart}
                                     />
                                 )}
                             </div>
                             <div id="clear-timer-button" style={{ lineHeight: 0 }}>
-                                <Icon type="close-circle" title="Clear" onClick={this.onClear} />
+                                <Button
+                                    shape="circle"
+                                    icon="close"
+                                    title="Clear"
+                                    onClick={this.onClear}
+                                />
                             </div>
-                            <Icon type="more" title="Show More" onClick={this.toggleMode} />
+                            <Button
+                                id="more-timer-button"
+                                icon="more"
+                                shape="circle"
+                                title="Show More"
+                                onClick={this.toggleMode}
+                            />
                         </ButtonRow>
 
                         <MoreInfo>

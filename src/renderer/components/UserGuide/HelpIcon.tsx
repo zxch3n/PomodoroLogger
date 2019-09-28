@@ -2,28 +2,29 @@ import { connect } from 'react-redux';
 import { actions } from './actions';
 import React, { FC } from 'react';
 import { Dispatch } from 'redux';
-import { Icon } from 'antd';
+import { Icon, Button } from 'antd';
 
 interface InputProps {
-    storyName: string
+    storyName: string;
+    style?: any;
 }
 
 interface Props {
-    showStory: ()=>void;
+    showStory: () => void;
+    style?: any;
 }
-
 
 const _HelpIcon: FC<Props> = (props: Props) => {
     return (
-        <Icon type={'help'} onClick={props.showStory}/>
-    )
+        <Button icon={'question'} onClick={props.showStory} shape={'circle'} style={props.style} />
+    );
 };
 
 export const HelpIcon = connect(
     undefined,
     (dispatch: Dispatch, props: InputProps) => {
         return {
-            showStory: () => dispatch(actions.getHelpByStoryName(props.storyName))
-        }
+            showStory: () => dispatch(actions.startHelpByStoryName(props.storyName))
+        };
     }
 )(_HelpIcon);
