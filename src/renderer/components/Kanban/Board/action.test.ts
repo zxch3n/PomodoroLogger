@@ -56,12 +56,14 @@ describe('board actions', () => {
         await actions.addBoard(_id, 'B0')(dispatch);
         const doc: KanbanBoard = await db.findOne({ _id });
         expect(doc.lists.length).toBe(3);
+        delete doc.lastVisitTime;
         expect(doc).toStrictEqual(state[_id]);
         await actions.moveList(_id, 0, 2)(dispatch);
         const newDoc: KanbanBoard = await db.findOne({ _id });
         expect(newDoc.lists[0]).toBe(doc.lists[1]);
         expect(newDoc.lists[1]).toBe(doc.lists[2]);
         expect(newDoc.lists[2]).toBe(doc.lists[0]);
+        delete newDoc.lastVisitTime;
         expect(newDoc).toStrictEqual(state[_id]);
     });
 });
