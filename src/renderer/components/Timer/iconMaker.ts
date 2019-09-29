@@ -71,10 +71,6 @@ function drawCircleProgress(
     ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.fill();
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2 - 1, 0, 2 * Math.PI);
-    ctx.closePath();
-    ctx.stroke();
 
     if (isFocusing) {
         ctx.fillStyle = red;

@@ -1,6 +1,11 @@
 import { createActionCreator, createReducer } from 'deox';
+import { actions as boardActions } from './Board/action';
+import { actions as timerActions } from '../Timer/action';
+import { Dispatch } from 'redux';
 
+export type SortType = 'recent' | 'alpha' | 'due' | 'spent' | 'remaining';
 export interface KanbanState {
+    sortedBy: SortType;
     chosenBoardId?: string;
     editCard: {
         isEditing: boolean;
@@ -8,18 +13,29 @@ export interface KanbanState {
         listId: string;
     };
     searchReg?: string;
+    configuringBoardId?: string;
 }
 
 const defaultState: KanbanState = {
+    sortedBy: 'recent',
     editCard: {
         isEditing: false,
         listId: ''
     }
 };
 
+const setConfiguringBoardId = createActionCreator(
+    '[KANBAN]CONFIGURING_BOARD_ID',
+    resolve => (_id?: string) => resolve({ _id })
+);
+
 const setChosenBoardId = createActionCreator(
     '[KANBAN]SET_CHOSEN_BOARD_ID',
     resolve => (_id?: string) => resolve({ _id })
+);
+
+const setSortedBy = createActionCreator('[KANBAN]SET_SORTED_BY', resolve => (sortedBy: SortType) =>
+    resolve({ sortedBy })
 );
 
 const setEditCard = createActionCreator(
@@ -33,9 +49,20 @@ const setSearchReg = createActionCreator('[KANBAN]SET_SEARCH_REG', resolve => (r
 );
 
 export const actions = {
-    setChosenBoardId,
     setEditCard,
-    setSearchReg
+    setSortedBy,
+    setSearchReg,
+    setConfiguringBoardId,
+    setChosenBoardId: (_id: string | undefined) => async (dispatch: Dispatch) => {
+        dispatch(setChosenBoardId(_id));
+        if (_id) {
+            await boardActions.setLastVisitTime(_id, new Date().getTime())(dispatch);
+        }
+    },
+    focusOn: (_id: string) => (dispatch: Dispatch) => {
+        dispatch(timerActions.changeAppTab('timer'));
+        dispatch(timerActions.setBoardId(_id));
+    }
 };
 
 export type KanbanActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
@@ -57,8 +84,16 @@ export const reducer = createReducer<KanbanState, any>(defaultState, handle => [
             }
         };
     }),
+    handle(setSortedBy, (state, { payload: { sortedBy } }) => ({
+        ...state,
+        sortedBy
+    })),
     handle(setSearchReg, (state, { payload: { reg } }) => ({
         ...state,
         searchReg: reg
+    })),
+    handle(setConfiguringBoardId, (state, { payload: { _id } }) => ({
+        ...state,
+        configuringBoardId: _id
     }))
 ]);

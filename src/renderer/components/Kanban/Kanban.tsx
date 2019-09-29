@@ -3,25 +3,51 @@ import { KanbanActionTypes } from './action';
 import { KanbanState } from './reducer';
 import { BoardActionTypes } from './Board/action';
 import { CardInDetail } from './Card/CardInDetail';
-import { Switch, Button, Divider, Form, Icon, Input, Layout, Modal, Popconfirm, Select, Row, Col } from 'antd';
-import shortid from 'shortid';
+import { Switch, Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select } from 'antd';
 import Board from './Board';
 import styled from 'styled-components';
 import TextArea from 'antd/es/input/TextArea';
 import { SearchBar } from './SearchBar';
 import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
-
+import backIcon from '../../../res/back.svg';
+import { Label } from './style/Form';
+import shortid from 'shortid';
 const { Option } = Select;
-const { Content } = Layout;
+
+const Content = styled.main`
+    overflow: auto;
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background-color: #f5f5f5;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        background-color: rgba(50, 50, 50, 0.3);
+    }
+    ::-webkit-scrollbar-track {
+        border-radius: 8px;
+        background-color: rgba(200, 200, 200, 0.5);
+    }
+`;
+
+const Title = styled.h1`
+    user-select: none;
+    display: inline-block;
+    margin: 0;
+    font-size: 22px;
+    vertical-align: bottom;
+`;
 
 const Header = styled.div`
+    margin: 0 16px;
     position: relative;
-    
+
     .header-right {
         position: absolute;
-        top: 0px;
-        right: 0px;
+        top: 0;
+        right: 0;
     }
 `;
 
@@ -30,15 +56,14 @@ interface FormValue {
     description: string;
 }
 
-interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes {
-}
+interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes {}
 
 export const Kanban: FunctionComponent<Props> = (props: Props) => {
     const ref = useRef<Form>();
     const [visible, setVisible] = useState(false);
     const [showTable, setShowTable] = useState(false);
     const [editingBoardId, setEditingBoardId] = useState<string | undefined>('');
-    const onShowTableChange = (value: boolean)=>{
+    const onShowTableChange = (value: boolean) => {
         setShowTable(value);
     };
     const valueHandler: (values: FormValue) => void = ({ name, description }: FormValue) => {
@@ -124,53 +149,91 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
 
     const onDelete = () => {
         if (props.kanban.chosenBoardId) {
-            props.deleteBoard(props.kanban.chosenBoardId)
+            props.deleteBoard(props.kanban.chosenBoardId);
+        } else if (props.kanban.configuringBoardId) {
+            props.deleteBoard(props.kanban.configuringBoardId);
         }
 
         setVisible(false);
     };
 
     const boardNameValidator = (name: string) => {
-        return -1 === Object.values(props.boards).findIndex(v=>v.name === name);
+        return -1 === Object.values(props.boards).findIndex(v => v.name === name);
+    };
+
+    const goBack = () => {
+        props.setChosenBoardId(undefined);
+    };
+
+    const choose = () => {
+        if (props.kanban.chosenBoardId) {
+            props.focusOn(props.kanban.chosenBoardId);
+        }
     };
 
     return (
-        <Layout style={{ padding: 4 }}>
+        <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
             <Header>
-                <Select
-                    onChange={onSelectChange}
-                    value={props.kanban.chosenBoardId}
-                    style={{
-                        width: 200
-                    }}
-                    placeholder={'Choose your board'}
-                >
-                    <Option value={overviewId} key={overviewId}>
-                        [Overview]
-                    </Option>
-                    {Object.values(props.boards).map(v => {
-                        return (
-                            <Option value={v._id} key={v._id}>
-                                {v.name}
-                            </Option>
-                        );
-                    })}
-                </Select>
-                <Button style={{paddingLeft: 10, paddingRight: 10}} onClick={addBoard}>
-                    <Icon type={'plus'}/>
-                </Button>
-                <div className='header-right'>
-                    {
-                        props.kanban.chosenBoardId ? (
-                            <Button shape={'circle'} icon={'setting'} onClick={showBoardSettingMenu}/>
-                        ) : (
-                            <LabelButton>
-                                <label>Show Table: </label>
-                                <Switch onChange={onShowTableChange} checked={showTable}/>
-                            </LabelButton>
-                        )
-                    }
+                {props.kanban.chosenBoardId ? (
+                    <>
+                        <Title>{props.boards[props.kanban.chosenBoardId].name}</Title>
+                        <Button
+                            style={{ paddingLeft: 10, paddingRight: 10, marginLeft: 10 }}
+                            onClick={goBack}
+                        >
+                            <Icon component={backIcon} />
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Title>Kanban Boards Overview</Title>
+                        <Button
+                            style={{ paddingLeft: 10, paddingRight: 10, margin: '0 4px 0 16px' }}
+                            onClick={addBoard}
+                            id={'create-kanban-button'}
+                        >
+                            <Icon type={'plus'} />
+                        </Button>
 
+                        <Label>Sorted by:</Label>
+                        <Select
+                            value={props.kanban.sortedBy}
+                            onChange={props.setSortedBy}
+                            style={{
+                                width: 140
+                            }}
+                        >
+                            <Option value="recent">Last Visit</Option>
+                            <Option value="alpha">Alphabet</Option>
+                            {/* TODO: Due time */}
+                            {/*<Option value="due">Due Time</Option>*/}
+                            <Option value="spent">Spent Time</Option>
+                            <Option value="remaining">Remaining Time</Option>
+                        </Select>
+                    </>
+                )}
+                <div className="header-right">
+                    {props.kanban.chosenBoardId ? (
+                        <>
+                            <Button
+                                type={'default'}
+                                shape={'circle'}
+                                icon={'caret-right'}
+                                onClick={choose}
+                                style={{ marginRight: 6 }}
+                            />
+                            <Button
+                                shape={'circle'}
+                                icon={'setting'}
+                                onClick={showBoardSettingMenu}
+                            />
+                        </>
+                    ) : (
+                        <LabelButton>
+                            <label>Show Table: </label>
+                            <Switch onChange={onShowTableChange} checked={showTable} />
+                        </LabelButton>
+                    )}
                 </div>
             </Header>
             <Content
@@ -180,9 +243,9 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                 }}
             >
                 {props.kanban.chosenBoardId === undefined ? (
-                    <Overview showConfigById={showConfigById} showTable={showTable}/>
+                    <Overview showConfigById={showConfigById} showTable={showTable} />
                 ) : (
-                    <Board boardId={props.kanban.chosenBoardId} key={props.kanban.chosenBoardId}/>
+                    <Board boardId={props.kanban.chosenBoardId} key={props.kanban.chosenBoardId} />
                 )}
             </Content>
             {
@@ -197,8 +260,8 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                     nameValidator={boardNameValidator}
                 />
             }
-            <CardInDetail/>
-            <SearchBar/>
+            <CardInDetail />
+            <SearchBar />
         </Layout>
     );
 };
@@ -209,19 +272,19 @@ interface FormProps {
     form: any;
     visible: boolean;
     isCreating: boolean;
-    onDelete: ()=>void;
-    nameValidator: (name: string)=>boolean;
+    onDelete: () => void;
+    nameValidator: (name: string) => boolean;
 }
 
 const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
     class extends React.Component<FormProps> {
         validator = (rule: any, name: string, callback: Function) => {
-            if (this.props.nameValidator(name)) {
+            if (this.props.isCreating || this.props.nameValidator(name)) {
                 callback();
                 return;
             }
 
-            callback(`Board "${name}" already exists`)
+            callback(`Board "${name}" already exists`);
         };
 
         render() {
@@ -240,25 +303,27 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                             {getFieldDecorator('name', {
                                 rules: [
                                     { required: true, message: 'Please input the name of board!' },
-                                    { max: 24, message: 'Max length of name is 24'},
-                                    { validator: this.validator}
+                                    { max: 24, message: 'Max length of name is 24' },
+                                    { validator: this.validator }
                                 ]
-                            })(<Input/>)}
+                            })(<Input />)}
                         </Form.Item>
                         <Form.Item label="Description">
                             {getFieldDecorator('description')(
-                                <TextArea autosize={{ minRows: 3, maxRows: 5 }}/>
+                                <TextArea autosize={{ minRows: 3, maxRows: 5 }} />
                             )}
                         </Form.Item>
-                        {
-                            !isCreating? (
-                                <Form.Item>
-                                    <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
-                                        <Button shape={'circle'} type={'danger'} icon={'delete'}/>
-                                    </Popconfirm>
-                                </Form.Item>
-                            ) : undefined
-                        }
+                        {!isCreating ? (
+                            <Form.Item>
+                                <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
+                                    <Button type={'danger'} icon={'delete'}>
+                                        Delete
+                                    </Button>
+                                </Popconfirm>
+                            </Form.Item>
+                        ) : (
+                            undefined
+                        )}
                     </Form>
                 </Modal>
             );

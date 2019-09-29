@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+import { actions as timerActions } from '../../Timer/action';
 import { connect } from 'react-redux';
 import { RootState } from '../../../reducers';
 import { actions, KanbanBoard } from './action';
 import { actions as kanbanActions } from '../action';
 import { Dispatch } from 'redux';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Card, CardsState } from '../Card/action';
 import { ListsState } from '../List/action';
 import { Button, Divider } from 'antd';
@@ -14,8 +15,10 @@ import formatMarkdown from '../Card/formatMarkdown';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
+import { ListsCountBar } from '../../Visualization/Bar';
 
 const BriefCard = styled.div`
+    position: relative;
     display: inline-block;
     padding: 6px;
     background-color: white;
@@ -24,45 +27,98 @@ const BriefCard = styled.div`
     width: 260px;
     min-height: 100px;
     cursor: pointer;
-    transition: transform 0.3s;
-    
+    transition: box-shadow 0.5s, transform 0.5s;
+
     :hover {
-      box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.14);
-      transform: translate(-3px, -3px);
+        box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.14);
+        transform: translate(-3px -3px);
+        z-index: 100;
+    }
+`;
+
+const clipAnimation = keyframes`
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  20% {
+    clip-path: inset(0 0 0 0);
+  }
+  85% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+`;
+
+const AnimTrend = styled.div`
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    z-index: -1;
+    opacity: 0.5;
+    bottom: 16px;
+
+    svg {
+        animation: ${clipAnimation} 3s linear infinite;
+        animation-delay: 0.4s;
+        clip-path: inset(100%);
     }
 `;
 
 const Content = styled.div`
-  
+    position: relative;
+    padding: 0 8px;
 `;
 
 const Header = styled.div`
-  margin-bottom: 4px;
-  display: flex;
-  justify-content: space-between;
-  
-  h1 {
-    max-width: 180px;
-    word-break: break-all;
-  }
+    margin-top: 6px;
+    margin-bottom: 4px;
+    padding: 0 6px;
+    display: flex;
+    justify-content: space-between;
+
+    h1 {
+        max-width: 180px;
+        word-break: break-all;
+    }
 `;
 
-
 interface InputProps {
-    onClick?: ()=>void
+    onClick?: () => void;
 }
 
-interface Props extends KanbanBoard, InputProps{
-    delete: ()=>void,
-    choose: ()=>void,
-    listsById: ListsState,
-    cardsById: CardsState,
+interface Props extends KanbanBoard, InputProps {
+    choose: () => void;
+    configure: () => void;
+    listsById: ListsState;
+    cardsById: CardsState;
 }
-
 
 type NewCard = Card & { isDone?: boolean };
 const _BoardBrief: React.FC<Props> = (props: Props) => {
-    const { name, lists, relatedSessions, _id, listsById, doneList, cardsById, onClick } = props;
+    if (props._id === undefined) {
+        return <></>;
+    }
+
+    const {
+        name,
+        lists,
+        relatedSessions,
+        _id,
+        listsById,
+        doneList,
+        cardsById,
+        onClick,
+        spentHours
+    } = props;
+    const [hover, setHover] = useState(false);
+    const onMouseEnter = () => {
+        setHover(true);
+    };
+    const onMouseLeave = () => {
+        setHover(false);
+    };
     const cards: NewCard[] = lists.reduce((l: NewCard[], listId) => {
         for (const cardId of listsById[listId].cards) {
             const card: NewCard = cardsById[cardId];
@@ -111,78 +167,100 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
         accColor = '#ff350e';
     }
 
-    const onSettingClick = (event: any)=>{
+    const onSettingClick = (event: any) => {
         event.preventDefault();
         event.stopPropagation();
+        props.configure();
         props.onSettingClick!();
     };
 
     return (
-
-        <BriefCard onClick={onClick}>
+        <BriefCard
+            onClick={onClick}
+            onMouseLeave={onMouseLeave}
+            onMouseEnter={onMouseEnter}
+            className={'kanban-brief-card'}
+        >
             <Header>
                 <h1>{name}</h1>
                 <span>
-                    {
-                        props.onSettingClick? (
-                            <Button
-                                type={'default'}
-                                icon={'setting'}
-                                shape={'circle'}
-                                onClick={onSettingClick}
-                            />
-                        ) : undefined
-                    }
+                    <Button
+                        type={'default'}
+                        shape={'circle'}
+                        icon={'caret-right'}
+                        onClick={props.choose}
+                        size={'small'}
+                        style={{ marginRight: 6 }}
+                    />
+                    {props.onSettingClick ? (
+                        <Button
+                            type={'default'}
+                            icon={'setting'}
+                            shape={'circle'}
+                            onClick={onSettingClick}
+                            size={'small'}
+                        />
+                    ) : (
+                        undefined
+                    )}
                 </span>
             </Header>
             <Content>
-                {
-                    props.description? (
-                        <Markdown dangerouslySetInnerHTML={{__html: formatMarkdown(props.description)}}/>
-                    ) : (
-                        <i>No description provided</i>
-                    )
-                }
-                {
-                    props.relatedSessions.length? (
-                        <IdTrend boardId={props._id}/>
-                    ) : undefined
-                }
+                {props.description ? (
+                    <Markdown
+                        dangerouslySetInnerHTML={{ __html: formatMarkdown(props.description) }}
+                    />
+                ) : (
+                    undefined
+                )}
+                <ListsCountBar boardId={props._id} height={40} />
+                {props.relatedSessions.length ? (
+                    <AnimTrend style={{ display: hover ? undefined : 'none' }}>
+                        <IdTrend boardId={props._id} />
+                    </AnimTrend>
+                ) : (
+                    undefined
+                )}
             </Content>
-            <Divider style={{margin: '6px '}}/>
+            <Divider style={{ margin: '6px 0' }} />
             <BadgeHolder>
-                {
-                    estimatedLeftTimeSum? (
-                        <Badge type={'left'} value={formatTime(estimatedLeftTimeSum)}/>
-                    ) : undefined
-                }
-                <Badge type={'spent-time'} value={formatTime(actualTimeSum)}/>
-                {
-                    showErr? (
-                        <Badge type={'accuracy'} value={acc} color={accColor} title={'Estimate accuracy'}/>
-                    ) : undefined
-                }
+                {estimatedLeftTimeSum ? (
+                    <Badge type={'left'} value={formatTime(estimatedLeftTimeSum)} />
+                ) : (
+                    undefined
+                )}
+                <Badge type={'spent-time'} value={formatTime(spentHours)} />
+                {showErr ? (
+                    <Badge
+                        type={'accuracy'}
+                        value={acc}
+                        color={accColor}
+                        title={'Estimate accuracy'}
+                    />
+                ) : (
+                    undefined
+                )}
             </BadgeHolder>
         </BriefCard>
-    )
+    );
 };
 
-
 interface InputProps {
-    boardId: string,
-    onSettingClick?: ()=>void
+    boardId: string;
+    onSettingClick?: () => void;
 }
-
 
 export const BoardBrief = connect(
     (state: RootState, props: InputProps) => ({
         ...state.kanban.boards[props.boardId],
         listsById: state.kanban.lists,
-        cardsById: state.kanban.cards,
+        cardsById: state.kanban.cards
     }),
     (dispatch: Dispatch, props: InputProps) => ({
-        delete: () => actions.deleteBoard(props.boardId)(dispatch),
-        choose: () => dispatch(kanbanActions.setChosenBoardId(props.boardId))
+        choose: () => {
+            dispatch(timerActions.changeAppTab('timer'));
+            dispatch(timerActions.setBoardId(props.boardId));
+        },
+        configure: () => dispatch(kanbanActions.setConfiguringBoardId(props.boardId))
     })
-
 )(_BoardBrief);

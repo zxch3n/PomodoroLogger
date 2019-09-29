@@ -4,9 +4,28 @@ import { actions, Card, CardActionTypes } from './action';
 import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
 import { genMapDispatchToProp } from '../../../utils';
-import { Button, Form, Input, InputNumber, Modal, Switch } from 'antd';
+import {
+    Button,
+    Col,
+    Form,
+    Icon,
+    Input,
+    InputNumber,
+    Menu,
+    Modal,
+    Popconfirm,
+    Row,
+    Switch
+} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
+import styled from 'styled-components';
+
+const Container = styled.div`
+    .ant-form-item {
+        margin-bottom: 8px;
+    }
+`;
 
 interface Props extends CardActionTypes {
     visible: boolean;
@@ -46,6 +65,14 @@ const _CardInDetail: FC<Props> = (props: Props) => {
             } as FormData);
         }
     }, [card]);
+    const onDelete = () => {
+        if (!card) {
+            return;
+        }
+
+        props.deleteCard(card._id, listId);
+        onCancel();
+    };
 
     const [isEditingActualTime, setIsEditingActualTime] = useState(false);
     const onSwitchIsEditing = () => {
@@ -94,53 +121,72 @@ const _CardInDetail: FC<Props> = (props: Props) => {
             onCancel={onCancel}
             onOk={onSave}
         >
-            <Form layout="vertical">
-                <Form.Item label="Title">
-                    {getFieldDecorator('title', {
-                        rules: [{ required: true, message: 'Please input the name of board!' }]
-                    })(<Input placeholder={'Title'} />)}
-                </Form.Item>
-                <Form.Item label="Content">
-                    {getFieldDecorator('content')(
-                        <TextArea
-                            autosize={{ minRows: 3, maxRows: 5 }}
-                            placeholder={'Description'}
-                        />
-                    )}
-                </Form.Item>
-                <Form.Item label="Estimated Time In Hour">
-                    {getFieldDecorator('estimatedTime')(
-                        <InputNumber
-                            min={0}
-                            max={100}
-                            step={0.5}
-                            precision={1}
-                            placeholder={'Estimated Time In Hour'}
-                        />
-                    )}
-                </Form.Item>
-                {isCreating ? (
-                    undefined
-                ) : (
-                    <Form.Item label="Actual Spent Time In Hour">
-                        {getFieldDecorator('actualTime')(
-                            <InputNumber
-                                disabled={!isEditingActualTime}
-                                precision={2}
-                                min={0}
-                                step={0.2}
-                                placeholder={'Actual Time In Hour'}
+            <Container>
+                <Form layout="vertical">
+                    <Form.Item label="Title">
+                        {getFieldDecorator('title', {
+                            rules: [{ required: true, message: 'Please input the name of board!' }]
+                        })(<Input placeholder={'Title'} />)}
+                    </Form.Item>
+                    <Form.Item label="Content">
+                        {getFieldDecorator('content')(
+                            <TextArea
+                                autosize={{ minRows: 3, maxRows: 5 }}
+                                placeholder={'Description'}
                             />
                         )}
-                        <Button
-                            style={{ marginLeft: 4 }}
-                            icon={isEditingActualTime ? 'unlock' : 'lock'}
-                            shape={'circle-outline'}
-                            onClick={onSwitchIsEditing}
-                        />
                     </Form.Item>
-                )}
-            </Form>
+                    <Row>
+                        <Col span={12}>
+                            <Form.Item label="Estimated Time In Hour">
+                                {getFieldDecorator('estimatedTime')(
+                                    <InputNumber
+                                        min={0}
+                                        max={100}
+                                        step={0.5}
+                                        precision={1}
+                                        placeholder={'Estimated Time In Hour'}
+                                    />
+                                )}
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            {isCreating ? (
+                                undefined
+                            ) : (
+                                <Form.Item label="Actual Spent Time In Hour">
+                                    {getFieldDecorator('actualTime')(
+                                        <InputNumber
+                                            disabled={!isEditingActualTime}
+                                            precision={2}
+                                            min={0}
+                                            step={0.2}
+                                            placeholder={'Actual Time In Hour'}
+                                        />
+                                    )}
+                                    <Button
+                                        style={{ marginLeft: 4 }}
+                                        icon={isEditingActualTime ? 'unlock' : 'lock'}
+                                        shape={'circle-outline'}
+                                        onClick={onSwitchIsEditing}
+                                    />
+                                </Form.Item>
+                            )}
+                        </Col>
+                    </Row>
+                    {isCreating ? (
+                        undefined
+                    ) : (
+                        <Row>
+                            <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
+                                <Button type={'danger'} icon={'delete'}>
+                                    Delete
+                                </Button>
+                            </Popconfirm>
+                        </Row>
+                    )}
+                </Form>
+            </Container>
         </Modal>
     );
 };

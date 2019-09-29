@@ -13,18 +13,19 @@ const Container = styled.div`
     padding: 4px;
     margin: 6px;
     border-radius: 6px;
-    background-color: white;
+    background-color: rgb(254, 254, 254);
 `;
 
 const ListHead = styled.div`
     height: 4em;
     min-width: 250px;
     padding: 4px 12px;
-    background-color: white;
+    background-color: rgb(254, 254, 254);
     border-radius: 6px;
     position: relative;
 
     h1 {
+        font-size: 18px;
         margin: 0;
     }
 
@@ -48,24 +49,68 @@ const ListHead = styled.div`
     }
 `;
 
+// Using css ::before and ::after will cause dnd component jitter
+const BeforePlaceHolder = styled.div`
+    position: sticky;
+    display: block;
+    top: -2px;
+    width: 100%;
+    height: 0.6rem;
+    background: linear-gradient(
+        rgba(222, 222, 222, 1),
+        rgba(222, 222, 222, 0.001)
+    ); /* transparent keyword is broken in Safari */
+    pointer-events: none;
+`;
+
+const AfterPlaceHolder = styled.div`
+    content: '';
+    position: sticky;
+    display: block;
+    bottom: -2px;
+    width: 100%;
+    height: 0.6rem;
+    background: linear-gradient(
+        rgba(222, 222, 222, 0.001),
+        rgba(222, 222, 222, 1)
+    ); /* transparent keyword is broken in Safari */
+    pointer-events: none;
+`;
+
 const Cards = styled.div`
+    position: relative;
     padding: 0 2px;
     background-color: #dedede;
     border-radius: 4px;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
+    max-height: calc(100vh - 230px);
+    overflow-y: overlay;
+    min-height: 200px;
     max-width: 270px;
+    overflow-x: hidden;
+    ::-webkit-scrollbar {
+        width: 0.25rem;
+        opacity: 0;
+        transition: opacity 0.2s;
+        :hover {
+            opacity: 1;
+        }
+    }
+`;
+
+const ButtonPlaceHolder = styled.div`
+    position: sticky;
+    bottom: 0;
+    height: 32px;
 `;
 
 const ButtonWrapper = styled.div`
+    margin-top: 4px;
     text-align: center;
     position: sticky;
     left: 50%;
     bottom: 0;
     display: flex;
     justify-content: center;
-    background-color: #dedede;
-    border-radius: 0 0 4px 4px;
 `;
 
 export interface InputProps {
@@ -155,7 +200,12 @@ export const List: FC<Props> = (props: Props) => {
         <Draggable draggableId={props.listId} index={props.index}>
             {(provided, { draggingOver }) => (
                 <div>
-                    <Container ref={provided.innerRef} {...provided.draggableProps}>
+                    <Container
+                        ref={provided.innerRef}
+                        className={'kanban-list'}
+                        id={props.focused ? 'focused-list' : props.done ? 'done-list' : undefined}
+                        {...provided.draggableProps}
+                    >
                         <ListHead {...provided.dragHandleProps}>
                             {isEditing ? (
                                 <div
@@ -176,7 +226,7 @@ export const List: FC<Props> = (props: Props) => {
                                     </span>
                                     <div className="list-head-icon">
                                         {focused ? (
-                                            <Tooltip title={'Focused column'}>
+                                            <Tooltip title={'Focused List'}>
                                                 <span style={{ color: 'red', marginRight: 8 }}>
                                                     <Icon component={FocusIcon} />
                                                 </span>
@@ -185,7 +235,7 @@ export const List: FC<Props> = (props: Props) => {
                                             undefined
                                         )}
                                         {done ? (
-                                            <Tooltip title={'Done column'}>
+                                            <Tooltip title={'Done List'}>
                                                 <span style={{ color: 'green', marginRight: 8 }}>
                                                     <Icon component={DoneIcon} />
                                                 </span>
@@ -203,6 +253,7 @@ export const List: FC<Props> = (props: Props) => {
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => (
                                 <Cards ref={provided.innerRef}>
+                                    <BeforePlaceHolder />
                                     {filteredCards.map((cardId, index) => (
                                         <Card
                                             cardId={cardId}
@@ -213,12 +264,18 @@ export const List: FC<Props> = (props: Props) => {
                                         />
                                     ))}
                                     {provided.placeholder}
-                                    <ButtonWrapper>
-                                        <Button onClick={addCard} shape={'circle'} icon="plus" />
-                                    </ButtonWrapper>
+                                    <AfterPlaceHolder />
                                 </Cards>
                             )}
                         </Droppable>
+                        <ButtonWrapper>
+                            <Button
+                                onClick={addCard}
+                                shape={'circle'}
+                                icon="plus"
+                                id={'create-card-button'}
+                            />
+                        </ButtonWrapper>
                     </Container>
                     {provided.placeholder}
                 </div>

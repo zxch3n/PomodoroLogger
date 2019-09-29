@@ -74,7 +74,9 @@ To download, go to [release page](https://github.com/rem2016/PomodoroLogger/rele
 
 # Development
 
-To build the project, issue the following commands
+You need to install node.js and node-gyp to build this project.
+
+After installing yarn, issue the following commands
 
 ```
 yarn

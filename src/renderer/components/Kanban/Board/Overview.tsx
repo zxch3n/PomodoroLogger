@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { Table } from 'antd';
 import { RootState } from '../../../reducers';
 import { Dispatch } from 'redux';
-import { KanbanBoardState } from './action';
+import { KanbanBoard, KanbanBoardState } from './action';
 import { ListsState } from '../List/action';
 import { connect } from 'react-redux';
 import { Card, CardsState } from '../Card/action';
@@ -10,11 +10,13 @@ import { IdTrend } from '../../Visualization/ProjectTrend';
 import styled from 'styled-components';
 import { formatTime, formatTimeWithoutZero } from '../../../utils';
 import { BoardBrief } from './BoardBrief';
-import { actions } from '../action';
+import { actions, SortType } from '../action';
+import { workers } from '../../../workers';
+import { PomodoroRecord } from '../../../monitor/type';
 
 const Container = styled.div``;
 
-interface Props{
+interface Props {
     boards: KanbanBoardState;
     lists: ListsState;
     cards: CardsState;
@@ -133,57 +135,144 @@ const _OverviewTable: FC<Props> = (props: Props) => {
     );
 };
 
-
 interface InputProps {
     showTable?: boolean;
-    showConfigById?: (boardId: string)=>void;
+    showConfigById?: (boardId: string) => void;
 }
 
-const OverviewTable = connect(
-    (state: RootState) => ({
-        boards: state.kanban.boards,
-        lists: state.kanban.lists,
-        cards: state.kanban.cards
-    }),
-)(_OverviewTable);
+const OverviewTable = connect((state: RootState) => ({
+    boards: state.kanban.boards,
+    lists: state.kanban.lists,
+    cards: state.kanban.cards
+}))(_OverviewTable);
 
 const BriefContainer = styled.div`
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
 `;
 
+const sortFunc: Map<SortType, (a: KanbanBoard, b: KanbanBoard) => number> = new Map();
+sortFunc.set('alpha', (a, b) => {
+    return a.name < b.name ? -1 : 1;
+});
+sortFunc.set('due', (a, b) => {
+    if (!a.dueTime) {
+        return 1;
+    }
+
+    if (!b.dueTime) {
+        return -1;
+    }
+
+    return a.dueTime - b.dueTime;
+});
+sortFunc.set('spent', (a, b) => {
+    return -a.spentHours + b.spentHours;
+});
+sortFunc.set('recent', (a, b) => {
+    if (!a.lastVisitTime) {
+        return 1;
+    }
+
+    if (!b.lastVisitTime) {
+        return -1;
+    }
+
+    return -a.lastVisitTime + b.lastVisitTime;
+});
+
 interface OverviewCardsProps {
-    boards: string[];
-    setId: (_id: string)=>void;
-    showConfigById?: (boardId: string)=>void;
+    boards: KanbanBoard[];
+    sortedBy: SortType;
+    setId: (_id: string) => void;
+    lists: ListsState;
+    cards: CardsState;
+    showConfigById?: (boardId: string) => void;
 }
 
 const OverviewCards = connect(
     (state: RootState) => ({
-        boards: Object.keys(state.kanban.boards)
+        boards: Object.values(state.kanban.boards),
+        sortedBy: state.kanban.kanban.sortedBy,
+        lists: state.kanban.lists,
+        cards: state.kanban.cards
     }),
     (dispatch: Dispatch) => ({
-        setId: (_id: string) => dispatch(actions.setChosenBoardId(_id))
+        setId: (_id: string) => actions.setChosenBoardId(_id)(dispatch)
     })
-)(((props: OverviewCardsProps)=>{
-    const {boards, setId} = props;
+)(((props: OverviewCardsProps) => {
+    const { boards, setId } = props;
+    const [ids, setIds] = useState<string[]>([]);
+    useEffect(() => {
+        let alive = true;
+        if (
+            props.sortedBy === 'due' ||
+            props.sortedBy === 'alpha' ||
+            props.sortedBy === 'spent' ||
+            props.sortedBy === 'recent'
+        ) {
+            boards.sort(sortFunc.get(props.sortedBy));
+        } else if (props.sortedBy === 'remaining') {
+            const boardsMap: { [_id: string]: number } = {};
+            for (let i = 0; i < boards.length; i += 1) {
+                if (boardsMap[boards[i]._id] == null) {
+                    boardsMap[boards[i]._id] = 0;
+                }
+
+                const board = boards[i];
+                let leftSum = 0;
+                for (const j of board.lists) {
+                    if (j === board.doneList) {
+                        continue;
+                    }
+
+                    for (const card of props.lists[j].cards) {
+                        const h = props.cards[card].spentTimeInHour;
+                        const left = h.estimated - h.actual;
+                        leftSum += Math.max(0, left);
+                    }
+                }
+
+                boardsMap[boards[i]._id] = leftSum;
+            }
+
+            boards.sort((a, b) => {
+                return -boardsMap[a._id] + boardsMap[b._id];
+            });
+        }
+        setIds(boards.map(b => b._id));
+        return () => {
+            alive = false;
+        };
+    }, [
+        props.sortedBy,
+        props.boards,
+        props.sortedBy === 'remaining' && props.cards,
+        boards.reduce((v, b) => (b.lastVisitTime ? b.lastVisitTime : 0) + v, 0)
+    ]);
 
     return (
         <BriefContainer>
-            {boards.map(_id=>{
-                const onClick = ()=>setId(_id);
-                const onSettingClick = props.showConfigById? (()=>{
-                    props.showConfigById!(_id);
-                }) : undefined;
+            {ids.map(_id => {
+                const onClick = () => setId(_id);
+                const onSettingClick = props.showConfigById
+                    ? () => {
+                        props.showConfigById!(_id);
+                    }
+                    : undefined;
                 return (
-                    <BoardBrief key={_id} boardId={_id} onClick={onClick} onSettingClick={onSettingClick}/>
-                )
-            }) }
+                    <BoardBrief
+                        key={_id}
+                        boardId={_id}
+                        onClick={onClick}
+                        onSettingClick={onSettingClick}
+                    />
+                );
+            })}
         </BriefContainer>
     );
 }) as FC<OverviewCardsProps>);
 
-export const Overview: FC<InputProps> = ({showTable = false, showConfigById}: InputProps)=> (
-    showTable? <OverviewTable/> : <OverviewCards showConfigById={showConfigById}/>
-);
+export const Overview: FC<InputProps> = ({ showTable = false, showConfigById }: InputProps) =>
+    showTable ? <OverviewTable /> : <OverviewCards showConfigById={showConfigById} />;

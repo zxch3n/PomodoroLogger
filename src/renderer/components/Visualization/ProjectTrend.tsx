@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 // @ts-ignore
 import Trend from 'react-trend';
@@ -6,33 +6,66 @@ import { DBWorker } from '../../workers/DBWorker';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 
-const Container = styled.div``;
+const Container = styled.div`
+  position: relative;
+  transition: background-color 1s;
+  background-color: rgba(255, 255, 223, 0);
+  :hover {
+    background-color: rgba(23, 43, 223, 0.1);
+    h1 {
+      opacity: 1;
+    }
+  }
+  
+  h1 {
+    color: #0074E9;
+    opacity: 0;
+    transition: opacity 0.5s;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+`;
+
+const NoHover = styled.div``;
 
 interface Props {
     width?: number;
     height?: number;
     data: number[];
+    hoverEffect?: boolean;
 }
 
 export const ProjectTrend: React.FC<Props> = (props: Props) => {
+    const {hoverEffect=false} = props;
+    const ref = useRef();
+    const C = hoverEffect? Container : NoHover;
     return (
-        <Container>
+        // @ts-ignore
+        <C ref={ref}>
             {props.data.length > 0 ? (
-                <Trend
-                    width={props.width}
-                    height={props.height}
-                    smooth={true}
-                    data={props.data}
-                    gradient={['#00c6ff', '#F0F', '#FF0']}
-                    radius={10.1}
-                    strokeWidth={1.5}
-                    strokeLinecap={'butt'}
-                    maxData={16}
-                />
-            ) : (
-                undefined
-            )}
-        </Container>
+                <>
+                    {
+                        hoverEffect? (
+                            <h1>TREND</h1>
+                        ) : undefined
+                    }
+                    <Trend
+                        width={props.width}
+                        height={props.height}
+                        smooth={true}
+                        data={props.data}
+                        gradient={['#00c6ff', '#F0F', '#FF0']}
+                        radius={10.1}
+                        strokeWidth={1.5}
+                        strokeLinecap={'butt'}
+                        maxData={16}
+                    />
+                </>
+            ) : undefined}
+        </C>
     );
 };
 

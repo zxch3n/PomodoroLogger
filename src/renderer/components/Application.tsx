@@ -15,6 +15,7 @@ import { RootState } from '../reducers';
 import Kanban from './Kanban';
 import styled from 'styled-components';
 import Timer from './Timer';
+import { UserGuide } from './UserGuide/UserGuide';
 
 const Main = styled.div`
     .ant-tabs-bar {
@@ -59,7 +60,7 @@ const Application = (props: Props) => {
                             Kanban
                         </span>
                     }
-                    key="project"
+                    key="kanban"
                 >
                     <Kanban />
                 </TabPane>
@@ -103,6 +104,7 @@ const Application = (props: Props) => {
                     undefined
                 )}
             </Tabs>
+            <UserGuide />
         </Main>
     );
 };

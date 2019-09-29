@@ -37,19 +37,6 @@ export interface InputProps {
 interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {}
 export const Card: FC<Props> = (props: Props) => {
     const { index, listId, title, content, _id, isDraggingOver } = props;
-
-    const onDelete = () => {
-        props.deleteCard(props._id, props.listId);
-    };
-
-    const menu = (
-        <Menu>
-            <Menu.Item onClick={onDelete}>
-                <Icon type={'delete'} /> Delete
-            </Menu.Item>
-        </Menu>
-    );
-
     const onClick = () => {
         props.setEditCard(true, props.listId, props._id);
     };
@@ -64,16 +51,10 @@ export const Card: FC<Props> = (props: Props) => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             onClick={onClick}
+                            className={'kanban-card'}
                         >
                             <CardContent>
-                                <Dropdown overlay={menu} trigger={['click']}>
-                                    <span className="card-icon">
-                                        <h1>
-                                            <Icon type="more" />
-                                        </h1>
-                                    </span>
-                                </Dropdown>
-                                <h1>{props.title}</h1>
+                                <h1 style={{ margin: 0 }}>{props.title}</h1>
                                 <Markdown
                                     dangerouslySetInnerHTML={{
                                         __html: formatMarkdown(props.content)

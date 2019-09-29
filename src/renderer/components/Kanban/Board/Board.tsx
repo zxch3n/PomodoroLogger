@@ -9,6 +9,19 @@ const Container = styled.div`
     height: 100%;
     width: 100%;
     overflow-x: auto;
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background-color: #f5f5f5;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        background-color: rgba(50, 50, 50, 0.3);
+    }
+    ::-webkit-scrollbar-track {
+        border-radius: 8px;
+        background-color: rgba(200, 200, 200, 0.5);
+    }
 `;
 
 const ListContainer = styled.div`
