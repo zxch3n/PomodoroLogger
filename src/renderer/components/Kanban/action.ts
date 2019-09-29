@@ -1,5 +1,6 @@
 import { createActionCreator, createReducer } from 'deox';
 import { actions as boardActions } from './Board/action';
+import { actions as timerActions } from '../Timer/action';
 import { Dispatch } from 'redux';
 
 export type SortType = 'recent' | 'alpha' | 'due' | 'spent' | 'remaining';
@@ -57,6 +58,10 @@ export const actions = {
         if (_id) {
             await boardActions.setLastVisitTime(_id, new Date().getTime())(dispatch);
         }
+    },
+    focusOn: (_id: string) => (dispatch: Dispatch) => {
+        dispatch(timerActions.changeAppTab('timer'));
+        dispatch(timerActions.setBoardId(_id));
     }
 };
 

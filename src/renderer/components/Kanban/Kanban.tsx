@@ -165,6 +165,12 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
         props.setChosenBoardId(undefined);
     };
 
+    const choose = () => {
+        if (props.kanban.chosenBoardId) {
+            props.focusOn(props.kanban.chosenBoardId);
+        }
+    };
+
     return (
         <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
             <Header>
@@ -208,7 +214,20 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                 )}
                 <div className="header-right">
                     {props.kanban.chosenBoardId ? (
-                        <Button shape={'circle'} icon={'setting'} onClick={showBoardSettingMenu} />
+                        <>
+                            <Button
+                                type={'default'}
+                                shape={'circle'}
+                                icon={'caret-right'}
+                                onClick={choose}
+                                style={{ marginRight: 6 }}
+                            />
+                            <Button
+                                shape={'circle'}
+                                icon={'setting'}
+                                onClick={showBoardSettingMenu}
+                            />
+                        </>
                     ) : (
                         <LabelButton>
                             <label>Show Table: </label>

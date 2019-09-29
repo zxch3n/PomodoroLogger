@@ -68,7 +68,7 @@ const AnimTrend = styled.div`
 
 const Content = styled.div`
     position: relative;
-    padding: 8px;
+    padding: 0 8px;
 `;
 
 const Header = styled.div`
@@ -211,7 +211,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
                         dangerouslySetInnerHTML={{ __html: formatMarkdown(props.description) }}
                     />
                 ) : (
-                    <i>No description provided</i>
+                    undefined
                 )}
                 <ListsCountBar boardId={props._id} height={40} />
                 {props.relatedSessions.length ? (
