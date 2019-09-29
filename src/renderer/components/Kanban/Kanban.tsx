@@ -279,7 +279,7 @@ interface FormProps {
 const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
     class extends React.Component<FormProps> {
         validator = (rule: any, name: string, callback: Function) => {
-            if (this.props.isCreating || this.props.nameValidator(name)) {
+            if (!this.props.isCreating || this.props.nameValidator(name)) {
                 callback();
                 return;
             }
