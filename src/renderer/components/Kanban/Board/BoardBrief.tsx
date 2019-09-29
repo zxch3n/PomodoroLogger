@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { actions as timerActions } from '../../Timer/action';
 import { connect } from 'react-redux';
 import { RootState } from '../../../reducers';
 import { actions, KanbanBoard } from './action';
@@ -96,6 +97,10 @@ interface Props extends KanbanBoard, InputProps {
 
 type NewCard = Card & { isDone?: boolean };
 const _BoardBrief: React.FC<Props> = (props: Props) => {
+    if (props._id === undefined) {
+        return <></>;
+    }
+
     const {
         name,
         lists,
@@ -179,12 +184,21 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
             <Header>
                 <h1>{name}</h1>
                 <span>
+                    <Button
+                        type={'default'}
+                        shape={'circle'}
+                        icon={'caret-right'}
+                        onClick={props.choose}
+                        size={'small'}
+                        style={{ marginRight: 6 }}
+                    />
                     {props.onSettingClick ? (
                         <Button
                             type={'default'}
                             icon={'setting'}
                             shape={'circle'}
                             onClick={onSettingClick}
+                            size={'small'}
                         />
                     ) : (
                         undefined
@@ -243,7 +257,10 @@ export const BoardBrief = connect(
         cardsById: state.kanban.cards
     }),
     (dispatch: Dispatch, props: InputProps) => ({
-        choose: () => dispatch(kanbanActions.setChosenBoardId(props.boardId)),
+        choose: () => {
+            dispatch(timerActions.changeAppTab('timer'));
+            dispatch(timerActions.setBoardId(props.boardId));
+        },
         configure: () => dispatch(kanbanActions.setConfiguringBoardId(props.boardId))
     })
 )(_BoardBrief);

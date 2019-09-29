@@ -5,6 +5,7 @@ import { actions as cardActions } from '../Card/action';
 import { actions as kanbanActions } from '../action';
 import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
+import { lang } from '../../../../lang/en';
 
 const db = new DBWorker('kanbanDB');
 type ListId = string;
@@ -231,6 +232,8 @@ export const actions = {
         }
         dispatch(addBoard(_id, name, description, lists, lists[1], lists[2]));
 
+        const cardId = shortid.generate();
+        await cardActions.addCard(cardId, lists[0], lang.welcome, lang.demoCardContent)(dispatch);
         await db.insert({
             ...defaultBoard,
             _id,

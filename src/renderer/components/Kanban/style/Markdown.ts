@@ -33,4 +33,8 @@ export const Markdown = styled.div`
     p {
         margin: 0 !important;
     }
+
+    ul {
+        padding-left: 24px;
+    }
 `;

@@ -50,17 +50,26 @@ const ListHead = styled.div`
 `;
 
 const Cards = styled.div`
+    position: relative;
     padding: 0 2px;
     background-color: #dedede;
     border-radius: 4px;
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+    min-height: 200px;
     max-width: 270px;
+`;
+
+const ButtonPlaceHolder = styled.div`
+    position: sticky;
+    bottom: 0;
+    height: 32px;
 `;
 
 const ButtonWrapper = styled.div`
     text-align: center;
-    position: sticky;
+    position: absolute;
+    transform: translateX(-50%);
     left: 50%;
     bottom: 0;
     display: flex;
@@ -219,6 +228,7 @@ export const List: FC<Props> = (props: Props) => {
                                         />
                                     ))}
                                     {provided.placeholder}
+                                    <ButtonPlaceHolder />
                                     <ButtonWrapper>
                                         <Button
                                             onClick={addCard}
