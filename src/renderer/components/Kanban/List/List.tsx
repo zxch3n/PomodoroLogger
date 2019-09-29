@@ -13,14 +13,14 @@ const Container = styled.div`
     padding: 4px;
     margin: 6px;
     border-radius: 6px;
-    background-color: white;
+    background-color: rgb(254, 254, 254);
 `;
 
 const ListHead = styled.div`
     height: 4em;
     min-width: 250px;
     padding: 4px 12px;
-    background-color: white;
+    background-color: rgb(254, 254, 254);
     border-radius: 6px;
     position: relative;
 
@@ -54,7 +54,7 @@ const Cards = styled.div`
     padding: 0 2px;
     background-color: #dedede;
     border-radius: 4px;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 230px);
     overflow-y: auto;
     min-height: 200px;
     max-width: 270px;
@@ -67,15 +67,13 @@ const ButtonPlaceHolder = styled.div`
 `;
 
 const ButtonWrapper = styled.div`
+    margin-top: 4px;
     text-align: center;
-    position: absolute;
-    transform: translateX(-50%);
+    position: sticky;
     left: 50%;
     bottom: 0;
     display: flex;
     justify-content: center;
-    background-color: #dedede;
-    border-radius: 0 0 4px 4px;
 `;
 
 export interface InputProps {
@@ -228,18 +226,17 @@ export const List: FC<Props> = (props: Props) => {
                                         />
                                     ))}
                                     {provided.placeholder}
-                                    <ButtonPlaceHolder />
-                                    <ButtonWrapper>
-                                        <Button
-                                            onClick={addCard}
-                                            shape={'circle'}
-                                            icon="plus"
-                                            id={'create-card-button'}
-                                        />
-                                    </ButtonWrapper>
                                 </Cards>
                             )}
                         </Droppable>
+                        <ButtonWrapper>
+                            <Button
+                                onClick={addCard}
+                                shape={'circle'}
+                                icon="plus"
+                                id={'create-card-button'}
+                            />
+                        </ButtonWrapper>
                     </Container>
                     {provided.placeholder}
                 </div>
