@@ -49,15 +49,52 @@ const ListHead = styled.div`
     }
 `;
 
+// Using css ::before and ::after will cause dnd component jitter
+const BeforePlaceHolder = styled.div`
+    position: sticky;
+    display: block;
+    top: -2px;
+    width: 100%;
+    height: 0.6rem;
+    background: linear-gradient(
+        rgba(222, 222, 222, 1),
+        rgba(222, 222, 222, 0.001)
+    ); /* transparent keyword is broken in Safari */
+    pointer-events: none;
+`;
+
+const AfterPlaceHolder = styled.div`
+    content: '';
+    position: sticky;
+    display: block;
+    bottom: -2px;
+    width: 100%;
+    height: 0.6rem;
+    background: linear-gradient(
+        rgba(222, 222, 222, 0.001),
+        rgba(222, 222, 222, 1)
+    ); /* transparent keyword is broken in Safari */
+    pointer-events: none;
+`;
+
 const Cards = styled.div`
     position: relative;
     padding: 0 2px;
     background-color: #dedede;
     border-radius: 4px;
     max-height: calc(100vh - 230px);
-    overflow-y: auto;
+    overflow-y: overlay;
     min-height: 200px;
     max-width: 270px;
+    overflow-x: hidden;
+    ::-webkit-scrollbar {
+        width: 0.25rem;
+        opacity: 0;
+        transition: opacity 0.2s;
+        :hover {
+            opacity: 1;
+        }
+    }
 `;
 
 const ButtonPlaceHolder = styled.div`
@@ -189,7 +226,7 @@ export const List: FC<Props> = (props: Props) => {
                                     </span>
                                     <div className="list-head-icon">
                                         {focused ? (
-                                            <Tooltip title={'Focused column'}>
+                                            <Tooltip title={'Focused List'}>
                                                 <span style={{ color: 'red', marginRight: 8 }}>
                                                     <Icon component={FocusIcon} />
                                                 </span>
@@ -198,7 +235,7 @@ export const List: FC<Props> = (props: Props) => {
                                             undefined
                                         )}
                                         {done ? (
-                                            <Tooltip title={'Done column'}>
+                                            <Tooltip title={'Done List'}>
                                                 <span style={{ color: 'green', marginRight: 8 }}>
                                                     <Icon component={DoneIcon} />
                                                 </span>
@@ -216,6 +253,7 @@ export const List: FC<Props> = (props: Props) => {
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => (
                                 <Cards ref={provided.innerRef}>
+                                    <BeforePlaceHolder />
                                     {filteredCards.map((cardId, index) => (
                                         <Card
                                             cardId={cardId}
@@ -226,6 +264,7 @@ export const List: FC<Props> = (props: Props) => {
                                         />
                                     ))}
                                     {provided.placeholder}
+                                    <AfterPlaceHolder />
                                 </Cards>
                             )}
                         </Droppable>

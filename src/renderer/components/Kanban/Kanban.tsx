@@ -15,7 +15,23 @@ import backIcon from '../../../res/back.svg';
 import { Label } from './style/Form';
 
 const { Option } = Select;
-const { Content } = Layout;
+
+const Content = styled.main`
+    overflow: auto;
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background-color: #f5f5f5;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        background-color: rgba(50, 50, 50, 0.3);
+    }
+    ::-webkit-scrollbar-track {
+        border-radius: 8px;
+        background-color: rgba(200, 200, 200, 0.5);
+    }
+`;
 
 const Title = styled.h1`
     user-select: none;
