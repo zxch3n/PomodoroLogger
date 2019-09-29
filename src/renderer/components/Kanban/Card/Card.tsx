@@ -51,6 +51,7 @@ export const Card: FC<Props> = (props: Props) => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             onClick={onClick}
+                            className={'kanban-card'}
                         >
                             <CardContent>
                                 <h1 style={{ margin: 0 }}>{props.title}</h1>

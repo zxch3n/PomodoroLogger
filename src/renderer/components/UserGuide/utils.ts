@@ -11,7 +11,6 @@ export const getElementAbsoluteOffsetBySelector = (selector: string) => {
     const computedStyle = getComputedStyle(target);
     h = target.clientHeight; // height with padding
     w = target.clientWidth; // width with padding
-    console.log(w, h);
     try {
         // @ts-ignore
         h -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);

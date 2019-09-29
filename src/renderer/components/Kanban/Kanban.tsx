@@ -169,6 +169,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         <Button
                             style={{ paddingLeft: 10, paddingRight: 10, margin: '0 4px 0 16px' }}
                             onClick={addBoard}
+                            id={'create-kanban-button'}
                         >
                             <Icon type={'plus'} />
                         </Button>

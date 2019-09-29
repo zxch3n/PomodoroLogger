@@ -170,7 +170,12 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
     };
 
     return (
-        <BriefCard onClick={onClick} onMouseLeave={onMouseLeave} onMouseEnter={onMouseEnter}>
+        <BriefCard
+            onClick={onClick}
+            onMouseLeave={onMouseLeave}
+            onMouseEnter={onMouseEnter}
+            className={'kanban-brief-card'}
+        >
             <Header>
                 <h1>{name}</h1>
                 <span>

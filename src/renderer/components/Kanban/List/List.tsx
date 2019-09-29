@@ -156,7 +156,12 @@ export const List: FC<Props> = (props: Props) => {
         <Draggable draggableId={props.listId} index={props.index}>
             {(provided, { draggingOver }) => (
                 <div>
-                    <Container ref={provided.innerRef} {...provided.draggableProps}>
+                    <Container
+                        ref={provided.innerRef}
+                        className={'kanban-list'}
+                        id={props.focused ? 'focused-list' : props.done ? 'done-list' : undefined}
+                        {...provided.draggableProps}
+                    >
                         <ListHead {...provided.dragHandleProps}>
                             {isEditing ? (
                                 <div
@@ -215,7 +220,12 @@ export const List: FC<Props> = (props: Props) => {
                                     ))}
                                     {provided.placeholder}
                                     <ButtonWrapper>
-                                        <Button onClick={addCard} shape={'circle'} icon="plus" />
+                                        <Button
+                                            onClick={addCard}
+                                            shape={'circle'}
+                                            icon="plus"
+                                            id={'create-card-button'}
+                                        />
                                     </ButtonWrapper>
                                 </Cards>
                             )}

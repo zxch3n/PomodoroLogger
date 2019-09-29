@@ -33,10 +33,14 @@ export const Pointer: FC<PointerProps> = (props: PointerProps) => {
     const [wh, setWh] = useState([0, 0]);
     const ref = useRef<SVGElement>();
     const updatePosition = () => {
-        const [x, y, w, h] = getElementAbsoluteOffsetBySelector(targetSelector);
-        console.log('xywh', x, y, w, h);
-        setWh([w, h]);
-        setXy([x + w / 2, y + h / 2]);
+        try {
+            const [x, y, w, h] = getElementAbsoluteOffsetBySelector(targetSelector);
+            setWh([w, h]);
+            setXy([x + w / 2, y + h / 2]);
+        } catch (e) {
+            console.error('cannot find', targetSelector);
+            setXy([-1000, -1000]);
+        }
     };
 
     useEffect(() => {
@@ -57,8 +61,9 @@ export const Pointer: FC<PointerProps> = (props: PointerProps) => {
                 left: xy[0],
                 top: xy[1],
                 display: show ? undefined : 'none',
-                zIndex: 103,
-                transform: `rotate(${direction}rad)`
+                zIndex: 2003,
+                transform: `rotate(${direction}rad)`,
+                transition: 'transform 0.3s'
             }}
         >
             <Wrapper>
@@ -66,7 +71,8 @@ export const Pointer: FC<PointerProps> = (props: PointerProps) => {
                     style={{
                         fontSize: 48,
                         fill: 'white',
-                        transform: `translate(16px, ${Math.cos(direction * 2) * -16}px)`
+                        transform: `translate(16px, ${Math.cos(direction * 2) * -16}px)`,
+                        transition: 'transform 0.3s'
                     }}
                 />
             </Wrapper>

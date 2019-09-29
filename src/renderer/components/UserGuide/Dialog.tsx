@@ -2,14 +2,23 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { getElementAbsoluteOffsetBySelector } from './utils';
 import { Position } from './type';
-import { Button, Card } from 'antd';
+import { Button, Divider } from 'antd';
 
 const Container = styled.div`
-    z-index: 101;
+    z-index: 2001;
     user-select: none;
     position: fixed;
     font-family: sans-serif, 'Lucida Sans', 'Microsoft YaHei';
-    color: white;
+`;
+
+const Card = styled.div`
+    font-size: 1rem;
+    color: #5f5f5f;
+    border-radius: 8px;
+    background-color: rgb(245, 245, 245);
+    padding: 8px 0.8rem;
+    max-width: 400px;
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.2);
 `;
 
 export interface DialogProps {
@@ -32,8 +41,6 @@ export const Dialog: React.FC<DialogProps> = (props: DialogProps) => {
         if (targetSelector == null) {
             return;
         }
-
-        const [x, y, w, h] = getElementAbsoluteOffsetBySelector(targetSelector);
     }, [targetSelector]);
     return (
         <Container
@@ -41,10 +48,17 @@ export const Dialog: React.FC<DialogProps> = (props: DialogProps) => {
                 ...position
             }}
         >
-            <Card style={{ borderRadius: 4 }}>
-                <p style={{ fontSize: 18 }}>{text}</p>
+            <Card>
+                <p style={{ margin: 0 }}>{text}</p>
+                {hasConfirm ? (
+                    <>
+                        <Divider style={{ margin: '6px 0' }} />
+                        <Button onClick={onConfirm}>Confirm</Button>
+                    </>
+                ) : (
+                    undefined
+                )}
             </Card>
-            {hasConfirm ? <Button onClick={onConfirm}>Confirm</Button> : undefined}
         </Container>
     );
 };

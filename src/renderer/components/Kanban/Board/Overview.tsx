@@ -194,6 +194,7 @@ const OverviewCards = connect(
     const { boards, setId } = props;
     const [ids, setIds] = useState<string[]>([]);
     useEffect(() => {
+        let alive = true;
         if (props.sortedBy === 'due' || props.sortedBy === 'alpha' || props.sortedBy === 'spent') {
             boards.sort(sortFunc.get(props.sortedBy));
         } else if (props.sortedBy === 'recent') {
@@ -213,7 +214,9 @@ const OverviewCards = connect(
                 }
 
                 boards.sort((a, b) => p[a._id] - p[b._id]);
-                setIds(boards.map(b => b._id));
+                if (alive) {
+                    setIds(boards.map(b => b._id));
+                }
             });
             return;
         } else if (props.sortedBy === 'remaining') {
@@ -245,6 +248,9 @@ const OverviewCards = connect(
             });
         }
         setIds(boards.map(b => b._id));
+        return () => {
+            alive = false;
+        };
     }, [props.sortedBy, props.boards, props.sortedBy === 'remaining' && props.cards]);
 
     return (

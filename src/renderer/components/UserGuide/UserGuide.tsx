@@ -49,7 +49,8 @@ const _UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
     const { next } = props;
 
     const onConfirm = () => {
-        next();
+        // need other UI elements to be ready
+        setTimeout(next, 200);
     };
 
     const setZ = () => {
@@ -64,7 +65,7 @@ const _UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
 
         const originalZ = elem.style.zIndex;
         const position = elem.style.position;
-        elem.style.zIndex = '108';
+        elem.style.zIndex = '2008';
         elem.style.position = 'relative';
         elem.addEventListener('click', onConfirm);
         return () => {
@@ -114,22 +115,27 @@ const _UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
                 onConfirm={onConfirm}
             />
 
-            {useMask ? <Mask /> : undefined}
-
-            <Button
-                onClick={props.exit}
-                shape={'circle'}
-                icon={'close'}
-                color={'red'}
-                size={'small'}
-                type={'danger'}
-                style={{
-                    position: 'fixed',
-                    zIndex: 101,
-                    top: 16,
-                    right: 16
-                }}
-            />
+            {useMask ? (
+                <>
+                    <Mask />
+                    <Button
+                        onClick={props.exit}
+                        shape={'circle'}
+                        icon={'close'}
+                        color={'red'}
+                        size={'small'}
+                        type={'danger'}
+                        style={{
+                            position: 'fixed',
+                            zIndex: 2000,
+                            top: 16,
+                            right: 16
+                        }}
+                    />
+                </>
+            ) : (
+                undefined
+            )}
         </>
     );
 };
