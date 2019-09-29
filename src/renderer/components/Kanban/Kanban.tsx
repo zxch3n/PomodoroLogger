@@ -4,7 +4,6 @@ import { KanbanState } from './reducer';
 import { BoardActionTypes } from './Board/action';
 import { CardInDetail } from './Card/CardInDetail';
 import { Switch, Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select } from 'antd';
-import shortid from 'shortid';
 import Board from './Board';
 import styled from 'styled-components';
 import TextArea from 'antd/es/input/TextArea';
@@ -13,7 +12,7 @@ import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
 import backIcon from '../../../res/back.svg';
 import { Label } from './style/Form';
-
+import shortid from 'shortid';
 const { Option } = Select;
 
 const Content = styled.main`
@@ -191,10 +190,17 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         </Button>
 
                         <Label>Sorted by:</Label>
-                        <Select value={props.kanban.sortedBy} onChange={props.setSortedBy}>
+                        <Select
+                            value={props.kanban.sortedBy}
+                            onChange={props.setSortedBy}
+                            style={{
+                                width: 140
+                            }}
+                        >
                             <Option value="recent">Last Visit</Option>
                             <Option value="alpha">Alphabet</Option>
-                            <Option value="due">Due Time</Option>
+                            {/* TODO: Due time */}
+                            {/*<Option value="due">Due Time</Option>*/}
                             <Option value="spent">Spent Time</Option>
                             <Option value="remaining">Remaining Time</Option>
                         </Select>

@@ -1,4 +1,6 @@
 import { createActionCreator, createReducer } from 'deox';
+import { actions as boardActions } from './Board/action';
+import { Dispatch } from 'redux';
 
 export type SortType = 'recent' | 'alpha' | 'due' | 'spent' | 'remaining';
 export interface KanbanState {
@@ -46,11 +48,16 @@ const setSearchReg = createActionCreator('[KANBAN]SET_SEARCH_REG', resolve => (r
 );
 
 export const actions = {
-    setChosenBoardId,
     setEditCard,
     setSortedBy,
     setSearchReg,
-    setConfiguringBoardId
+    setConfiguringBoardId,
+    setChosenBoardId: (_id: string | undefined) => async (dispatch: Dispatch) => {
+        dispatch(setChosenBoardId(_id));
+        if (_id) {
+            await boardActions.setLastVisitTime(_id, new Date().getTime())(dispatch);
+        }
+    }
 };
 
 export type KanbanActionTypes = { [key in keyof typeof actions]: typeof actions[key] };

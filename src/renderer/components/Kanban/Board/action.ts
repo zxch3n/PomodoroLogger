@@ -28,6 +28,7 @@ export interface KanbanBoard {
     doneList: string;
     relatedSessions: SessionId[];
     dueTime?: number; // TODO: Add due time setting
+    lastVisitTime?: number; // TODO: Add due time setting
     aggInfo?: AggInfo;
 }
 
@@ -80,6 +81,10 @@ const deleteBoard = createActionCreator('[Board]DEL_BOARD', resolve => _id => re
 
 const deleteList = createActionCreator('[Board]DEL_LIST', resolve => (_id, listId) =>
     resolve({ _id, listId })
+);
+
+const setLastVisitTime = createActionCreator('[Board]SET_LAST_VISIT_TIME', resolve => (_id, time) =>
+    resolve({ _id, time })
 );
 
 const onTimerFinished = createActionCreator(
@@ -166,6 +171,16 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         };
     }),
 
+    handle(setLastVisitTime, (state, { payload: { _id, time } }) => {
+        return {
+            ...state,
+            [_id]: {
+                ...state[_id],
+                lastVisitTime: time
+            }
+        };
+    }),
+
     handle(editBoard, (state, { payload: { _id, name, description } }) => ({
         ...state,
         [_id]: {
@@ -211,8 +226,8 @@ export const actions = {
         await db.update({ _id }, { $push: { lists: listId } });
     },
     deleteBoard: (_id: string) => async (dispatch: Dispatch) => {
-        dispatch(kanbanActions.setChosenBoardId(undefined));
         dispatch(deleteBoard(_id));
+        await kanbanActions.setChosenBoardId(undefined)(dispatch);
         await db.remove({ _id });
     },
     deleteList: (_id: string, listId: string) => async (dispatch: Dispatch) => {
@@ -240,9 +255,15 @@ export const actions = {
             description,
             name,
             lists,
+            lastVisitTime: new Date().getTime(),
             focusedList: lists[1],
             doneList: lists[2]
         } as KanbanBoard);
+    },
+
+    setLastVisitTime: (_id: string, time: number) => async (dispatch: Dispatch) => {
+        dispatch(setLastVisitTime(_id, time));
+        await db.update({ _id }, { $set: { lastVisitTime: time } });
     },
 
     moveCard: (fromListId: string, toListId: string, fromIndex: number, toIndex: number) => async (
@@ -265,6 +286,8 @@ export const actions = {
         for (const cardId of cardIds) {
             await cardActions.onTimerFinished(cardId, sessionId, timeSpent)(dispatch);
         }
+
+        await actions.setLastVisitTime(_id, new Date().getTime())(dispatch);
     },
 
     editBoard: (_id: string, name: string, description: string) => async (dispatch: Dispatch) => {

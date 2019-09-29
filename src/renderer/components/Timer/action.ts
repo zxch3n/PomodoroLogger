@@ -172,7 +172,7 @@ export const actions = {
     },
     switchToKanban: (kanbanId: string) => (dispatch: Dispatch) => {
         dispatch(actions.changeAppTab('kanban'));
-        dispatch(kanbanActions.setChosenBoardId(kanbanId));
+        kanbanActions.setChosenBoardId(kanbanId)(dispatch);
     }
 };
 

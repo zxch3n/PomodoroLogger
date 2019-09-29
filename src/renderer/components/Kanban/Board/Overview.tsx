@@ -158,17 +158,28 @@ sortFunc.set('alpha', (a, b) => {
 });
 sortFunc.set('due', (a, b) => {
     if (!a.dueTime) {
-        return -1;
+        return 1;
     }
 
     if (!b.dueTime) {
-        return 1;
+        return -1;
     }
 
     return a.dueTime - b.dueTime;
 });
 sortFunc.set('spent', (a, b) => {
-    return a.spentHours - b.spentHours;
+    return -a.spentHours + b.spentHours;
+});
+sortFunc.set('recent', (a, b) => {
+    if (!a.lastVisitTime) {
+        return 1;
+    }
+
+    if (!b.lastVisitTime) {
+        return -1;
+    }
+
+    return -a.lastVisitTime + b.lastVisitTime;
 });
 
 interface OverviewCardsProps {
@@ -188,37 +199,20 @@ const OverviewCards = connect(
         cards: state.kanban.cards
     }),
     (dispatch: Dispatch) => ({
-        setId: (_id: string) => dispatch(actions.setChosenBoardId(_id))
+        setId: (_id: string) => actions.setChosenBoardId(_id)(dispatch)
     })
 )(((props: OverviewCardsProps) => {
     const { boards, setId } = props;
     const [ids, setIds] = useState<string[]>([]);
     useEffect(() => {
         let alive = true;
-        if (props.sortedBy === 'due' || props.sortedBy === 'alpha' || props.sortedBy === 'spent') {
+        if (
+            props.sortedBy === 'due' ||
+            props.sortedBy === 'alpha' ||
+            props.sortedBy === 'spent' ||
+            props.sortedBy === 'recent'
+        ) {
             boards.sort(sortFunc.get(props.sortedBy));
-        } else if (props.sortedBy === 'recent') {
-            const sess = workers.dbWorkers['sessionDB'];
-            const promises = boards.map(b => {
-                return sess.findOne(b.relatedSessions[b.relatedSessions.length - 1]);
-            });
-            Promise.all(promises).then((sessions: (PomodoroRecord | undefined)[]) => {
-                const p: { [_id: string]: number } = {};
-                for (let i = 0; i < sessions.length; i += 1) {
-                    const v = sessions[i];
-                    if (v == null) {
-                        p[boards[i]._id] = 0;
-                    } else {
-                        p[boards[i]._id] = v.startTime;
-                    }
-                }
-
-                boards.sort((a, b) => p[a._id] - p[b._id]);
-                if (alive) {
-                    setIds(boards.map(b => b._id));
-                }
-            });
-            return;
         } else if (props.sortedBy === 'remaining') {
             const boardsMap: { [_id: string]: number } = {};
             for (let i = 0; i < boards.length; i += 1) {
@@ -244,14 +238,19 @@ const OverviewCards = connect(
             }
 
             boards.sort((a, b) => {
-                return boardsMap[a._id] - boardsMap[b._id];
+                return -boardsMap[a._id] + boardsMap[b._id];
             });
         }
         setIds(boards.map(b => b._id));
         return () => {
             alive = false;
         };
-    }, [props.sortedBy, props.boards, props.sortedBy === 'remaining' && props.cards]);
+    }, [
+        props.sortedBy,
+        props.boards,
+        props.sortedBy === 'remaining' && props.cards,
+        boards.reduce((v, b) => (b.lastVisitTime ? b.lastVisitTime : 0) + v, 0)
+    ]);
 
     return (
         <BriefContainer>
