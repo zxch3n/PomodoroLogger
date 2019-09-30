@@ -54,7 +54,9 @@ export const Card: FC<Props> = (props: Props) => {
                             className={'kanban-card'}
                         >
                             <CardContent>
-                                <h1 style={{ margin: 0 }}>{props.title}</h1>
+                                <h1 style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}>
+                                    {props.title}
+                                </h1>
                                 <Markdown
                                     dangerouslySetInnerHTML={{
                                         __html: formatMarkdown(props.content)

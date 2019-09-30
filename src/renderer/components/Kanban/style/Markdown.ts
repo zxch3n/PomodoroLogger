@@ -4,12 +4,10 @@ export const Markdown = styled.div`
     font-size: 14px;
     h1 {
         font-size: 1.2em;
-        font-weight: 800;
         margin: 0 !important;
     }
     h2 {
-        font-size: 1.2em;
-        font-weight: 700;
+        font-size: 1.15em;
         margin: 0 !important;
     }
     h3 {
