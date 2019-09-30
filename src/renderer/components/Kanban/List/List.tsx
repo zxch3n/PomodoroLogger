@@ -83,24 +83,23 @@ const Cards = styled.div`
     background-color: #dedede;
     border-radius: 4px;
     max-height: calc(100vh - 230px);
-    overflow-y: overlay;
+    overflow: overlay;
     min-height: 200px;
     max-width: 270px;
-    overflow-x: hidden;
     ::-webkit-scrollbar {
-        width: 0.25rem;
-        opacity: 0;
-        transition: opacity 0.2s;
-        :hover {
-            opacity: 1;
-        }
+        width: 4px;
+        height: 4px;
+        background-color: rgba(0, 0, 0, 0);
     }
-`;
-
-const ButtonPlaceHolder = styled.div`
-    position: sticky;
-    bottom: 0;
-    height: 32px;
+    ::-webkit-scrollbar-track {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-thumb {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
 `;
 
 const ButtonWrapper = styled.div`
@@ -137,7 +136,8 @@ export const List: FC<Props> = (props: Props) => {
         },
         [0, 0] as [number, number]
     );
-    const overallTimeInfo = `${actualTimeSum.toFixed(1)}h / ${estimatedTimeSum.toFixed(1)}h`;
+    const overallTimeInfo =
+        estimatedTimeSum > 0 ? `${actualTimeSum.toFixed(1)}h/${estimatedTimeSum.toFixed(1)}h` : '';
     const filteredCards =
         searchReg === undefined
             ? cards
@@ -222,7 +222,11 @@ export const List: FC<Props> = (props: Props) => {
                                 <>
                                     <span className="list-head-text">
                                         <h1>{props.title}</h1>
-                                        <span>{overallTimeInfo}</span>
+                                        <span>
+                                            {props.cards.length} Card
+                                            {props.cards.length > 1 ? 's ' : ' '}
+                                            {overallTimeInfo}
+                                        </span>
                                     </span>
                                     <div className="list-head-icon">
                                         {focused ? (
