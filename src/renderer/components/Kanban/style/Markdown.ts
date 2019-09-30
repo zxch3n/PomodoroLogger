@@ -34,5 +34,6 @@ export const Markdown = styled.div`
 
     ul {
         padding-left: 24px;
+        margin-bottom: 0;
     }
 `;
