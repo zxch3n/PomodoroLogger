@@ -15,6 +15,14 @@ const CardContainer = styled.div`
     margin: 8px 4px;
     border-radius: 6px;
     cursor: grab;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+    transition: box-shadow 0.2s, transform 0.2s, background-color 0.1s;
+    &.is-dragging {
+        box-shadow: 0 0 18px 8px rgba(0, 0, 0, 0.2);
+    }
+    :hover {
+        background-color: rgba(244, 244, 248);
+    }
 `;
 
 const CardContent = styled.div`
@@ -51,7 +59,9 @@ export const Card: FC<Props> = (props: Props) => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             onClick={onClick}
-                            className={'kanban-card'}
+                            className={
+                                'kanban-card ' + (snapshot.isDragging ? 'is-dragging' : undefined)
+                            }
                         >
                             <CardContent>
                                 <h1 style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}>
