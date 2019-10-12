@@ -298,7 +298,7 @@ class Timer extends Component<Props, State> {
 
     onStart = () => {
         if (this.props.timer.isFocusing) {
-            this.monitor = new Monitor(() => {}, 1000, this.props.timer.screenShotInterval);
+            this.monitor = new Monitor(() => {}, 1000);
             this.monitor.start();
         }
 

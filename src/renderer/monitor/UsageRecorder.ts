@@ -10,7 +10,6 @@ function removeAppSuffix(name: string) {
 export type Listener = (appName: string, data: PomodoroRecord, imgUrl?: string) => void;
 export class UsageRecorder {
     private record: PomodoroRecord;
-    private readonly screenShotInterval?: number;
     private lastUsingApp?: string;
     private lock: boolean = false;
 
@@ -18,7 +17,7 @@ export class UsageRecorder {
     private lastScreenShotUrl?: string;
     private readonly monitorListener: Listener;
 
-    constructor(monitorListener: Listener, screenShotInterval?: number) {
+    constructor(monitorListener: Listener) {
         this.record = {
             _id: shortid.generate(),
             apps: {},
@@ -27,7 +26,6 @@ export class UsageRecorder {
             startTime: 0
         };
 
-        this.screenShotInterval = screenShotInterval;
         this.monitorListener = monitorListener;
     }
 
