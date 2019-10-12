@@ -1,21 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, Col, Row, Select, Statistic } from 'antd';
-import { HistoryActionCreatorTypes } from './action';
+import { HistoryActionCreatorTypes, HistoryState } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
-import { DualPieChart, PomodoroDualPieChart } from '../Visualization/DualPieChart';
-import { RootState } from '../../reducers';
-import {
-    AggPomodoroInfo,
-    getAggPomodoroInfo,
-    getPomodoroCalendarData,
-    getPomodoroCount,
-    TimeSpentData
-} from './op';
-import { AsyncWordCloud, WordCloud } from '../Visualization/WordCloud';
-import { PomodoroRecord } from '../../monitor/type';
+import { DualPieChart } from '../Visualization/DualPieChart';
+import { AggPomodoroInfo, getAggPomodoroInfo } from './op';
+import { WordCloud } from '../Visualization/WordCloud';
 import { KanbanBoardState } from '../Kanban/Board/action';
 import { workers } from '../../workers';
+import { DBWorker } from '../../workers/DBWorker';
 
 const { Option } = Select;
 
@@ -25,7 +18,7 @@ const Container = styled.div`
     padding: 20px;
 `;
 
-interface Props extends HistoryActionCreatorTypes {
+interface Props extends HistoryActionCreatorTypes, HistoryState {
     chosenId?: string;
     boards: KanbanBoardState;
 }
@@ -65,26 +58,18 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
 
     useEffect(resizeEffect, []);
     useEffect(() => {
-        if (props.chosenId === undefined) {
-            workers.dbWorkers.sessionDB
-                .find({}, {})
-                .then(docs => {
-                    return getAggPomodoroInfo(docs);
-                })
-                .then((ans: AggPomodoroInfo) => {
-                    setAggInfo(ans);
-                });
-        } else {
-            workers.dbWorkers.sessionDB
-                .find({ boardId: props.chosenId }, {})
-                .then(docs => {
-                    return getAggPomodoroInfo(docs);
-                })
-                .then((ans: AggPomodoroInfo) => {
-                    setAggInfo(ans);
-                });
-        }
-    }, [props.chosenId]);
+        const searchArg = props.chosenId === undefined ? {} : { boardId: props.chosenId };
+        // Avoid using outdated cache
+        const db = new DBWorker('sessionDB');
+        db.find(searchArg, {})
+            .then(docs => {
+                return getAggPomodoroInfo(docs);
+            })
+            .then((ans: AggPomodoroInfo) => {
+                setAggInfo(ans);
+                console.log('set agg info');
+            });
+    }, [props.chosenId, props.expiringKey]);
 
     const onChange = (v: string) => {
         props.setChosenProjectId(v);

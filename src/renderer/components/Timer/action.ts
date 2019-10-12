@@ -3,6 +3,7 @@ import { Dispatch } from 'redux';
 import { addSession } from '../../monitor/sessionManager';
 import { actions as boardActions } from '../Kanban/Board/action';
 import { actions as kanbanActions } from '../Kanban/action';
+import { actions as historyActions } from '../History/action';
 import { promisify } from 'util';
 import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
@@ -145,6 +146,7 @@ export const actions = {
         boardId?: string | undefined
     ) => async (dispatch: Dispatch) => {
         dispatch(timerFinished());
+        dispatch(historyActions.setExpiringKey(new Date().toString()));
         if (sessionData) {
             await addSession(sessionData).catch(err => console.error(err));
             if (boardId !== undefined) {

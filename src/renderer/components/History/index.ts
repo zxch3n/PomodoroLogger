@@ -7,6 +7,7 @@ import { HistoryActionCreatorTypes, actions } from './action';
 
 const mapStateToProps = (state: RootState) => ({
     chosenId: state.history.chosenProjectId,
+    expiringKey: state.history.expiringKey,
     boards: state.kanban.boards
 });
 const mapDispatchToProps = genMapDispatchToProp<HistoryActionCreatorTypes>(actions);

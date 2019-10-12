@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { Card as CardType, CardActionTypes } from './action';
 import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
-import { Icon, Divider, Dropdown, Menu } from 'antd';
+import { Icon, Divider, Dropdown } from 'antd';
 import formatMarkdown from './formatMarkdown';
 import { Badge } from './Badge';
 import { formatTime } from '../../../utils';
