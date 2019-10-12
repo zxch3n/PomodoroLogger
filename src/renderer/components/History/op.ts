@@ -83,13 +83,13 @@ export const getTimeSpentDataFromRecords = async (
 
 export interface AggPomodoroInfo {
     count: {
-        day: number;
-        week: number;
-        month: number;
+        day?: number;
+        week?: number;
+        month?: number;
     };
-    calendarCount: any;
-    wordWeights: [string, number][];
-    pieChart: TimeSpentData;
+    calendarCount?: any;
+    wordWeights?: [string, number][];
+    pieChart?: TimeSpentData;
 }
 
 export async function getAggPomodoroInfo(pomodoros: PomodoroRecord[]): Promise<AggPomodoroInfo> {

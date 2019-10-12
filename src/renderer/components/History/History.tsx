@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Card, Col, Row, Select, Statistic } from 'antd';
+import { Card, Col, Row, Select, Spin, Statistic } from 'antd';
 import { HistoryActionCreatorTypes, HistoryState } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
@@ -7,8 +7,8 @@ import { DualPieChart } from '../Visualization/DualPieChart';
 import { AggPomodoroInfo, getAggPomodoroInfo } from './op';
 import { WordCloud } from '../Visualization/WordCloud';
 import { KanbanBoardState } from '../Kanban/Board/action';
-import { workers } from '../../workers';
 import { DBWorker } from '../../workers/DBWorker';
+import { Loading } from '../utils/Loading';
 
 const { Option } = Select;
 
@@ -26,16 +26,13 @@ interface Props extends HistoryActionCreatorTypes, HistoryState {
 export const History: React.FunctionComponent<Props> = (props: Props) => {
     const [aggInfo, setAggInfo] = useState<AggPomodoroInfo>({
         count: {
-            day: 0,
-            month: 0,
-            week: 0
+            day: undefined,
+            month: undefined,
+            week: undefined
         },
-        calendarCount: 0,
-        pieChart: {
-            appData: [],
-            projectData: []
-        },
-        wordWeights: []
+        calendarCount: undefined,
+        pieChart: undefined,
+        wordWeights: undefined
     });
     const container = useRef<HTMLDivElement>();
     const [calendarWidth, setCalendarWidth] = useState(800);
@@ -107,51 +104,67 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             <Row gutter={16}>
                 <Col span={8}>
                     <Card>
-                        <Statistic
-                            title="Pomodoros Today"
-                            value={aggInfo.count.day}
-                            precision={0}
-                            valueStyle={{ color: '#3f8600' }}
-                        />
+                        {aggInfo.count.day != null ? (
+                            <Statistic
+                                title="Pomodoros Today"
+                                value={aggInfo.count.day}
+                                precision={0}
+                                valueStyle={{ color: '#3f8600' }}
+                            />
+                        ) : (
+                            <Loading hideBackground={true} />
+                        )}
                     </Card>
                 </Col>
                 <Col span={8}>
                     <Card>
-                        <Statistic
-                            title="Pomodoros This Week"
-                            value={aggInfo.count.week}
-                            precision={0}
-                            valueStyle={{ color: '#3f8600' }}
-                        />
+                        {aggInfo.count.week != null ? (
+                            <Statistic
+                                title="Pomodoros This Week"
+                                value={aggInfo.count.week}
+                                precision={0}
+                                valueStyle={{ color: '#3f8600' }}
+                            />
+                        ) : (
+                            <Loading hideBackground={true} />
+                        )}
                     </Card>
                 </Col>
                 <Col span={8}>
                     <Card>
-                        <Statistic
-                            title="Pomodoros This Month"
-                            value={aggInfo.count.month}
-                            precision={0}
-                            valueStyle={{ color: '#cf1322' }}
-                        />
+                        {aggInfo.count.month != null ? (
+                            <Statistic
+                                title="Pomodoros This Month"
+                                value={aggInfo.count.month}
+                                precision={0}
+                                valueStyle={{ color: '#cf1322' }}
+                            />
+                        ) : (
+                            <Loading hideBackground={true} />
+                        )}
                     </Card>
                 </Col>
             </Row>
-            {calendarWidth > 670 ? (
-                <React.Fragment>
-                    <GridCalendar data={aggInfo.calendarCount} width={calendarWidth} />
-                    <DualPieChart
-                        {...aggInfo.pieChart}
-                        width={calendarWidth}
-                        onProjectClick={onProjectClick}
-                    />
-                    <WordCloud
-                        weights={aggInfo.wordWeights}
-                        width={calendarWidth}
-                        height={calendarWidth * 0.6}
-                    />
-                </React.Fragment>
+            {aggInfo.pieChart != null && aggInfo.wordWeights != null ? (
+                calendarWidth > 670 ? (
+                    <React.Fragment>
+                        <GridCalendar data={aggInfo.calendarCount} width={calendarWidth} />
+                        <DualPieChart
+                            {...aggInfo.pieChart}
+                            width={calendarWidth}
+                            onProjectClick={onProjectClick}
+                        />
+                        <WordCloud
+                            weights={aggInfo.wordWeights}
+                            width={calendarWidth}
+                            height={calendarWidth * 0.6}
+                        />
+                    </React.Fragment>
+                ) : (
+                    undefined
+                )
             ) : (
-                undefined
+                <Loading size={'large'} />
             )}
         </Container>
     );

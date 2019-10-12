@@ -6,6 +6,7 @@ import { getNameFromBoardId } from '../../dbs';
 import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
 import { getTimeSpentDataFromRecords, TimeSpentData } from '../History/op';
+import { Loading } from '../utils/Loading';
 
 const Container = styled.div`
     margin: 0 auto;
@@ -129,10 +130,17 @@ export const PomodoroDualPieChart: React.FC<PomodoroPieChartProps> = (
         projectData: [],
         appData: []
     });
+    const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
         getTimeSpentDataFromRecords(pomodoros).then(v => {
             setTimeSpent(v);
+            setIsLoading(false);
         });
     }, [pomodoros]);
-    return <DualPieChart {...timeSpent} {...restProps} />;
+
+    return isLoading ? (
+        <Loading size={'large'} height={400} />
+    ) : (
+        <DualPieChart {...timeSpent} {...restProps} />
+    );
 };

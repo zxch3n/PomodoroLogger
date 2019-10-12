@@ -3,6 +3,7 @@ import * as React from 'react';
 import WordCloud2 from 'wordcloud';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
+import { Loading } from '../utils/Loading';
 
 const tokenizer = workers.tokenizer;
 
@@ -49,11 +50,17 @@ type MAsyncProps = AsyncProps & { [name: string]: any };
 export const AsyncWordCloud: React.FC<MAsyncProps> = (props: MAsyncProps) => {
     const { records, ...restProps } = props;
     const [weights, setWeights] = React.useState<[string, number][]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
         tokenizer.tokenize(records).then(weights => {
             console.log(records, weights);
             setWeights(weights);
+            setIsLoading(false);
         });
     }, [records]);
-    return <WordCloud weights={weights} {...restProps} />;
+    return isLoading ? (
+        <Loading size={'large'} height={400} />
+    ) : (
+        <WordCloud weights={weights} {...restProps} />
+    );
 };
