@@ -125,7 +125,7 @@ module.exports = merge.smart(baseConfig, {
                 loader: 'source-map-loader'
             },
             {
-                test: /\.dat$/,
+                test: /\.(dat|mp3)$/,
                 use: 'file-loader'
             },
             {

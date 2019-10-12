@@ -1,7 +1,6 @@
-import { ApplicationSpentTime, PomodoroRecord } from './type';
+import { PomodoroRecord } from './type';
 import { ActiveWinListener } from './activeWinMonitor';
 import { BaseResult } from 'active-win';
-import { getScreen } from './screenshot';
 import shortid from 'shortid';
 
 function removeAppSuffix(name: string) {
@@ -13,7 +12,6 @@ export class UsageRecorder {
     private record: PomodoroRecord;
     private readonly screenShotInterval?: number;
     private lastUsingApp?: string;
-    private lastScreenShotTime: number = 0;
     private lock: boolean = false;
 
     private lastScreenShot?: ImageData;
@@ -26,7 +24,6 @@ export class UsageRecorder {
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
-            screenStaticDuration: screenShotInterval === undefined ? undefined : 0,
             startTime: 0
         };
 
@@ -45,7 +42,6 @@ export class UsageRecorder {
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
-            screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0,
             startTime: 0
         };
     };
@@ -92,7 +88,6 @@ export class UsageRecorder {
                 spentTimeInHour: 0,
                 titleSpentTime: {},
                 switchTimes: 0,
-                screenStaticDuration: this.screenShotInterval === undefined ? undefined : 0,
                 lastUpdateTime: now
             };
         }
@@ -153,12 +148,6 @@ export class UsageRecorder {
         }
 
         row.lastUpdateTime = now;
-        await this.takeCareOfScreenShot(row).catch(err => {
-            if (err) {
-                console.error(err);
-                throw err;
-            }
-        });
     };
 
     private normalizeTitleSpentTime = () => {
@@ -176,69 +165,5 @@ export class UsageRecorder {
                 titles[title].normalizedWeight = titles[title].occurrence / totalTitleOccurrences;
             }
         }
-    };
-
-    takeCareOfScreenShot = async (appRow: ApplicationSpentTime) => {
-        // Screen Shot
-        const now = new Date().getTime();
-        if (this.screenShotInterval && this.lastScreenShotTime + this.screenShotInterval < now) {
-            const duration = (now - this.lastScreenShotTime) / 3600 / 1000;
-            this.lastScreenShotTime = now;
-            const canvas = await getScreen().catch(err => {
-                throw err;
-            });
-            if (!canvas) {
-                throw new Error();
-            }
-
-            const newScreenShot = this.getImageData(canvas);
-            if (this.lastScreenShot) {
-                console.log('Comparing screenshot');
-                if (this.didScreenShotChange(newScreenShot)) {
-                    console.log('screenshot changed');
-                } else {
-                    console.log('screenshots are the same');
-                    if (appRow.screenStaticDuration !== undefined) {
-                        appRow.screenStaticDuration += duration;
-                        if (this.record.screenStaticDuration !== undefined) {
-                            this.record.screenStaticDuration += duration;
-                        }
-                    } else {
-                        throw new Error();
-                    }
-                }
-            }
-
-            this.lastScreenShot = newScreenShot;
-            this.lastScreenShotUrl = canvas.toDataURL('image/png');
-        }
-    };
-
-    getImageData = (canvas: HTMLCanvasElement): ImageData => {
-        const context = canvas.getContext('2d');
-        if (!context) {
-            throw new Error('cannot get context');
-        }
-
-        return context.getImageData(0, 0, canvas.width, canvas.height);
-    };
-
-    didScreenShotChange = (newImg: ImageData): boolean => {
-        const oldImg = this.lastScreenShot;
-        if (!oldImg) {
-            return true;
-        }
-
-        if (newImg.data.length !== oldImg.data.length) {
-            return true;
-        }
-
-        for (let i = 0; i < newImg.data.length; i += 1) {
-            if (oldImg.data[i] !== newImg.data[i]) {
-                return true;
-            }
-        }
-
-        return false;
     };
 }

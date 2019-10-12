@@ -120,9 +120,9 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
             </SliderContainer>
 
             <h4>Idle Detection (Need Screenshot) </h4>
-            <ButtonWrapper>
-                <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />
-            </ButtonWrapper>
+            {/*<ButtonWrapper>*/}
+            {/*    <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />*/}
+            {/*</ButtonWrapper>*/}
 
             <h4>Data Management</h4>
             <ButtonWrapper>

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Divider, Icon, message, Tooltip } from 'antd';
+import { Button, Divider, message, Tooltip } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
-import { BoardActionTypes, KanbanBoard } from '../Kanban/Board/action';
+import { BoardActionTypes } from '../Kanban/Board/action';
 import { TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
@@ -22,6 +22,7 @@ import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
 import Board from '../Kanban/Board';
 import { HelpIcon } from '../UserGuide/HelpIcon';
+import dingMp3 from '../../../res/ding.mp3';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -139,6 +140,7 @@ class Timer extends Component<Props, State> {
     monitor?: Monitor;
     win?: BrowserWindow;
     mainDiv: React.RefObject<HTMLDivElement>;
+    sound: React.RefObject<HTMLAudioElement>;
     private stagedSession?: PomodoroRecord;
 
     constructor(props: Props) {
@@ -152,6 +154,7 @@ class Timer extends Component<Props, State> {
             pomodoroNum: 0
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
+        this.sound = React.createRef<HTMLAudioElement>();
     }
 
     componentDidMount(): void {
@@ -352,6 +355,8 @@ class Timer extends Component<Props, State> {
         this.props.stopTimer();
         this.props.changeAppTab('timer');
         this.clearStat();
+        this.remindUserTimeout(0);
+        this.remindUserTimeout(60 * 1000, 1.0);
     };
 
     private onFocusingSessionDone = async () => {
@@ -452,13 +457,22 @@ class Timer extends Component<Props, State> {
         }
     };
 
+    private remindUserTimeout = (timeout = 0, volume = 0.5) => {
+        setTimeout(() => {
+            if (this.state.showMask) {
+                this.focusOnCurrentWindow();
+                if (this.sound.current) {
+                    this.sound.current.volume = volume;
+                    this.sound.current.play().catch(err => console.error(err));
+                }
+            }
+        }, timeout);
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
         const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
-        const kanbanBoard: KanbanBoard | undefined = this.props.timer.boardId
-            ? this.props.kanban.boards[this.props.timer.boardId]
-            : undefined;
         for (const pomodoro of pomodorosToday) {
             for (const appName in pomodoro.apps) {
                 if (!(appName in apps)) {
@@ -608,6 +622,7 @@ class Timer extends Component<Props, State> {
                         )}
                     </TimerInnerLayout>
                 </TimerLayout>
+                <audio src={dingMp3} ref={this.sound} />
             </MyLayout>
         );
     }

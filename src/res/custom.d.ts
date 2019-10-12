@@ -25,3 +25,8 @@ declare module 'worker-loader!*' {
 
     export default WebpackWorker;
 }
+
+declare module '*.mp3' {
+    const path: string;
+    export default path;
+}
