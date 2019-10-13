@@ -6,6 +6,10 @@ export class Tokenizer extends BaseWorker {
     protected worker = new Worker();
 
     public async tokenize(records: PomodoroRecord[]): Promise<[string, number][]> {
+        if (process.env.NODE_ENV === 'test') {
+            return [];
+        }
+
         return (await this.createHandler(
             {
                 type: 'tokenize',

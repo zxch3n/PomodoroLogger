@@ -1,5 +1,5 @@
 import { remote } from 'electron';
-import { DBs } from '../main/db';
+import { DBs, refreshDbs as _refresh } from '../main/db';
 import { DBWorker } from './workers/DBWorker';
 import { KanbanBoard } from './components/Kanban/Board/action';
 
@@ -37,4 +37,5 @@ export async function getNameFromBoardId(_id: string) {
     return board.name;
 }
 
+export const refreshDbs = _refresh;
 export default dbs;

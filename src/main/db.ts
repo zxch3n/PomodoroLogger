@@ -2,7 +2,7 @@ import nedb from 'nedb';
 import { dbPaths } from '../config';
 
 const { projectDB, sessionDB, settingDB, kanbanDB, cardsDB, listsDB, moveDB } = dbPaths;
-export const DBs = {
+export let DBs = {
     projectDB: new nedb({ filename: projectDB }),
     sessionDB: new nedb({ filename: sessionDB }),
     settingDB: new nedb({ filename: settingDB }),
@@ -36,4 +36,16 @@ for (const db in DBs) {
     };
 
     load();
+}
+
+export function refreshDbs() {
+    DBs = {
+        projectDB: new nedb({ filename: projectDB }),
+        sessionDB: new nedb({ filename: sessionDB }),
+        settingDB: new nedb({ filename: settingDB }),
+        kanbanDB: new nedb({ filename: kanbanDB }),
+        cardsDB: new nedb({ filename: cardsDB }),
+        listsDB: new nedb({ filename: listsDB }),
+        moveDB: new nedb({ filename: moveDB })
+    };
 }
