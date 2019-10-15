@@ -42,7 +42,7 @@ const monthList = [
 interface GridData {
     month: number;
     day: number;
-    week: number;
+    week: number; // k-th week shown in the calendar; i.e. the number of the column
     count: number;
     date: number;
     year: number;
@@ -105,24 +105,30 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         toolTipTop -= 70;
     }
 
+    let tooltipPositionLeft = undefined;
+    if (chosenIndex) {
+        tooltipPositionLeft = Math.min(
+            (gridMargin + gridWidth) * grids[chosenIndex].week + axisMargin,
+            width - 180
+        );
+    }
     const Tooltip = chosenIndex ? (
         <div
             style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 color: 'white',
                 position: 'absolute',
-                left: (gridMargin + gridWidth) * grids[chosenIndex].week + axisMargin,
+                left: tooltipPositionLeft,
+                maxWidth: 180,
                 top: toolTipTop,
-                padding: '16px 8px',
-                borderRadius: 8,
+                padding: '8px 8px',
+                borderRadius: 4,
                 zIndex: 10,
                 overflow: 'hidden',
                 textOverflow: 'clip'
             }}
         >
-            <span style={{ fontWeight: 700 }}>
-                <b>{`${grids[chosenIndex].count} pomodoros `}</b>
-            </span>
+            <span style={{ fontWeight: 700 }}>{`${grids[chosenIndex].count} pomodoros `}</span>
             <span style={{ fontWeight: 300, fontSize: '0.7em', marginLeft: 8 }}>
                 {`${grids[chosenIndex].year}-${grids[chosenIndex].month}-${grids[chosenIndex].date}`}
             </span>
@@ -133,6 +139,12 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
 
     const rects = grids.map((v, index) => {
         const onEnter = () => setChosenIndex(index);
+        const onLeave = () => {
+            if (chosenIndex === index) {
+                setChosenIndex(undefined);
+            }
+        };
+
         return (
             <rect
                 width={gridWidth}
@@ -142,7 +154,8 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                 fill={`hsl(50, ${v.count === 0 ? '0%' : '60%'}, ${92 -
                     (v.count / maxCountInADay) * 70}%`}
                 key={index}
-                onMouseOver={onEnter}
+                onMouseEnter={onEnter}
+                onMouseLeave={onLeave}
             />
         );
     });
@@ -170,9 +183,14 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         for (let i = 0; i < weekMonthMap.length - 1; i += 1) {
             const week = i;
             const month = weekMonthMap[week];
-            if (firstMonthWeekPair.findIndex(v => v[0] === month) === -1) {
-                firstMonthWeekPair.push([month, week + 1]);
+            if (week === 0 || weekMonthMap[week] !== weekMonthMap[week - 1]) {
+                firstMonthWeekPair.push([month, week]);
             }
+        }
+
+        if (firstMonthWeekPair[1][1] - firstMonthWeekPair[0][1] < 2) {
+            // avoid overlapping
+            firstMonthWeekPair.splice(0, 1);
         }
 
         return firstMonthWeekPair.map(v => (
