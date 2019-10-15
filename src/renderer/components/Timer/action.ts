@@ -204,7 +204,12 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isRunning: true,
         targetTime: state.leftTime ? new Date().getTime() + state.leftTime : state.targetTime
     })),
-    handle(clearTimer, state => ({ ...state, isRunning: false, targetTime: undefined })),
+    handle(clearTimer, state => ({
+        ...state,
+        leftTime: undefined,
+        isRunning: false,
+        targetTime: undefined
+    })),
     handle(timerFinished, (state: TimerState) => {
         return {
             ...state,
@@ -233,7 +238,10 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
 
     handle(switchFocusRestMode, state => ({
         ...state,
-        isFocusing: !state.isFocusing
+        isFocusing: !state.isFocusing,
+        leftTime: undefined,
+        targetTime: undefined,
+        isRunning: false
     })),
 
     handle(setBoardId, (state, { payload: { boardId } }) => ({ ...state, boardId })),

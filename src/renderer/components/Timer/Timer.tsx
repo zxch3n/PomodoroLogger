@@ -435,6 +435,10 @@ class Timer extends Component<Props, State> {
 
         this.props.switchFocusRestMode();
         this.clearStat();
+        if (this.monitor) {
+            this.monitor.stop();
+            this.monitor.clear();
+        }
     };
 
     private onMaskClick = () => {
