@@ -4,6 +4,7 @@ import * as url from 'url';
 import * as db from './db';
 import logo from '../res/icon_sm.png';
 import { build } from '../../package.json';
+import { AutoUpdater } from './AutoUpdater';
 
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
@@ -21,6 +22,7 @@ if (process.platform === 'win32') {
 }
 
 let win: BrowserWindow | undefined;
+const autoUpdater = new AutoUpdater(console.log);
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -49,8 +51,6 @@ const createWindow = async () => {
     }
 
     if (process.env.NODE_ENV === 'production') {
-        // update this app automatically
-        require('update-electron-app')();
         win.removeMenu();
     }
 
@@ -101,6 +101,7 @@ app.on('ready', async () => {
     });
 
     await createWindow();
+    autoUpdater.start();
 });
 
 function setMenuItems(items: { label: string; type: string; click: any }[]) {

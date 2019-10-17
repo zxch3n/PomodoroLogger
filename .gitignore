@@ -10,3 +10,4 @@ yarn.error
 !build/icon.png
 junit.xml
 *.DS_Store
+.token

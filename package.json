@@ -1,7 +1,7 @@
 {
   "name": "pomodoro-logger",
-  "version": "0.1.2",
-  "description": "pomodoro project-time-logger",
+  "version": "0.1.3",
+  "description": "Pomodoro Logger -- When a time logger meets Pomodoro and Kanban board",
   "main": "./dist/main.js",
   "scripts": {
     "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
@@ -19,9 +19,9 @@
     "pretest:e2e": "npm run build",
     "test:e2e": "jest '(\\/test\\/e2e/).*'",
     "pack": "npm run build && electron-builder --dir",
-    "dist-win": "npm run build && electron-builder --windows",
-    "dist-mac": "npm run build && electron-builder --mac",
-    "dist-linux": "npm run build && electron-builder --linux",
+    "dist-win": "npm run build && electron-builder --windows -p onTagOrDraft",
+    "dist-mac": "npm run build && electron-builder --mac -p onTagOrDraft",
+    "dist-linux": "npm run build && electron-builder --linux -p onTagOrDraft",
     "dist-all": "npm run build && electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -43,8 +43,17 @@
   "build": {
     "productName": "Pomodoro Logger",
     "appId": "com.github.rem2016.pomodoro-logger",
+    "publish": {
+      "provider": "github",
+      "owner": "zxch3n",
+      "repo": "PomodoroLogger"
+    },
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "target": [
+        "zip",
+        "dmg"
+      ]
     },
     "directories": {
       "output": "release"
@@ -62,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:rem2016/TimeLogger.git"
+    "url": "git+ssh://git@github.com:zxch3n/PomodoroLogger.git"
   },
   "author": {
     "name": "Zixuan Chen",
@@ -70,9 +79,9 @@
   },
   "license": "LGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/rem2016/TimeLogger/issues"
+    "url": "https://github.com/zxch3n/PomodoroLogger/issues"
   },
-  "homepage": "https://github.com/rem2016/TimeLogger",
+  "homepage": "https://github.com/zxch3n/PomodoroLogger",
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
@@ -154,6 +163,7 @@
     "classnames": "^2.2.6",
     "deox": "^2.1.0",
     "echarts": "^4.2.1",
+    "electron-updater": "^4.1.2",
     "lodash": "^4.17.14",
     "marked": "^0.7.0",
     "nedb": "^1.8.0",
@@ -166,7 +176,6 @@
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.14",
     "styled-components": "^4.3.2",
-    "update-electron-app": "^1.5.0",
     "wordcloud": "^1.1.0"
   }
 }
