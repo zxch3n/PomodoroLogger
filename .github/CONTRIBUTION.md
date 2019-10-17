@@ -1,10 +1,10 @@
 # How to contribute 🌟
 
-I'm really happy you're reading this.😄 Thanks for taking time to contribute!👍
+I'm really happy you're reading this.😄 Thanks for taking the time to contribute!👍
 
 - Pomodoro Logger's roadmap is shown on the [issue page](https://github.com/zxch3n/PomodoroLogger/issues)
-- If you find a bug or want a new feature, [create a issue](https://github.com/zxch3n/PomodoroLogger/issues)
-- If you want to work on an issue, comment it to let me konw
+- If you find a bug or want a new feature, [create an issue](https://github.com/zxch3n/PomodoroLogger/issues)
+- If you want to work on an issue, comment on it to let me know
 
 # Development
 
@@ -28,7 +28,7 @@ yarn start-dev
 
 ---
 
-If you are in China, there may be connection problem when setting things up. 
+If you are in China, there may be a connection problem when setting things up. 
 
 Before running `yarn`, issue 
 
@@ -36,7 +36,7 @@ Before running `yarn`, issue
 ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"
 ```
 
-Alternatively, you can add following lines to `.npmrc` and `.yarnrc` files.
+Alternatively, you can add the following lines to `.npmrc` and `.yarnrc` files.
 
 ```bash
 # ~/.npmrc
