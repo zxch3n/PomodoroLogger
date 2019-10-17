@@ -72,18 +72,13 @@ This project currently supports Windows and macOS.
 To download, go to [release page](https://github.com/rem2016/PomodoroLogger/releases).
 
 
-# Development
+# Contribution
 
-You need to install node.js and node-gyp to build this project.
+I'd love to see you're involved! Read [Contribution Guide](./.github/CONTRIBUTION.md) for detail.
 
-After installing yarn, issue the following commands
-
-```
-yarn
-
-yarn build
-```
-
+- The roadmap is shown on the [issue page](https://github.com/zxch3n/PomodoroLogger/issues)
+- If you find a bug or want a new feature, [create a issue](https://github.com/zxch3n/PomodoroLogger/issues)
+- If you want to start working on an issue, read [Contribution Guide](./.github/CONTRIBUTION.md) and comment the issue to let me konw
 
 # Screenshot
 

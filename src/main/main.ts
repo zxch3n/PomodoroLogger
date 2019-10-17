@@ -25,13 +25,10 @@ const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
     const forceDownload = true;
-    console.log('forcedownload', forceDownload);
     const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-    console.log('react', installer[extensions[0]]);
-    console.log('redux', installer[extensions[1]]);
     return Promise.all(
         extensions.map(name => installer.default(installer[name], forceDownload))
-    ).catch(console.log);
+    ).catch(console.error);
 };
 
 const createWindow = async () => {
@@ -58,10 +55,8 @@ const createWindow = async () => {
     }
 
     if (process.env.NODE_ENV === 'development') {
-        console.log('Dev from localhost');
         win.loadURL(`http://localhost:2003`);
     } else {
-        console.log('Prod or test from file');
         win.loadURL(
             url.format({
                 pathname: path.join(__dirname, 'index.html'),
@@ -71,7 +66,6 @@ const createWindow = async () => {
         );
     }
 
-    console.log('loaded url');
     win.on('close', (event: Event) => {
         if (win) {
             win.hide();
