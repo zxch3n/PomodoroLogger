@@ -166,6 +166,7 @@
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.14",
     "styled-components": "^4.3.2",
+    "update-electron-app": "^1.5.0",
     "wordcloud": "^1.1.0"
   }
 }

@@ -47,13 +47,13 @@ const createWindow = async () => {
         }
     });
 
-    console.log('create window');
     if (process.env.NODE_ENV !== 'production') {
         await installExtensions();
     }
-    console.log('installed extensions');
 
     if (process.env.NODE_ENV === 'production') {
+        // update this app automatically
+        require('update-electron-app')();
         win.removeMenu();
     }
 
