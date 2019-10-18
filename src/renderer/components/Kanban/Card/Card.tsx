@@ -52,61 +52,64 @@ export const Card: FC<Props> = (props: Props) => {
     return (
         <>
             <Draggable draggableId={_id} index={index}>
-                {(provided, snapshot) => (
-                    <>
-                        <CardContainer
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            onClick={onClick}
-                            className={
-                                'kanban-card ' + (snapshot.isDragging ? 'is-dragging' : undefined)
-                            }
-                        >
-                            <CardContent>
-                                <h1 style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}>
-                                    {props.title}
-                                </h1>
-                                <Markdown
-                                    dangerouslySetInnerHTML={{
-                                        __html: formatMarkdown(props.content)
-                                    }}
-                                />
-                                <Divider style={{ margin: '4px 0' }} />
-                                <BadgeHolder>
-                                    {props.spentTimeInHour.estimated ? (
-                                        <Badge
-                                            type={'estimated'}
-                                            value={formatTime(props.spentTimeInHour.estimated)}
-                                            color={'#97ca00'}
-                                        />
-                                    ) : (
-                                        undefined
-                                    )}
-                                    {props.spentTimeInHour.actual ? (
-                                        <Badge
-                                            type={'actual'}
-                                            value={formatTime(props.spentTimeInHour.actual)}
-                                            color={'#007ec6'}
-                                        />
-                                    ) : (
-                                        undefined
-                                    )}
-                                    {props.sessionIds.length > 0 ? (
-                                        <Badge
-                                            type={'pomodoros'}
-                                            value={props.sessionIds.length.toString()}
-                                            color={'#ca6129'}
-                                        />
-                                    ) : (
-                                        undefined
-                                    )}
-                                </BadgeHolder>
-                            </CardContent>
-                        </CardContainer>
-                        {isDraggingOver && provided.placeholder}
-                    </>
-                )}
+                {(provided, snapshot) => {
+                    return (
+                        <>
+                            <CardContainer
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                onClick={onClick}
+                                className={
+                                    'kanban-card ' +
+                                    (snapshot.isDragging ? 'is-dragging' : undefined)
+                                }
+                            >
+                                <CardContent>
+                                    <h1 style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}>
+                                        {props.title}
+                                    </h1>
+                                    <Markdown
+                                        dangerouslySetInnerHTML={{
+                                            __html: formatMarkdown(props.content)
+                                        }}
+                                    />
+                                    <Divider style={{ margin: '4px 0' }} />
+                                    <BadgeHolder>
+                                        {props.spentTimeInHour.estimated ? (
+                                            <Badge
+                                                type={'estimated'}
+                                                value={formatTime(props.spentTimeInHour.estimated)}
+                                                color={'#97ca00'}
+                                            />
+                                        ) : (
+                                            undefined
+                                        )}
+                                        {props.spentTimeInHour.actual ? (
+                                            <Badge
+                                                type={'actual'}
+                                                value={formatTime(props.spentTimeInHour.actual)}
+                                                color={'#007ec6'}
+                                            />
+                                        ) : (
+                                            undefined
+                                        )}
+                                        {props.sessionIds.length > 0 ? (
+                                            <Badge
+                                                type={'pomodoros'}
+                                                value={props.sessionIds.length.toString()}
+                                                color={'#ca6129'}
+                                            />
+                                        ) : (
+                                            undefined
+                                        )}
+                                    </BadgeHolder>
+                                </CardContent>
+                            </CardContainer>
+                            {isDraggingOver && provided.placeholder}
+                        </>
+                    );
+                }}
             </Draggable>
         </>
     );

@@ -8,7 +8,7 @@ import { Button } from 'antd';
 const Container = styled.div`
     height: 100%;
     width: 100%;
-    overflow-x: auto;
+    overflow-x: scroll;
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -20,7 +20,7 @@ const Container = styled.div`
     }
     ::-webkit-scrollbar-track {
         border-radius: 8px;
-        background-color: rgba(200, 200, 200, 0.5);
+        background-color: rgba(200, 200, 200, 0);
     }
 `;
 
@@ -81,7 +81,7 @@ export const Board: FC<Props> = (props: Props) => {
     let lists;
     if (doesOnlyShowFocusedList) {
         lists = (provided: any) => (
-            <ListContainer ref={provided.innerRef}>
+            <ListContainer ref={provided.innerRef} {...provided.droppableProps}>
                 <List listId={props.focusedList} index={0} key={0} boardId={props.boardId} />
                 {provided.placeholder}
             </ListContainer>

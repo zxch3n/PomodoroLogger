@@ -79,11 +79,11 @@ const AfterPlaceHolder = styled.div`
 
 const Cards = styled.div`
     position: relative;
-    padding: 0 2px;
+    padding: 0 0 0 2px;
     background-color: #dedede;
     border-radius: 4px;
     max-height: calc(100vh - 230px);
-    overflow: overlay;
+    overflow-y: scroll;
     min-height: 200px;
     max-width: 270px;
     ::-webkit-scrollbar {
@@ -255,22 +255,24 @@ export const List: FC<Props> = (props: Props) => {
                             )}
                         </ListHead>
                         <Droppable droppableId={props._id}>
-                            {(provided, { isDraggingOver }) => (
-                                <Cards ref={provided.innerRef}>
-                                    <BeforePlaceHolder />
-                                    {filteredCards.map((cardId, index) => (
-                                        <Card
-                                            cardId={cardId}
-                                            index={index}
-                                            key={cardId}
-                                            listId={props.listId}
-                                            isDraggingOver={isDraggingOver}
-                                        />
-                                    ))}
-                                    {provided.placeholder}
-                                    <AfterPlaceHolder />
-                                </Cards>
-                            )}
+                            {(provided, { isDraggingOver }) => {
+                                return (
+                                    <Cards ref={provided.innerRef} {...provided.droppableProps}>
+                                        <BeforePlaceHolder />
+                                        {filteredCards.map((cardId, index) => (
+                                            <Card
+                                                cardId={cardId}
+                                                index={index}
+                                                key={cardId}
+                                                listId={props.listId}
+                                                isDraggingOver={isDraggingOver}
+                                            />
+                                        ))}
+                                        {provided.placeholder}
+                                        <AfterPlaceHolder />
+                                    </Cards>
+                                );
+                            }}
                         </Droppable>
                         <ButtonWrapper>
                             <Button
