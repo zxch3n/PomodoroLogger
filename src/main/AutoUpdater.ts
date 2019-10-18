@@ -9,32 +9,34 @@ export class AutoUpdater {
 
     init(sendStatusToWindow: any) {
         autoUpdater.on('checking-for-update', () => {
-            sendStatusToWindow('Checking for update...');
+            console.log('Checking for update...');
         });
         autoUpdater.on('update-available', info => {
-            sendStatusToWindow('Update available.');
+            console.log('update available');
             console.log(info);
+            sendStatusToWindow('update-available', `Version: ${info.version}; ${info.releaseName}`);
         });
         autoUpdater.on('update-not-available', info => {
-            sendStatusToWindow('Update not available.');
+            console.log('update not available');
         });
+
         autoUpdater.on('error', err => {
-            sendStatusToWindow('Error in auto-updater. ' + err);
+            sendStatusToWindow('error', 'Error in auto-updater. ' + err);
         });
         autoUpdater.on('download-progress', progressObj => {
             let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
             log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
             log_message =
                 log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-            sendStatusToWindow(log_message);
+            sendStatusToWindow('download-progress', log_message);
         });
         autoUpdater.on('update-downloaded', info => {
-            sendStatusToWindow('Update downloaded');
             console.log(info);
+            sendStatusToWindow('update-downloaded', 'Update downloaded');
         });
     }
 
-    start() {
+    checkUpdate() {
         const data = {
             provider: 'github',
             owner: 'zxch3n',
@@ -43,5 +45,10 @@ export class AutoUpdater {
         autoUpdater.setFeedURL(data);
         autoUpdater.autoDownload = false;
         autoUpdater.checkForUpdates();
+    }
+
+    download() {
+        autoUpdater.autoInstallOnAppQuit = true;
+        autoUpdater.downloadUpdate();
     }
 }

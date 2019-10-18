@@ -1,4 +1,4 @@
-import { nativeImage, app, Tray, BrowserWindow, Notification, Menu } from 'electron';
+import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
@@ -22,7 +22,6 @@ if (process.platform === 'win32') {
 }
 
 let win: BrowserWindow | undefined;
-const autoUpdater = new AutoUpdater(console.log);
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -101,7 +100,18 @@ app.on('ready', async () => {
     });
 
     await createWindow();
-    autoUpdater.start();
+    const autoUpdater = new AutoUpdater((type: string, info: string) => {
+        console.log(info);
+        if (win) {
+            win.webContents.send(type, info);
+        }
+    });
+
+    ipcMain.on('download-update', () => {
+        autoUpdater.download();
+    });
+
+    autoUpdater.checkUpdate();
 });
 
 function setMenuItems(items: { label: string; type: string; click: any }[]) {
