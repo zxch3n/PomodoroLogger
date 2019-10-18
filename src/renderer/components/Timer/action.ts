@@ -15,6 +15,7 @@ export interface Setting {
     restDuration: number;
     monitorInterval: number;
     screenShotInterval?: number;
+    startOnBoot: boolean;
 }
 
 export interface TimerState extends Setting {
@@ -33,6 +34,7 @@ export const defaultState: TimerState = {
     restDuration: 5 * 60,
     isRunning: false,
     isFocusing: true,
+    startOnBoot: false,
 
     monitorInterval: 1000,
     screenShotInterval: undefined,
@@ -44,6 +46,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const setStartOnBoot = createActionCreator(
+    '[Timer]SWITCH_START_ON_BOOT',
+    resolve => (check: boolean) => resolve(check)
+);
 export const setFocusDuration = createActionCreator(
     '[Timer]SET_FOCUS_DURATION',
     resolve => (duration: number) => resolve(duration)
@@ -118,6 +124,15 @@ export const actions = {
         dbs.settingDB.update(
             { name: 'setting' },
             { $set: { restDuration } },
+            { upsert: true },
+            throwError
+        );
+    },
+    setStartOnBoot: (check: boolean) => async (dispatch: Dispatch) => {
+        dispatch(setStartOnBoot(check));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { startOnBoot: check } },
             { upsert: true },
             throwError
         );
@@ -245,5 +260,9 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     })),
 
     handle(setBoardId, (state, { payload: { boardId } }) => ({ ...state, boardId })),
-    handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload }))
+    handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload })),
+    handle(setStartOnBoot, (state, { payload }) => ({
+        ...state,
+        startOnBoot: payload
+    }))
 ]);

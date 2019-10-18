@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button, Icon, message, notification, Popconfirm, Slider, Switch } from 'antd';
 import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
 import { writeFile } from 'fs';
-import { remote } from 'electron';
+import { remote, app } from 'electron';
 import { promisify } from 'util';
 
 const dialog = remote.dialog;
@@ -36,23 +36,23 @@ const restMarks = {
 
 interface Props extends TimerState, TimerActionTypes {}
 export const Setting: React.FunctionComponent<Props> = (props: Props) => {
-    const onChangeFocus = (v: number | [number, number]) => {
+    const onChangeFocus = React.useCallback((v: number | [number, number]) => {
         if (v instanceof Array) {
             return;
         }
 
         props.setFocusDuration(v * 60);
-    };
+    }, []);
 
-    const onChangeRest = (v: number | [number, number]) => {
+    const onChangeRest = React.useCallback((v: number | [number, number]) => {
         if (v instanceof Array) {
             return;
         }
 
         props.setRestDuration(v * 60);
-    };
+    }, []);
 
-    const switchScreenshot = (v: boolean) => {
+    const switchScreenshot = React.useCallback((v: boolean) => {
         if (v) {
             props.setScreenShotInterval(5000);
         } else {
@@ -65,7 +65,21 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
             duration: 0,
             icon: <Icon type="warning" />
         });
-    };
+    }, []);
+
+    const setStartOnBoot = React.useCallback((v: boolean) => {
+        props.setStartOnBoot(v);
+        if (v) {
+            app.setLoginItemSettings({
+                openAtLogin: true,
+                openAsHidden: true
+            });
+        } else {
+            app.setLoginItemSettings({
+                openAtLogin: false
+            });
+        }
+    }, []);
 
     function onDeleteData() {
         deleteAllUserData().then(() => {
@@ -118,6 +132,11 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                     onChange={onChangeRest}
                 />
             </SliderContainer>
+
+            <h4>Start On Boot </h4>
+            <ButtonWrapper>
+                <Switch onChange={setStartOnBoot} checked={props.startOnBoot} />
+            </ButtonWrapper>
 
             {/*<h4>Idle Detection (Need Screenshot) </h4>*/}
             {/*<ButtonWrapper>*/}
