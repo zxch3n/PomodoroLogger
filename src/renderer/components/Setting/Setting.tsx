@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button, Icon, message, notification, Popconfirm, Slider, Switch } from 'antd';
 import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
 import { writeFile } from 'fs';
-import { remote, app } from 'electron';
+import { shell, remote, app } from 'electron';
 import { promisify } from 'util';
 
 const dialog = remote.dialog;
@@ -19,6 +19,15 @@ const SliderContainer = styled.div`
 
 const ButtonWrapper = styled.div`
     margin: 0.6em;
+`;
+
+const StyledIcon = styled(Icon)`
+    font-size: 2.5rem;
+    color: black;
+    transition: color 0.1s;
+    :hover {
+        color: rgb(87, 80, 89);
+    }
 `;
 
 const marks = {
@@ -107,6 +116,14 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
         }
     }
 
+    function openIssuePage() {
+        shell.openExternal('https://github.com/zxch3n/PomodoroLogger/issues/new');
+    }
+
+    function openGithubPage() {
+        shell.openExternal('https://github.com/zxch3n/PomodoroLogger');
+    }
+
     return (
         <Container>
             <h4>Focus Duration</h4>
@@ -152,6 +169,19 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 <Popconfirm title={'Sure to delete?'} onConfirm={onDeleteData}>
                     <Button type="danger">Delete All Data</Button>
                 </Popconfirm>
+            </ButtonWrapper>
+            <h4>Misc</h4>
+            <ButtonWrapper>
+                <Button onClick={openIssuePage}>Feedback</Button>
+                <br />
+            </ButtonWrapper>
+            <ButtonWrapper>
+                <StyledIcon
+                    type="github"
+                    onClick={openGithubPage}
+                    title="This project is open-source and hosted on GitHub"
+                />
+                <br />
             </ButtonWrapper>
         </Container>
     );
