@@ -586,6 +586,13 @@ class Timer extends Component<Props, State> {
                                 />
                             </div>
                             <Button
+                                id="mode-switching-button"
+                                title="Switch Mode"
+                                icon="swap"
+                                shape="circle"
+                                onClick={this.switchMode}
+                            />
+                            <Button
                                 id="more-timer-button"
                                 icon="more"
                                 shape="circle"
