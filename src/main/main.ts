@@ -9,6 +9,23 @@ import { AutoUpdater } from './AutoUpdater';
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
 app.commandLine.appendSwitch('disable-background-timer-throttling');
+// @ts-ignore
+window['__react-beautiful-dnd-disable-dev-warnings'] = true;
+
+let win: BrowserWindow | undefined;
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (win) {
+            if (win.isMinimized()) win.restore();
+            win.focus();
+        }
+    });
+}
 
 const mGlobal: typeof global & {
     sharedDB?: typeof db.DBs;
@@ -21,7 +38,6 @@ if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
 }
 
-let win: BrowserWindow | undefined;
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
