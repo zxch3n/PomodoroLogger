@@ -9,8 +9,6 @@ import { AutoUpdater } from './AutoUpdater';
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
 app.commandLine.appendSwitch('disable-background-timer-throttling');
-// @ts-ignore
-window['__react-beautiful-dnd-disable-dev-warnings'] = true;
 
 let win: BrowserWindow | undefined;
 const gotTheLock = app.requestSingleInstanceLock();
