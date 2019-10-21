@@ -100,7 +100,8 @@ export const actions = {
             ['focusDuration', setFocusDuration],
             ['restDuration', setRestDuration],
             ['monitorInterval', setMonitorInterval],
-            ['screenShotInterval', setScreenShotInterval]
+            ['screenShotInterval', setScreenShotInterval],
+            ['startOnBoot', setStartOnBoot]
         ];
         for (const key of settingKeywords) {
             if (key[0] in settings) {
