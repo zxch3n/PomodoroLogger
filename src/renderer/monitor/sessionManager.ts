@@ -73,7 +73,6 @@ export async function addSession(record: PomodoroRecord) {
     if (!record.boardId) {
         // TODO: invoke ML inference
     }
-    consistencyCheck(record);
     // @ts-ignore
     await insert(record).catch(err => console.log(err));
 }

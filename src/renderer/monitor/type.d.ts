@@ -30,4 +30,5 @@ export interface PomodoroRecord {
     startTime: number;
     screenStaticDuration?: number;
     boardId?: string;
+    isRotten?: boolean;
 }

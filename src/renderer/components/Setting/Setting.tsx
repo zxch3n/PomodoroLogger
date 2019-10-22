@@ -143,7 +143,7 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 <Slider
                     marks={marks}
                     step={1}
-                    min={process.env.NODE_ENV === 'production' ? 15 : 2}
+                    min={process.env.NODE_ENV === 'production' ? 20 : 2}
                     max={60}
                     value={props.focusDuration / 60}
                     onChange={onChangeFocus}
