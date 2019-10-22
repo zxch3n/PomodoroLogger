@@ -39,6 +39,7 @@ const FadeEffect = styled.div`
 
 interface Props {
     isWorking: boolean;
+    isLongBreak: boolean;
     onClick?: () => void;
 }
 
@@ -52,7 +53,13 @@ export const WorkRestIcon: FunctionComponent<Props> = (props: Props) => {
             <FadeEffect>
                 {props.isWorking ? <Icon component={WorkIcon} /> : <Icon component={RestIcon} />}
             </FadeEffect>
-            <FadeEffect>{props.isWorking ? 'Working' : 'Resting'}</FadeEffect>
+            {props.isWorking ? (
+                <FadeEffect>Working</FadeEffect>
+            ) : (
+                <FadeEffect style={{ fontSize: '0.8em' }}>
+                    {props.isLongBreak ? 'Long Break' : 'Short Break'}
+                </FadeEffect>
+            )}
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import { Button, List, Popover, Row } from 'antd';
-import { actions } from '../Timer/action';
+import { actions, LONG_BREAK_INTERVAL } from '../Timer/action';
 import { PomodoroNumView } from './PomodoroNumView';
 import React from 'react';
 import styled from 'styled-components';
@@ -61,6 +61,7 @@ export interface MaskProps extends InputProps {
     isFocusing: boolean;
     boardId?: string;
     boards: KanbanBoardState;
+    isLongBreak: boolean;
 }
 
 const _TimerMask = (props: MaskProps) => {
@@ -110,14 +111,19 @@ const _TimerMask = (props: MaskProps) => {
                             </ProjectName>
                         </Popover>
                     ) : (
-                        <ProjectName>Resting</ProjectName>
+                        <ProjectName>Break</ProjectName>
                     )}
                     <h1 style={{ color: 'white', fontSize: '3.5em', marginBottom: '1em' }}>
                         Session Finished
                     </h1>
                 </Row>
                 <Button size="large" onClick={onStartClick}>
-                    Start {props.isFocusing ? 'Resting' : 'Focusing'}
+                    Start
+                    {!props.isFocusing
+                        ? ' Focusing'
+                        : props.isLongBreak
+                        ? ' Long Break'
+                        : ' Short Break'}
                 </Button>
                 <Row style={{ marginTop: '2em' }}>
                     <h1 style={{ color: 'white' }}>Today Pomodoros</h1>
@@ -131,6 +137,7 @@ const _TimerMask = (props: MaskProps) => {
 export const TimerMask = connect(
     (state: RootState, props: InputProps) => ({
         isFocusing: state.timer.isFocusing,
+        isLongBreak: !((state.timer.iBreak + 1) % LONG_BREAK_INTERVAL),
         boardId: state.timer.boardId,
         boards: state.kanban.boards
     }),

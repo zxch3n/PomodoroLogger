@@ -3,7 +3,7 @@ import { Button, Divider, message, Tooltip } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes } from '../Kanban/Board/action';
-import { TimerActionTypes as ThisActionTypes } from './action';
+import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
@@ -190,7 +190,7 @@ class Timer extends Component<Props, State> {
                 }
             },
             {
-                label: 'Start Resting',
+                label: 'Start Break',
                 type: 'normal',
                 click: () => {
                     if (this.props.timer.isFocusing) {
@@ -312,8 +312,11 @@ class Timer extends Component<Props, State> {
             isFocusing = this.props.timer.isFocusing;
         }
 
+        const isLongBreak = this.props.timer.iBreak % 4 === 0;
         const duration = isFocusing
             ? this.props.timer.focusDuration
+            : isLongBreak
+            ? this.props.timer.longBreakDuration
             : this.props.timer.restDuration;
         return `${to2digits(duration / 60)}:00`;
     };
@@ -550,6 +553,9 @@ class Timer extends Component<Props, State> {
                                     </div>
                                     <WorkRestIcon
                                         isWorking={this.props.timer.isFocusing}
+                                        isLongBreak={
+                                            !(this.props.timer.iBreak % LONG_BREAK_INTERVAL)
+                                        }
                                         onClick={this.switchMode}
                                     />
                                 </ProgressTextContainer>

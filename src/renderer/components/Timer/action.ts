@@ -10,9 +10,12 @@ import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE } from '../../../config';
 
+export const LONG_BREAK_INTERVAL = 4;
+
 export interface Setting {
     focusDuration: number;
     restDuration: number;
+    longBreakDuration: number;
     monitorInterval: number;
     screenShotInterval?: number;
     startOnBoot: boolean;
@@ -24,6 +27,7 @@ export interface TimerState extends Setting {
     isFocusing: boolean;
     isRunning: boolean;
     boardId?: string;
+    iBreak: number; // i-th break session, if i can be divided by 4, start longer break
 
     currentTab: string;
 }
@@ -32,6 +36,8 @@ export const defaultState: TimerState = {
     targetTime: undefined,
     focusDuration: 25 * 60,
     restDuration: 5 * 60,
+    iBreak: 0,
+    longBreakDuration: 15 * 60,
     isRunning: false,
     isFocusing: true,
     startOnBoot: false,
@@ -46,6 +52,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const setLongBreakDuration = createActionCreator(
+    '[Timer]SET_LONG_BREAK',
+    resolve => (longBreakDuration: number) => resolve({ longBreakDuration })
+);
 export const setStartOnBoot = createActionCreator(
     '[Timer]SWITCH_START_ON_BOOT',
     resolve => (check: boolean) => resolve(check)
@@ -101,7 +111,8 @@ export const actions = {
             ['restDuration', setRestDuration],
             ['monitorInterval', setMonitorInterval],
             ['screenShotInterval', setScreenShotInterval],
-            ['startOnBoot', setStartOnBoot]
+            ['startOnBoot', setStartOnBoot],
+            ['longBreakDuration', setLongBreakDuration]
         ];
         for (const key of settingKeywords) {
             if (key[0] in settings) {
@@ -125,6 +136,15 @@ export const actions = {
         dbs.settingDB.update(
             { name: 'setting' },
             { $set: { restDuration } },
+            { upsert: true },
+            throwError
+        );
+    },
+    setLongBreakDuration: (longBreakDuration: number) => async (dispatch: Dispatch) => {
+        dispatch(setLongBreakDuration(longBreakDuration));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { longBreakDuration } },
             { upsert: true },
             throwError
         );
@@ -197,7 +217,11 @@ export const actions = {
 export type TimerActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
 export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(startTimer, (state: TimerState) => {
-        const duration: number = state.isFocusing ? state.focusDuration : state.restDuration;
+        const duration: number = state.isFocusing
+            ? state.focusDuration
+            : state.iBreak % LONG_BREAK_INTERVAL === 0
+            ? state.longBreakDuration
+            : state.restDuration;
         const now = new Date().getTime();
         if (process.env.NODE_ENV !== 'production') {
             return {
@@ -215,6 +239,7 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isRunning: false,
         leftTime: state.targetTime ? state.targetTime - new Date().getTime() : undefined
     })),
+
     handle(continueTimer, state => ({
         ...state,
         isRunning: true,
@@ -231,7 +256,8 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
             ...state,
             isRunning: false,
             targetTime: undefined,
-            isFocusing: !state.isFocusing
+            isFocusing: !state.isFocusing,
+            iBreak: state.iBreak + (state.isFocusing ? 1 : 0)
         };
     }),
 
@@ -265,5 +291,9 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(setStartOnBoot, (state, { payload }) => ({
         ...state,
         startOnBoot: payload
+    })),
+    handle(setLongBreakDuration, (state, { payload: { longBreakDuration } }) => ({
+        ...state,
+        longBreakDuration
     }))
 ]);
