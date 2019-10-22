@@ -8,6 +8,12 @@ import { RootState } from '../../reducers';
 import { KanbanBoardState } from '../Kanban/Board/action';
 import { Dispatch } from 'redux';
 
+const ButtonContainer = styled.div`
+    position: absolute;
+    top: 16px;
+    right: 16px;
+`;
+
 const Mask = styled.div`
     left: 0;
     top: 0;
@@ -54,6 +60,7 @@ export interface InputProps {
     onCancel: () => void;
     onStart: () => void;
     pomodoroNum: number;
+    extendCurrentSession: (timeInMinutes: number) => void;
 }
 
 export interface MaskProps extends InputProps {
@@ -98,6 +105,21 @@ const _TimerMask = (props: MaskProps) => {
         props.onStart();
     };
 
+    const extend10 = React.useCallback(
+        (event: any) => {
+            event.stopPropagation();
+            props.extendCurrentSession(10);
+        },
+        [props.extendCurrentSession]
+    );
+    const extend5 = React.useCallback(
+        (event: any) => {
+            event.stopPropagation();
+            props.extendCurrentSession(5);
+        },
+        [props.extendCurrentSession]
+    );
+
     return (
         <Mask style={{ display: props.showMask ? 'flex' : 'none' }} onClick={props.onCancel}>
             <MaskInnerContainer>
@@ -130,6 +152,18 @@ const _TimerMask = (props: MaskProps) => {
                     <PomodoroNumView num={props.pomodoroNum} color={'#f9ec52'} showNum={false} />
                 </Row>
             </MaskInnerContainer>
+            {props.isFocusing ? (
+                <ButtonContainer>
+                    <Button style={{ margin: 4 }} title={'Extend 5 minutes'} onClick={extend5}>
+                        +5
+                    </Button>
+                    <Button style={{ margin: 4 }} title={'Extend 10 minutes'} onClick={extend10}>
+                        +10
+                    </Button>
+                </ButtonContainer>
+            ) : (
+                undefined
+            )}
         </Mask>
     );
 };

@@ -141,6 +141,7 @@ class Timer extends Component<Props, State> {
     win?: BrowserWindow;
     mainDiv: React.RefObject<HTMLDivElement>;
     sound: React.RefObject<HTMLAudioElement>;
+    extendedTimeInMinute: number;
     private stagedSession?: PomodoroRecord;
 
     constructor(props: Props) {
@@ -155,6 +156,7 @@ class Timer extends Component<Props, State> {
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
         this.sound = React.createRef<HTMLAudioElement>();
+        this.extendedTimeInMinute = 0;
     }
 
     componentDidMount(): void {
@@ -246,13 +248,7 @@ class Timer extends Component<Props, State> {
         }
 
         const leftTime = `${to2digits(Math.floor(sec / 60))}:${to2digits(sec % 60)}`;
-        const percent =
-            100 -
-            timeSpan /
-                10 /
-                (this.props.timer.isFocusing
-                    ? this.props.timer.focusDuration
-                    : this.props.timer.restDuration);
+        const percent = 100 - timeSpan / 10 / (this.getDuration() + this.extendedTimeInMinute * 60);
         if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
             setTrayImageWithMadeIcon(
                 leftTime.slice(0, 2),
@@ -306,19 +302,22 @@ class Timer extends Component<Props, State> {
         this.updateLeftTime();
     };
 
-    private defaultLeftTime = (isFocusing?: boolean) => {
+    private getDuration = (isFocusing?: boolean) => {
         if (isFocusing === undefined) {
             // tslint:disable-next-line:no-parameter-reassignment
             isFocusing = this.props.timer.isFocusing;
         }
 
         const isLongBreak = this.props.timer.iBreak % 4 === 0;
-        const duration = isFocusing
+        return isFocusing
             ? this.props.timer.focusDuration
             : isLongBreak
             ? this.props.timer.longBreakDuration
             : this.props.timer.restDuration;
-        return `${to2digits(duration / 60)}:00`;
+    };
+
+    private defaultLeftTime = (isFocusing?: boolean) => {
+        return `${to2digits(this.getDuration(isFocusing) / 60)}:00`;
     };
 
     private clearStat = () => {
@@ -337,6 +336,7 @@ class Timer extends Component<Props, State> {
         }
 
         this.clearStat();
+        this.extendedTimeInMinute = 0;
     };
 
     onDone = async () => {
@@ -378,16 +378,18 @@ class Timer extends Component<Props, State> {
         thisSession.spentTimeInHour = this.props.timer.focusDuration / 3600;
         this.stagedSession = thisSession;
         this.monitor.stop();
-        this.monitor.clear();
-        this.monitor = undefined;
         if (this.props.timer.boardId === undefined) {
             this.props.inferProject(thisSession);
         }
-
-        this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
     };
 
     private onSessionConfirmed = async () => {
+        if (this.monitor) {
+            this.monitor.clear();
+            this.monitor = undefined;
+        }
+
+        this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
         if (this.stagedSession === undefined) {
             // Resting session
             this.props.timerFinished();
@@ -400,6 +402,8 @@ class Timer extends Component<Props, State> {
             }
         }
 
+        this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
+        this.extendedTimeInMinute = 0;
         if (this.props.timer.boardId !== undefined) {
             this.stagedSession.boardId = this.props.timer.boardId;
             const kanban = this.props.kanban;
@@ -476,6 +480,18 @@ class Timer extends Component<Props, State> {
         }, timeout);
     };
 
+    private extendCurrentSession = (timeInMinutes: number) => {
+        if (this.monitor) {
+            this.monitor.resume();
+        } else if (process.env.NODE_ENV === 'development') {
+            throw new Error();
+        }
+
+        this.extendedTimeInMinute += timeInMinutes;
+        this.props.extendCurrentSession(timeInMinutes * 60);
+        this.setState({ showMask: false });
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
@@ -501,6 +517,7 @@ class Timer extends Component<Props, State> {
         return (
             <MyLayout style={{ backgroundColor: 'white' }}>
                 <TimerMask
+                    extendCurrentSession={this.extendCurrentSession}
                     showMask={showMask}
                     onCancel={this.onMaskClick}
                     onStart={this.onMaskButtonClick}

@@ -52,6 +52,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const extendCurrentSession = createActionCreator(
+    '[Timer]EXTEND_CURRENT_SESSION',
+    resolve => (time: number) => resolve(time)
+);
 export const setLongBreakDuration = createActionCreator(
     '[Timer]SET_LONG_BREAK',
     resolve => (longBreakDuration: number) => resolve({ longBreakDuration })
@@ -98,6 +102,7 @@ export const actions = {
     switchFocusRestMode,
     setBoardId,
     changeAppTab,
+    extendCurrentSession,
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
             dbs.settingDB.findOne.bind(dbs.settingDB)
@@ -295,5 +300,11 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     handle(setLongBreakDuration, (state, { payload: { longBreakDuration } }) => ({
         ...state,
         longBreakDuration
+    })),
+    handle(extendCurrentSession, (state, { payload }) => ({
+        ...state,
+        targetTime: new Date().getTime() + payload * 1000,
+        isFocusing: true,
+        isRunning: true
     }))
 ]);
