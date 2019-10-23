@@ -287,6 +287,12 @@ class Timer extends Component<Props, State> {
 
     private onStop() {
         this.props.stopTimer();
+        setTrayImageWithMadeIcon(
+            this.state.leftTime.slice(0, 2),
+            this.state.percent / 100,
+            this.props.timer.isFocusing,
+            true
+        ).catch(console.error);
         if (this.monitor) {
             this.monitor.stop();
         }

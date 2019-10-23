@@ -11,7 +11,26 @@ function drawText(ctx: CanvasRenderingContext2D, isMac: boolean, size: number, l
     ctx.fillText(leftTime, size / 2, (size / 9) * 5);
 }
 
-async function makeIcon(leftTime?: string, progress?: number, isFocus?: boolean): Promise<string> {
+function drawPause(ctx: CanvasRenderingContext2D, size: number) {
+    const side = size / Math.sqrt(2) / 1.3;
+    const margin = (size - side) / 2;
+    const padding = side / 3;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillRect(margin, margin, padding, side);
+    ctx.fillRect(margin + padding * 2, margin, padding, side);
+}
+
+async function makeIcon(
+    leftTime?: string,
+    progress?: number,
+    isFocus?: boolean,
+    isPause?: boolean
+): Promise<string> {
     const canvas = document.createElement('canvas');
     let size = 100;
     const isMac = process.platform === 'darwin';
@@ -33,7 +52,7 @@ async function makeIcon(leftTime?: string, progress?: number, isFocus?: boolean)
             reject(e);
         });
         img.addEventListener('load', e => {
-            if (leftTime !== undefined) {
+            if (leftTime !== undefined && !isPause) {
                 if (progress !== undefined) {
                     drawCircleProgress(ctx, !!isFocus, size, progress);
                 }
@@ -41,6 +60,9 @@ async function makeIcon(leftTime?: string, progress?: number, isFocus?: boolean)
                 drawText(ctx, isMac, size, leftTime);
             } else {
                 ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, size, size);
+                if (isPause) {
+                    drawPause(ctx, size);
+                }
             }
 
             resolve(canvas.toDataURL('image/png'));
@@ -92,9 +114,10 @@ function drawCircleProgress(
 export async function setTrayImageWithMadeIcon(
     leftTime?: string,
     progress?: number,
-    isFocus?: boolean
+    isFocus?: boolean,
+    isPause?: boolean
 ) {
-    const src = await makeIcon(leftTime, progress, isFocus);
+    const src = await makeIcon(leftTime, progress, isFocus, isPause);
     const tray = remote.getGlobal('tray');
     const img = nativeImage.createFromDataURL(src);
     tray.setImage(img);
