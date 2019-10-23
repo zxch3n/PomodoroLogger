@@ -34,9 +34,7 @@ export class UpdateController extends React.Component<any, State> {
             const args = {
                 message: 'Update Download Failed',
                 description:
-                    '' +
-                    message +
-                    'You can download the latest version from https://github.com/zxch3n/PomodoroLogger/releases/latest',
+                    'You can download manually from https://github.com/zxch3n/PomodoroLogger/releases',
                 duration: 0
             };
             notification.open(args);
