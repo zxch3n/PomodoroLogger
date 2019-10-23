@@ -262,7 +262,8 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
             isRunning: false,
             targetTime: undefined,
             isFocusing: !state.isFocusing,
-            iBreak: state.iBreak + (state.isFocusing ? 1 : 0)
+            iBreak: state.iBreak + (state.isFocusing ? 1 : 0),
+            leftTime: undefined
         };
     }),
 

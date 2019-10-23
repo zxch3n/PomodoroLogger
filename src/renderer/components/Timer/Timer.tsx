@@ -280,6 +280,12 @@ class Timer extends Component<Props, State> {
 
     private onResume() {
         this.props.continueTimer();
+        setTrayImageWithMadeIcon(
+            this.state.leftTime.slice(0, 2),
+            this.state.percent / 100,
+            this.props.timer.isFocusing,
+            false
+        ).catch(console.error);
         if (this.monitor) {
             this.monitor.resume();
         }
@@ -641,7 +647,7 @@ class Timer extends Component<Props, State> {
                                     />
                                 )}
                             </div>
-                            {this.props.timer.isRunning || this.props.timer.leftTime ? (
+                            {this.props.timer.isRunning || this.props.timer.targetTime ? (
                                 <Button
                                     title="Finish"
                                     icon="check"
