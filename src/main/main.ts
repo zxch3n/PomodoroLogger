@@ -114,10 +114,23 @@ app.on('ready', async () => {
     });
 
     await createWindow();
-    const autoUpdater = new AutoUpdater((type: string, info: string) => {
+    const autoUpdater = new AutoUpdater((type: string, info: any) => {
         console.log(info);
         if (win) {
             win.webContents.send(type, info);
+        }
+
+        if (type === 'download-progress') {
+            const { percent } = info;
+            if (win) {
+                win.setProgressBar(percent / 100);
+            }
+        }
+
+        if (type === 'update-downloaded' || type === 'error') {
+            if (win) {
+                win.setProgressBar(-1);
+            }
         }
     });
 

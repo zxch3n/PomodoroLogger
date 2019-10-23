@@ -22,13 +22,18 @@ export class AutoUpdater {
 
         autoUpdater.on('error', err => {
             sendStatusToWindow('error', 'Error in auto-updater. ' + err);
+            sendStatusToWindow('error', err);
         });
         autoUpdater.on('download-progress', progressObj => {
             let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
             log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
             log_message =
                 log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-            sendStatusToWindow('download-progress', log_message);
+            console.log(log_message);
+            sendStatusToWindow('download-progress', {
+                percent: progressObj.percent,
+                bytesPerSecond: progressObj.bytesPerSecond
+            });
         });
         autoUpdater.on('update-downloaded', info => {
             console.log(info);

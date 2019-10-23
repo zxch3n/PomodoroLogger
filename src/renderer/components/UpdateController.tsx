@@ -29,6 +29,18 @@ export class UpdateController extends React.Component<any, State> {
         ipcRenderer.addListener('update-downloaded', () => {
             this.notifyDownloaded();
         });
+
+        ipcRenderer.addListener('error', (event: any, message: string) => {
+            const args = {
+                message: 'Update Download Failed',
+                description:
+                    '' +
+                    message +
+                    'You can download the latest version from https://github.com/zxch3n/PomodoroLogger/releases/latest',
+                duration: 0
+            };
+            notification.open(args);
+        });
     }
 
     onOk = () => {
