@@ -1,7 +1,7 @@
 import React from 'react';
 import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
-import { Button, Icon, message, notification, Popconfirm, Slider, Switch } from 'antd';
+import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
 import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
 import { writeFile } from 'fs';
 import { shell, remote, app } from 'electron';
@@ -38,6 +38,10 @@ const marks = {
 
 const restMarks = {
     5: '5min',
+    10: '10min'
+};
+
+const longBreakMarks = {
     10: '10min',
     15: '15min',
     20: '20min'
@@ -59,6 +63,14 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
         }
 
         props.setRestDuration(v * 60);
+    }, []);
+
+    const onChangeLongBreak = React.useCallback((v: number | [number, number]) => {
+        if (v instanceof Array) {
+            return;
+        }
+
+        props.setLongBreakDuration(v * 60);
     }, []);
 
     const switchScreenshot = React.useCallback((v: boolean) => {
@@ -131,24 +143,41 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 <Slider
                     marks={marks}
                     step={1}
-                    min={process.env.NODE_ENV === 'production' ? 15 : 2}
+                    min={process.env.NODE_ENV === 'production' ? 20 : 2}
                     max={60}
                     value={props.focusDuration / 60}
                     onChange={onChangeFocus}
                 />
             </SliderContainer>
 
-            <h4>Rest Duration</h4>
-            <SliderContainer>
-                <Slider
-                    marks={restMarks}
-                    step={1}
-                    min={process.env.NODE_ENV === 'production' ? 5 : 1}
-                    max={20}
-                    value={props.restDuration / 60}
-                    onChange={onChangeRest}
-                />
-            </SliderContainer>
+            <Row>
+                <Col span={12}>
+                    <h4>Short Break</h4>
+                    <SliderContainer>
+                        <Slider
+                            marks={restMarks}
+                            step={1}
+                            min={process.env.NODE_ENV === 'production' ? 5 : 1}
+                            max={10}
+                            value={props.restDuration / 60}
+                            onChange={onChangeRest}
+                        />
+                    </SliderContainer>
+                </Col>
+                <Col span={12}>
+                    <h4>Long Break</h4>
+                    <SliderContainer>
+                        <Slider
+                            marks={longBreakMarks}
+                            step={1}
+                            min={10}
+                            max={20}
+                            value={props.longBreakDuration / 60}
+                            onChange={onChangeLongBreak}
+                        />
+                    </SliderContainer>
+                </Col>
+            </Row>
 
             <h4>Start On Boot </h4>
             <ButtonWrapper>

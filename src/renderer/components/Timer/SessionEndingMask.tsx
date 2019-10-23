@@ -1,5 +1,5 @@
 import { Button, List, Popover, Row } from 'antd';
-import { actions } from '../Timer/action';
+import { actions, LONG_BREAK_INTERVAL } from '../Timer/action';
 import { PomodoroNumView } from './PomodoroNumView';
 import React from 'react';
 import styled from 'styled-components';
@@ -7,6 +7,12 @@ import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import { KanbanBoardState } from '../Kanban/Board/action';
 import { Dispatch } from 'redux';
+
+const ButtonContainer = styled.div`
+    position: absolute;
+    top: 16px;
+    right: 16px;
+`;
 
 const Mask = styled.div`
     left: 0;
@@ -54,6 +60,7 @@ export interface InputProps {
     onCancel: () => void;
     onStart: () => void;
     pomodoroNum: number;
+    extendCurrentSession: (timeInMinutes: number) => void;
 }
 
 export interface MaskProps extends InputProps {
@@ -61,6 +68,7 @@ export interface MaskProps extends InputProps {
     isFocusing: boolean;
     boardId?: string;
     boards: KanbanBoardState;
+    isLongBreak: boolean;
 }
 
 const _TimerMask = (props: MaskProps) => {
@@ -97,6 +105,21 @@ const _TimerMask = (props: MaskProps) => {
         props.onStart();
     };
 
+    const extend10 = React.useCallback(
+        (event: any) => {
+            event.stopPropagation();
+            props.extendCurrentSession(10);
+        },
+        [props.extendCurrentSession]
+    );
+    const extend5 = React.useCallback(
+        (event: any) => {
+            event.stopPropagation();
+            props.extendCurrentSession(5);
+        },
+        [props.extendCurrentSession]
+    );
+
     return (
         <Mask style={{ display: props.showMask ? 'flex' : 'none' }} onClick={props.onCancel}>
             <MaskInnerContainer>
@@ -110,20 +133,37 @@ const _TimerMask = (props: MaskProps) => {
                             </ProjectName>
                         </Popover>
                     ) : (
-                        <ProjectName>Resting</ProjectName>
+                        <ProjectName>Break</ProjectName>
                     )}
                     <h1 style={{ color: 'white', fontSize: '3.5em', marginBottom: '1em' }}>
                         Session Finished
                     </h1>
                 </Row>
                 <Button size="large" onClick={onStartClick}>
-                    Start {props.isFocusing ? 'Resting' : 'Focusing'}
+                    Start
+                    {!props.isFocusing
+                        ? ' Focusing'
+                        : props.isLongBreak
+                        ? ' Long Break'
+                        : ' Short Break'}
                 </Button>
                 <Row style={{ marginTop: '2em' }}>
                     <h1 style={{ color: 'white' }}>Today Pomodoros</h1>
                     <PomodoroNumView num={props.pomodoroNum} color={'#f9ec52'} showNum={false} />
                 </Row>
             </MaskInnerContainer>
+            {props.isFocusing ? (
+                <ButtonContainer>
+                    <Button style={{ margin: 4 }} title={'Extend 5 minutes'} onClick={extend5}>
+                        +5
+                    </Button>
+                    <Button style={{ margin: 4 }} title={'Extend 10 minutes'} onClick={extend10}>
+                        +10
+                    </Button>
+                </ButtonContainer>
+            ) : (
+                undefined
+            )}
         </Mask>
     );
 };
@@ -131,6 +171,7 @@ const _TimerMask = (props: MaskProps) => {
 export const TimerMask = connect(
     (state: RootState, props: InputProps) => ({
         isFocusing: state.timer.isFocusing,
+        isLongBreak: !((state.timer.iBreak + 1) % LONG_BREAK_INTERVAL),
         boardId: state.timer.boardId,
         boards: state.kanban.boards
     }),

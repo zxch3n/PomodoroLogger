@@ -2,9 +2,12 @@ import {
     actions,
     reducer,
     setFocusDuration,
+    setLongBreakDuration,
     setRestDuration,
     startTimer,
-    stopTimer
+    stopTimer,
+    timerFinished,
+    TimerState
 } from './action';
 import { generateRandomName } from '../../utils';
 import { getAllSession } from '../../monitor/sessionManager';
@@ -38,6 +41,20 @@ describe('Reducer', () => {
         expect(state.focusDuration).toBe(100);
         state = reducer(state, setRestDuration(123));
         expect(state.restDuration).toBe(123);
+    });
+
+    it('records break count', async () => {
+        let state: TimerState = reducer(undefined, setLongBreakDuration(100));
+        expect(state.longBreakDuration).toBe(100);
+        state = reducer(state, timerFinished());
+        expect(state.iBreak).toBe(1);
+        state = reducer(state, timerFinished());
+        expect(state.iBreak).toBe(1);
+        state = reducer(state, timerFinished());
+        expect(state.iBreak).toBe(2);
+        state = reducer(state, timerFinished());
+        state = reducer(state, timerFinished());
+        expect(state.iBreak).toBe(3);
     });
 });
 

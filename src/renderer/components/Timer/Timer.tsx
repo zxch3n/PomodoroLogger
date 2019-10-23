@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Divider, message, Tooltip } from 'antd';
+import { Button, Divider, message, Tooltip, Popconfirm } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes } from '../Kanban/Board/action';
-import { TimerActionTypes as ThisActionTypes } from './action';
+import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
@@ -141,6 +141,7 @@ class Timer extends Component<Props, State> {
     win?: BrowserWindow;
     mainDiv: React.RefObject<HTMLDivElement>;
     sound: React.RefObject<HTMLAudioElement>;
+    extendedTimeInMinute: number;
     private stagedSession?: PomodoroRecord;
 
     constructor(props: Props) {
@@ -155,6 +156,7 @@ class Timer extends Component<Props, State> {
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
         this.sound = React.createRef<HTMLAudioElement>();
+        this.extendedTimeInMinute = 0;
     }
 
     componentDidMount(): void {
@@ -190,7 +192,7 @@ class Timer extends Component<Props, State> {
                 }
             },
             {
-                label: 'Start Resting',
+                label: 'Start Break',
                 type: 'normal',
                 click: () => {
                     if (this.props.timer.isFocusing) {
@@ -246,13 +248,7 @@ class Timer extends Component<Props, State> {
         }
 
         const leftTime = `${to2digits(Math.floor(sec / 60))}:${to2digits(sec % 60)}`;
-        const percent =
-            100 -
-            timeSpan /
-                10 /
-                (this.props.timer.isFocusing
-                    ? this.props.timer.focusDuration
-                    : this.props.timer.restDuration);
+        const percent = 100 - timeSpan / 10 / (this.getDuration() + this.extendedTimeInMinute * 60);
         if (leftTime.slice(0, 2) !== this.state.leftTime.slice(0, 2)) {
             setTrayImageWithMadeIcon(
                 leftTime.slice(0, 2),
@@ -291,6 +287,12 @@ class Timer extends Component<Props, State> {
 
     private onStop() {
         this.props.stopTimer();
+        setTrayImageWithMadeIcon(
+            this.state.leftTime.slice(0, 2),
+            this.state.percent / 100,
+            this.props.timer.isFocusing,
+            true
+        ).catch(console.error);
         if (this.monitor) {
             this.monitor.stop();
         }
@@ -306,16 +308,22 @@ class Timer extends Component<Props, State> {
         this.updateLeftTime();
     };
 
-    private defaultLeftTime = (isFocusing?: boolean) => {
+    private getDuration = (isFocusing?: boolean) => {
         if (isFocusing === undefined) {
             // tslint:disable-next-line:no-parameter-reassignment
             isFocusing = this.props.timer.isFocusing;
         }
 
-        const duration = isFocusing
+        const isLongBreak = this.props.timer.iBreak % 4 === 0;
+        return isFocusing
             ? this.props.timer.focusDuration
+            : isLongBreak
+            ? this.props.timer.longBreakDuration
             : this.props.timer.restDuration;
-        return `${to2digits(duration / 60)}:00`;
+    };
+
+    private defaultLeftTime = (isFocusing?: boolean) => {
+        return `${to2digits(this.getDuration(isFocusing) / 60)}:00`;
     };
 
     private clearStat = () => {
@@ -334,12 +342,13 @@ class Timer extends Component<Props, State> {
         }
 
         this.clearStat();
+        this.extendedTimeInMinute = 0;
     };
 
-    onDone = async () => {
+    onDone = async (shouldRemind: boolean = true, isRotten?: boolean) => {
         if (this.props.timer.isFocusing) {
-            await this.onFocusingSessionDone();
-        } else {
+            await this.onFocusingSessionDone(shouldRemind, isRotten);
+        } else if (shouldRemind) {
             const notification = new remote.Notification({
                 title: 'Resting session ended',
                 body: `Completed ${this.state.pomodoroNum} sessions today. \n\n`,
@@ -348,43 +357,65 @@ class Timer extends Component<Props, State> {
             notification.show();
         }
 
-        this.focusOnCurrentWindow();
         this.setState({
             showMask: true
         });
         this.props.stopTimer();
         this.props.changeAppTab('timer');
         this.clearStat();
-        this.remindUserTimeout(0);
-        this.remindUserTimeout(60 * 1000, 1.0);
+        if (shouldRemind) {
+            this.focusOnCurrentWindow();
+            this.remindUserTimeout(0);
+            this.remindUserTimeout(60 * 1000, 1.0);
+        }
     };
 
-    private onFocusingSessionDone = async () => {
+    private onFocusingSessionDone = async (shouldRemind = true, isRotten = false) => {
         if (!this.monitor) {
             throw new Error('No monitor');
         }
 
-        const notification = new remote.Notification({
-            title: 'Focusing finished. Start resting.',
-            body: `Completed ${this.state.pomodoroNum + 1} sessions today. \n\n`,
-            icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
-        });
-        notification.show();
+        if (shouldRemind) {
+            const notification = new remote.Notification({
+                title: 'Focusing finished. Start resting.',
+                body: `Completed ${this.state.pomodoroNum + 1} sessions today. \n\n`,
+                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
+            });
+            notification.show();
+        }
 
         const thisSession = this.monitor.sessionData;
-        thisSession.spentTimeInHour = this.props.timer.focusDuration / 3600;
+        if (!isRotten) {
+            thisSession.spentTimeInHour = this.props.timer.focusDuration / 3600;
+        } else {
+            const elapsedTimeInSec = this.getElapsedTimeInSecond();
+            thisSession.spentTimeInHour = elapsedTimeInSec / 3600;
+            thisSession.isRotten = true;
+        }
+
         this.stagedSession = thisSession;
         this.monitor.stop();
-        this.monitor.clear();
-        this.monitor = undefined;
         if (this.props.timer.boardId === undefined) {
             this.props.inferProject(thisSession);
         }
-
-        this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
     };
 
+    private getElapsedTimeInSecond() {
+        const { targetTime, isFocusing } = this.props.timer;
+        const now = new Date().getTime();
+        const timeSpan = targetTime! - now;
+        const leftTimeInSec = Math.floor(timeSpan / 1000 + 0.5);
+        const duration = this.getDuration(isFocusing);
+        return duration - leftTimeInSec;
+    }
+
     private onSessionConfirmed = async () => {
+        if (this.monitor) {
+            this.monitor.clear();
+            this.monitor = undefined;
+        }
+
+        this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
         if (this.stagedSession === undefined) {
             // Resting session
             this.props.timerFinished();
@@ -397,6 +428,8 @@ class Timer extends Component<Props, State> {
             }
         }
 
+        this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
+        this.extendedTimeInMinute = 0;
         if (this.props.timer.boardId !== undefined) {
             this.stagedSession.boardId = this.props.timer.boardId;
             const kanban = this.props.kanban;
@@ -473,6 +506,33 @@ class Timer extends Component<Props, State> {
         }, timeout);
     };
 
+    private extendCurrentSession = (timeInMinutes: number) => {
+        if (this.monitor) {
+            this.monitor.resume();
+        } else if (process.env.NODE_ENV === 'development') {
+            throw new Error();
+        }
+
+        this.extendedTimeInMinute += timeInMinutes;
+        this.props.extendCurrentSession(timeInMinutes * 60);
+        this.setState({ showMask: false });
+    };
+
+    private onFinishButtonClick = async () => {
+        const { isFocusing } = this.props.timer;
+        if (!isFocusing) {
+            return this.onDone(false);
+        }
+
+        const eTime = this.getElapsedTimeInSecond();
+        if (eTime < 600) {
+            message.warn('Focus at least for 10 minutes to finish');
+            return;
+        }
+
+        await this.onDone(false, true);
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
@@ -498,6 +558,7 @@ class Timer extends Component<Props, State> {
         return (
             <MyLayout style={{ backgroundColor: 'white' }}>
                 <TimerMask
+                    extendCurrentSession={this.extendCurrentSession}
                     showMask={showMask}
                     onCancel={this.onMaskClick}
                     onStart={this.onMaskButtonClick}
@@ -550,6 +611,9 @@ class Timer extends Component<Props, State> {
                                     </div>
                                     <WorkRestIcon
                                         isWorking={this.props.timer.isFocusing}
+                                        isLongBreak={
+                                            !(this.props.timer.iBreak % LONG_BREAK_INTERVAL)
+                                        }
                                         onClick={this.switchMode}
                                     />
                                 </ProgressTextContainer>
@@ -577,6 +641,22 @@ class Timer extends Component<Props, State> {
                                     />
                                 )}
                             </div>
+                            {this.props.timer.isRunning || this.props.timer.leftTime ? (
+                                <Button
+                                    title="Finish"
+                                    icon="check"
+                                    shape={'circle'}
+                                    onClick={this.onFinishButtonClick}
+                                />
+                            ) : (
+                                <Button
+                                    id="mode-switching-button"
+                                    title="Switch Mode"
+                                    icon="swap"
+                                    shape="circle"
+                                    onClick={this.switchMode}
+                                />
+                            )}
                             <div id="clear-timer-button" style={{ lineHeight: 0 }}>
                                 <Button
                                     shape="circle"
@@ -585,13 +665,6 @@ class Timer extends Component<Props, State> {
                                     onClick={this.onClear}
                                 />
                             </div>
-                            <Button
-                                id="mode-switching-button"
-                                title="Switch Mode"
-                                icon="swap"
-                                shape="circle"
-                                onClick={this.switchMode}
-                            />
                             <Button
                                 id="more-timer-button"
                                 icon="more"
