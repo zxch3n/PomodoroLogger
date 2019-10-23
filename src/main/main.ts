@@ -11,7 +11,7 @@ import { AutoUpdater } from './AutoUpdater';
 app.commandLine.appendSwitch('disable-background-timer-throttling');
 
 let win: BrowserWindow | undefined;
-const gotTheLock = app.requestSingleInstanceLock();
+const gotTheLock = process.env.NODE_ENV !== 'production' || app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
     app.quit();
@@ -88,6 +88,10 @@ const createWindow = async () => {
 };
 
 app.on('ready', async () => {
+    if (!gotTheLock) {
+        return;
+    }
+
     const img = nativeImage.createFromPath(path.join(__dirname, logo));
     img.resize({ width: 16, height: 16 });
     mGlobal.tray = new Tray(img);

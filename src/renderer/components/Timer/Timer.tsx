@@ -447,7 +447,7 @@ class Timer extends Component<Props, State> {
         }
 
         const finishedSessions = this.state.pomodorosToday.concat([this.stagedSession]);
-        this.setState({ pomodorosToday: finishedSessions });
+        this.setState({ pomodorosToday: finishedSessions, leftTime: '' });
         this.stagedSession = undefined;
     };
 
