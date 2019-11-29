@@ -253,7 +253,7 @@ const OverviewCards = connect(
     ]);
 
     return (
-        <StackGrid columnWidth={268}>
+        <StackGrid columnWidth={265} gutterHeight={0}>
             {ids.map(_id => {
                 const onClick = () => setId(_id);
                 const onSettingClick = props.showConfigById
