@@ -71,8 +71,10 @@ describe('On timerFinished', () => {
             startTime: new Date().getTime(),
             boardId: generateRandomName(),
             spentTimeInHour: 10,
+            switchActivities: [],
             apps: {
                 Chrome: {
+                    index: 0,
                     spentTimeInHour: 10,
                     appName: 'Chrome',
                     screenStaticDuration: 5,

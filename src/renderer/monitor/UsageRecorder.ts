@@ -12,6 +12,7 @@ export class UsageRecorder {
     private record: PomodoroRecord;
     private lastUsingApp?: string;
     private lock: boolean = false;
+    private maxIndex: number = 0;
 
     private lastScreenShot?: ImageData;
     private lastScreenShotUrl?: string;
@@ -20,6 +21,7 @@ export class UsageRecorder {
     constructor(monitorListener: Listener) {
         this.record = {
             _id: shortid.generate(),
+            switchActivities: [],
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
@@ -37,11 +39,14 @@ export class UsageRecorder {
     clear = () => {
         this.record = {
             _id: shortid.generate(),
+            switchActivities: [],
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
             startTime: 0
         };
+
+        this.maxIndex = 0;
     };
 
     start = () => {
@@ -83,11 +88,14 @@ export class UsageRecorder {
         if (!(appName in this.record.apps)) {
             this.record.apps[appName] = {
                 appName,
+                index: this.maxIndex,
                 spentTimeInHour: 0,
                 titleSpentTime: {},
                 switchTimes: 0,
                 lastUpdateTime: now
             };
+
+            this.maxIndex += 1;
         }
 
         await this.updateThisAppUsageInfo(appName, result.title).catch(err => {
@@ -146,6 +154,14 @@ export class UsageRecorder {
         }
 
         row.lastUpdateTime = now;
+        this.updateSwitchActivity(row.index);
+    };
+
+    private updateSwitchActivity = (index: number) => {
+        const last = this.record.switchActivities.length - 1;
+        if (this.record.switchActivities[last] !== index) {
+            this.record.switchActivities.push(index);
+        }
     };
 
     private normalizeTitleSpentTime = () => {

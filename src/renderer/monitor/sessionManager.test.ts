@@ -16,6 +16,7 @@ describe('sessionManager', () => {
 
     it('addSession', async () => {
         const record: PomodoroRecord = {
+            switchActivities: [],
             _id: generateRandomName(),
             boardId: generateRandomName(),
             startTime: new Date().getTime(),
@@ -36,6 +37,7 @@ describe('sessionManager', () => {
             _id: generateRandomName(),
             boardId: generateRandomName(),
             startTime: new Date().getTime(),
+            switchActivities: [],
             apps: {},
             switchTimes: 0,
             screenStaticDuration: 0,

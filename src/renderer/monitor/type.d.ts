@@ -13,6 +13,7 @@ export interface ApplicationSpentTime {
     appName: string;
     spentTimeInHour: number;
     titleSpentTime: TitleSpentTimeDict;
+    index: number;
     // how many times user switched to this app
     switchTimes: number;
     // how long the screen shot stay the same in this app
@@ -31,4 +32,5 @@ export interface PomodoroRecord {
     screenStaticDuration?: number;
     boardId?: string;
     isRotten?: boolean;
+    switchActivities: number[];
 }

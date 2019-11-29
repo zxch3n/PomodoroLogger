@@ -45,8 +45,10 @@ function generateRecord(
     appUsage: { [appName: string]: number }
 ): PomodoroRecord {
     const apps: { [appName: string]: ApplicationSpentTime } = {};
+    let index = 0;
     for (const app in appUsage) {
         apps[app] = {
+            index,
             appName: app,
             spentTimeInHour: appUsage[app],
             lastUpdateTime: undefined,
@@ -54,10 +56,13 @@ function generateRecord(
             switchTimes: 3,
             titleSpentTime: {}
         };
+
+        index += 1;
     }
 
     return {
         apps,
+        switchActivities: [],
         _id: generateRandomName(),
         boardId: projectId,
         screenStaticDuration: undefined,

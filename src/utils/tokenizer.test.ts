@@ -90,6 +90,7 @@ describe('Tokenizer', () => {
 
 function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
     const record: PomodoroRecord = {
+        switchActivities: [],
         _id: generateRandomName(),
         apps: {},
         switchTimes: 10,
@@ -109,6 +110,7 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
 
         record.apps[i.toString()] = {
             titleSpentTime,
+            index: i,
             spentTimeInHour: 0.1,
             switchTimes: 1,
             appName: i.toString()
