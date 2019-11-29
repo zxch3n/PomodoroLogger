@@ -88,7 +88,6 @@ describe('On timerFinished', () => {
 
         const thunk = actions.timerFinished(record);
         await thunk(x => {
-            console.log(x);
             return x;
         });
         const sessions = await getAllSession();

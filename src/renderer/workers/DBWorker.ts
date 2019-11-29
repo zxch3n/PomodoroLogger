@@ -4,6 +4,7 @@ import nedb from 'nedb';
 import dbs from '../dbs';
 import { dbPaths } from '../../config';
 
+/* istanbul ignore next */
 class TrueDBWorker extends BaseWorker {
     protected worker = new Worker();
 

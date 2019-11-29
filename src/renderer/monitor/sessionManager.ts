@@ -40,6 +40,7 @@ export function renameIllegalName(record: PomodoroRecord) {
     }
 }
 
+/* istanbul ignore next */
 function consistencyCheck(record: PomodoroRecord) {
     if (record.startTime === 0) {
         throw new Error('no startTime');
@@ -139,11 +140,7 @@ export function loadDBSync(path: string) {
     return db;
 }
 
-export async function getDailyCount() {
-    // TODO:
-}
-
-const deleteFolderRecursive = (path: string) => {
+export const deleteFolderRecursive = (path: string) => {
     if (fs.existsSync(path)) {
         fs.readdirSync(path).forEach((file, index) => {
             const curPath = path + '/' + file;
@@ -159,12 +156,14 @@ const deleteFolderRecursive = (path: string) => {
     }
 };
 
+/* istanbul ignore next */
 export async function deleteAllUserData() {
     if (fs.existsSync(dbBaseDir)) {
         deleteFolderRecursive(dbBaseDir);
     }
 }
 
+/* istanbul ignore next */
 export async function exportDBData() {
     const [projectDB, sessionDB, settingDB] = await Promise.all([
         promisify(dbs.projectDB.find.bind(dbs.projectDB, {}, {}))(),
@@ -177,8 +176,4 @@ export async function exportDBData() {
         sessionDB,
         settingDB
     };
-}
-
-export async function loadDBData() {
-    // TODO
 }

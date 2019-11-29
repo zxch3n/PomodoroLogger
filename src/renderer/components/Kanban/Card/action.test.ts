@@ -1,10 +1,12 @@
-import { actions, Card } from './action';
+import { actions, Card, cardReducer, CardsState } from './action';
 import { existsSync, mkdir, unlink } from 'fs';
 import { promisify } from 'util';
 import { dbBaseDir, dbPaths } from '../../../../config';
 import shortid from 'shortid';
 import { AsyncDB } from '../../../../utils/dbHelper';
 import dbs, { refreshDbs } from '../../../dbs';
+import { Dispatch } from 'redux';
+import { boardReducer } from '../Board/action';
 
 const db = new AsyncDB(dbs.cardsDB);
 
@@ -136,5 +138,31 @@ describe("Cards' actions", () => {
                 actual: 0
             }
         });
+    });
+
+    it('should update', async () => {
+        const _id = shortid.generate();
+        let state: CardsState = {};
+        // @ts-ignore
+        const dispatch: Dispatch = (action: any) => {
+            try {
+                state = cardReducer(state, action);
+            } catch (e) {}
+        };
+
+        await actions.addCard(_id, 'list', '0')(dispatch);
+        expect(state[_id].title).toBe('0');
+        await actions.setActualTime(_id, 101)(dispatch);
+        await actions.setEstimatedTime(_id, 110)(dispatch);
+        await actions.setContent(_id, '8888')(dispatch);
+        await actions.renameCard(_id, 'title')(dispatch);
+        expect(state[_id].title).toBe('title');
+        expect(state[_id].content).toBe('8888');
+        expect(state[_id].spentTimeInHour.actual).toBe(101);
+        expect(state[_id].spentTimeInHour.estimated).toBe(110);
+        await actions.addActualTime(_id, 90)(dispatch);
+        expect(state[_id].spentTimeInHour.actual).toBe(191);
+        await actions.deleteCard(_id, 'list')(dispatch);
+        expect(state[_id]).toBeUndefined();
     });
 });

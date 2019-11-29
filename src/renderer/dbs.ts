@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { remote } from 'electron';
 import { DBs, refreshDbs as _refresh } from '../main/db';
 import { DBWorker } from './workers/DBWorker';

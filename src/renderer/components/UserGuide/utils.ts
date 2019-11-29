@@ -20,7 +20,6 @@ export const getElementAbsoluteOffsetBySelector = (selector: string) => {
         console.log('sub failed');
     }
 
-    console.log(w, h);
     while (target) {
         if (target.offsetLeft == null) {
             throw new Error('Imp assumption error');

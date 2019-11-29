@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import shortid from 'shortid';

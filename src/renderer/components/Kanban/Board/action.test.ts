@@ -44,14 +44,11 @@ describe('board actions', () => {
         let state: KanbanBoardState = {};
         // @ts-ignore
         const dispatch: Dispatch = (action: any) => {
-            console.log('before', state);
             try {
                 state = boardReducer(state, action);
             } catch (e) {
                 console.warn(e);
             }
-
-            console.log(action, state);
         };
         await actions.addBoard(_id, 'B0')(dispatch);
         const doc: KanbanBoard = await db.findOne({ _id });
@@ -65,5 +62,56 @@ describe('board actions', () => {
         expect(newDoc.lists[2]).toBe(doc.lists[0]);
         delete newDoc.lastVisitTime;
         expect(newDoc).toStrictEqual(state[_id]);
+
+        await actions.addListById(_id, 'list')(dispatch);
+        const list = state[_id].lists;
+        expect(list[list.length - 1]).toBe('list');
+    });
+
+    it('should update after editing, setLastVisit, onTimerFinished, remove', async () => {
+        const _id = shortid.generate();
+        let state: KanbanBoardState = {};
+        // @ts-ignore
+        const dispatch: Dispatch = (action: any) => {
+            try {
+                state = boardReducer(state, action);
+            } catch (e) {
+                console.warn(e);
+            }
+        };
+        await actions.addBoard(_id, _id)(dispatch);
+        actions.editBoard(_id, 'new_name', 'new_name')(dispatch);
+        actions.setLastVisitTime(_id, 1000)(dispatch);
+        expect(state[_id].lastVisitTime).toBe(1000);
+        await actions.onTimerFinished(_id, '111', 123, [])(dispatch);
+        expect(state[_id].name).toBe('new_name');
+        expect(state[_id].description).toBe('new_name');
+        expect(state[_id].relatedSessions).toStrictEqual(['111']);
+        expect(state[_id].spentHours).toStrictEqual(123);
+        await new Promise(r => setTimeout(r, 500));
+        const board = await db.findOne({ _id });
+        expect(board).toStrictEqual(state[_id]);
+        actions.deleteBoard(_id)(dispatch);
+        expect(state[_id]).toBeUndefined();
+    });
+
+    it('should add list directly', async done => {
+        const _id = shortid.generate();
+        let state: KanbanBoardState = {};
+        // @ts-ignore
+        const dispatch: Dispatch = (action: any) => {
+            if (action.type.startsWith('[List]')) {
+                if (action.payload.title === 'title') {
+                    done();
+                }
+            }
+            try {
+                state = boardReducer(state, action);
+            } catch (e) {
+                console.warn(e);
+            }
+        };
+        await actions.addBoard(_id, _id)(dispatch);
+        await actions.addList(_id, 'title')(dispatch);
     });
 });
