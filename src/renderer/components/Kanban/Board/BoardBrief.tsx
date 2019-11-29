@@ -18,6 +18,7 @@ import { Markdown } from '../style/Markdown';
 import { ListsCountBar } from '../../Visualization/Bar';
 
 const BriefCard = styled.div`
+    word-break: break-word;
     position: relative;
     display: inline-block;
     padding: 6px;

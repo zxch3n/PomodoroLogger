@@ -11,6 +11,7 @@ import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 
 const CardContainer = styled.div`
+    word-break: break-word;
     background-color: white;
     margin: 8px 4px;
     border-radius: 6px;
