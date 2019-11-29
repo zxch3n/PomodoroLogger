@@ -57,6 +57,6 @@ export function parseTime(formattedTime: string) {
         throw new Error();
     }
     const hour = parseInt(matchedH.entries().next().value[1], 10);
-    const minute = parseInt(matchedH.entries().next().value[1], 10);
+    const minute = parseInt(matchedM.entries().next().value[1], 10);
     return hour + minute / 60;
 }

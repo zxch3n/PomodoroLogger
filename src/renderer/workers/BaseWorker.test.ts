@@ -58,7 +58,7 @@ describe('BaseWorker', () => {
 
         const testWorker = new TestWorker();
         const promises: Promise<any>[] = [];
-        for (let i = 0; i < 100; i += 1) {
+        for (let i = 0; i < 20; i += 1) {
             promises.push(
                 testWorker.createHandler(
                     { type: 'start', payload: i },
@@ -70,7 +70,7 @@ describe('BaseWorker', () => {
         }
 
         const ans = await Promise.all(promises);
-        for (let i = 0; i < 100; i += 1) {
+        for (let i = 0; i < 20; i += 1) {
             expect(ans[i]).toEqual(i);
         }
     });

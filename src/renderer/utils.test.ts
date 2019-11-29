@@ -19,9 +19,9 @@ describe('renderer.utils', () => {
     it('should parse time from string', () => {
         expect(utils.parseTime('10h 30m')).toBe(10.5);
         for (let i = 0; i < 1000; i += 1) {
-            const time = Math.floor(Math.random() * 100) + Math.random();
-            expect(utils.parseTime(utils.formatTimeWithoutZero(time))).toBe(time);
-            expect(utils.parseTime(utils.formatTime(time))).toBe(time);
+            const time = Math.floor(Math.random() * 100) + Math.floor(Math.random() * 60) / 60;
+            expect(utils.parseTime(utils.formatTimeWithoutZero(time))).toBeCloseTo(time);
+            expect(utils.parseTime(utils.formatTime(time))).toBeCloseTo(time);
         }
     });
 
