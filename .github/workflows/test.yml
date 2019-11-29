@@ -1,0 +1,25 @@
+name: Test & Upload Result to Codecov
+on: [push]
+jobs:
+  run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: 
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 10
+      uses: actions/setup-node@v1
+      with:
+        version: 10
+    - name: yarn install, yarn lint, yarn test, yarn build
+      run: |
+        yarn
+        yarn build
+        yarn test -- --ci --runInBand --reporters=default --reporters=jest-junit
+      env:
+        JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+    - name: Upload coverage to Codecov  
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
