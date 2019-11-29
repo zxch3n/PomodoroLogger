@@ -25,15 +25,6 @@ export const generateRandomName = () => {
     return output.join('') as string;
 };
 
-export async function executeThunkAction(action: (dispatch: Dispatch) => void) {
-    await new Promise(resolve => {
-        action(x => {
-            resolve();
-            return x;
-        });
-    });
-}
-
 export function getBetterAppName(appName: string) {
     const name = appName.replace(/\.exe$/g, '');
     return name[0].toUpperCase() + name.slice(1);
@@ -41,10 +32,10 @@ export function getBetterAppName(appName: string) {
 
 export function to2digits(num: number) {
     if (num < 10) {
-        return `0${num}`;
+        return `0${Math.floor(num)}`;
     }
 
-    return num;
+    return Math.floor(num).toString();
 }
 
 export function formatTime(timeInHour: number) {
