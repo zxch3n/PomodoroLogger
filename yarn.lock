@@ -1387,6 +1387,11 @@
   resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-10.14.15.tgz?cache=0&sync_timestamp=1565213600002&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-10.14.15.tgz#e8f7729b631be1b02ae130ff0b61f3e018000640"
   integrity sha1-6Pdym2Mb4bAq4TD/C2Hz4BgABkA=
 
+"@types/node@^12.12.7":
+  version "12.12.7"
+  resolved "https://registry.npmjs.org/@types/node/-/node-12.12.7.tgz#01e4ea724d9e3bd50d90c11fd5980ba317d8fa11"
+  integrity sha512-E6Zn0rffhgd130zbCbAr/JdXfXkoOUFAKNs/rF8qnafSJ8KYaA/j3oz7dcwal+lYjLA7xvdd5J4wdYpCTlP8+w==
+
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
   resolved "https://registry.npmjs.org/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
@@ -4900,6 +4905,11 @@ figures@^2.0.0:
   dependencies:
     escape-string-regexp "^1.0.5"
 
+file-icon@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/file-icon/-/file-icon-3.1.0.tgz#f1639685d74b9ae621eeb809576e7a3d22c9fe8b"
+  integrity sha512-1+EdWiwE4S7Wa/SCEcEC+StMcT/OEVdw0RbGmD5ZmlsUL9Kqf6SyXzSbhxa9p2isIfORtCh3/lEflGdbMNX8fA==
+
 file-loader@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/file-loader/-/file-loader-3.0.1.tgz#f8e0ba0b599918b51adfe45d66d1e771ad560faa"
@@ -5260,6 +5270,16 @@ gaze@^1.0.0, gaze@~1.1.2:
   integrity sha512-BRdNm8hbWzFzWHERTrejLqwHDfS4GibPoq5wjTPIoJHoBtKGPg3xAFfxmM+9ztbXelxcf2hwQcaz1PtmFeue8g==
   dependencies:
     globule "^1.0.0"
+
+get-app-icon@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/get-app-icon/-/get-app-icon-1.0.0.tgz#7caa01f0c64d2366e9d95f252733467f52ed2c23"
+  integrity sha512-ClvP9KH3YEWuwCgnJzxBwgmbukhAHFMKE9MrBoJV/zm/MA0RvvHlJPWLmWQw0YWzcqZpQMbXuUxbk2TMFzImRg==
+  dependencies:
+    "@types/node" "^12.12.7"
+    file-icon "^3.1.0"
+    icon-extractor "^1.0.3"
+    typescript "^3.7.2"
 
 get-caller-file@^1.0.1:
   version "1.0.3"
@@ -5887,6 +5907,13 @@ husky@^2.3.0:
     read-pkg "^5.1.1"
     run-node "^1.0.0"
     slash "^3.0.0"
+
+icon-extractor@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/icon-extractor/-/icon-extractor-1.0.3.tgz#0818aaa511051ab692442bbe23ca3d2b8d164f0d"
+  integrity sha1-CBiqpREFGraSRCu+I8o9K40WTw0=
+  dependencies:
+    lodash "^3.10.1"
 
 iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.4, iconv-lite@~0.4.13:
   version "0.4.24"
@@ -7549,6 +7576,11 @@ lodash.throttle@^4.0.0:
   version "4.1.1"
   resolved "https://registry.npmjs.org/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
   integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
+
+lodash@^3.10.1:
+  version "3.10.1"
+  resolved "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
+  integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
 lodash@^4.0.0, lodash@^4.15.0, lodash@^4.16.5, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.3.0, lodash@^4.8.0, lodash@~4.17.10:
   version "4.17.15"
@@ -12020,6 +12052,11 @@ typescript@^3.4.5:
   version "3.5.3"
   resolved "https://registry.npmjs.org/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
   integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
+
+typescript@^3.7.2:
+  version "3.7.2"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-3.7.2.tgz#27e489b95fa5909445e9fef5ee48d81697ad18fb"
+  integrity sha512-ml7V7JfiN2Xwvcer+XAf2csGO1bPBdRbFCkYBczNZggrBZ9c7G3riSUeJmqEU5uOtXNPMhE3n+R4FA/3YOAWOQ==
 
 ua-parser-js@^0.7.18:
   version "0.7.20"
