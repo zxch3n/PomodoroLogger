@@ -8,11 +8,11 @@ import { connect } from 'react-redux';
 import { Card, CardsState } from '../Card/action';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import styled from 'styled-components';
-import { formatTime, formatTimeWithoutZero } from '../../../utils';
+import { formatTimeWithoutZero } from '../../../utils';
 import { BoardBrief } from './BoardBrief';
 import { actions, SortType } from '../action';
-import { workers } from '../../../workers';
-import { PomodoroRecord } from '../../../monitor/type';
+// @ts-ignore
+import StackGrid from 'react-stack-grid';
 
 const Container = styled.div``;
 
@@ -253,7 +253,7 @@ const OverviewCards = connect(
     ]);
 
     return (
-        <BriefContainer>
+        <StackGrid columnWidth={268}>
             {ids.map(_id => {
                 const onClick = () => setId(_id);
                 const onSettingClick = props.showConfigById
@@ -270,7 +270,7 @@ const OverviewCards = connect(
                     />
                 );
             })}
-        </BriefContainer>
+        </StackGrid>
     );
 }) as FC<OverviewCardsProps>);
 
