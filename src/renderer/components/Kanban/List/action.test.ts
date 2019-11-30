@@ -1,15 +1,22 @@
 import { actions, List, listReducer, ListsState } from './action';
 import shortid from 'shortid';
 import { AsyncDB } from '../../../../utils/dbHelper';
-import dbs from '../../../dbs';
+import dbs, { refreshDbs } from '../../../dbs';
 import { generateRandomName } from '../../../utils';
-import { existsSync, mkdir, unlink } from 'fs';
+import { existsSync, mkdir, unlink, stat } from 'fs';
 import { dbBaseDir, dbPaths } from '../../../../config';
 import { promisify } from 'util';
 import { Dispatch } from 'redux';
 
 jest.setTimeout(10000);
+let lock = false;
 beforeEach(async () => {
+    while (lock) {
+        await new Promise(r => setTimeout(r, Math.random() * 1000));
+    }
+
+    lock = true;
+    console.log('get lock');
     if (existsSync(dbPaths.listsDB)) {
         await promisify(unlink)(dbPaths.listsDB).catch(() => {});
     }
@@ -17,6 +24,13 @@ beforeEach(async () => {
     if (!existsSync(dbBaseDir)) {
         await promisify(mkdir)(dbBaseDir).catch(() => {});
     }
+
+    await refreshDbs();
+});
+
+afterEach(() => {
+    console.log('release lock');
+    lock = false;
 });
 
 const db = new AsyncDB(dbs.listsDB);
@@ -44,6 +58,7 @@ async function moveCardSetup(dispatch: any = undefined) {
     await addCard(_id1, '12', dispatch);
     return [_id0, _id1];
 }
+
 describe('listActions', () => {
     it('add list', async () => {
         const _id = shortid.generate();
@@ -138,45 +153,62 @@ describe('listActions', () => {
 });
 
 describe('listReducer', () => {
-    it('move item 0', async () => {
+    it('should move item', async () => {
         let state: ListsState = {};
 
         // @ts-ignore
         const dispatch: Dispatch = (action: any) => {
-            console.log('before', state);
             try {
                 state = listReducer(state, action);
-            } catch (e) {
-                console.warn(e);
-            }
-            console.log(action);
-            console.log('after', state);
+            } catch (e) {}
         };
 
         const [_id0, _id1] = await moveCardSetup(dispatch);
         await actions.moveCard(_id0, _id0, 0, 2)(dispatch);
         expect(state[_id0].cards).toStrictEqual(['1', '2', '0']);
         expect(state[_id1].cards).toStrictEqual(['10', '11', '12']);
+
+        // test delete card
+        const cardId = state[_id1].cards[0];
+        await actions.deleteCard(_id1, cardId)(dispatch);
+        expect(state[_id1].cards.every(v => v !== cardId)).toBeTruthy();
+
+        // test delete list
+        await actions.deleteList(_id0)(dispatch);
+        expect(state[_id0]).toBeUndefined();
+
+        // TODO
+        // // test fetch & save
+        // const oldState = Object.assign(state, {});
+        // state = {};
+        // await actions.fetchLists()(dispatch);
+        // expect(state).toStrictEqual(oldState);
     });
 
-    it('move item 1', async () => {
+    it('should update', async done => {
         let state: ListsState = {};
 
         // @ts-ignore
         const dispatch: Dispatch = (action: any) => {
-            console.log('before', state);
+            if (action.type.startsWith('[Card]')) {
+                if (action.payload.title === 'newcardid') {
+                    done();
+                    return;
+                }
+            }
+
             try {
                 state = listReducer(state, action);
-            } catch (e) {
-                console.warn(e);
-            }
-            console.log(action);
-            console.log('after', state);
+            } catch (e) {}
         };
 
         const [_id0, _id1] = await moveCardSetup(dispatch);
         await actions.moveCard(_id0, _id1, 0, 2)(dispatch);
         expect(state[_id0].cards).toStrictEqual(['1', '2']);
         expect(state[_id1].cards).toStrictEqual(['10', '11', '0', '12']);
+
+        await actions.renameList(_id0, 'id011')(dispatch);
+        expect(state[_id0].title).toBe('id011');
+        await actions.addCard(_id0, 'newcardid')(dispatch);
     });
 });

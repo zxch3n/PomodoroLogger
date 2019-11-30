@@ -5,7 +5,7 @@ import { actions as boardActions } from '../Board/action';
 import shortid from 'shortid';
 import { DBWorker } from '../../../workers/DBWorker';
 
-const db = new DBWorker('listsDB');
+let db = new DBWorker('listsDB');
 const moveDB = new DBWorker('moveDB');
 
 export interface List {
@@ -105,6 +105,7 @@ export const listReducer = createReducer<ListsState, any>({}, handle => [
 
 export const actions = {
     fetchLists: () => async (dispatch: Dispatch) => {
+        db = new DBWorker('listsDB');
         const all: List[] = await db.find({}, {});
         const listMap: ListsState = {};
         for (const list of all) {

@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { createActionCreator, createReducer } from 'deox';
 import { actions as boardActions } from './Board/action';
 import { actions as timerActions } from '../Timer/action';

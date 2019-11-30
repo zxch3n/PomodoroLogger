@@ -200,6 +200,7 @@ export const actions = {
             }
         }
     },
+    /* istanbul ignore next */
     inferProject: (sessionData: PomodoroRecord) => async (dispatch: Dispatch) => {
         // Predict session's project
         const newProjectId = (await workers.knn.predict(sessionData).catch(err => {

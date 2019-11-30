@@ -95,14 +95,16 @@ describe('board actions', () => {
         expect(state[_id]).toBeUndefined();
     });
 
-    it('should add list directly', async done => {
+    it('should add list directly', async () => {
         const _id = shortid.generate();
         let state: KanbanBoardState = {};
+        let added = false;
         // @ts-ignore
         const dispatch: Dispatch = (action: any) => {
             if (action.type.startsWith('[List]')) {
                 if (action.payload.title === 'title') {
-                    done();
+                    added = true;
+                    return;
                 }
             }
             try {
@@ -113,5 +115,17 @@ describe('board actions', () => {
         };
         await actions.addBoard(_id, _id)(dispatch);
         await actions.addList(_id, 'title')(dispatch);
+        expect(added).toBeTruthy();
+
+        await actions.renameBoard(_id, 'lalala')(dispatch);
+        expect(state[_id].name).toBe('lalala');
+        const lists = state[_id].lists.concat();
+        await actions.deleteList(_id, state[_id].lists[0])(dispatch);
+        expect(state[_id].lists).toStrictEqual(lists.slice(1));
+        const oldState = Object.assign(state, {});
+        state = {};
+        await actions.fetchBoards()(dispatch);
+        // TODO
+        // expect(state).toStrictEqual(oldState);
     });
 });

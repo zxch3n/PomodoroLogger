@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export const lang = {
     demoCardContent:
         'This is a demo Card 🎈. \n' +

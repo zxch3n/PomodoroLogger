@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import nedb from 'nedb';
 import { dbPaths } from '../config';
 
