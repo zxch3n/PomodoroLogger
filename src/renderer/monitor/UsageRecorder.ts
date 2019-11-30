@@ -13,6 +13,8 @@ export class UsageRecorder {
     private lastUsingApp?: string;
     private lock: boolean = false;
     private maxIndex: number = 0;
+    private lastUpdateTime: number | undefined = undefined;
+    public isRunning: boolean = false;
 
     private lastScreenShot?: ImageData;
     private lastScreenShotUrl?: string;
@@ -22,6 +24,7 @@ export class UsageRecorder {
         this.record = {
             _id: shortid.generate(),
             switchActivities: [],
+            stayTimeInSecond: [],
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
@@ -32,6 +35,10 @@ export class UsageRecorder {
     }
 
     get sessionData() {
+        if (this.isRunning) {
+            this.stop();
+        }
+
         this.normalizeTitleSpentTime();
         return this.record;
     }
@@ -40,6 +47,7 @@ export class UsageRecorder {
         this.record = {
             _id: shortid.generate(),
             switchActivities: [],
+            stayTimeInSecond: [],
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
@@ -47,17 +55,29 @@ export class UsageRecorder {
         };
 
         this.maxIndex = 0;
+        this.isRunning = false;
+        this.lastUpdateTime = undefined;
     };
 
     start = () => {
         this.record.startTime = new Date().getTime();
+        this.lastUpdateTime = this.record.startTime;
+        this.isRunning = true;
     };
 
-    resume = () => {};
+    resume = () => {
+        this.lastUpdateTime = new Date().getTime();
+        this.isRunning = true;
+    };
 
-    stop = async () => {
-        // TODO: test to make sure this is invoked
-        await this.listener(undefined);
+    stop = () => {
+        if (this.isRunning) {
+            this.updateThisAppUsageInfo(this.lastUsingApp!);
+        }
+
+        this.lastUpdateTime = undefined;
+        this.isRunning = false;
+        this.listener(undefined);
     };
 
     /**
@@ -74,7 +94,6 @@ export class UsageRecorder {
             return;
         }
 
-        const now = new Date().getTime();
         const appName = result ? removeAppSuffix(result.owner.name) : undefined;
         if (this.lastUsingApp && appName !== this.lastUsingApp) {
             this.updateLastAppUsageInfo(this.lastUsingApp);
@@ -90,20 +109,13 @@ export class UsageRecorder {
                 appName,
                 index: this.maxIndex,
                 spentTimeInHour: 0,
-                titleSpentTime: {},
-                switchTimes: 0,
-                lastUpdateTime: now
+                titleSpentTime: {}
             };
 
             this.maxIndex += 1;
         }
 
-        await this.updateThisAppUsageInfo(appName, result.title).catch(err => {
-            if (err) {
-                this.lock = false;
-                throw err;
-            }
-        });
+        this.updateThisAppUsageInfo(appName, result.title);
         this.lastUsingApp = appName;
         this.monitorListener(appName, this.record, this.lastScreenShotUrl);
         this.lock = false;
@@ -117,20 +129,12 @@ export class UsageRecorder {
             );
         }
 
-        row.switchTimes += 1;
         this.record.switchTimes += 1;
-        if (row.lastUpdateTime != null) {
-            const spentTimeInHour = (new Date().getTime() - row.lastUpdateTime) / 1000 / 3600;
-            row.spentTimeInHour += spentTimeInHour;
-            this.record.spentTimeInHour += spentTimeInHour;
-            row.lastUpdateTime = undefined;
-        }
-
         this.lastUsingApp = undefined;
         this.lastScreenShot = undefined;
     };
 
-    updateThisAppUsageInfo = async (appName: string, title: string) => {
+    updateThisAppUsageInfo = (appName: string, title?: string) => {
         const row = this.record.apps[appName];
         const now = new Date().getTime();
         if (!row) {
@@ -139,28 +143,36 @@ export class UsageRecorder {
 
         // Count the title occurrences.
         // This should be normalized when session finished.
-        if (!(title in row.titleSpentTime)) {
-            row.titleSpentTime[title] = {
-                normalizedWeight: 0,
-                occurrence: 0
-            };
-        }
-        row.titleSpentTime[title].occurrence += 1;
-
-        if (row.lastUpdateTime != null) {
-            const spentTimeInHour = (now - row.lastUpdateTime) / 1000 / 3600;
-            row.spentTimeInHour += spentTimeInHour;
-            this.record.spentTimeInHour += spentTimeInHour;
+        if (title != null) {
+            if (!(title in row.titleSpentTime)) {
+                row.titleSpentTime[title] = {
+                    normalizedWeight: 0,
+                    occurrence: 0
+                };
+            }
+            row.titleSpentTime[title].occurrence += 1;
         }
 
-        row.lastUpdateTime = now;
-        this.updateSwitchActivity(row.index);
+        if (this.lastUpdateTime == null) {
+            throw new Error('You should start recorder before using it');
+        }
+
+        const spentTimeInHour = (now - this.lastUpdateTime!) / 1000 / 3600;
+        row.spentTimeInHour += spentTimeInHour;
+        this.record.spentTimeInHour += spentTimeInHour;
+        this.updateSwitchActivity(row.index, now);
+        this.lastUpdateTime = now;
     };
 
-    private updateSwitchActivity = (index: number) => {
-        const last = this.record.switchActivities.length - 1;
-        if (this.record.switchActivities[last] !== index) {
-            this.record.switchActivities.push(index);
+    private updateSwitchActivity = (index: number, now: number) => {
+        const last = this.record.switchActivities!.length - 1;
+        const stayTimeArr = this.record.stayTimeInSecond!;
+        if (stayTimeArr.length !== 0) {
+            stayTimeArr[stayTimeArr.length - 1] += (now - this.lastUpdateTime!) / 1000;
+        }
+        if (this.record.switchActivities![last] !== index) {
+            this.record.switchActivities!.push(index);
+            this.record.stayTimeInSecond!.push(0);
         }
     };
 
