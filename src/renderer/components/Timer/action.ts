@@ -9,9 +9,11 @@ import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE } from '../../../config';
+import { AsyncDB } from '../../../utils/dbHelper';
 
 export const LONG_BREAK_INTERVAL = 4;
-
+const settingDB = new AsyncDB(dbs.settingDB);
+export type DistractingRow = { app?: string; title?: string };
 export interface Setting {
     focusDuration: number;
     restDuration: number;
@@ -19,6 +21,7 @@ export interface Setting {
     monitorInterval: number;
     screenShotInterval?: number;
     startOnBoot: boolean;
+    distractingList: DistractingRow[];
 }
 
 export interface TimerState extends Setting {
@@ -33,6 +36,18 @@ export interface TimerState extends Setting {
 }
 
 export const defaultState: TimerState = {
+    distractingList: [
+        {
+            app: 'Chrome|Edge|Iexplore|Safari|Firefox|Brave',
+            title: 'Facebook|微博|Twitter|哔哩哔哩|YouTube|Twitch|微信'
+        },
+        {
+            app: 'WeChatStore'
+        },
+        {
+            title: '邮件|Mail'
+        }
+    ],
     targetTime: undefined,
     focusDuration: 25 * 60,
     restDuration: 5 * 60,
@@ -52,6 +67,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const setDistractingList = createActionCreator(
+    '[Setting]SET_DISTRACTING_LIST',
+    resolve => (rows: DistractingRow[]) => resolve(rows)
+);
 export const extendCurrentSession = createActionCreator(
     '[Timer]EXTEND_CURRENT_SESSION',
     resolve => (time: number) => resolve(time)
@@ -117,7 +136,8 @@ export const actions = {
             ['monitorInterval', setMonitorInterval],
             ['screenShotInterval', setScreenShotInterval],
             ['startOnBoot', setStartOnBoot],
-            ['longBreakDuration', setLongBreakDuration]
+            ['longBreakDuration', setLongBreakDuration],
+            ['distractingList', setDistractingList]
         ];
         for (const key of settingKeywords) {
             if (key[0] in settings) {
@@ -134,6 +154,15 @@ export const actions = {
             { $set: { focusDuration } },
             { upsert: true },
             throwError
+        );
+    },
+    setDistractingList: (distractingList: DistractingRow[]) => async (dispatch: Dispatch) => {
+        dispatch(setDistractingList(distractingList));
+        console.log(distractingList);
+        await settingDB.update(
+            { name: 'setting' },
+            { $set: { distractingList } },
+            { upsert: true }
         );
     },
     setRestDuration: (restDuration: number) => async (dispatch: Dispatch) => {
@@ -313,5 +342,10 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         targetTime: new Date().getTime() + payload * 1000,
         isFocusing: true,
         isRunning: true
+    })),
+
+    handle(setDistractingList, (state, { payload }) => ({
+        ...state,
+        distractingList: payload
     }))
 ]);

@@ -7,6 +7,7 @@ import { HistoryActionCreatorTypes } from '../History/action';
 import { workers } from '../../workers';
 import { Bar } from '../Visualization/Bar';
 import { GridCalendar } from '../Visualization/GridCalendar';
+import { DistractingList } from '../Setting/DistractingList';
 
 const Container = styled.div`
     position: relative;
