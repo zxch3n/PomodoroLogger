@@ -75,7 +75,7 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
 
     const switchScreenshot = React.useCallback((v: boolean) => {
         if (v) {
-            props.setScreenShotInterval(5000);
+            props.setScreenShotInterval(1000 * 60 * 5);
         } else {
             props.setScreenShotInterval(undefined);
         }
@@ -184,10 +184,10 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 <Switch onChange={setStartOnBoot} checked={props.startOnBoot} />
             </ButtonWrapper>
 
-            {/*<h4>Idle Detection (Need Screenshot) </h4>*/}
-            {/*<ButtonWrapper>*/}
-            {/*    <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />*/}
-            {/*</ButtonWrapper>*/}
+            <h4>Screenshot</h4>
+            <ButtonWrapper>
+                <Switch onChange={switchScreenshot} checked={!!props.screenShotInterval} />
+            </ButtonWrapper>
 
             <h4>Data Management</h4>
             <ButtonWrapper>

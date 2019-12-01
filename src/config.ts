@@ -14,10 +14,16 @@ if (!existsSync(baseDir)) {
 }
 
 const dbDir = process.env.NODE_ENV !== 'test' ? 'db' : '__test__db';
+const scDir = process.env.NODE_ENV !== 'test' ? 'screenshots' : '__test__screenshots';
 export const dbBaseDir = process.env.NODE_ENV === 'production' ? join(baseDir, dbDir) : dbDir;
+export const screenshotDir = process.env.NODE_ENV === 'production' ? join(baseDir, scDir) : scDir;
 
 if (!existsSync(dbBaseDir)) {
     mkdirSync(dbBaseDir);
+}
+
+if (!existsSync(screenshotDir)) {
+    mkdirSync(screenshotDir);
 }
 
 export const dbPaths = {

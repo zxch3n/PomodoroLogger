@@ -22,7 +22,11 @@ export class Monitor {
         this.monitorInterval = monitorInterval;
         this.screenShotInterval = screenShotInterval;
         this.recorder = new UsageRecorder(monitorListener);
-        this.winMonitor = new WindowMonitor(this.recorder.listener, this.monitorInterval);
+        this.winMonitor = new WindowMonitor(
+            this.recorder.listener,
+            this.monitorInterval,
+            screenShotInterval
+        );
     }
 
     start = () => {

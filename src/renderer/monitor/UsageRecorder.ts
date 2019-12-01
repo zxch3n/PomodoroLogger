@@ -16,7 +16,6 @@ export class UsageRecorder {
     private lastUpdateTime: number | undefined = undefined;
     public isRunning: boolean = false;
 
-    private lastScreenShot?: ImageData;
     private lastScreenShotUrl?: string;
     private readonly monitorListener: Listener;
 
@@ -83,12 +82,24 @@ export class UsageRecorder {
     /**
      *
      * @param result, undefined means the timer is stopped
+     * @param screenshot, the path to screenshot
      */
-    listener: ActiveWinListener = async (result?: BaseResult) => {
+    listener: ActiveWinListener = async (result?: BaseResult, screenshot?: string) => {
         // Because we await something here, and
         // this method is call at an interval, there are chances
         // that we run call the method before last call is done;
         // I use a lock to avoid that.
+        if (screenshot) {
+            if (this.record.screenshots == null) {
+                this.record.screenshots = [];
+            }
+
+            this.record.screenshots.push({
+                time: new Date().getTime(),
+                path: screenshot
+            });
+        }
+
         if (this.lock) {
             console.warn('Locked! The update interval is too short.');
             return;
@@ -131,7 +142,6 @@ export class UsageRecorder {
 
         this.record.switchTimes += 1;
         this.lastUsingApp = undefined;
-        this.lastScreenShot = undefined;
     };
 
     updateThisAppUsageInfo = (appName: string, title?: string) => {

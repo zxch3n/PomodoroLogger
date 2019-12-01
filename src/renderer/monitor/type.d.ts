@@ -31,4 +31,5 @@ export interface PomodoroRecord {
     isRotten?: boolean;
     stayTimeInSecond?: number[];
     switchActivities?: number[];
+    screenshots?: { time: number; path: string }[];
 }

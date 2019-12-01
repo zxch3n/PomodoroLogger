@@ -282,7 +282,12 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
 
     handle(setScreenShotInterval, (state, { payload }) => ({
         ...state,
-        screenShotInterval: payload
+        screenShotInterval:
+            payload == null
+                ? payload
+                : process.env.NODE_ENV === 'production'
+                ? payload
+                : payload / DEBUG_TIME_SCALE
     })),
 
     handle(switchFocusRestMode, state => ({

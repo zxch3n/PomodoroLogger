@@ -1,4 +1,8 @@
 import * as electron from 'electron';
+import * as fs from 'fs';
+import * as path from 'path';
+import { screenshotDir } from '../../config';
+import { generateRandomName } from '../utils';
 
 const remote = electron.remote;
 
@@ -28,7 +32,7 @@ const getCurrentScreen = () => {
 
 const curScreen = getCurrentScreen();
 function getScreenCallback(
-    maxSize: number,
+    maxSize: number | undefined,
     callback: (err?: Error, canvas?: HTMLCanvasElement) => void
 ) {
     const handleStream = (stream: MediaStream) => {
@@ -41,6 +45,8 @@ function getScreenCallback(
             if (loaded) {
                 return;
             }
+
+            video.pause();
             loaded = true;
             // Set video ORIGINAL height (screenshot)
             video.style.height = video.videoHeight + 'px'; // videoHeight
@@ -65,7 +71,9 @@ function getScreenCallback(
                 // nothing
             }
         };
+
         video.srcObject = stream;
+        video.play();
         document.body.appendChild(video);
     };
 
@@ -91,11 +99,11 @@ function getScreenCallback(
                             // @ts-ignore
                             mandatory: {
                                 chromeMediaSource: 'desktop',
-                                chromeMediaSourceId: selectSource.id + '',
-                                minWidth: 3,
-                                minHeight: 3,
-                                maxWidth: maxSize,
-                                maxHeight: maxSize
+                                chromeMediaSourceId: selectSource.id + ''
+                                // minWidth: 3,
+                                // minHeight: 3,
+                                // maxWidth: maxSize,
+                                // maxHeight: maxSize
                             }
                         }
                     },
@@ -114,11 +122,11 @@ function getScreenCallback(
                     // @ts-ignore
                     mandatory: {
                         chromeMediaSource: 'desktop',
-                        chromeMediaSourceId: `screen:${curScreen.id}`,
-                        minWidth: 3,
-                        minHeight: 3,
-                        maxWidth: maxSize,
-                        maxHeight: maxSize
+                        chromeMediaSourceId: `screen:${curScreen.id}`
+                        // minWidth: 3,
+                        // minHeight: 3,
+                        // maxWidth: maxSize,
+                        // maxHeight: maxSize
                     }
                 }
             },
@@ -132,8 +140,8 @@ function getScreenCallback(
 
 export async function getScreen(
     timeout: number = 500,
-    maxSize: number = 16
-): Promise<HTMLCanvasElement> {
+    maxSize: number | undefined = 1024
+): Promise<string> {
     return await new Promise((resolve, reject) => {
         let finished = false;
         getScreenCallback(maxSize, (err, canvas) => {
@@ -141,7 +149,22 @@ export async function getScreen(
                 reject(err);
             } else if (!finished) {
                 finished = true;
-                resolve(canvas);
+                if (!canvas) {
+                    reject('Screenshot error');
+                    return;
+                }
+
+                const filePath = path.join(screenshotDir, new Date().getTime() + '.jpg');
+                // Get the DataUrl from the Canvas
+                const url = canvas.toDataURL('image/jpg', 0.1);
+                // remove Base64 stuff from the Image
+                const base64Data = url.replace(/^data:image\/png;base64,/, '');
+                fs.writeFile(filePath, base64Data, 'base64', err => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                resolve(filePath);
             }
         });
 
