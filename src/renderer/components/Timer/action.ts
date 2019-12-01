@@ -314,7 +314,7 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         screenShotInterval:
             payload == null
                 ? payload
-                : process.env.NODE_ENV === 'production'
+                : process.env.NODE_ENV !== 'development'
                 ? payload
                 : payload / DEBUG_TIME_SCALE
     })),

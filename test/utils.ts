@@ -22,6 +22,7 @@ export function createRecord(
     return {
         apps,
         switchActivities: [],
+        stayTimeInSecond: [],
         _id: '',
         screenStaticDuration: 0,
         startTime: new Date().getTime(),

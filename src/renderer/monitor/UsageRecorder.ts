@@ -180,6 +180,7 @@ export class UsageRecorder {
         if (stayTimeArr.length !== 0) {
             stayTimeArr[stayTimeArr.length - 1] += (now - this.lastUpdateTime!) / 1000;
         }
+
         if (this.record.switchActivities![last] !== index) {
             this.record.switchActivities!.push(index);
             this.record.stayTimeInSecond!.push(0);
