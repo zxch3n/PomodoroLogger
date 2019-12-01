@@ -157,16 +157,20 @@ describe('monitor/UsageRecorder', () => {
         mockDate(60000);
         await recorder.listener(c());
         mockDate(70000);
-        await recorder.listener(c());
+        await recorder.listener(c(), 'sss.jpg');
         mockDate(80000);
         await recorder.listener(c());
         mockDate(90000);
         await recorder.listener(b());
         mockDate(100000);
-        await recorder.listener(a());
+        await recorder.listener(a(), '111.jpg');
         mockDate(110000);
         recorder.stop();
         expect(recorder.sessionData.switchActivities).toStrictEqual([0, 1, 0, 2, 1, 0]);
         expect(recorder.sessionData.stayTimeInSecond).toStrictEqual([20, 10, 10, 40, 10, 10]);
+        expect(recorder.sessionData.screenshots).toStrictEqual([
+            { time: 70000, path: 'sss.jpg' },
+            { time: 100000, path: '111.jpg' }
+        ]);
     });
 });
