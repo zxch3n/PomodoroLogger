@@ -16,7 +16,6 @@ beforeEach(async () => {
     }
 
     lock = true;
-    console.log('get lock');
     if (existsSync(dbPaths.listsDB)) {
         await promisify(unlink)(dbPaths.listsDB).catch(() => {});
     }
@@ -29,7 +28,6 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-    console.log('release lock');
     lock = false;
 });
 

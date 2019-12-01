@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import Worker from 'worker-loader!./trainKnn.worker';
 import { PomodoroRecord } from '../monitor/type';
 import { BaseWorker } from './BaseWorker';

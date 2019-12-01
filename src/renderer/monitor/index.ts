@@ -1,5 +1,5 @@
 import { Monitor as WindowMonitor } from './activeWinMonitor';
-import { removeRedundantField, renameIllegalName } from './sessionManager';
+import { renameIllegalName } from './sessionManager';
 import { PomodoroRecord } from './type';
 import { Listener, UsageRecorder } from './UsageRecorder';
 
@@ -59,7 +59,6 @@ export class Monitor {
 
     get sessionData(): PomodoroRecord {
         const data = this.recorder.sessionData;
-        removeRedundantField(data);
         renameIllegalName(data);
         return data;
     }

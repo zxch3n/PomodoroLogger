@@ -6,7 +6,6 @@ import {
     deleteAllUserData,
     loadDB,
     loadDBSync,
-    removeRedundantField,
     getTodaySessions,
     exportDBData,
     deleteFolderRecursive
@@ -111,13 +110,6 @@ describe('sessionManager', () => {
         {
             const db = loadDBSync(join(dbBaseDir, 'test_loading.db'));
         }
-    });
-
-    it('should rm redundant field', () => {
-        const record = createRecord('app', 213, [['app', 123]]);
-        record.apps['app'].lastUpdateTime = 100;
-        removeRedundantField(record);
-        expect(record.apps['app']).not.toHaveProperty('lastUpdateTime');
     });
 
     it('should return today sessions', async () => {

@@ -51,9 +51,7 @@ function generateRecord(
             index,
             appName: app,
             spentTimeInHour: appUsage[app],
-            lastUpdateTime: undefined,
             screenStaticDuration: 10,
-            switchTimes: 3,
             titleSpentTime: {}
         };
 

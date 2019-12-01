@@ -11,10 +11,8 @@ export function createRecord(
         apps[appName] = {
             index,
             appName,
-            lastUpdateTime: 0,
             screenStaticDuration: 0,
             spentTimeInHour: value,
-            switchTimes: 0,
             titleSpentTime: {}
         };
 

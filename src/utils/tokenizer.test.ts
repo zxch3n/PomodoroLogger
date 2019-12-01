@@ -112,7 +112,6 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
             titleSpentTime,
             index: i,
             spentTimeInHour: 0.1,
-            switchTimes: 1,
             appName: i.toString()
         };
     }

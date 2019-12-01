@@ -9,18 +9,6 @@ const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.se
     m => promisify(m.bind(dbs.sessionDB))
 );
 
-export function removeRedundantField(record: PomodoroRecord): PomodoroRecord {
-    for (const app in record.apps) {
-        // TODO: when add title spent time, add the following part
-        // for (let title in record.apps[app].titleSpentTime) {
-        //
-        // }
-        delete record.apps[app].lastUpdateTime;
-    }
-
-    return record;
-}
-
 export function renameIllegalName(record: PomodoroRecord) {
     for (const app in record.apps) {
         const appRow = record.apps[app];

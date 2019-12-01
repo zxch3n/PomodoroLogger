@@ -4,7 +4,6 @@ import {
     reducer,
     setFocusDuration,
     setLongBreakDuration,
-    setMonitorInterval,
     setRestDuration,
     setScreenShotInterval,
     setStartOnBoot,
@@ -146,8 +145,7 @@ describe('On timerFinished', () => {
                     spentTimeInHour: 10,
                     appName: 'Chrome',
                     screenStaticDuration: 5,
-                    titleSpentTime: {},
-                    switchTimes: 3
+                    titleSpentTime: {}
                 }
             },
             screenStaticDuration: 5,
