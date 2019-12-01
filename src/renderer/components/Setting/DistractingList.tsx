@@ -212,8 +212,8 @@ class PrivateDistractingList extends React.Component<Props> {
     };
 
     render() {
-        // @ts-ignore
         const node = (
+            // @ts-ignore
             <WrappedDynamicFieldSet wrappedComponentRef={this.ref} onSubmit={this.onSubmit} />
         );
         return <Container>{node}</Container>;

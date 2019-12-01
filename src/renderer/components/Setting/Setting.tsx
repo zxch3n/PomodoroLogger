@@ -251,6 +251,7 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 onCancel={() => setEditingDistracting(false)}
                 onOk={onOk}
                 destroyOnClose={true}
+                okText={'Save'}
             >
                 <DistractingList ref={formRef} />
             </Modal>
