@@ -43,7 +43,7 @@ describe('Efficiency Analysis', () => {
 
 describe('EfficiencyAnalyser', () => {
     it('should get efficiency correctly', () => {
-        const ef = new EfficiencyAnalyser(['Facebook', undefined], [undefined, 'title']);
+        const ef = new EfficiencyAnalyser([{ app: 'facebook' }, { title: 'title' }]);
         let record = createRecord('aa', 100, [['Facebook', 100]]);
         record.stayTimeInSecond = [3600 * 100];
         record.switchActivities = [0];
