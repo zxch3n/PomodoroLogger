@@ -31,6 +31,7 @@
 - Use [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) to manage your time
 - Collect and visualize your desktop working activities, i.e., the names and titles of the using apps, **locally**
 - Use integrated Kanban Board to make your schedule control easier
+- Analyse your efficiency
 
 ## Pomodoro Technique :tomato:
 
@@ -44,6 +45,17 @@ In the Pomodoro Logger, the app will record the names and titles of the apps you
 
 
 By connecting your todo items with the corresponding recorded Pomodoro sessions, you can analyze how often you are interrupted by email and social software, the time distribution of the application and application title used to complete the task. It will help you have a more comprehensive understanding of your working hours on PC.
+
+
+## Efficiency Analysis
+
+Pomodoro Logger keeps a list of distracting app (you can config it in the setting). When it detect your using distracting apps, you lose your efficiency.
+
+It calculates user efficiency by [a heuristic method](./src/efficiency/efficiency.png).
+
+Demonstrating your efficiency by the dots. The larger the hole, the less efficient you are.
+
+<img width="150px" src="https://i.postimg.cc/Kzth8088/da.gif"/>
 
 
 # Data :chart_with_upwards_trend:
