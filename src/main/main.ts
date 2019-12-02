@@ -50,6 +50,8 @@ const createWindow = async () => {
     win = new BrowserWindow({
         width: 1080,
         height: 800,
+        minWidth: 380,
+        minHeight: 562,
         frame: true,
         icon: nativeImage.createFromPath(path.join(__dirname, logo)),
         title: 'Pomodoro Logger',

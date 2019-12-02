@@ -51,10 +51,25 @@ const TimerLayout = styled.div`
     height: calc(100vh - 45px);
     overflow-y: auto;
     width: 100%;
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-track {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-thumb {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
 `;
 
 const TimerInnerLayout = styled.div`
-    overflow-x: auto;
+    overflow-x: hidden;
+    min-width: 350px;
     max-width: 850px;
     margin: 0 auto;
 `;
@@ -66,12 +81,15 @@ const MyLayout = styled.div`
 `;
 
 const MySider = styled.aside`
+    position: relative;
     flex: 0 0 300px;
     padding: 6px;
     border-right: 1px solid #dfdfdf;
     background-color: #eaeaea;
     height: calc(100vh - 45px);
     float: left;
+    box-shadow: 2px 0 2px 0 rgba(0, 0, 0, 0.3);
+    transition: margin-left 0.2s;
 `;
 
 const ProgressContainer = styled.div`
@@ -130,6 +148,7 @@ function joinDict<T>(maps: { [key: string]: T }[]): { [key: string]: T } {
 interface State {
     leftTime: string;
     percent: number;
+    showSider: boolean;
     more: boolean;
     pomodorosToday: PomodoroRecord[];
     showMask: boolean;
@@ -145,6 +164,7 @@ class Timer extends Component<Props, State> {
     extendedTimeInMinute: number;
     efficiencyAnalyser: EfficiencyAnalyser;
     private stagedSession?: PomodoroRecord;
+    selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     constructor(props: Props) {
         super(props);
@@ -154,7 +174,8 @@ class Timer extends Component<Props, State> {
             more: false,
             pomodorosToday: [],
             showMask: false,
-            pomodoroNum: 0
+            pomodoroNum: 0,
+            showSider: true
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
         this.sound = React.createRef<HTMLAudioElement>();
@@ -162,11 +183,24 @@ class Timer extends Component<Props, State> {
         this.efficiencyAnalyser = new EfficiencyAnalyser([]);
     }
 
+    onResize = () => {
+        if (!this.selfRef.current) {
+            return;
+        }
+
+        if (this.selfRef.current.clientWidth < 700) {
+            if (this.state.showSider) {
+                this.setState({ showSider: false });
+            }
+        }
+    };
+
     componentDidMount(): void {
         this.efficiencyAnalyser = new EfficiencyAnalyser(this.props.timer.distractingList);
         this.interval = setInterval(this.updateLeftTime, 500);
         this.win = remote.getCurrentWindow();
         this.updateLeftTime();
+        this.selfRef.current!.addEventListener('resize', this.onResize);
         getTodaySessions().then(finishedSessions => {
             finishedSessions.sort((a, b) => a.startTime - b.startTime);
             this.setState({
@@ -235,6 +269,8 @@ class Timer extends Component<Props, State> {
         if (this.interval) {
             clearInterval(this.interval);
         }
+
+        this.selfRef.current!.removeEventListener('resize', this.onResize);
     }
 
     updateLeftTime = () => {
@@ -547,6 +583,10 @@ class Timer extends Component<Props, State> {
         await this.onDone(false, true);
     };
 
+    switchSider = () => {
+        this.setState(state => ({ showSider: !state.showSider }));
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
@@ -570,7 +610,7 @@ class Timer extends Component<Props, State> {
         const listId =
             boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
         return (
-            <MyLayout style={{ backgroundColor: 'white' }}>
+            <MyLayout style={{ backgroundColor: 'white' }} ref={this.selfRef}>
                 <TimerMask
                     extendCurrentSession={this.extendCurrentSession}
                     newPomodoro={this.stagedSession}
@@ -582,7 +622,11 @@ class Timer extends Component<Props, State> {
                 {listId === undefined || boardId === undefined ? (
                     undefined
                 ) : (
-                    <MySider>
+                    <MySider
+                        style={{
+                            marginLeft: this.state.showSider ? 0 : -300
+                        }}
+                    >
                         <KanbanName onClick={this.switchToKanban}>
                             {this.props.kanban.boards[boardId].name}
                         </KanbanName>
@@ -590,6 +634,18 @@ class Timer extends Component<Props, State> {
                             boardId={boardId}
                             doesOnlyShowFocusedList={true}
                             showHeader={false}
+                        />
+                        <Button
+                            icon={'more'}
+                            style={{
+                                position: 'absolute',
+                                right: 0,
+                                top: 20,
+                                marginRight: -15,
+                                zIndex: 50,
+                                boxShadow: '4px 0 2px -1px rgba(0, 0, 0, 0.3)'
+                            }}
+                            onClick={this.switchSider}
                         />
                     </MySider>
                 )}
