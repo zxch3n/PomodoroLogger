@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import { KanbanBoardState } from '../Kanban/Board/action';
 import { Dispatch } from 'redux';
+import { PomodoroRecord } from '../../monitor/type';
 
 const ButtonContainer = styled.div`
     position: absolute;
@@ -59,7 +60,8 @@ export interface InputProps {
     showMask: boolean;
     onCancel: () => void;
     onStart: () => void;
-    pomodoroNum: number;
+    pomodoros: PomodoroRecord[];
+    newPomodoro?: PomodoroRecord;
     extendCurrentSession: (timeInMinutes: number) => void;
 }
 
@@ -149,7 +151,12 @@ const _TimerMask = (props: MaskProps) => {
                 </Button>
                 <Row style={{ marginTop: '2em' }}>
                     <h1 style={{ color: 'white' }}>Today Pomodoros</h1>
-                    <PomodoroNumView num={props.pomodoroNum} color={'#f9ec52'} showNum={false} />
+                    <PomodoroNumView
+                        pomodoros={props.pomodoros}
+                        color={'#f9ec52'}
+                        showNum={false}
+                        newPomodoro={props.newPomodoro}
+                    />
                 </Row>
             </MaskInnerContainer>
             {props.isFocusing ? (

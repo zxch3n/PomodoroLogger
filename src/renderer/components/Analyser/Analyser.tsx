@@ -8,6 +8,8 @@ import { workers } from '../../workers';
 import { Bar } from '../Visualization/Bar';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import { DistractingList } from '../Setting/DistractingList';
+import { PomodoroNumView } from '../Timer/PomodoroNumView';
+import { createRecord } from '../../../../test/utils';
 
 const Container = styled.div`
     position: relative;
@@ -46,6 +48,25 @@ export const Analyser: React.FC<Props> = (props: Props) => {
         ['Logger', 20]
     ];
 
+    const pomodoros = [
+        createRecord('dd', 10, []),
+        createRecord('dd', 10, []),
+        createRecord('dd', 10, []),
+        createRecord('dd', 10, [])
+    ];
+
+    pomodoros[0].efficiency = 0.2;
+    pomodoros[0].startTime = 0;
+    pomodoros[1].startTime = 100;
+
+    pomodoros[1].efficiency = 0.5;
+
+    pomodoros[2].startTime = 5000;
+    pomodoros[2].efficiency = 0;
+    const r = createRecord('dd', 10, []);
+    r.startTime = 5004;
+    r.efficiency = 0.4;
+
     return (
         <Container>
             <Row gutter={16} style={{ marginBottom: 10 }}>
@@ -65,6 +86,7 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             </Button>
             <Progress percent={progress} size="small" />
             <GridCalendar data={{}} width={800} />
+            <PomodoroNumView pomodoros={pomodoros} newPomodoro={r} />
             <div style={{ height: 50, width: 280 }}>
                 <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']} />
             </div>

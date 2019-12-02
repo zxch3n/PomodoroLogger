@@ -32,4 +32,5 @@ export interface PomodoroRecord {
     stayTimeInSecond?: number[];
     switchActivities?: number[];
     screenshots?: { time: number; path: string }[];
+    efficiency?: number;
 }

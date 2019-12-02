@@ -23,6 +23,7 @@ import { WorkRestIcon } from './WorkRestIcon';
 import Board from '../Kanban/Board';
 import { HelpIcon } from '../UserGuide/HelpIcon';
 import dingMp3 from '../../../res/ding.mp3';
+import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -142,6 +143,7 @@ class Timer extends Component<Props, State> {
     mainDiv: React.RefObject<HTMLDivElement>;
     sound: React.RefObject<HTMLAudioElement>;
     extendedTimeInMinute: number;
+    efficiencyAnalyser: EfficiencyAnalyser;
     private stagedSession?: PomodoroRecord;
 
     constructor(props: Props) {
@@ -157,13 +159,16 @@ class Timer extends Component<Props, State> {
         this.mainDiv = React.createRef<HTMLDivElement>();
         this.sound = React.createRef<HTMLAudioElement>();
         this.extendedTimeInMinute = 0;
+        this.efficiencyAnalyser = new EfficiencyAnalyser([]);
     }
 
     componentDidMount(): void {
+        this.efficiencyAnalyser = new EfficiencyAnalyser(this.props.timer.distractingList);
         this.interval = setInterval(this.updateLeftTime, 500);
         this.win = remote.getCurrentWindow();
         this.updateLeftTime();
         getTodaySessions().then(finishedSessions => {
+            finishedSessions.sort((a, b) => a.startTime - b.startTime);
             this.setState({
                 pomodorosToday: finishedSessions,
                 pomodoroNum: finishedSessions.length
@@ -400,6 +405,7 @@ class Timer extends Component<Props, State> {
         }
 
         this.stagedSession = thisSession;
+        this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
         this.monitor.stop();
         if (this.props.timer.boardId === undefined) {
             this.props.inferProject(thisSession);
@@ -435,6 +441,8 @@ class Timer extends Component<Props, State> {
         }
 
         this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
+        this.efficiencyAnalyser.update(this.props.timer.distractingList);
+        this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
         this.extendedTimeInMinute = 0;
         if (this.props.timer.boardId !== undefined) {
             this.stagedSession.boardId = this.props.timer.boardId;
@@ -565,10 +573,11 @@ class Timer extends Component<Props, State> {
             <MyLayout style={{ backgroundColor: 'white' }}>
                 <TimerMask
                     extendCurrentSession={this.extendCurrentSession}
+                    newPomodoro={this.stagedSession}
                     showMask={showMask}
                     onCancel={this.onMaskClick}
                     onStart={this.onMaskButtonClick}
-                    pomodoroNum={this.state.pomodoroNum}
+                    pomodoros={this.state.pomodorosToday}
                 />
                 {listId === undefined || boardId === undefined ? (
                     undefined
@@ -683,7 +692,7 @@ class Timer extends Component<Props, State> {
                         <MoreInfo>
                             <Tooltip title="Pomodoros Today">
                                 <PomodoroNumView
-                                    num={this.state.pomodorosToday.length}
+                                    pomodoros={this.state.pomodorosToday}
                                     showNum={false}
                                     animation={isRunning}
                                 />

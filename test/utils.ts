@@ -1,4 +1,5 @@
 import { ApplicationSpentTime, PomodoroRecord } from '../src/renderer/monitor/type';
+import { generateRandomName } from '../src/renderer/utils';
 
 export function createRecord(
     name: string,
@@ -23,7 +24,7 @@ export function createRecord(
         apps,
         switchActivities: [],
         stayTimeInSecond: [],
-        _id: '',
+        _id: generateRandomName(),
         screenStaticDuration: 0,
         startTime: new Date().getTime(),
         boardId: name,

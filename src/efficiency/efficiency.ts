@@ -1,4 +1,5 @@
 import { PomodoroRecord, TitleSpentTimeDict } from '../renderer/monitor/type';
+import { DistractingRow } from '../renderer/components/Timer/action';
 
 export const EFFICIENCY_INC_RATE = 1 / 90;
 export function getEfficiency(isDistractionArr: boolean[], stayTimeArr: number[]) {
@@ -54,11 +55,39 @@ export function compressArray(isDistractionArr: boolean[], stayTimeArr: number[]
 }
 
 export class EfficiencyAnalyser {
-    appRegs: (RegExp | undefined)[];
-    titleRegs: (RegExp | undefined)[];
-    constructor(appRegs: (string | undefined)[], titleRegs: (string | undefined)[]) {
-        this.appRegs = appRegs.map(v => (v ? new RegExp(v, 'i') : undefined));
-        this.titleRegs = titleRegs.map(v => (v ? new RegExp(v, 'i') : undefined));
+    appRegs: (RegExp | undefined)[] = [];
+    titleRegs: (RegExp | undefined)[] = [];
+    bk: DistractingRow[] = [];
+    constructor(appTitleRegs: DistractingRow[]) {
+        this.init(appTitleRegs);
+    }
+
+    init(appTitleRegs: DistractingRow[]) {
+        this.appRegs = appTitleRegs.map(v => (v.app ? new RegExp(v.app, 'i') : undefined));
+        this.titleRegs = appTitleRegs.map(v => (v.title ? new RegExp(v.title, 'i') : undefined));
+        this.bk = appTitleRegs;
+    }
+
+    isSame(other: DistractingRow[]) {
+        if (this.bk.length !== other.length) {
+            return false;
+        }
+
+        for (let i = 0; i < this.bk.length; i += 1) {
+            if (this.bk[i].app !== other[i].app || this.bk[i].title !== other[i].title) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    update(other: DistractingRow[]) {
+        if (this.isSame(other)) {
+            return;
+        }
+
+        this.init(other);
     }
 
     private getTitleDistractingPos = (titles: TitleSpentTimeDict, reg: RegExp) => {
