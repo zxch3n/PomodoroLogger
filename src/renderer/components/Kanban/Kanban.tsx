@@ -11,6 +11,7 @@ import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
 import backIcon from '../../../res/back.svg';
 import { Label } from './style/Form';
+import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
 const { Option } = Select;
 
@@ -197,6 +198,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         >
                             <Icon type={'plus'} />
                         </Button>
+                        <Hotkeys keyName={'ctrl+n'} onKeyDown={addBoard} />
 
                         <Label>Sorted by:</Label>
                         <Select
@@ -306,6 +308,7 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                     onCancel={onCancel}
                     onOk={onSave}
                 >
+                    <Hotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
                     <Form layout="vertical">
                         <Form.Item label="Name">
                             {getFieldDecorator('name', {

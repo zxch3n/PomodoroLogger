@@ -1529,6 +1529,11 @@
   resolved "https://registry.npmjs.org/@types/zrender/-/zrender-4.0.0.tgz#a6806f12ec4eccaaebd9b0d816f049aca6188fbd"
   integrity sha512-s89GOIeKFiod2KSqHkfd2rzx+T2DVu7ihZCBEBnhFrzvQPUmzvDSBot9Fi1DfMQm9Odg+rTqoMGC38RvrwJK2w==
 
+"@uiw/react-shields@^1.0.10":
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/@uiw/react-shields/-/react-shields-1.1.0.tgz#0317ec46dd19d4c7334ddd33ddbbf1176ce2d990"
+  integrity sha512-EGHx2se5+UwT2n2Pc7kwbJDEIorXRj/2NDSDB5+RCP52JuFB5V07iH3wbArOZliLshg8okjJPdHsJqA7KCztPg==
+
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
   resolved "https://registry.npmjs.org/@webassemblyjs/ast/-/ast-1.8.5.tgz#51b1c5fe6576a34953bf4b253df9f0d490d9e359"
@@ -5787,6 +5792,11 @@ hosted-git-info@^2.1.4, hosted-git-info@^2.7.1:
   integrity sha512-CyjlXII6LMsPMyUzxpTt8fzh5QwzGqPmQXgY/Jyf4Zfp27t/FvfhwoE/8laaMUcMy816CkWF20I7NeQhwwY88w==
   dependencies:
     lru-cache "^5.1.1"
+
+hotkeys-js@^3.7.3:
+  version "3.7.3"
+  resolved "https://registry.npmjs.org/hotkeys-js/-/hotkeys-js-3.7.3.tgz#f0c718166e844b3e52065d1b60cffaa6065b5183"
+  integrity sha512-CSaeVPAKEEYNexYR35znMJnCqoofk7oqG/AOOqWow1qDT0Yxy+g+Y8Hs/LhGlsZaSJ7973YN6/N41LAr3t30QQ==
 
 hpack.js@^2.1.6:
   version "2.1.6"
@@ -10056,6 +10066,16 @@ react-dom@^16.8.6:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
     scheduler "^0.13.6"
+
+react-hot-keys@^2.4.4:
+  version "2.4.4"
+  resolved "https://registry.npmjs.org/react-hot-keys/-/react-hot-keys-2.4.4.tgz#3358eab7c8a2f5b9b65319a8e128d025a6e950b2"
+  integrity sha512-XgukZnlt/lIR137EPjYl1mCGnatkPkArNV+BfD/7yIFHtzyRoRkevM4PByvVhet5ZBhVxhKqaiNcgDrJYTUUVA==
+  dependencies:
+    "@babel/runtime" "^7.4.5"
+    "@uiw/react-shields" "^1.0.10"
+    hotkeys-js "^3.7.3"
+    prop-types "^15.7.2"
 
 react-hot-loader@^4.8.8:
   version "4.12.10"

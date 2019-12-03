@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { actions, Card, CardActionTypes } from './action';
 import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
+import ReactHotkeys from 'react-hot-keys';
 import { genMapDispatchToProp } from '../../../utils';
 import {
     Button,
@@ -121,6 +122,7 @@ const _CardInDetail: FC<Props> = (props: Props) => {
             onCancel={onCancel}
             onOk={onSave}
         >
+            <ReactHotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
             <Container>
                 <Form layout="vertical">
                     <Form.Item label="Title">

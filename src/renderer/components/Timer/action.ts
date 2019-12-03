@@ -13,6 +13,11 @@ import { AsyncDB } from '../../../utils/dbHelper';
 
 export const LONG_BREAK_INTERVAL = 4;
 const settingDB = new AsyncDB(dbs.settingDB);
+export const TABS: tabType[] = ['timer', 'kanban', 'history', 'setting'];
+if (process.env.NODE_ENV !== 'production') {
+    TABS.push('analyser');
+}
+export type tabType = 'timer' | 'kanban' | 'history' | 'setting' | 'analyser';
 export type DistractingRow = { app?: string; title?: string };
 export interface Setting {
     focusDuration: number;
@@ -32,7 +37,7 @@ export interface TimerState extends Setting {
     boardId?: string;
     iBreak: number; // i-th break session, if i can be divided by 4, start longer break
 
-    currentTab: string;
+    currentTab: tabType;
 }
 
 export const defaultState: TimerState = {
@@ -104,8 +109,11 @@ export const setScreenShotInterval = createActionCreator(
     resolve => (interval?: number) => resolve(interval)
 );
 export const switchFocusRestMode = createActionCreator('[Timer]SWITCH_FOCUS_MODE');
-export const changeAppTab = createActionCreator('[App]CHANGE_APP_TAB', resolve => (tab: string) =>
+export const changeAppTab = createActionCreator('[App]CHANGE_APP_TAB', resolve => (tab: tabType) =>
     resolve(tab)
+);
+export const switchTab = createActionCreator('[App]SWITCH_TAB', resolve => (direction: 1 | -1) =>
+    resolve(direction)
 );
 
 const throwError = (err: Error) => {
@@ -121,6 +129,7 @@ export const actions = {
     switchFocusRestMode,
     setBoardId,
     changeAppTab,
+    switchTab,
     extendCurrentSession,
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
@@ -343,9 +352,15 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         isFocusing: true,
         isRunning: true
     })),
-
     handle(setDistractingList, (state, { payload }) => ({
         ...state,
         distractingList: payload
-    }))
+    })),
+    handle(switchTab, (state, { payload }) => {
+        const index = (TABS.indexOf(state.currentTab) + payload + TABS.length) % TABS.length;
+        return {
+            ...state,
+            currentTab: TABS[index]
+        };
+    })
 ]);

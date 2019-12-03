@@ -5,8 +5,9 @@ import 'antd/dist/antd.css';
 import Setting from './Setting';
 import History from './History';
 import Analyser from './Analyser';
+import ReactHotkeys from 'react-hot-keys';
 import { connect } from 'react-redux';
-import { actions as timerActions, TimerActionTypes } from './Timer/action';
+import { actions as timerActions, switchTab, TimerActionTypes } from './Timer/action';
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { kanbanActions } from './Kanban/reducer';
 import { genMapDispatchToProp } from '../utils';
@@ -40,9 +41,20 @@ const Application = (props: Props) => {
         setTrayImageWithMadeIcon(undefined);
     }, []);
 
+    const onKeyDown = (keyname: string) => {
+        switch (keyname) {
+            case 'ctrl+tab':
+                props.switchTab(1);
+                break;
+            case 'ctrl+shift+tab':
+                props.switchTab(-1);
+                break;
+        }
+    };
+
     return (
         <Main>
-            <Tabs activeKey={props.currentTab} onChange={props.changeAppTab}>
+            <Tabs activeKey={props.currentTab} onChange={props.changeAppTab as any}>
                 <TabPane
                     tab={
                         <span>
@@ -109,6 +121,7 @@ const Application = (props: Props) => {
             <UserGuide />
             <UpdateController />
             <CardInDetail />
+            <ReactHotkeys keyName={'ctrl+tab,ctrl+shift+tab'} onKeyDown={onKeyDown} />
         </Main>
     );
 };

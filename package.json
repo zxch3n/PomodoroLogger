@@ -171,6 +171,7 @@
     "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.5",
     "react-dom": "^16.8.6",
+    "react-hot-keys": "^2.4.4",
     "react-redux": "^7.0.3",
     "react-stack-grid": "^0.7.1",
     "react-trend": "zxch3n/react-trend",
