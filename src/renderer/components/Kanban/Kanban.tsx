@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { KanbanActionTypes } from './action';
 import { KanbanState } from './reducer';
 import { BoardActionTypes } from './Board/action';
-import { CardInDetail } from './Card/CardInDetail';
 import { Switch, Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select } from 'antd';
 import Board from './Board';
 import styled from 'styled-components';
@@ -171,6 +170,10 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
         }
     };
 
+    const switchIsSearching = () => {
+        props.setIsSearching(!props.kanban.isSearching);
+    };
+
     return (
         <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
             <Header>
@@ -216,6 +219,12 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                     {props.kanban.chosenBoardId ? (
                         <>
                             <Button
+                                shape={'circle'}
+                                icon={'search'}
+                                onClick={switchIsSearching}
+                                style={{ marginRight: 6 }}
+                            />
+                            <Button
                                 type={'default'}
                                 shape={'circle'}
                                 icon={'caret-right'}
@@ -227,6 +236,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                                 icon={'setting'}
                                 onClick={showBoardSettingMenu}
                             />
+                            <SearchBar />
                         </>
                     ) : (
                         <LabelButton>
@@ -260,8 +270,6 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                     nameValidator={boardNameValidator}
                 />
             }
-            <CardInDetail />
-            <SearchBar />
         </Layout>
     );
 };

@@ -19,11 +19,12 @@ const Bar = styled.div`
 
 interface Props {
     reg?: string;
+    isSearching: boolean;
     setReg: (reg?: string) => void;
+    setIsSearching: (isSearching: boolean) => void;
 }
 
 const _SearchBar: FC<Props> = (props: Props) => {
-    const [visible, setVisible] = useState(false);
     const ref = useRef<Search>();
     useEffect(() => {
         window.addEventListener('keydown', event => {
@@ -32,18 +33,18 @@ const _SearchBar: FC<Props> = (props: Props) => {
                 (event.key === 'f' || event.which === 70 || event.code === 'KeyF')
             ) {
                 // Ctrl + F: Search
-                setVisible(true);
+                props.setIsSearching(true);
                 if (ref.current) {
                     ref.current.focus();
                 }
             } else if (event.key === 'Escape' || event.which === 27 || event.code === 'Escape') {
-                setVisible(false);
+                props.setIsSearching(false);
             }
         });
     }, []);
 
     const onSearch = () => {
-        setVisible(false);
+        props.setIsSearching(false);
     };
 
     const onChange = (event: any) => {
@@ -51,7 +52,7 @@ const _SearchBar: FC<Props> = (props: Props) => {
     };
 
     return (
-        <Bar style={{ display: visible ? undefined : 'none' }}>
+        <Bar style={{ display: props.isSearching ? undefined : 'none' }}>
             <Search
                 // @ts-ignore
                 ref={ref}
@@ -66,9 +67,11 @@ const _SearchBar: FC<Props> = (props: Props) => {
 
 export const SearchBar = connect(
     (state: RootState) => ({
-        reg: state.kanban.kanban.searchReg
+        reg: state.kanban.kanban.searchReg,
+        isSearching: state.kanban.kanban.isSearching
     }),
     (dispatch: Dispatch) => ({
-        setReg: (reg?: string) => dispatch(actions.setSearchReg(reg))
+        setReg: (reg?: string) => dispatch(actions.setSearchReg(reg)),
+        setIsSearching: (isSearch: boolean) => dispatch(actions.setIsSearching(isSearch))
     })
 )(_SearchBar);

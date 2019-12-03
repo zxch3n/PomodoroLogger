@@ -1,5 +1,5 @@
 import { hot } from 'react-hot-loader/root';
-import { Icon, Tabs } from 'antd';
+import { Icon, Layout, Tabs } from 'antd';
 import * as React from 'react';
 import 'antd/dist/antd.css';
 import Setting from './Setting';
@@ -17,6 +17,7 @@ import styled from 'styled-components';
 import Timer from './Timer';
 import { UserGuide } from './UserGuide/UserGuide';
 import { UpdateController } from './UpdateController';
+import { CardInDetail } from './Kanban/Card/CardInDetail';
 
 const Main = styled.div`
     .ant-tabs-bar {
@@ -107,6 +108,7 @@ const Application = (props: Props) => {
             </Tabs>
             <UserGuide />
             <UpdateController />
+            <CardInDetail />
         </Main>
     );
 };

@@ -13,17 +13,24 @@ export interface KanbanState {
         _id?: string;
         listId: string;
     };
+    isSearching: boolean;
     searchReg?: string;
     configuringBoardId?: string;
 }
 
 const defaultState: KanbanState = {
+    isSearching: false,
     sortedBy: 'recent',
     editCard: {
         isEditing: false,
         listId: ''
     }
 };
+
+const setIsSearching = createActionCreator(
+    '[KANBAN]SET_IS_SEARCHING',
+    resolve => (isSearching: boolean) => resolve(isSearching)
+);
 
 const setConfiguringBoardId = createActionCreator(
     '[KANBAN]CONFIGURING_BOARD_ID',
@@ -53,6 +60,7 @@ export const actions = {
     setEditCard,
     setSortedBy,
     setSearchReg,
+    setIsSearching,
     setConfiguringBoardId,
     setChosenBoardId: (_id: string | undefined) => async (dispatch: Dispatch) => {
         dispatch(setChosenBoardId(_id));
@@ -96,5 +104,9 @@ export const reducer = createReducer<KanbanState, any>(defaultState, handle => [
     handle(setConfiguringBoardId, (state, { payload: { _id } }) => ({
         ...state,
         configuringBoardId: _id
+    })),
+    handle(setIsSearching, (state, { payload }) => ({
+        ...state,
+        isSearching: payload
     }))
 ]);
