@@ -16,6 +16,7 @@ import { IdTrend } from '../../Visualization/ProjectTrend';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { ListsCountBar } from '../../Visualization/Bar';
+import { PomodoroDot } from '../../Visualization/PomodoroDot';
 
 const BriefCard = styled.div`
     word-break: break-word;
@@ -225,6 +226,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
             </Content>
             <Divider style={{ margin: '6px 0' }} />
             <BadgeHolder>
+                <PomodoroDot num={props.relatedSessions.length} />
                 {estimatedLeftTimeSum ? (
                     <Badge type={'left'} value={formatTime(estimatedLeftTimeSum)} />
                 ) : (

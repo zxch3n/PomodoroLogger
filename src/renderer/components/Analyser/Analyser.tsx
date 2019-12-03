@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { WordCloud } from '../Visualization/WordCloud';
 import { Button, Card, Col, Progress, Row, Statistic } from 'antd';
 import { RootState } from '../../reducers';
 import { HistoryActionCreatorTypes } from '../History/action';
 import { workers } from '../../workers';
 import { Bar } from '../Visualization/Bar';
 import { GridCalendar } from '../Visualization/GridCalendar';
-import { DistractingList } from '../Setting/DistractingList';
-import { PomodoroNumView } from '../Timer/PomodoroNumView';
 import { createRecord } from '../../../../test/utils';
+import { PomodoroDot } from '../Visualization/PomodoroDot';
 
 const Container = styled.div`
     position: relative;
@@ -86,10 +84,18 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             </Button>
             <Progress percent={progress} size="small" />
             <GridCalendar data={{}} width={800} />
-            <PomodoroNumView pomodoros={pomodoros} newPomodoro={r} />
             <div style={{ height: 50, width: 280 }}>
                 <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']} />
             </div>
+            <PomodoroDot num={0} />
+            <PomodoroDot num={9} />
+            <PomodoroDot num={10} />
+            <PomodoroDot num={100} />
+            <PomodoroDot num={999} />
+            <PomodoroDot num={1000} />
+            <PomodoroDot num={8722} />
+            <PomodoroDot num={10000} />
+            <PomodoroDot num={38212} />
         </Container>
     );
 };

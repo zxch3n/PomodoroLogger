@@ -175,9 +175,21 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
         props.setIsSearching(!props.kanban.isSearching);
     };
 
+    const onKeyDown = (name: string) => {
+        switch (name) {
+            case 'esc':
+                goBack();
+                break;
+            case 'ctrl+n':
+                addBoard();
+                break;
+        }
+    };
+
     return (
         <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
             <Header>
+                <Hotkeys keyName={'ctrl+n,esc'} onKeyDown={onKeyDown} />
                 {props.kanban.chosenBoardId ? (
                     <>
                         <Title>{props.boards[props.kanban.chosenBoardId].name}</Title>
@@ -187,7 +199,6 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         >
                             <Icon component={backIcon} />
                         </Button>
-                        <Hotkeys keyName={'esc'} onKeyDown={goBack} />
                     </>
                 ) : (
                     <>
@@ -199,7 +210,6 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         >
                             <Icon type={'plus'} />
                         </Button>
-                        <Hotkeys keyName={'ctrl+n'} onKeyDown={addBoard} />
 
                         <Label>Sorted by:</Label>
                         <Select

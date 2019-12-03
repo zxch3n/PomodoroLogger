@@ -9,6 +9,7 @@ import { Badge } from './Badge';
 import { formatTime } from '../../../utils';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
+import { PomodoroDot } from '../../Visualization/PomodoroDot';
 
 const CardContainer = styled.div`
     word-break: break-word;
@@ -77,6 +78,11 @@ export const Card: FC<Props> = (props: Props) => {
                                     />
                                     <Divider style={{ margin: '4px 0' }} />
                                     <BadgeHolder>
+                                        {props.sessionIds.length > 0 ? (
+                                            <PomodoroDot num={props.sessionIds.length} />
+                                        ) : (
+                                            undefined
+                                        )}
                                         {props.spentTimeInHour.estimated ? (
                                             <Badge
                                                 type={'estimated'}
@@ -91,15 +97,6 @@ export const Card: FC<Props> = (props: Props) => {
                                                 type={'actual'}
                                                 value={formatTime(props.spentTimeInHour.actual)}
                                                 color={'#007ec6'}
-                                            />
-                                        ) : (
-                                            undefined
-                                        )}
-                                        {props.sessionIds.length > 0 ? (
-                                            <Badge
-                                                type={'pomodoros'}
-                                                value={props.sessionIds.length.toString()}
-                                                color={'#ca6129'}
                                             />
                                         ) : (
                                             undefined
