@@ -98,19 +98,22 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
         spentTimeInHour: 0.3
     };
 
+    let index = 0;
     for (let i = 0; i < pairs.length; i += 10) {
         const titleSpentTime: TitleSpentTimeDict = {};
         for (let j = i; j < pairs.length && j < i + 10; j += 1) {
             const pair = pairs[j];
             titleSpentTime[pair[0]] = {
+                index,
                 normalizedWeight: pair[1],
                 occurrence: pair[1] * 100
             };
+
+            index += 1;
         }
 
         record.apps[i.toString()] = {
             titleSpentTime,
-            index: i,
             spentTimeInHour: 0.1,
             appName: i.toString()
         };

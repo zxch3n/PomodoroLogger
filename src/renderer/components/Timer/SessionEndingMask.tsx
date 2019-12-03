@@ -1,5 +1,5 @@
 import { Button, List, Popover, Row } from 'antd';
-import { actions, LONG_BREAK_INTERVAL } from '../Timer/action';
+import { actions, LONG_BREAK_INTERVAL } from './action';
 import { PomodoroNumView } from './PomodoroNumView';
 import React from 'react';
 import styled from 'styled-components';

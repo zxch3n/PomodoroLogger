@@ -141,7 +141,6 @@ describe('On timerFinished', () => {
             switchActivities: [],
             apps: {
                 Chrome: {
-                    index: 0,
                     spentTimeInHour: 10,
                     appName: 'Chrome',
                     screenStaticDuration: 5,

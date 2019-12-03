@@ -119,12 +119,9 @@ export class UsageRecorder {
         if (!(appName in this.record.apps)) {
             this.record.apps[appName] = {
                 appName,
-                index: this.maxIndex,
                 spentTimeInHour: 0,
                 titleSpentTime: {}
             };
-
-            this.maxIndex += 1;
         }
 
         this.updateThisAppUsageInfo(appName, result.title);
@@ -145,7 +142,7 @@ export class UsageRecorder {
         this.lastUsingApp = undefined;
     };
 
-    updateThisAppUsageInfo = (appName: string, title?: string) => {
+    updateThisAppUsageInfo = (appName: string, title: string = appName) => {
         const row = this.record.apps[appName];
         const now = new Date().getTime();
         if (!row) {
@@ -154,15 +151,17 @@ export class UsageRecorder {
 
         // Count the title occurrences.
         // This should be normalized when session finished.
-        if (title != null) {
-            if (!(title in row.titleSpentTime)) {
-                row.titleSpentTime[title] = {
-                    normalizedWeight: 0,
-                    occurrence: 0
-                };
-            }
-            row.titleSpentTime[title].occurrence += 1;
+        if (!(title in row.titleSpentTime)) {
+            row.titleSpentTime[title] = {
+                index: this.maxIndex,
+                normalizedWeight: 0,
+                occurrence: 0
+            };
+
+            this.maxIndex += 1;
         }
+
+        row.titleSpentTime[title].occurrence += 1;
 
         if (this.lastUpdateTime == null) {
             throw new Error('You should start recorder before using it');
@@ -171,7 +170,7 @@ export class UsageRecorder {
         const spentTimeInHour = (now - this.lastUpdateTime!) / 1000 / 3600;
         row.spentTimeInHour += spentTimeInHour;
         this.record.spentTimeInHour += spentTimeInHour;
-        this.updateSwitchActivity(row.index, now);
+        this.updateSwitchActivity(row.titleSpentTime[title].index, now);
         this.lastUpdateTime = now;
     };
 

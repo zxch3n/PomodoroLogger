@@ -71,7 +71,7 @@ describe('sessionManager', () => {
             ['abf.eeeee', 123]
         ]);
         record.apps['abc.exe'].titleSpentTime = {
-            'hello.123': { normalizedWeight: 0.12, occurrence: 123 }
+            'hello.123': { normalizedWeight: 0.12, occurrence: 123, index: 0 }
         };
         renameIllegalName(record);
         for (const app in record.apps) {

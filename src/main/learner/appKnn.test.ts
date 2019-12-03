@@ -48,7 +48,6 @@ function generateRecord(
     let index = 0;
     for (const app in appUsage) {
         apps[app] = {
-            index,
             appName: app,
             spentTimeInHour: appUsage[app],
             screenStaticDuration: 10,

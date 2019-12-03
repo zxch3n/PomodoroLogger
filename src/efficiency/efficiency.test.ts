@@ -45,37 +45,71 @@ describe('EfficiencyAnalyser', () => {
     it('should get efficiency correctly', () => {
         const ef = new EfficiencyAnalyser([{ app: 'facebook' }, { title: 'title' }]);
         let record = createRecord('aa', 100, [['Facebook', 100]]);
+        record.apps['Facebook'].titleSpentTime['a'] = {
+            occurrence: 1,
+            normalizedWeight: 1,
+            index: 0
+        };
         record.stayTimeInSecond = [3600 * 100];
         record.switchActivities = [0];
         expect(ef.analyse(record)).toBe(0);
 
         record = createRecord('aa', 10, [['assbook', 10]]);
+        record.apps['assbook'].titleSpentTime['a'] = {
+            occurrence: 1,
+            normalizedWeight: 1,
+            index: 0
+        };
         record.stayTimeInSecond = [10 * 3600];
         record.switchActivities = [0];
         expect(ef.analyse(record)).toBe(1);
 
         record = createRecord('aa', 10, [['assbook', 10]]);
-        record.apps.assbook.titleSpentTime['title'] = { occurrence: 1, normalizedWeight: 1 };
+        record.apps.assbook.titleSpentTime['title'] = {
+            occurrence: 1,
+            normalizedWeight: 1,
+            index: 0
+        };
         record.stayTimeInSecond = [10 * 3600];
         record.switchActivities = [0];
         expect(ef.analyse(record)).toBe(0);
 
         record = createRecord('aa', 10, [['assbook', 10], ['bb', 0]]);
-        record.apps.assbook.titleSpentTime['bb'] = { occurrence: 1, normalizedWeight: 0.5 };
-        record.apps.assbook.titleSpentTime['title'] = { occurrence: 1, normalizedWeight: 0.5 };
-        record.stayTimeInSecond = [5 * 3600, 0, 5 * 3600];
+        record.apps.assbook.titleSpentTime['bb'] = {
+            occurrence: 1,
+            normalizedWeight: 0.5,
+            index: 0
+        };
+        record.apps.assbook.titleSpentTime['title'] = {
+            occurrence: 1,
+            normalizedWeight: 0.5,
+            index: 1
+        };
+        record.stayTimeInSecond = [5 * 3600, 1 * 3600, 4 * 3600];
         record.switchActivities = [0, 1, 0];
-        expect(ef.analyse(record)).toBeCloseTo(0.5);
+        expect(ef.analyse(record)).toBeCloseTo(0.9);
     });
 
     it('should break it down to title level', () => {
         const ef = new EfficiencyAnalyser([{ app: 'facebook' }, { title: 'title' }]);
         const record = createRecord('aa', 10, [['assbook', 10]]);
-        record.apps.assbook.titleSpentTime['bb'] = { occurrence: 100, normalizedWeight: 0.3 };
-        record.apps.assbook.titleSpentTime['title'] = { occurrence: 100, normalizedWeight: 0.3 };
-        record.apps.assbook.titleSpentTime['aa'] = { occurrence: 100, normalizedWeight: 0.4 };
-        record.stayTimeInSecond = [5 * 3600];
-        record.switchActivities = [0];
-        expect(ef.analyse(record)).toBeCloseTo(1 / 3);
+        record.apps.assbook.titleSpentTime['bb'] = {
+            occurrence: 100,
+            normalizedWeight: 0.3,
+            index: 0
+        };
+        record.apps.assbook.titleSpentTime['title'] = {
+            occurrence: 100,
+            normalizedWeight: 0.3,
+            index: 1
+        };
+        record.apps.assbook.titleSpentTime['aa'] = {
+            occurrence: 100,
+            normalizedWeight: 0.4,
+            index: 2
+        };
+        record.stayTimeInSecond = [5 * 3600, 5 * 3600, 5 * 3600];
+        record.switchActivities = [0, 1, 2];
+        expect(ef.analyse(record)).toBeCloseTo(2 / 3);
     });
 });

@@ -10,7 +10,6 @@ export function createRecord(
     let index = 0;
     for (const [appName, value] of appData) {
         apps[appName] = {
-            index,
             appName,
             screenStaticDuration: 0,
             spentTimeInHour: value,

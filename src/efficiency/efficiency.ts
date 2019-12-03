@@ -92,69 +92,44 @@ export class EfficiencyAnalyser {
         return true;
     }
 
-    private getTitleDistractingPos = (titles: TitleSpentTimeDict, reg: RegExp) => {
-        let totalTimes = 0;
-        for (const title in titles) {
-            if (!titles.hasOwnProperty(title)) {
-                continue;
+    getIsDistracting = (app: string, title: string) => {
+        for (let i = 0; i < this.appRegs.length; i += 1) {
+            const appReg = this.appRegs[i];
+            const titleReg = this.titleRegs[i];
+            if (appReg) {
+                if (appReg.exec(app)) {
+                    if (!titleReg || titleReg.exec(title)) {
+                        return true;
+                    }
+                }
+            } else if (titleReg) {
+                if (titleReg.exec(title)) {
+                    return true;
+                }
+            } else {
+                throw new Error();
             }
-
-            if (!reg.exec(title)) {
-                continue;
-            }
-
-            totalTimes += titles[title].occurrence;
         }
 
-        return totalTimes;
+        return false;
     };
 
     analyse = (record: PomodoroRecord) => {
-        const appDistractingOcc = [];
+        // tslint:disable-next-line:no-parameter-reassignment
+        record = cloneDeep(record);
+        const isDistracting = record.switchActivities!.map(() => false);
         for (const app in record.apps) {
-            const curIndex = record.apps[app].index;
-            const totalOccurrence = record.switchActivities!.reduce(
-                (l, index) => l + (index === curIndex ? 1 : 0),
-                0
-            );
-            let distractingOccurrence = 0;
-            for (let i = 0; i < this.appRegs.length; i += 1) {
-                if (this.appRegs[i] && this.appRegs[i]!.exec(app)) {
-                    if (this.titleRegs[i]) {
-                        const v = this.getTitleDistractingPos(
-                            record.apps[app].titleSpentTime,
-                            this.titleRegs[i]!
-                        );
-                        distractingOccurrence = Math.max(distractingOccurrence, v);
-                    } else {
-                        distractingOccurrence = totalOccurrence;
-                    }
-                } else if (this.titleRegs[i]) {
-                    const v = this.getTitleDistractingPos(
-                        record.apps[app].titleSpentTime,
-                        this.titleRegs[i]!
-                    );
-                    distractingOccurrence = Math.max(distractingOccurrence, v);
+            const _app = record.apps[app];
+            for (const title in _app.titleSpentTime) {
+                if (!_app.titleSpentTime.hasOwnProperty(title)) {
+                    continue;
                 }
-            }
 
-            appDistractingOcc[record.apps[app].index] = distractingOccurrence;
-        }
-
-        const isDistracting = record.switchActivities!.map((v, i) => false);
-        const index = record.switchActivities!.map((v, i) => i);
-        for (let i = 0; i < index.length; i += 1) {
-            const b = Math.floor(Math.random() * index.length);
-            [index[i], index[b]] = [index[b], index[i]];
-        }
-
-        for (const i of index) {
-            if (appDistractingOcc[i]) {
-                isDistracting[i] = true;
-                appDistractingOcc[i] -= 1;
+                const _title = _app.titleSpentTime[title];
+                isDistracting[_title.index] = this.getIsDistracting(app, title);
             }
         }
 
-        return getEfficiency(isDistracting, record.stayTimeInSecond!.concat());
+        return getEfficiency(isDistracting, record.stayTimeInSecond!);
     };
 }
