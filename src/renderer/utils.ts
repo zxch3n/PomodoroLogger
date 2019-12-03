@@ -39,6 +39,13 @@ export function to2digits(num: number) {
 }
 
 export function formatTime(timeInHour: number) {
+    if (timeInHour >= 1000) {
+        return `${timeInHour}h`;
+    }
+
+    if (timeInHour >= 100) {
+        return `${timeInHour.toFixed(1)}h`;
+    }
     const hour = Math.floor(timeInHour);
     const minute = Math.floor((timeInHour - hour) * 60 + 0.5);
     return `${to2digits(hour)}h ${to2digits(minute)}m`;

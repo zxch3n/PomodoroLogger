@@ -13,6 +13,7 @@ import backIcon from '../../../res/back.svg';
 import { Label } from './style/Form';
 import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
+import { throttle } from 'lodash';
 const { Option } = Select;
 
 const Content = styled.main`
@@ -181,7 +182,9 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                 goBack();
                 break;
             case 'ctrl+n':
-                addBoard();
+                if (!props.kanban.chosenBoardId) {
+                    addBoard();
+                }
                 break;
         }
     };

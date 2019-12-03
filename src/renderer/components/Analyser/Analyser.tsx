@@ -8,6 +8,7 @@ import { Bar } from '../Visualization/Bar';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import { createRecord } from '../../../../test/utils';
 import { PomodoroDot } from '../Visualization/PomodoroDot';
+import { TimeBadge } from '../Kanban/Card/Badge';
 
 const Container = styled.div`
     position: relative;
@@ -94,8 +95,18 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             <PomodoroDot num={999} />
             <PomodoroDot num={1000} />
             <PomodoroDot num={8722} />
-            <PomodoroDot num={10000} />
-            <PomodoroDot num={38212} />
+            <br />
+            <TimeBadge leftTime={10} spentTime={10} />
+            <br />
+            <TimeBadge leftTime={0.3} spentTime={10} />
+            <TimeBadge leftTime={0} spentTime={10} />
+            <br />
+            <TimeBadge leftTime={0} spentTime={0} />
+            <TimeBadge leftTime={0.1} spentTime={99.99} />
+            <TimeBadge leftTime={99.1} spentTime={0.09} />
+            <TimeBadge leftTime={10000} spentTime={0.09} />
+            <TimeBadge leftTime={10000} spentTime={100} />
+            <TimeBadge leftTime={100} spentTime={999} />
         </Container>
     );
 };

@@ -4,6 +4,7 @@ import { addSession } from '../../monitor/sessionManager';
 import { actions as boardActions } from '../Kanban/Board/action';
 import { actions as kanbanActions } from '../Kanban/action';
 import { actions as historyActions } from '../History/action';
+import { throttle, debounce } from 'lodash';
 import { promisify } from 'util';
 import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
@@ -126,11 +127,11 @@ export const actions = {
     continueTimer,
     clearTimer,
     startTimer,
-    switchFocusRestMode,
     setBoardId,
     changeAppTab,
-    switchTab,
     extendCurrentSession,
+    switchFocusRestMode: throttle(switchFocusRestMode, 500),
+    switchTab: throttle((direction: 1 | -1) => switchTab(direction), 500),
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
             dbs.settingDB.findOne.bind(dbs.settingDB)

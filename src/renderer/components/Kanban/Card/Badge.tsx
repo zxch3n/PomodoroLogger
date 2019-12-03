@@ -1,4 +1,24 @@
 import React from 'react';
+import { formatTime } from '../../../utils';
+import shortid from 'shortid';
+import styled from 'styled-components';
+import { throttle } from 'lodash';
+
+const AnimeSvg = styled.svg`
+    transition: transform 0.15s;
+    user-select: none;
+    cursor: pointer;
+    font-weight: 600;
+    :hover {
+        transform: scale(1.1);
+    }
+    .clip-path {
+        transition: all 0.2s;
+    }
+    .label {
+        font-weight: 700;
+    }
+`;
 
 export interface Props {
     type: string;
@@ -8,13 +28,13 @@ export interface Props {
 }
 
 export const Badge = (props: Props) => {
-    const { color="#32d31f", type, value, title } = props;
+    const { color = '#32d31f', type, value, title } = props;
     const textSize = Math.floor(props.type.length * 6.5 + 10);
     const timeSize = Math.floor(value.length * 6.5 + 10);
     const idA = `${type.length},${value.length}a`;
     const idB = `${type.length},${value.length}b`;
     return (
-        <svg width={textSize + timeSize} height="20" style={{ margin: '1px 4px 1px 4px' }} >
+        <svg width={textSize + timeSize} height="20" style={{ margin: '1px 4px 1px 4px' }}>
             <title>{title}</title>
             <linearGradient id={idB} x2="0" y2="100%">
                 <stop offset="0" stopColor="#bbb" stopOpacity=".1" />
@@ -74,5 +94,129 @@ export const Badge = (props: Props) => {
                 </text>
             </g>
         </svg>
+    );
+};
+
+interface TimeBadgeProps {
+    spentTime?: number;
+    leftTime?: number;
+}
+
+export const TimeBadge = (props: TimeBadgeProps) => {
+    const [clipState, setClipState] = React.useState('default');
+    const id = React.useMemo(shortid.generate, []);
+    const id1 = id + '1';
+    let { spentTime = 0, leftTime = 0 } = props;
+    if (leftTime < 0) {
+        leftTime = 0;
+    }
+    if (spentTime < 0) {
+        spentTime = 0;
+    }
+
+    const sSpentTime = formatTime(spentTime);
+    const sEstimatedTime = formatTime(leftTime);
+    const sum = spentTime + leftTime;
+    const totalWidth = 180;
+    const spentWidth = sum ? ((totalWidth - 100) / sum) * spentTime + 50 : 90;
+    const estimatedWidth = totalWidth - spentWidth;
+    const onHoverSpent = throttle(() => setClipState('spent'), 800);
+    const onLeave = throttle(() => setClipState('default'), 800);
+    const onHoverLeft = throttle(() => setClipState('left'), 800);
+    let state = clipState;
+    if (estimatedWidth < 53) {
+        state = 'spent';
+    } else if (spentWidth < 53) {
+        state = 'left';
+    }
+
+    let transform = `translate(0 0)`;
+    switch (state) {
+        case 'spent':
+            transform = `translate(${totalWidth} 0)`;
+            break;
+        case 'left':
+            transform = `translate(${-totalWidth} 0)`;
+            break;
+    }
+
+    return (
+        <AnimeSvg
+            width={totalWidth}
+            height="20"
+            style={{ margin: '1px 10px 1px 10px', fontSize: 12 }}
+            onMouseLeave={onLeave}
+        >
+            <defs>
+                <clipPath id={id}>
+                    <path
+                        className={'clip-path'}
+                        d={`M ${spentWidth} -10 L ${spentWidth} 30 L ${totalWidth *
+                            2} 30 L ${totalWidth * 2} -10 Z`}
+                        fill={'white'}
+                        transform={transform}
+                    />
+                </clipPath>
+                <clipPath id={id1}>
+                    <path
+                        className={'clip-path'}
+                        d={`M -${totalWidth} -10 H ${spentWidth} V 40 L ${-totalWidth} 30 Z`}
+                        fill={'white'}
+                        transform={transform}
+                    />
+                </clipPath>
+            </defs>
+
+            <g onMouseOver={onHoverSpent} clipPath={`url(#${id1})`}>
+                <rect height={20} width={totalWidth - 50} x={50} rx={3} fill={'#97ca00'} />
+                <text
+                    x={4}
+                    y={10}
+                    textLength={sSpentTime.length * 6.2}
+                    textAnchor={'start'}
+                    alignmentBaseline={'central'}
+                    fill={'black'}
+                >
+                    {sSpentTime}
+                </text>
+
+                <text
+                    className={'label'}
+                    x={totalWidth - 4}
+                    y={10}
+                    textLength={38}
+                    textAnchor={'end'}
+                    alignmentBaseline={'central'}
+                    fill={'white'}
+                >
+                    SPENT
+                </text>
+            </g>
+
+            <g clipPath={`url(#${id})`} onMouseOver={onHoverLeft}>
+                <rect height={20} width={totalWidth - 50} x={0} rx={3} fill={'#ddd'} />
+                <text
+                    className={'label'}
+                    x={4}
+                    y={10}
+                    textLength={30}
+                    textAnchor={'start'}
+                    alignmentBaseline={'central'}
+                    fill={'white'}
+                >
+                    LEFT
+                </text>
+                <text
+                    x={spentWidth + estimatedWidth - 4}
+                    y={10}
+                    textLength={sEstimatedTime.length * 6.2}
+                    textAnchor={'end'}
+                    alignmentBaseline={'central'}
+                    fill={'black'}
+                >
+                    {sEstimatedTime}
+                </text>
+            </g>
+        </AnimeSvg>
     );
 };

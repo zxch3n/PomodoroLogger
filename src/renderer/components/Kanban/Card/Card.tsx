@@ -5,7 +5,7 @@ import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
 import { Icon, Divider, Dropdown } from 'antd';
 import formatMarkdown from './formatMarkdown';
-import { Badge } from './Badge';
+import { Badge, TimeBadge } from './Badge';
 import { formatTime } from '../../../utils';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
@@ -83,20 +83,14 @@ export const Card: FC<Props> = (props: Props) => {
                                         ) : (
                                             undefined
                                         )}
-                                        {props.spentTimeInHour.estimated ? (
-                                            <Badge
-                                                type={'estimated'}
-                                                value={formatTime(props.spentTimeInHour.estimated)}
-                                                color={'#97ca00'}
-                                            />
-                                        ) : (
-                                            undefined
-                                        )}
-                                        {props.spentTimeInHour.actual ? (
-                                            <Badge
-                                                type={'actual'}
-                                                value={formatTime(props.spentTimeInHour.actual)}
-                                                color={'#007ec6'}
+                                        {props.spentTimeInHour.estimated ||
+                                        props.spentTimeInHour.actual ? (
+                                            <TimeBadge
+                                                spentTime={props.spentTimeInHour.actual}
+                                                leftTime={
+                                                    props.spentTimeInHour.estimated -
+                                                    props.spentTimeInHour.actual
+                                                }
                                             />
                                         ) : (
                                             undefined

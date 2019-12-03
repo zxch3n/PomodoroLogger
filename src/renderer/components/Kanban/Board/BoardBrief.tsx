@@ -9,7 +9,7 @@ import styled, { keyframes } from 'styled-components';
 import { Card, CardsState } from '../Card/action';
 import { ListsState } from '../List/action';
 import { Button, Divider } from 'antd';
-import { Badge } from '../Card/Badge';
+import { Badge, TimeBadge } from '../Card/Badge';
 import { formatTime } from '../../../utils';
 import formatMarkdown from '../Card/formatMarkdown';
 import { IdTrend } from '../../Visualization/ProjectTrend';
@@ -227,12 +227,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
             <Divider style={{ margin: '6px 0' }} />
             <BadgeHolder>
                 <PomodoroDot num={props.relatedSessions.length} />
-                {estimatedLeftTimeSum ? (
-                    <Badge type={'left'} value={formatTime(estimatedLeftTimeSum)} />
-                ) : (
-                    undefined
-                )}
-                <Badge type={'spent-time'} value={formatTime(spentHours)} />
+                <TimeBadge spentTime={spentHours} leftTime={estimatedLeftTimeSum} />
                 {showErr ? (
                     <Badge
                         type={'accuracy'}
