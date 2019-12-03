@@ -67,4 +67,15 @@ describe('EfficiencyAnalyser', () => {
         record.switchActivities = [0, 1, 0];
         expect(ef.analyse(record)).toBeCloseTo(0.5);
     });
+
+    it('should break it down to title level', () => {
+        const ef = new EfficiencyAnalyser([{ app: 'facebook' }, { title: 'title' }]);
+        const record = createRecord('aa', 10, [['assbook', 10]]);
+        record.apps.assbook.titleSpentTime['bb'] = { occurrence: 100, normalizedWeight: 0.3 };
+        record.apps.assbook.titleSpentTime['title'] = { occurrence: 100, normalizedWeight: 0.3 };
+        record.apps.assbook.titleSpentTime['aa'] = { occurrence: 100, normalizedWeight: 0.4 };
+        record.stayTimeInSecond = [5 * 3600];
+        record.switchActivities = [0];
+        expect(ef.analyse(record)).toBeCloseTo(1 / 3);
+    });
 });

@@ -1,6 +1,7 @@
 import { PomodoroRecord } from './type';
 import { ActiveWinListener } from './activeWinMonitor';
 import { BaseResult } from 'active-win';
+import { cloneDeep } from 'lodash';
 import shortid from 'shortid';
 
 function removeAppSuffix(name: string) {
@@ -39,7 +40,7 @@ export class UsageRecorder {
         }
 
         this.normalizeTitleSpentTime();
-        return this.record;
+        return cloneDeep(this.record);
     }
 
     clear = () => {

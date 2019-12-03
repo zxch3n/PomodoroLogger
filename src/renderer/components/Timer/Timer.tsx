@@ -477,8 +477,10 @@ class Timer extends Component<Props, State> {
         }
 
         this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
-        this.efficiencyAnalyser.update(this.props.timer.distractingList);
-        this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
+        if (this.efficiencyAnalyser.update(this.props.timer.distractingList)) {
+            this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
+        }
+
         this.extendedTimeInMinute = 0;
         if (this.props.timer.boardId !== undefined) {
             this.stagedSession.boardId = this.props.timer.boardId;

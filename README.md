@@ -14,6 +14,9 @@
   <a href="https://codecov.io/gh/zxch3n/PomodoroLogger">
     <img src="https://codecov.io/gh/zxch3n/PomodoroLogger/branch/master/graph/badge.svg" />
   </a>
+  <a href="https://github.com/zxch3n/PomodoroLogger/releases/latest">
+    <img src="https://img.shields.io/github/downloads/zxch3n/PomodoroLogger/total" />
+  </a>
 </p>
 
 

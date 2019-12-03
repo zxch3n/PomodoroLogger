@@ -1,5 +1,6 @@
 import { PomodoroRecord, TitleSpentTimeDict } from '../renderer/monitor/type';
 import { DistractingRow } from '../renderer/components/Timer/action';
+import { cloneDeep } from 'lodash';
 
 export const EFFICIENCY_INC_RATE = 1 / 90;
 export function getEfficiency(isDistractionArr: boolean[], stayTimeArr: number[]) {
@@ -84,10 +85,11 @@ export class EfficiencyAnalyser {
 
     update(other: DistractingRow[]) {
         if (this.isSame(other)) {
-            return;
+            return false;
         }
 
         this.init(other);
+        return true;
     }
 
     private getTitleDistractingPos = (titles: TitleSpentTimeDict, reg: RegExp) => {
@@ -153,6 +155,6 @@ export class EfficiencyAnalyser {
             }
         }
 
-        return getEfficiency(isDistracting, record.stayTimeInSecond!);
+        return getEfficiency(isDistracting, record.stayTimeInSecond!.concat());
     };
 }

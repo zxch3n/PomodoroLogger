@@ -187,6 +187,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
                         >
                             <Icon component={backIcon} />
                         </Button>
+                        <Hotkeys keyName={'esc'} onKeyDown={goBack} />
                     </>
                 ) : (
                     <>
