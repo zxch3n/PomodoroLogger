@@ -12,13 +12,7 @@ const SvgDot = styled.svg`
     }
 `;
 
-const Div = styled.div`
-    transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.96, 0.59);
-    transform: scale(0.9);
-    :hover {
-        transform: scale(1);
-    }
-`;
+const Div = styled.div``;
 
 const scale = keyframes`
   0% {
@@ -186,13 +180,6 @@ export class PomodoroNumView extends React.Component<Props> {
             );
         }
 
-        return (
-            <Div
-                style={{ padding: 12, display: 'flex', justifyContent: 'center' }}
-                title={`Completed ${pomodoros.length} pomodoros today`}
-            >
-                {dots}
-            </Div>
-        );
+        return <Div style={{ padding: 12, display: 'flex', justifyContent: 'center' }}>{dots}</Div>;
     }
 }
