@@ -9,13 +9,28 @@ import { WordCloud } from '../Visualization/WordCloud';
 import { KanbanBoardState } from '../Kanban/Board/action';
 import { DBWorker } from '../../workers/DBWorker';
 import { Loading } from '../utils/Loading';
+import { debounce } from 'lodash';
+import { fatScrollBar, tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 
 const { Option } = Select;
 
 const Container = styled.div`
-    max-width: 1200px;
-    margin: 10px auto;
+    overflow-y: auto;
+    margin: 0;
     padding: 20px;
+    ${tabMaxHeight}
+    ${fatScrollBar}
+`;
+
+const SubContainer = styled.div`
+    max-width: 1200px;
+    margin: 0 auto;
+`;
+
+const ChartContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `;
 
 interface Props extends HistoryActionCreatorTypes, HistoryState {
@@ -38,14 +53,14 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
     const [calendarWidth, setCalendarWidth] = useState(800);
 
     const resizeEffect = () => {
-        const setWidth = () => {
+        const setWidth = debounce(() => {
             const w = !container.current
                 ? 800
                 : container.current.clientWidth > 1060
                 ? 1000
                 : container.current.clientWidth - 60;
             setCalendarWidth(w);
-        };
+        }, 200);
         setWidth();
         window.addEventListener('resize', setWidth);
         return () => {
@@ -82,90 +97,92 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
     return (
         // @ts-ignore
         <Container ref={container}>
-            <Row style={{ marginBottom: 20 }}>
-                <Select
-                    onChange={onChange}
-                    value={props.chosenId}
-                    style={{ width: 200 }}
-                    placeholder={'Set Project Filter'}
-                >
-                    <Option value={undefined} key="All Projects">
-                        All Projects
-                    </Option>
-                    {Object.values(props.boards).map(v => {
-                        return (
-                            <Option value={v._id} key={v._id}>
-                                {v.name}
-                            </Option>
-                        );
-                    })}
-                </Select>
-            </Row>
-            <Row gutter={16}>
-                <Col span={8}>
-                    <Card>
-                        {aggInfo.count.day != null ? (
-                            <Statistic
-                                title="Pomodoros Today"
-                                value={aggInfo.count.day}
-                                precision={0}
-                                valueStyle={{ color: '#3f8600' }}
+            <SubContainer>
+                <Row style={{ marginBottom: 20 }}>
+                    <Select
+                        onChange={onChange}
+                        value={props.chosenId}
+                        style={{ width: 200 }}
+                        placeholder={'Set Project Filter'}
+                    >
+                        <Option value={undefined} key="All Projects">
+                            All Projects
+                        </Option>
+                        {Object.values(props.boards).map(v => {
+                            return (
+                                <Option value={v._id} key={v._id}>
+                                    {v.name}
+                                </Option>
+                            );
+                        })}
+                    </Select>
+                </Row>
+                <Row gutter={16}>
+                    <Col span={8}>
+                        <Card>
+                            {aggInfo.count.day != null ? (
+                                <Statistic
+                                    title="Pomodoros Today"
+                                    value={aggInfo.count.day}
+                                    precision={0}
+                                    valueStyle={{ color: '#3f8600' }}
+                                />
+                            ) : (
+                                <Loading hideBackground={true} />
+                            )}
+                        </Card>
+                    </Col>
+                    <Col span={8}>
+                        <Card>
+                            {aggInfo.count.week != null ? (
+                                <Statistic
+                                    title="Pomodoros This Week"
+                                    value={aggInfo.count.week}
+                                    precision={0}
+                                    valueStyle={{ color: '#3f8600' }}
+                                />
+                            ) : (
+                                <Loading hideBackground={true} />
+                            )}
+                        </Card>
+                    </Col>
+                    <Col span={8}>
+                        <Card>
+                            {aggInfo.count.month != null ? (
+                                <Statistic
+                                    title="Pomodoros This Month"
+                                    value={aggInfo.count.month}
+                                    precision={0}
+                                    valueStyle={{ color: '#cf1322' }}
+                                />
+                            ) : (
+                                <Loading hideBackground={true} />
+                            )}
+                        </Card>
+                    </Col>
+                </Row>
+                {aggInfo.pieChart != null && aggInfo.wordWeights != null ? (
+                    calendarWidth > 670 ? (
+                        <ChartContainer>
+                            <GridCalendar data={aggInfo.calendarCount} width={calendarWidth} />
+                            <DualPieChart
+                                {...aggInfo.pieChart}
+                                width={calendarWidth}
+                                onProjectClick={onProjectClick}
                             />
-                        ) : (
-                            <Loading hideBackground={true} />
-                        )}
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card>
-                        {aggInfo.count.week != null ? (
-                            <Statistic
-                                title="Pomodoros This Week"
-                                value={aggInfo.count.week}
-                                precision={0}
-                                valueStyle={{ color: '#3f8600' }}
+                            <WordCloud
+                                weights={aggInfo.wordWeights}
+                                width={calendarWidth}
+                                height={calendarWidth * 0.6}
                             />
-                        ) : (
-                            <Loading hideBackground={true} />
-                        )}
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card>
-                        {aggInfo.count.month != null ? (
-                            <Statistic
-                                title="Pomodoros This Month"
-                                value={aggInfo.count.month}
-                                precision={0}
-                                valueStyle={{ color: '#cf1322' }}
-                            />
-                        ) : (
-                            <Loading hideBackground={true} />
-                        )}
-                    </Card>
-                </Col>
-            </Row>
-            {aggInfo.pieChart != null && aggInfo.wordWeights != null ? (
-                calendarWidth > 670 ? (
-                    <React.Fragment>
-                        <GridCalendar data={aggInfo.calendarCount} width={calendarWidth} />
-                        <DualPieChart
-                            {...aggInfo.pieChart}
-                            width={calendarWidth}
-                            onProjectClick={onProjectClick}
-                        />
-                        <WordCloud
-                            weights={aggInfo.wordWeights}
-                            width={calendarWidth}
-                            height={calendarWidth * 0.6}
-                        />
-                    </React.Fragment>
+                        </ChartContainer>
+                    ) : (
+                        undefined
+                    )
                 ) : (
-                    undefined
-                )
-            ) : (
-                <Loading size={'large'} />
-            )}
+                    <Loading size={'large'} />
+                )}
+            </SubContainer>
         </Container>
     );
 };

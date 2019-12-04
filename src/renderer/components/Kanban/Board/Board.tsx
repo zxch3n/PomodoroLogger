@@ -4,24 +4,14 @@ import { BoardActionTypes, KanbanBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
+import { fatScrollBar } from '../../../style/scrollbar';
 
 const Container = styled.div`
     height: 100%;
     width: 100%;
     overflow-x: scroll;
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-        background-color: #f5f5f5;
-    }
-    ::-webkit-scrollbar-thumb {
-        border-radius: 8px;
-        background-color: rgba(50, 50, 50, 0.3);
-    }
-    ::-webkit-scrollbar-track {
-        border-radius: 8px;
-        background-color: rgba(200, 200, 200, 0);
-    }
+    margin: 0;
+    ${fatScrollBar}
 `;
 
 const ListContainer = styled.div`

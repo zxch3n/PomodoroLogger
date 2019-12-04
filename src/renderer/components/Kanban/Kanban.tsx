@@ -17,6 +17,7 @@ import { throttle } from 'lodash';
 const { Option } = Select;
 
 const Content = styled.main`
+    margin: 0;
     overflow: auto;
     ::-webkit-scrollbar {
         width: 8px;

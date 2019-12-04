@@ -8,6 +8,7 @@ import Card from '../Card';
 import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm, Tooltip } from 'antd';
 import { KanbanActionTypes } from '../action';
 import { CardsState } from '../Card/action';
+import { thinScrollBar } from '../../../style/scrollbar';
 
 const Container = styled.div`
     padding: 4px;
@@ -86,20 +87,7 @@ const Cards = styled.div`
     overflow-y: scroll;
     min-height: 200px;
     max-width: 270px;
-    ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-        background-color: rgba(0, 0, 0, 0);
-    }
-    ::-webkit-scrollbar-track {
-        width: 4px;
-        background-color: rgba(0, 0, 0, 0);
-    }
-    ::-webkit-scrollbar-thumb {
-        width: 4px;
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-    }
+    ${thinScrollBar}
 `;
 
 const ButtonWrapper = styled.div`

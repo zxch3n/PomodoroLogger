@@ -20,7 +20,6 @@ export const WordCloud: React.FC<MProps> = (props: MProps) => {
             return;
         }
 
-        console.log('weights update', weights);
         const width = canvas.current.clientWidth || props.width || 800;
         WordCloud2(canvas.current, {
             list: weights,

@@ -5,6 +5,11 @@ const Container = styled.div`
     position: relative;
     display: flex;
     justify-content: center;
+    transition: all 0.4s;
+    g,
+    rect {
+        transition: all 0.4s;
+    }
 `;
 
 const SvgContainer = styled.div`
@@ -91,7 +96,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     const shownGrids = (day === 0 ? 7 : day) + (shownWeeks - 1) * 7;
     const grids = getGridData(data, tillTimestamp, shownGrids);
     const maxCountInADay = Math.max(5, Math.max(...grids.map(v => v.count)));
-    const axisMargin = 36;
+    const axisMargin = 28;
     const innerWidth = width - axisMargin;
 
     const gridMargin = Math.floor((innerWidth / shownWeeks) * 0.1 + 2);
@@ -171,8 +176,8 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         );
     });
 
+    const weekMonthMap: number[] = [];
     function getMonthText() {
-        const weekMonthMap: number[] = [];
         grids.forEach(v => {
             weekMonthMap[v.week] = v.month;
         });
@@ -204,11 +209,13 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     }
 
     const onMouseLeave = () => setChosenIndex(undefined);
+    const monthText = getMonthText();
+    const maxWidth = weekMonthMap.length * (gridWidth + gridMargin) + axisMargin;
     return (
         <Container>
             <SvgContainer onMouseLeave={onMouseLeave}>
-                <svg width={width + axisMargin} height={height + axisMargin}>
-                    <g transform={`translate(${axisMargin}, 0)`}>{getMonthText()}</g>
+                <svg width={maxWidth} height={height + axisMargin}>
+                    <g transform={`translate(${axisMargin}, 0)`}>{monthText}</g>
                     <g transform={`translate(0, ${axisMargin})`}>{weekdays}</g>
                     <g transform={`translate(${axisMargin}, ${axisMargin})`}>{rects}</g>
                 </svg>

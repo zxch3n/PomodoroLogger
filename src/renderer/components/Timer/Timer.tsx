@@ -24,6 +24,7 @@ import Board from '../Kanban/Board';
 import { HelpIcon } from '../UserGuide/HelpIcon';
 import dingMp3 from '../../../res/ding.mp3';
 import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
+import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -48,23 +49,10 @@ const ProgressTextContainer = styled.div`
 const TimerLayout = styled.div`
     position: relative;
     padding: 0 24px 0 24px;
-    height: calc(100vh - 45px);
     overflow-y: auto;
     width: 100%;
-    ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-        background-color: rgba(0, 0, 0, 0);
-    }
-    ::-webkit-scrollbar-track {
-        width: 4px;
-        background-color: rgba(0, 0, 0, 0);
-    }
-    ::-webkit-scrollbar-thumb {
-        width: 4px;
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-    }
+    ${tabMaxHeight}
+    ${thinScrollBar}
 `;
 
 const TimerInnerLayout = styled.div`
@@ -86,10 +74,10 @@ const MySider = styled.aside`
     padding: 6px;
     border-right: 1px solid #dfdfdf;
     background-color: #eaeaea;
-    height: calc(100vh - 45px);
     float: left;
     box-shadow: 2px 0 2px 0 rgba(0, 0, 0, 0.3);
     transition: margin-left 0.2s;
+    ${tabMaxHeight}
 `;
 
 const ProgressContainer = styled.div`
