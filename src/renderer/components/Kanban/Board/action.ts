@@ -30,6 +30,7 @@ export interface KanbanBoard {
     dueTime?: number; // TODO: Add due time setting
     lastVisitTime?: number; // TODO: Add due time setting
     aggInfo?: AggInfo;
+    pin?: boolean;
 }
 
 const defaultBoard: KanbanBoard = {
@@ -99,6 +100,10 @@ const editBoard = createActionCreator(
         resolve({ _id, name, description })
 );
 
+const setPin = createActionCreator('[Board]SET_PIN', resolve => (_id: string, pin: boolean) =>
+    resolve({ _id, pin })
+);
+
 const updateAggInfo = createActionCreator(
     '[Board]UPDATE_AGG_INFO',
     resolve => (_id: string, aggInfo: AggInfo) => resolve({ _id, aggInfo })
@@ -122,6 +127,13 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
     ),
 
     handle(setBoardMap, (state, { payload }) => payload),
+    handle(setPin, (state, { payload: { _id, pin } }) => ({
+        ...state,
+        [_id]: {
+            ...state[_id],
+            pin
+        }
+    })),
     handle(moveList, (state, { payload: { _id, fromIndex, toIndex } }) => {
         const newState = { ...state };
         const lists = newState[_id].lists.concat();
@@ -293,6 +305,11 @@ export const actions = {
     editBoard: (_id: string, name: string, description: string) => async (dispatch: Dispatch) => {
         dispatch(editBoard(_id, name, description));
         await db.update({ _id }, { $set: { name, description } });
+    },
+
+    setPin: (_id: string, pin: boolean) => async (dispatch: Dispatch) => {
+        dispatch(setPin(_id, pin));
+        await db.update({ _id }, { $set: { pin } });
     }
 };
 

@@ -9,6 +9,7 @@ import { GridCalendar } from '../Visualization/GridCalendar';
 import { createRecord } from '../../../../test/utils';
 import { PomodoroDot } from '../Visualization/PomodoroDot';
 import { TimeBadge } from '../Kanban/Card/Badge';
+import { Pin } from '../Visualization/Pin';
 
 const Container = styled.div`
     position: relative;
@@ -66,6 +67,8 @@ export const Analyser: React.FC<Props> = (props: Props) => {
     r.startTime = 5004;
     r.efficiency = 0.4;
 
+    const [pin, setPin] = useState(false);
+
     return (
         <Container>
             <Row gutter={16} style={{ marginBottom: 10 }}>
@@ -88,25 +91,6 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             <div style={{ height: 50, width: 280 }}>
                 <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']} />
             </div>
-            <PomodoroDot num={0} />
-            <PomodoroDot num={9} />
-            <PomodoroDot num={10} />
-            <PomodoroDot num={100} />
-            <PomodoroDot num={999} />
-            <PomodoroDot num={1000} />
-            <PomodoroDot num={8722} />
-            <br />
-            <TimeBadge leftTime={10} spentTime={10} />
-            <br />
-            <TimeBadge leftTime={0.3} spentTime={10} />
-            <TimeBadge leftTime={0} spentTime={10} />
-            <br />
-            <TimeBadge leftTime={0} spentTime={0} />
-            <TimeBadge leftTime={0.1} spentTime={99.99} />
-            <TimeBadge leftTime={99.1} spentTime={0.09} />
-            <TimeBadge leftTime={10000} spentTime={0.09} />
-            <TimeBadge leftTime={10000} spentTime={100} />
-            <TimeBadge leftTime={100} spentTime={999} />
         </Container>
     );
 };

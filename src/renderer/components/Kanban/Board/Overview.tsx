@@ -152,11 +152,19 @@ const BriefContainer = styled.div`
     flex-wrap: wrap;
 `;
 
+const getPinScore = ({ pin: aPin }: KanbanBoard, { pin: bPin }: KanbanBoard) => {
+    const a = aPin ? 1 : 0;
+    const b = bPin ? 1 : 0;
+    return -a + b;
+};
+
 const sortFunc: Map<SortType, (a: KanbanBoard, b: KanbanBoard) => number> = new Map();
 sortFunc.set('alpha', (a, b) => {
+    if (getPinScore(a, b)) return getPinScore(a, b);
     return a.name < b.name ? -1 : 1;
 });
 sortFunc.set('due', (a, b) => {
+    if (getPinScore(a, b)) return getPinScore(a, b);
     if (!a.dueTime) {
         return 1;
     }
@@ -168,9 +176,11 @@ sortFunc.set('due', (a, b) => {
     return a.dueTime - b.dueTime;
 });
 sortFunc.set('spent', (a, b) => {
+    if (getPinScore(a, b)) return getPinScore(a, b);
     return -a.spentHours + b.spentHours;
 });
 sortFunc.set('recent', (a, b) => {
+    if (getPinScore(a, b)) return getPinScore(a, b);
     if (!a.lastVisitTime) {
         return 1;
     }
@@ -238,6 +248,7 @@ const OverviewCards = connect(
             }
 
             boards.sort((a, b) => {
+                if (getPinScore(a, b)) return getPinScore(a, b);
                 return -boardsMap[a._id] + boardsMap[b._id];
             });
         }

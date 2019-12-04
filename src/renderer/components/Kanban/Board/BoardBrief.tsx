@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { actions as timerActions } from '../../Timer/action';
 import { connect } from 'react-redux';
 import { RootState } from '../../../reducers';
@@ -10,13 +10,13 @@ import { Card, CardsState } from '../Card/action';
 import { ListsState } from '../List/action';
 import { Button, Divider } from 'antd';
 import { Badge, TimeBadge } from '../Card/Badge';
-import { formatTime } from '../../../utils';
 import formatMarkdown from '../Card/formatMarkdown';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { ListsCountBar } from '../../Visualization/Bar';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
+import { Pin } from '../../Visualization/Pin';
 
 const BriefCard = styled.div`
     word-break: break-word;
@@ -95,6 +95,7 @@ interface Props extends KanbanBoard, InputProps {
     configure: () => void;
     listsById: ListsState;
     cardsById: CardsState;
+    setPin: (pin: boolean) => void;
 }
 
 type NewCard = Card & { isDone?: boolean };
@@ -103,17 +104,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
         return <></>;
     }
 
-    const {
-        name,
-        lists,
-        relatedSessions,
-        _id,
-        listsById,
-        doneList,
-        cardsById,
-        onClick,
-        spentHours
-    } = props;
+    const { name, lists, listsById, doneList, cardsById, onClick, spentHours } = props;
     const [hover, setHover] = useState(false);
     const onMouseEnter = () => {
         setHover(true);
@@ -184,7 +175,18 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
             className={'kanban-brief-card'}
         >
             <Header>
-                <h1>{name}</h1>
+                <h1>
+                    {name}
+                    <Pin
+                        isPin={!!props.pin}
+                        onClick={useCallback(() => props.setPin(!props.pin), [
+                            props._id,
+                            props.pin
+                        ])}
+                        isHover={hover}
+                        style={{ marginLeft: 4 }}
+                    />
+                </h1>
                 <span>
                     <Button
                         type={'default'}
@@ -259,6 +261,7 @@ export const BoardBrief = connect(
             dispatch(timerActions.changeAppTab('timer'));
             dispatch(timerActions.setBoardId(props.boardId));
         },
-        configure: () => dispatch(kanbanActions.setConfiguringBoardId(props.boardId))
+        configure: () => dispatch(kanbanActions.setConfiguringBoardId(props.boardId)),
+        setPin: (pin: boolean) => actions.setPin(props.boardId, pin)(dispatch)
     })
 )(_BoardBrief);
