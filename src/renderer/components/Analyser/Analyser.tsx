@@ -7,15 +7,20 @@ import { workers } from '../../workers';
 import { Bar } from '../Visualization/Bar';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import { createRecord } from '../../../../test/utils';
-import { PomodoroDot } from '../Visualization/PomodoroDot';
-import { TimeBadge } from '../Kanban/Card/Badge';
-import { Pin } from '../Visualization/Pin';
+import { PomodoroSankey } from '../Visualization/PomodoroSankey';
+import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
+import dbs from '../../dbs';
+import { fatScrollBar, tabMaxHeight } from '../../style/scrollbar';
+import { PomodoroRecord } from '../../monitor/type';
 
 const Container = styled.div`
     position: relative;
     max-width: 800px;
     margin: 0 auto;
     padding: 2em;
+    overflow: auto;
+    ${tabMaxHeight}
+    ${fatScrollBar}
 `;
 
 interface Props extends RootState, HistoryActionCreatorTypes {}
@@ -23,6 +28,7 @@ export const Analyser: React.FC<Props> = (props: Props) => {
     const [acc, setAcc] = useState<undefined | number>(undefined);
     const [isTraining, setIsTraining] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [record, setRecord] = useState(createRecord('aha', 10, []));
     const worker = workers.knn;
     const onTrain = async () => {
         if (isTraining) {
@@ -67,8 +73,18 @@ export const Analyser: React.FC<Props> = (props: Props) => {
     r.startTime = 5004;
     r.efficiency = 0.4;
 
-    const [pin, setPin] = useState(false);
-
+    // @ts-ignore
+    React.useEffect(() => {
+        dbs.sessionDB.find({}, (err: Error, doc?: PomodoroRecord[]) => {
+            if (err || !doc) {
+                console.error(err);
+                return;
+            }
+            console.log(doc);
+            doc.sort((a, b) => a.startTime - b.startTime);
+            setRecord(doc[doc.length - 1]);
+        });
+    }, []);
     return (
         <Container>
             <Row gutter={16} style={{ marginBottom: 10 }}>
@@ -91,6 +107,15 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             <div style={{ height: 50, width: 280 }}>
                 <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']} />
             </div>
+            {record ? (
+                <PomodoroSankey
+                    record={record}
+                    efficiencyAnalyser={new EfficiencyAnalyser(props.timer.distractingList)}
+                    showSwitch={true}
+                />
+            ) : (
+                undefined
+            )}
         </Container>
     );
 };

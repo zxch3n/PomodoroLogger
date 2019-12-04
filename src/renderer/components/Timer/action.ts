@@ -68,6 +68,10 @@ export const defaultState: TimerState = {
     currentTab: 'timer'
 };
 
+if (process.env.NODE_ENV === 'development') {
+    defaultState.currentTab = 'analyser';
+}
+
 export const startTimer = createActionCreator('[Timer]START_TIMER');
 export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
