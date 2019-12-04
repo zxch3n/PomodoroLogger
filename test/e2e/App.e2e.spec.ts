@@ -51,7 +51,7 @@ describe('Main Window', () => {
                 // Click again to stop timer
                 await client.$('#start-timer-button').click();
                 const text = await client.getText('#left-time-text');
-                expect(text).toBe('24:59');
+                expect(text).toMatch(/24:(59|58)/);
                 setTimeout(async () => {
                     const text = await client.getText('#left-time-text');
                     expect(text).toBe('24:59');

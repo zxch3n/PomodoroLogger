@@ -112,12 +112,13 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
             width - 180
         );
     }
-    const Tooltip = chosenIndex ? (
+    const Tooltip = (
         <div
             style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 color: 'white',
                 position: 'absolute',
+                transition: 'all 0.2s',
                 left: tooltipPositionLeft,
                 maxWidth: 180,
                 top: toolTipTop,
@@ -125,26 +126,23 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                 borderRadius: 4,
                 zIndex: 10,
                 overflow: 'hidden',
-                textOverflow: 'clip'
+                textOverflow: 'clip',
+                display: chosenIndex ? undefined : 'none'
             }}
         >
-            <span style={{ fontWeight: 700 }}>{`${grids[chosenIndex].count} pomodoros `}</span>
+            <span style={{ fontWeight: 700 }}>
+                {chosenIndex != null ? `${grids[chosenIndex].count} pomodoros ` : ''}
+            </span>
             <span style={{ fontWeight: 300, fontSize: '0.7em', marginLeft: 8 }}>
-                {`${grids[chosenIndex].year}-${grids[chosenIndex].month}-${grids[chosenIndex].date}`}
+                {chosenIndex != null
+                    ? `${grids[chosenIndex].year}-${grids[chosenIndex].month}-${grids[chosenIndex].date}`
+                    : ''}
             </span>
         </div>
-    ) : (
-        undefined
     );
 
     const rects = grids.map((v, index) => {
         const onEnter = () => setChosenIndex(index);
-        const onLeave = () => {
-            if (chosenIndex === index) {
-                setChosenIndex(undefined);
-            }
-        };
-
         return (
             <rect
                 width={gridWidth}
@@ -155,7 +153,6 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                     (v.count / maxCountInADay) * 70}%`}
                 key={index}
                 onMouseEnter={onEnter}
-                onMouseLeave={onLeave}
             />
         );
     });

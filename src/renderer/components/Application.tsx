@@ -24,6 +24,21 @@ const Main = styled.div`
     .ant-tabs-bar {
         margin: 0;
     }
+
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-track {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-thumb {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
 `;
 
 const { TabPane } = Tabs;
