@@ -112,4 +112,36 @@ describe('EfficiencyAnalyser', () => {
         record.switchActivities = [0, 1, 2];
         expect(ef.analyse(record)).toBeCloseTo(2 / 3);
     });
+
+    it('should update', async () => {
+        const ef = new EfficiencyAnalyser([{ app: 'facebook' }, { title: 'title' }]);
+        ef.update([{ app: 'facebook' }, { title: 'biubiu' }]);
+        for (let i = 0; i < 10000; i += 1) {
+            ef.update([{ app: 'facebook' }, { title: 'biubiu' }]);
+        }
+        const record = createRecord('aa', 10, [['assbook', 10], ['facebook', 20]]);
+        record.apps.assbook.titleSpentTime['biubiu 0'] = {
+            occurrence: 100,
+            normalizedWeight: 0.25,
+            index: 0
+        };
+        record.apps.assbook.titleSpentTime['title'] = {
+            occurrence: 100,
+            normalizedWeight: 0.25,
+            index: 1
+        };
+        record.apps.assbook.titleSpentTime['biubiu'] = {
+            occurrence: 100,
+            normalizedWeight: 0.25,
+            index: 2
+        };
+        record.apps.facebook.titleSpentTime['lala'] = {
+            index: 3,
+            occurrence: 100,
+            normalizedWeight: 0.25
+        };
+        record.stayTimeInSecond = [5 * 3600, 5 * 3600, 5 * 3600, 5 * 3600];
+        record.switchActivities = [0, 1, 2, 3];
+        expect(ef.analyse(record)).toBeCloseTo(1 / 4);
+    });
 });

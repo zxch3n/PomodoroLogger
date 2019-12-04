@@ -5,15 +5,15 @@ import styled from 'styled-components';
 import { throttle } from 'lodash';
 
 const AnimeSvg = styled.svg`
-    transition: transform 0.15s;
+    transition: transform 0.25s;
     user-select: none;
     cursor: pointer;
     font-weight: 600;
     :hover {
-        transform: scale(1.1);
+        transform: scale(1.06);
     }
     .clip-path {
-        transition: all 0.2s;
+        transition: all 0.65s;
     }
     .label {
         font-weight: 700;

@@ -130,6 +130,7 @@ export class EfficiencyAnalyser {
             }
         }
 
+        console.log(isDistracting, record.stayTimeInSecond);
         return getEfficiency(isDistracting, record.stayTimeInSecond!);
     };
 }

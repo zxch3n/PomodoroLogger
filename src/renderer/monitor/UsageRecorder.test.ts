@@ -161,16 +161,34 @@ describe('monitor/UsageRecorder', () => {
         mockDate(80000);
         await recorder.listener(c());
         mockDate(90000);
-        await recorder.listener(b());
+        await recorder.listener(createResult('b', 'hello'));
         mockDate(100000);
         await recorder.listener(a(), '111.jpg');
         mockDate(110000);
         recorder.stop();
-        expect(recorder.sessionData.switchActivities).toStrictEqual([0, 1, 0, 2, 1, 0]);
+        expect(recorder.sessionData.switchActivities).toStrictEqual([0, 1, 0, 2, 3, 0]);
         expect(recorder.sessionData.stayTimeInSecond).toStrictEqual([20, 10, 10, 40, 10, 10]);
         expect(recorder.sessionData.screenshots).toStrictEqual([
             { time: 70000, path: 'sss.jpg' },
             { time: 100000, path: '111.jpg' }
         ]);
+    });
+
+    it('should clear', async () => {
+        const recorder = new UsageRecorder(() => {});
+        const a = () => createResult('a');
+
+        mockDate(0);
+        recorder.start();
+        mockDate(100000);
+        await recorder.listener(a(), '111.jpg');
+        mockDate(110000);
+        recorder.stop();
+        const id = recorder.sessionData._id;
+        recorder.clear();
+        expect(id).not.toEqual(recorder.sessionData._id);
+        expect(recorder.sessionData.switchActivities!.length).toBe(0);
+        expect(recorder.sessionData.stayTimeInSecond!.length).toBe(0);
+        expect(recorder.sessionData.efficiency).toBeUndefined();
     });
 });
