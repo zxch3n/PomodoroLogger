@@ -165,3 +165,14 @@ export async function exportDBData() {
         settingDB
     };
 }
+
+export function getIndexToTitleApp(record: PomodoroRecord): [string, string][] {
+    const indexToTitle: [string, string][] = [];
+    for (const app in record.apps) {
+        for (const title in record.apps[app].titleSpentTime) {
+            indexToTitle[record.apps[app].titleSpentTime[title].index] = [title, app];
+        }
+    }
+
+    return indexToTitle;
+}

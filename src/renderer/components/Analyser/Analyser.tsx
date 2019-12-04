@@ -12,6 +12,7 @@ import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 import dbs from '../../dbs';
 import { fatScrollBar, tabMaxHeight } from '../../style/scrollbar';
 import { PomodoroRecord } from '../../monitor/type';
+import { PomodoroTimeline } from '../Visualization/Timeline';
 
 const Container = styled.div`
     position: relative;
@@ -108,10 +109,9 @@ export const Analyser: React.FC<Props> = (props: Props) => {
                 <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']} />
             </div>
             {record ? (
-                <PomodoroSankey
+                <PomodoroTimeline
                     record={record}
-                    efficiencyAnalyser={new EfficiencyAnalyser(props.timer.distractingList)}
-                    showSwitch={true}
+                    efficiencyAnalyser={new EfficiencyAnalyser([{ app: 'chrome' }])}
                 />
             ) : (
                 undefined
