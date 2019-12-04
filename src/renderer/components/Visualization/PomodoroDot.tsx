@@ -40,7 +40,7 @@ export const PomodoroDot: React.FC<Props> = props => {
             <circle cx={14} cy={14} r={14} fill={'#ca6129'} />
             <text
                 x={14}
-                y={13.5}
+                y={14.5}
                 textAnchor={'middle'}
                 alignmentBaseline={'central'}
                 fill="rgba(0, 0, 0, 0.2)"
@@ -49,7 +49,7 @@ export const PomodoroDot: React.FC<Props> = props => {
             </text>
             <text
                 x={14}
-                y={12.5}
+                y={13.5}
                 textAnchor={'middle'}
                 alignmentBaseline={'central'}
                 fill={'white'}

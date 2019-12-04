@@ -22,10 +22,10 @@ export const Pin: React.FC<Props> = (props: Props) => {
     const { isRounded = false } = props;
     let color = '#555';
     if (isHover) {
-        if (props.isPin) color = '#fe4509';
+        if (props.isPin) color = '#ee3500';
         if (!props.isPin) color = '#666';
     } else {
-        if (props.isPin) color = '#ee3500';
+        if (props.isPin) color = 'rgb(141, 84, 61)';
         if (!props.isPin) color = '#444';
     }
 
