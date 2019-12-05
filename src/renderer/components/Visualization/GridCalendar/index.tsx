@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -13,7 +13,6 @@ const Container = styled.div`
 `;
 
 const SvgContainer = styled.div`
-    padding: 10px 10px 30px 10px;
     margin: 0;
     position: relative;
 `;
@@ -58,6 +57,7 @@ interface Props {
     width?: number;
     till?: string | number;
     shownWeeks?: number;
+    clickDate?: (year: number, month: number, day: number) => void;
 }
 
 function getLastDayTimestamp(date: Date | string | number) {
@@ -96,7 +96,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     const shownGrids = (day === 0 ? 7 : day) + (shownWeeks - 1) * 7;
     const grids = getGridData(data, tillTimestamp, shownGrids);
     const maxCountInADay = Math.max(5, Math.max(...grids.map(v => v.count)));
-    const axisMargin = 28;
+    const axisMargin = 32;
     const innerWidth = width - axisMargin;
 
     const gridMargin = Math.floor((innerWidth / shownWeeks) * 0.1 + 2);
@@ -111,16 +111,18 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
     }
 
     let tooltipPositionLeft = undefined;
+    let maxWidth = 55 * (gridWidth + gridMargin) + axisMargin;
     if (chosenIndex) {
         tooltipPositionLeft = Math.min(
             (gridMargin + gridWidth) * grids[chosenIndex].week + axisMargin,
-            width - 180
+            maxWidth - 220
         );
     }
     const Tooltip = (
         <div
             style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                wordBreak: 'keep-all',
                 color: 'white',
                 position: 'absolute',
                 transition: 'all 0.2s',
@@ -148,6 +150,10 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
 
     const rects = grids.map((v, index) => {
         const onEnter = () => setChosenIndex(index);
+        const onClick = React.useMemo(
+            () => (props.clickDate ? () => props.clickDate!(v.year, v.month, v.date) : undefined),
+            [props.clickDate, v]
+        );
         return (
             <rect
                 width={gridWidth}
@@ -158,6 +164,10 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                     (v.count / maxCountInADay) * 70}%`}
                 key={index}
                 onMouseEnter={onEnter}
+                onClick={onClick}
+                style={{
+                    cursor: props.clickDate ? 'pointer' : undefined
+                }}
             />
         );
     });
@@ -210,17 +220,18 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
 
     const onMouseLeave = () => setChosenIndex(undefined);
     const monthText = getMonthText();
-    const maxWidth = weekMonthMap.length * (gridWidth + gridMargin) + axisMargin;
+    maxWidth = weekMonthMap.length * (gridWidth + gridMargin) + axisMargin;
+    const maxHeight = 7 * (gridMargin + gridHeight) + axisMargin;
     return (
         <Container>
             <SvgContainer onMouseLeave={onMouseLeave}>
-                <svg width={maxWidth} height={height + axisMargin}>
+                <svg width={maxWidth} height={maxHeight}>
                     <g transform={`translate(${axisMargin}, 0)`}>{monthText}</g>
                     <g transform={`translate(0, ${axisMargin})`}>{weekdays}</g>
                     <g transform={`translate(${axisMargin}, ${axisMargin})`}>{rects}</g>
                 </svg>
-                {Tooltip}
             </SvgContainer>
+            {Tooltip}
         </Container>
     );
 };

@@ -1,15 +1,66 @@
 import * as React from 'react';
 import ReactEcharts from 'echarts-for-react';
+import { actions } from '../Timer/action';
 import { PomodoroRecord } from '../../monitor/type';
 import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 import { ColorEncoder } from './ColorEncoder';
 import { cloneDeep } from 'lodash';
+import { connect } from 'react-redux';
+import { RootState } from '../../reducers';
+import styled from 'styled-components';
+import { fatScrollBar } from '../../style/scrollbar';
+import ReactHotkeys from 'react-hot-keys';
+import { formatTimeHMS, formatTimeYmdHms } from './Timeline';
+
+const FullscreenStyled = styled.div`
+    padding: 20px;
+    position: fixed;
+    z-index: 500;
+    left: 0;
+    top: 0;
+    overflow: auto;
+    background-color: rgba(255, 255, 255, 0.98);
+    width: 100%;
+    height: 100vh;
+    ${fatScrollBar}
+`;
+
+const InnerContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`;
+
+const Header = styled.div`
+    margin-top: 20px;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        margin: 0;
+        text-align: center;
+    }
+
+    h4 {
+        color: #7f7f7f;
+    }
+
+    h5 {
+        color: #7f7f7f;
+        font-size: 10px;
+    }
+`;
 
 interface Props {
-    record: PomodoroRecord;
+    record?: PomodoroRecord;
+    boardName?: string;
     efficiencyAnalyser: EfficiencyAnalyser;
     showSwitch: boolean;
     width?: number;
+    cancel?: () => void;
 }
 
 const breakWord = (key: string, breaker: string = '\n', maxLength: number = 40): string => {
@@ -101,6 +152,7 @@ const getLinkAndNode = (
             nodes.push({
                 name: key,
                 label: {
+                    show: value > 30,
                     fontSize: 12
                 },
                 tooltip: {
@@ -184,10 +236,10 @@ const getLinkAndNode = (
 };
 
 const getOption = (props: Props) => {
-    const data = getLinkAndNode(props.record, props.efficiencyAnalyser, props.showSwitch);
+    const data = getLinkAndNode(props.record!, props.efficiencyAnalyser, props.showSwitch);
     return {
         title: {
-            text: 'Sankey Diagram'
+            text: ''
         },
         tooltip: {
             trigger: 'item',
@@ -264,19 +316,60 @@ const getOption = (props: Props) => {
 };
 
 export const PomodoroSankey = (props: Props) => {
+    if (props.record == null) {
+        return <></>;
+    }
+
     const [option, setOption] = React.useState(getOption(props));
     const { width = '100%' } = props;
     React.useEffect(() => {
         setOption(getOption(props));
     }, [props.record]);
+    const onKeyDown = (keyname: string) => {
+        switch (keyname) {
+            case 'enter':
+            case 'esc':
+                if (props.cancel) {
+                    props.cancel();
+                }
+                break;
+        }
+    };
     return (
-        <ReactEcharts
-            option={option}
-            style={{
-                width,
-                height: '10000px',
-                minHeight: '300px'
-            }}
-        />
+        <FullscreenStyled onClick={props.cancel}>
+            <ReactHotkeys keyName={'esc,enter'} onKeyDown={onKeyDown} />
+            <InnerContainer>
+                <Header>
+                    <h1>Sankey Diagram</h1>
+                    <h2>{props.boardName}</h2>
+                    <h4>{formatTimeYmdHms(props.record!.startTime)}</h4>
+                    <h5>(Click Anywhere to Exit)</h5>
+                </Header>
+                <ReactEcharts
+                    option={option}
+                    style={{
+                        width,
+                        height: 'calc(100vh - 40px)',
+                        minHeight: '800px'
+                    }}
+                />
+            </InnerContainer>
+        </FullscreenStyled>
     );
 };
+
+export const ConnectedPomodoroSankey = connect(
+    (state: RootState): Props => {
+        const record = state.timer.chosenRecord;
+        const board = record && record.boardId ? state.kanban.boards[record.boardId] : undefined;
+        return {
+            showSwitch: false,
+            efficiencyAnalyser: new EfficiencyAnalyser(state.timer.distractingList),
+            record: state.timer.chosenRecord,
+            boardName: board ? board.name : undefined
+        };
+    },
+    dispatch => ({
+        cancel: () => dispatch(actions.setChosenRecord(undefined))
+    })
+)(PomodoroSankey);

@@ -20,6 +20,7 @@ import { UserGuide } from './UserGuide/UserGuide';
 import { UpdateController } from './UpdateController';
 import { CardInDetail } from './Kanban/Card/CardInDetail';
 import '../style/global.css';
+import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
 
 const Main = styled.div`
     .ant-tabs-bar {
@@ -122,6 +123,7 @@ const Application = (props: Props) => {
             <UserGuide />
             <UpdateController />
             <CardInDetail />
+            <ConnectedPomodoroSankey />
             <ReactHotkeys keyName={'ctrl+tab,ctrl+shift+tab'} onKeyDown={onKeyDown} />
         </Main>
     );

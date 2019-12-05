@@ -31,6 +31,7 @@ export interface Setting {
 }
 
 export interface TimerState extends Setting {
+    chosenRecord?: PomodoroRecord;
     targetTime?: number;
     leftTime?: number;
     isFocusing: boolean;
@@ -77,6 +78,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const setChosenRecord = createActionCreator(
+    '[Timer]SET_CHOSEN_RECORD',
+    resolve => (record?: PomodoroRecord) => resolve({ record })
+);
 export const setDistractingList = createActionCreator(
     '[Setting]SET_DISTRACTING_LIST',
     resolve => (rows: DistractingRow[]) => resolve(rows)
@@ -134,6 +139,7 @@ export const actions = {
     setBoardId,
     changeAppTab,
     extendCurrentSession,
+    setChosenRecord,
     switchFocusRestMode: throttle(switchFocusRestMode, 500),
     switchTab: throttle((direction: 1 | -1) => switchTab(direction), 500),
     fetchSettings: () => async (dispatch: Dispatch) => {
@@ -367,5 +373,9 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
             ...state,
             currentTab: TABS[index]
         };
-    })
+    }),
+    handle(setChosenRecord, (state, { payload: { record } }) => ({
+        ...state,
+        chosenRecord: record
+    }))
 ]);

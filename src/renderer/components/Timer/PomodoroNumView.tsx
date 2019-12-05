@@ -62,6 +62,8 @@ interface Props {
     showNum?: boolean;
     animation?: boolean;
     newPomodoro?: PomodoroRecord;
+    chooseRecord?: (record: PomodoroRecord) => void;
+    inline?: boolean;
 }
 
 interface State {
@@ -118,6 +120,7 @@ export class PomodoroNumView extends React.Component<Props> {
         const { color = 'red', animation = false } = this.props;
         const { transform } = this.state;
         const Svg = isNew ? AnimeSvgDot : SvgDot;
+        const chooseThis = this.props.chooseRecord ? () => this.props.chooseRecord!(v) : undefined;
         return (
             <Svg
                 key={v._id}
@@ -127,9 +130,10 @@ export class PomodoroNumView extends React.Component<Props> {
                 focusable="false"
                 viewBox="0 0 100 100"
                 style={{
-                    margin: '0.1em',
+                    margin: '0 0.1rem',
                     transition: 'transform 0.2s',
                     transitionTimingFunction: 'ease',
+                    cursor: 'pointer',
                     transform:
                         animation && transform[index]
                             ? `translate(${transform[index].x}px, ${transform[index].y}px)`
@@ -148,7 +152,14 @@ export class PomodoroNumView extends React.Component<Props> {
                     <rect id="bg" x="0" y="0" width="100%" height="100%" fill="white" />
                     <use xlinkHref={`#dmusk${this.key + v._id}`} fill="Black" />
                 </mask>
-                <circle r={50} cx={50} cy={50} color={color} mask={`url(#musk${this.key + v._id})`}>
+                <circle
+                    r={50}
+                    cx={50}
+                    cy={50}
+                    color={color}
+                    mask={`url(#musk${this.key + v._id})`}
+                    onClick={chooseThis}
+                >
                     <title>
                         {(isNew ? '[New]' : getTime(v.startTime)) +
                             (v.efficiency != null
@@ -161,7 +172,7 @@ export class PomodoroNumView extends React.Component<Props> {
     };
 
     render() {
-        const { showNum = true, pomodoros, newPomodoro } = this.props;
+        const { showNum = true, pomodoros, newPomodoro, inline = false } = this.props;
         const dots = pomodoros.map((v, index) => this.createDot(v, index));
         if (newPomodoro != null) {
             dots.push(this.createDot(newPomodoro, dots.length, true));
@@ -180,6 +191,9 @@ export class PomodoroNumView extends React.Component<Props> {
             );
         }
 
+        if (inline) {
+            return <div style={{ display: 'inline-block', verticalAlign: 'middle' }}>{dots}</div>;
+        }
         return <Div style={{ padding: 12, display: 'flex', justifyContent: 'center' }}>{dots}</Div>;
     }
 }

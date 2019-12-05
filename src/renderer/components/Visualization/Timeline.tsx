@@ -15,7 +15,17 @@ export function formatTimeHMS(time: number) {
     const hour = to2digits(date.getHours());
     const m = to2digits(date.getMinutes());
     const s = to2digits(date.getSeconds());
-    return `${hour}:${m}:${s}.${date.getMilliseconds()}`;
+    return `${hour}:${m}:${s}`;
+}
+
+export function formatTimeYMD(time: number) {
+    const date = new Date(time);
+    const y = date.getFullYear();
+    return `${y}-${date.getMonth() + 1}-${date.getDay()}`;
+}
+
+export function formatTimeYmdHms(time: number) {
+    return `${formatTimeYMD(time)} ${formatTimeHMS(time)}`;
 }
 
 export const PomodoroTimeline = (props: Props) => {

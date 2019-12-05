@@ -11,6 +11,9 @@ import { DBWorker } from '../../workers/DBWorker';
 import { Loading } from '../utils/Loading';
 import { debounce } from 'lodash';
 import { fatScrollBar, tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
+import { PomodoroNumView } from '../Timer/PomodoroNumView';
+import { PomodoroRecord } from '../../monitor/type';
+import { formatTimeYMD, formatTimeYmdHms } from '../Visualization/Timeline';
 
 const { Option } = Select;
 
@@ -18,12 +21,13 @@ const Container = styled.div`
     overflow-y: auto;
     margin: 0;
     padding: 20px;
-    ${tabMaxHeight}
+    height: calc(100vh - 45px);
     ${fatScrollBar}
 `;
 
 const SubContainer = styled.div`
     max-width: 1200px;
+    min-width: 736px;
     margin: 0 auto;
 `;
 
@@ -36,9 +40,12 @@ const ChartContainer = styled.div`
 interface Props extends HistoryActionCreatorTypes, HistoryState {
     chosenId?: string;
     boards: KanbanBoardState;
+    chooseRecord: (r: PomodoroRecord) => void;
 }
 
 export const History: React.FunctionComponent<Props> = (props: Props) => {
+    const [targetDate, setTargetDate] = useState<undefined | [number, number, number]>(undefined);
+    const [shownPomodoros, setPomodoros] = useState<undefined | PomodoroRecord[]>(undefined);
     const [aggInfo, setAggInfo] = useState<AggPomodoroInfo>({
         count: {
             day: undefined,
@@ -82,6 +89,22 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                 console.log('set agg info');
             });
     }, [props.chosenId, props.expiringKey]);
+    useEffect(() => {
+        if (targetDate == null) {
+            return;
+        }
+
+        console.log('Date Effect');
+        const db = new DBWorker('sessionDB');
+        const dateStart = new Date(`${targetDate[0]}-${targetDate[1]}-${targetDate[2]}`).getTime();
+        const nextDay = dateStart + 24 * 3600 * 1000;
+        db.find({ startTime: { $lt: nextDay, $gte: dateStart } }, {}).then(docs => {
+            console.log('docs', docs);
+            if (docs && docs.length) {
+                setPomodoros(docs);
+            }
+        });
+    }, [targetDate]);
 
     const onChange = (v: string) => {
         props.setChosenProjectId(v);
@@ -94,10 +117,12 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
         }
     };
 
+    const clickDate = (year: number, month: number, day: number) => {
+        setTargetDate([year, month, day]);
+    };
     return (
-        // @ts-ignore
-        <Container ref={container}>
-            <SubContainer>
+        <Container>
+            <SubContainer ref={container as any}>
                 <Row style={{ marginBottom: 20 }}>
                     <Select
                         onChange={onChange}
@@ -164,7 +189,33 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
                 {aggInfo.pieChart != null && aggInfo.wordWeights != null ? (
                     calendarWidth > 670 ? (
                         <ChartContainer>
-                            <GridCalendar data={aggInfo.calendarCount} width={calendarWidth} />
+                            <GridCalendar
+                                data={aggInfo.calendarCount}
+                                width={calendarWidth}
+                                clickDate={clickDate}
+                            />
+                            {shownPomodoros ? (
+                                <div style={{ margin: 10 }}>
+                                    <span
+                                        style={{
+                                            fontSize: 14,
+                                            color: '#7f7f7f',
+                                            margin: '0 5px',
+                                            display: 'inline-block'
+                                        }}
+                                    >
+                                        {formatTimeYMD(shownPomodoros[0].startTime)}
+                                    </span>
+                                    <PomodoroNumView
+                                        inline={true}
+                                        pomodoros={shownPomodoros}
+                                        showNum={false}
+                                        chooseRecord={props.chooseRecord}
+                                    />
+                                </div>
+                            ) : (
+                                undefined
+                            )}
                             <DualPieChart
                                 {...aggInfo.pieChart}
                                 width={calendarWidth}
