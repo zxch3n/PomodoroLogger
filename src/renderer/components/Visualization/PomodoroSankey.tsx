@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ReactEcharts from 'echarts-for-react';
+import { message } from 'antd';
 import { actions } from '../Timer/action';
 import { PomodoroRecord } from '../../monitor/type';
 import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
@@ -317,6 +318,17 @@ const getOption = (props: Props) => {
 
 export const PomodoroSankey = (props: Props) => {
     if (props.record == null) {
+        return <></>;
+    }
+    const isOutdated =
+        props.record.switchActivities == null ||
+        props.record.stayTimeInSecond == null ||
+        props.record.switchActivities.length !== props.record.stayTimeInSecond.length;
+    if (isOutdated) {
+        message.info(
+            'Cannot plot Sankey Diagram. ' +
+                'Chosen pomodoro was recorded in a version that lacks of required data'
+        );
         return <></>;
     }
 
