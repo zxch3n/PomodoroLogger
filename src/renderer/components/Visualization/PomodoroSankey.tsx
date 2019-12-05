@@ -349,8 +349,8 @@ export const PomodoroSankey = (props: Props) => {
                     option={option}
                     style={{
                         width,
-                        height: 'calc(100vh - 40px)',
-                        minHeight: '800px'
+                        height: 'calc(100vh - 140px)',
+                        minHeight: '640px'
                     }}
                 />
             </InnerContainer>

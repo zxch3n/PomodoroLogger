@@ -60,6 +60,12 @@ Demonstrating your efficiency by the dots. The larger the hole, the less efficie
 
 <img width="150px" src="https://i.postimg.cc/Kzth8088/da.gif"/>
 
+You can view the record in detail by clicking the circle
+
+<p align="center">
+    <img width="600px" src="https://i.postimg.cc/SKWhN9Vb/image.png"/>
+</pa>
+
 
 # Data :chart_with_upwards_trend:
 
