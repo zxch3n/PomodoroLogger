@@ -39,3 +39,17 @@ export class ColorEncoder {
         return '#' + this.encodeColor(color[0], color[1], color[2]);
     }
 }
+
+export class ColorScheme {
+    private colorMap: { [name: string]: string } = {};
+    private encoder = new ColorEncoder();
+    constructor() {}
+
+    get(name: string) {
+        if (!this.colorMap.hasOwnProperty(name)) {
+            this.colorMap[name] = this.encoder.getAColor();
+        }
+
+        return this.colorMap[name];
+    }
+}

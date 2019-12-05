@@ -13,6 +13,7 @@ import dbs from '../../dbs';
 import { fatScrollBar, tabMaxHeight } from '../../style/scrollbar';
 import { PomodoroRecord } from '../../monitor/type';
 import { PomodoroTimeline } from '../Visualization/Timeline';
+import { PomodoroBlockVis } from '../Visualization/PomodoroBlockVis';
 
 const Container = styled.div`
     position: relative;
@@ -86,6 +87,10 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             setRecord(doc[doc.length - 1]);
         });
     }, []);
+    const [sortby, setSortby] = React.useState<undefined | string>(undefined);
+    const onClick = () => {
+        setSortby('app');
+    };
     return (
         <Container>
             <Row gutter={16} style={{ marginBottom: 10 }}>
@@ -108,14 +113,7 @@ export const Analyser: React.FC<Props> = (props: Props) => {
             <div style={{ height: 50, width: 280 }}>
                 <Bar values={[5, 10, 100, 20, 30]} names={['123', '123', '22', '22', '123']} />
             </div>
-            {record ? (
-                <PomodoroTimeline
-                    record={record}
-                    efficiencyAnalyser={new EfficiencyAnalyser([{ app: 'chrome' }])}
-                />
-            ) : (
-                undefined
-            )}
+            <Button onClick={onClick}>Click me</Button>
         </Container>
     );
 };

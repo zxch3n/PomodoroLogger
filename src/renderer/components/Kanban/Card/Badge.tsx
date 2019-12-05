@@ -117,7 +117,7 @@ export const TimeBadge = (props: TimeBadgeProps) => {
     const sSpentTime = formatTime(spentTime);
     const sEstimatedTime = formatTime(leftTime);
     const sum = spentTime + leftTime;
-    const totalWidth = 180;
+    const totalWidth = 168;
     const spentWidth = sum ? ((totalWidth - 100) / sum) * spentTime + 50 : 90;
     const estimatedWidth = totalWidth - spentWidth;
     const onHoverSpent = throttle(() => setClipState('spent'), 800);
@@ -144,7 +144,7 @@ export const TimeBadge = (props: TimeBadgeProps) => {
         <AnimeSvg
             width={totalWidth}
             height="20"
-            style={{ margin: '1px 10px 1px 10px', fontSize: 12 }}
+            style={{ margin: '0 4px', fontSize: 12 }}
             onMouseLeave={onLeave}
         >
             <defs>

@@ -10,7 +10,7 @@ interface Props {
     efficiencyAnalyser: EfficiencyAnalyser;
 }
 
-function formatTime(time: number) {
+export function formatTimeHMS(time: number) {
     const date = new Date(time);
     const hour = to2digits(date.getHours());
     const m = to2digits(date.getMinutes());
@@ -27,7 +27,7 @@ export const PomodoroTimeline = (props: Props) => {
         const index = props.record.switchActivities![i];
         const [title, app] = indexToTitle[index];
         const isDistracting = props.efficiencyAnalyser.getIsDistracting(app, title);
-        const sTime = formatTime(time);
+        const sTime = formatTimeHMS(time);
 
         data.push(
             <Timeline.Item color={isDistracting ? 'red' : 'green'}>
