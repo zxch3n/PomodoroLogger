@@ -21,7 +21,7 @@ export function formatTimeHMS(time: number) {
 export function formatTimeYMD(time: number) {
     const date = new Date(time);
     const y = date.getFullYear();
-    return `${y}-${date.getMonth() + 1}-${date.getDay()}`;
+    return `${y}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
 export function formatTimeYmdHms(time: number) {
