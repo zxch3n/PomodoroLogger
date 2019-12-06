@@ -51,7 +51,7 @@ const TimerLayout = styled.div`
     padding: 0 24px 0 24px;
     overflow-y: auto;
     width: 100%;
-    ${tabMaxHeight}
+    height: calc(100vh - 45px);
     ${thinScrollBar}
 `;
 

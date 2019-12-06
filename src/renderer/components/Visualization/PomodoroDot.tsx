@@ -33,11 +33,11 @@ export const PomodoroDot: React.FC<Props> = props => {
         <Svg
             width="20"
             height="20"
-            style={{ margin: '0 4px 0 0', cursor: 'pointer' }}
+            style={{ margin: '0 0 2px 0', cursor: 'pointer' }}
             viewBox={'0 0 28 28'}
         >
             <title>{`${props.num} Pomodoros`}</title>
-            <circle cx={14} cy={14} r={14} fill={'#ca6129'} />
+            <circle cx={14} cy={14} r={14} fill={'#b3775b'} />
             <text
                 x={14}
                 y={14.5}

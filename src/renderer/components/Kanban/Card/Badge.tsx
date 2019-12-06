@@ -144,7 +144,7 @@ export const TimeBadge = (props: TimeBadgeProps) => {
         <AnimeSvg
             width={totalWidth}
             height="20"
-            style={{ margin: '0 4px', fontSize: 12 }}
+            style={{ margin: '0 0 2px 6px', fontSize: 12 }}
             onMouseLeave={onLeave}
         >
             <defs>
@@ -168,7 +168,7 @@ export const TimeBadge = (props: TimeBadgeProps) => {
             </defs>
 
             <g onMouseOver={onHoverSpent} clipPath={`url(#${id1})`}>
-                <rect height={20} width={totalWidth - 50} x={50} rx={3} fill={'#97ca00'} />
+                <rect height={20} width={totalWidth - 50} x={50} rx={3} fill={'#b37e5b'} />
                 <text
                     x={4}
                     y={10}

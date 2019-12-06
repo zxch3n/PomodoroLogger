@@ -229,7 +229,11 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
             <Divider style={{ margin: '6px 0' }} />
             <BadgeHolder>
                 <PomodoroDot num={props.relatedSessions.length} />
-                <TimeBadge spentTime={spentHours} leftTime={estimatedLeftTimeSum} />
+                {actualTimeSum + estimatedLeftTimeSum ? (
+                    <TimeBadge spentTime={actualTimeSum} leftTime={estimatedLeftTimeSum} />
+                ) : (
+                    undefined
+                )}
                 {showErr ? (
                     <Badge
                         type={'accuracy'}
