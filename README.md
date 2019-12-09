@@ -71,7 +71,7 @@ You can view the record in detail by clicking the circle
 
 Pomodoro Logger records your desktop activities when you are in a working session of Pomodoro. 
 
-It only records your application activities, including the name and title of the focused application, and low resolution (30 x 30) screenshot. You can disable monitor features in the settings.
+It only records your application activities, including the name and title of the focused application.
 
 You can import / export / delete all your data in the settings. 
 
@@ -81,14 +81,14 @@ All the data is saved and processed **locally**.
 
 Pomodoro Logger has integrated [Kanban Board](https://en.wikipedia.org/wiki/Kanban_board) to help you organize and estimate the time spent of your todos easily with confidence.
 
-The lists in Kanban are divided into `Todo`, `In Progress`, and `Done`. Though lists customization is possible, you are required to preserve `In Progress` list and `Done` list in order to track, estimate and analyse your project time spent. You can set the estimated time cost on each todo card. Pomodoro Logger will assist you with the corresponding actual time spent record. i.e., When you are focusing on a Kanban board, it will automatically associate your Pomodoro session with the todo cards of `In Progress` list in the Kanban, which makes the further analysis possible.
+The lists in Kanban are divided into `Todo`, `In Progress`, and `Done`. Though lists customization is possible, you are required to preserve `In Progress` list and `Done` list in order to track, estimate and analyze your project time spent. You can set the estimated time cost on each todo card. Pomodoro Logger will assist you with the corresponding actual time spent record. i.e., When you are focusing on a Kanban board, it will automatically associate your Pomodoro session with the todo cards of `In Progress` list in the Kanban, which makes further analysis possible.
 
 To make the statistics more accurate, you can keep the cards of the `In Progress` list as few as possible to precisely reflect the tasks you are focusing on.
 
 
 # Download
 
-This project currently supports Windows and macOS.
+Win10 / macOS / Linux
 
 To download, go to [release page](https://github.com/rem2016/PomodoroLogger/releases).
 
