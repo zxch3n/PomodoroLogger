@@ -12,12 +12,16 @@ export function getEfficiency(isDistractionArr: boolean[], stayTimeArr: number[]
     );
 
     let prevEfficiency = 0;
-    for (let i = 1; i < stayTimeArr.length; i += 1) {
+    for (let i = 0; i < stayTimeArr.length; i += 1) {
         if (isDistractionArr[i]) {
             continue;
         }
 
-        const lossFactor = 1 - Math.sqrt(Math.min(stayTimeArr[i - 1] / 30, 1)) * 0.5 - 0.5;
+        let lossFactor = 1;
+        if (prevEfficiency !== 0) {
+            lossFactor = 1 - Math.sqrt(Math.min(stayTimeArr[i - 1] / 30, 1)) * 0.5 - 0.5;
+        }
+
         const startEfficiency = prevEfficiency * lossFactor;
         const recoverTime = (1 - startEfficiency) / EFFICIENCY_INC_RATE;
         if (stayTimeArr[i] > recoverTime) {
@@ -130,7 +134,6 @@ export class EfficiencyAnalyser {
             }
         }
 
-        console.log(isDistracting, record.stayTimeInSecond);
         return getEfficiency(isDistracting, record.stayTimeInSecond!);
     };
 }

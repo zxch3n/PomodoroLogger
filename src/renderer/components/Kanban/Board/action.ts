@@ -6,6 +6,7 @@ import { actions as kanbanActions } from '../action';
 import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
 import { lang } from '../../../../lang/en';
+import { DistractingRow } from '../../Timer/action';
 
 const db = new DBWorker('kanbanDB');
 type ListId = string;
@@ -28,9 +29,10 @@ export interface KanbanBoard {
     doneList: string;
     relatedSessions: SessionId[];
     dueTime?: number; // TODO: Add due time setting
-    lastVisitTime?: number; // TODO: Add due time setting
+    lastVisitTime?: number;
     aggInfo?: AggInfo;
     pin?: boolean;
+    distractionList?: DistractingRow[];
 }
 
 const defaultBoard: KanbanBoard = {
@@ -107,6 +109,12 @@ const setPin = createActionCreator('[Board]SET_PIN', resolve => (_id: string, pi
 const updateAggInfo = createActionCreator(
     '[Board]UPDATE_AGG_INFO',
     resolve => (_id: string, aggInfo: AggInfo) => resolve({ _id, aggInfo })
+);
+
+const setDistractionList = createActionCreator(
+    '[Board]SET_DISTRACTION_LIST',
+    resolve => (_id: string, distractionList?: DistractingRow[]) =>
+        resolve({ _id, distractionList })
 );
 
 export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
@@ -199,6 +207,14 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
             ...state[_id],
             name,
             description
+        }
+    })),
+
+    handle(setDistractionList, (state, { payload: { _id, distractionList } }) => ({
+        ...state,
+        [_id]: {
+            ...state[_id],
+            distractionList
         }
     }))
 ]);
@@ -310,6 +326,13 @@ export const actions = {
     setPin: (_id: string, pin: boolean) => async (dispatch: Dispatch) => {
         dispatch(setPin(_id, pin));
         await db.update({ _id }, { $set: { pin } });
+    },
+
+    setDistractionList: (_id: string, distractionList?: DistractingRow[]) => async (
+        dispatch: Dispatch
+    ) => {
+        dispatch(setDistractionList(_id, distractionList));
+        await db.update({ _id }, { $set: { distractionList } });
     }
 };
 

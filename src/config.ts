@@ -69,3 +69,4 @@ export const modelPath = {
 };
 
 export const DEBUG_TIME_SCALE = 120;
+export const __DEV__ = process.env.NODE_ENV === 'development';

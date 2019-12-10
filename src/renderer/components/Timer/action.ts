@@ -9,7 +9,7 @@ import { promisify } from 'util';
 import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
-import { DEBUG_TIME_SCALE } from '../../../config';
+import { DEBUG_TIME_SCALE, __DEV__ } from '../../../config';
 import { AsyncDB } from '../../../utils/dbHelper';
 
 export const LONG_BREAK_INTERVAL = 4;
@@ -69,7 +69,7 @@ export const defaultState: TimerState = {
     currentTab: 'timer'
 };
 
-if (process.env.NODE_ENV === 'development') {
+if (__DEV__) {
     defaultState.currentTab = 'analyser';
 }
 

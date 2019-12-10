@@ -17,7 +17,7 @@ import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
 import { writeFile } from 'fs';
 import { shell, remote, app } from 'electron';
 import { promisify } from 'util';
-import { DistractingList } from './DistractingList';
+import { DistractingList, DistractingListModalButton } from './DistractingList';
 
 const dialog = remote.dialog;
 
@@ -61,9 +61,6 @@ const longBreakMarks = {
 
 interface Props extends TimerState, TimerActionTypes {}
 export const Setting: React.FunctionComponent<Props> = (props: Props) => {
-    const [editingDistracting, setEditingDistracting] = React.useState(false);
-    // @ts-ignore
-    const formRef = React.useRef<DistractingList>();
     const onChangeFocus = React.useCallback((v: number | [number, number]) => {
         if (v instanceof Array) {
             return;
@@ -151,14 +148,6 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
         shell.openExternal('https://github.com/zxch3n/PomodoroLogger');
     }
 
-    const onOk = () => {
-        if (formRef.current) {
-            formRef.current.onSave();
-        }
-
-        setEditingDistracting(false);
-    };
-
     return (
         <Container>
             <h4>Focus Duration</h4>
@@ -233,8 +222,7 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 <br />
             </ButtonWrapper>
             <ButtonWrapper>
-                {/* tslint:disable-next-line:jsx-no-lambda */}
-                <Button onClick={() => setEditingDistracting(true)}>Distracting App Setting</Button>
+                <DistractingListModalButton />
             </ButtonWrapper>
             <ButtonWrapper>
                 <StyledIcon
@@ -244,17 +232,6 @@ export const Setting: React.FunctionComponent<Props> = (props: Props) => {
                 />
                 <br />
             </ButtonWrapper>
-            <Modal
-                title={'Distracting App Setting'}
-                visible={editingDistracting}
-                /* tslint:disable-next-line:jsx-no-lambda */
-                onCancel={() => setEditingDistracting(false)}
-                onOk={onOk}
-                destroyOnClose={true}
-                okText={'Save'}
-            >
-                <DistractingList ref={formRef} />
-            </Modal>
         </Container>
     );
 };

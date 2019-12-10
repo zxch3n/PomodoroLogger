@@ -39,6 +39,12 @@ describe('Efficiency Analysis', () => {
         expect(getEfficiency([false], [1000])).toBe(1);
         expect(getEfficiency([true, false], [0, 1000])).toBeGreaterThan(0.95);
     });
+
+    it('should ', () => {
+        const v = getEfficiency([false, true, false], [9, 1, 9]);
+        const b = getEfficiency([true, false, false], [1, 9, 9]);
+        expect(b).toBeGreaterThan(v);
+    });
 });
 
 describe('EfficiencyAnalyser', () => {

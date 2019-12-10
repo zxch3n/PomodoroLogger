@@ -14,6 +14,7 @@ import { Label } from './style/Form';
 import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
 import { throttle } from 'lodash';
+import { DistractingListModalButton } from '../Setting/DistractingList';
 const { Option } = Select;
 
 const Content = styled.main`
@@ -278,6 +279,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
             {
                 // @ts-ignore
                 <EditKanbanForm
+                    boardId={editingBoardId}
                     wrappedComponentRef={ref}
                     visible={visible}
                     onSave={handleSave}
@@ -292,6 +294,7 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
 };
 
 interface FormProps {
+    boardId: string;
     onSave?: any;
     onCancel?: any;
     form: any;
@@ -313,7 +316,7 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
         };
 
         render() {
-            const { visible, onCancel, onSave, form, isCreating, onDelete } = this.props;
+            const { visible, onCancel, onSave, form, isCreating, onDelete, boardId } = this.props;
             const { getFieldDecorator } = form;
             return (
                 <Modal
@@ -350,6 +353,7 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                         ) : (
                             undefined
                         )}
+                        <DistractingListModalButton boardId={boardId} />
                     </Form>
                 </Modal>
             );

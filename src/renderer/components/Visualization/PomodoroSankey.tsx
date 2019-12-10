@@ -170,7 +170,10 @@ const getLinkAndNode = (
                             target = new_title;
                         }
 
-                        return breakWord(`${source} --- ${target}: ${dataValue}`, '<br/>');
+                        return breakWord(
+                            `${source} --- ${target}: ${dataValue.toFixed(1)}`,
+                            '<br/>'
+                        );
                     }
                 }
             });
@@ -374,9 +377,12 @@ export const ConnectedPomodoroSankey = connect(
     (state: RootState): Props => {
         const record = state.timer.chosenRecord;
         const board = record && record.boardId ? state.kanban.boards[record.boardId] : undefined;
+        const boardDistractingList = board ? board.distractionList || [] : [];
         return {
             showSwitch: false,
-            efficiencyAnalyser: new EfficiencyAnalyser(state.timer.distractingList),
+            efficiencyAnalyser: new EfficiencyAnalyser(
+                state.timer.distractingList.concat(boardDistractingList)
+            ),
             record: state.timer.chosenRecord,
             boardName: board ? board.name : undefined
         };

@@ -17,7 +17,7 @@ import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { TimerMask } from './SessionEndingMask';
-import { DEBUG_TIME_SCALE } from '../../../config';
+import { __DEV__, DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
 import { WorkRestIcon } from './WorkRestIcon';
 import Board from '../Kanban/Board';
@@ -75,7 +75,7 @@ const MySider = styled.aside`
     border-right: 1px solid #dfdfdf;
     background-color: #eaeaea;
     float: left;
-    box-shadow: 2px 0 2px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 0 6px 0 rgba(234, 234, 234, 0.6);
     transition: margin-left 0.2s;
     ${tabMaxHeight}
 `;
@@ -429,12 +429,38 @@ class Timer extends Component<Props, State> {
         }
 
         this.stagedSession = thisSession;
-        this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
+
+        if (__DEV__) {
+            for (const app in this.stagedSession.apps) {
+                this.stagedSession.apps[app].spentTimeInHour *= DEBUG_TIME_SCALE;
+            }
+
+            if (this.stagedSession.switchActivities) {
+                for (let i = 0; i < this.stagedSession.switchActivities.length; i += 1) {
+                    this.stagedSession.stayTimeInSecond![i] *= DEBUG_TIME_SCALE;
+                }
+            }
+        }
+
+        this.calculateSessionEfficiency();
         this.monitor.stop();
         if (this.props.timer.boardId === undefined) {
             this.props.inferProject(thisSession);
         }
     };
+
+    private calculateSessionEfficiency() {
+        if (this.stagedSession != null) {
+            const boardDistractionList = this.props.timer.boardId
+                ? this.props.kanban.boards[this.props.timer.boardId].distractionList || []
+                : [];
+            this.efficiencyAnalyser.update(
+                this.props.timer.distractingList.concat(boardDistractionList)
+            );
+            this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
+            console.log('efficiency', this.stagedSession.efficiency);
+        }
+    }
 
     private getElapsedTimeInSecond() {
         const { targetTime, isFocusing } = this.props.timer;
@@ -458,17 +484,7 @@ class Timer extends Component<Props, State> {
             return;
         }
 
-        if (process.env.NODE_ENV === 'development') {
-            for (const app in this.stagedSession.apps) {
-                this.stagedSession.apps[app].spentTimeInHour *= DEBUG_TIME_SCALE;
-            }
-        }
-
         this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
-        if (this.efficiencyAnalyser.update(this.props.timer.distractingList)) {
-            this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
-        }
-
         this.extendedTimeInMinute = 0;
         if (this.props.timer.boardId !== undefined) {
             this.stagedSession.boardId = this.props.timer.boardId;
@@ -549,7 +565,7 @@ class Timer extends Component<Props, State> {
     private extendCurrentSession = (timeInMinutes: number) => {
         if (this.monitor) {
             this.monitor.resume();
-        } else if (process.env.NODE_ENV === 'development') {
+        } else if (__DEV__) {
             throw new Error();
         }
 
@@ -633,7 +649,7 @@ class Timer extends Component<Props, State> {
                                 top: 20,
                                 marginRight: -15,
                                 zIndex: 50,
-                                boxShadow: '4px 0 2px -1px rgba(0, 0, 0, 0.3)'
+                                boxShadow: '4px 0 6px -1px rgba(234, 234, 234, 0.6)'
                             }}
                             onClick={this.switchSider}
                         />

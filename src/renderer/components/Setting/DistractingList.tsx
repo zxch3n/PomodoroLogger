@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { DistractingRow, actions } from '../Timer/action';
+import { actions as boardActions } from '../Kanban/Board/action';
 import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import { Dispatch } from 'redux';
-import { Form, Input, Icon, Button } from 'antd';
+import { Form, Input, Icon, Button, Modal } from 'antd';
 import { FormComponentProps } from 'antd/es/form/Form';
 import styled from 'styled-components';
 
@@ -179,7 +180,11 @@ class DynamicFieldSet extends React.Component<
 
 const WrappedDynamicFieldSet = Form.create({ name: 'dynamic_form_item' })(DynamicFieldSet);
 
-interface Props {
+interface InputProps {
+    boardId?: string;
+}
+
+interface Props extends InputProps {
     distractingList: DistractingRow[];
     setDistractingList: (rows: DistractingRow[]) => void;
 }
@@ -221,12 +226,61 @@ class PrivateDistractingList extends React.Component<Props> {
 }
 
 export const DistractingList = connect(
-    (state: RootState) => ({
-        distractingList: state.timer.distractingList
-    }),
-    (dispatch: Dispatch) => ({
-        setDistractingList: (rows: DistractingRow[]) => actions.setDistractingList(rows)(dispatch)
-    }),
+    (state: RootState, props: InputProps) => {
+        if (props.boardId == null) {
+            return {
+                distractingList: state.timer.distractingList
+            };
+        }
+
+        return {
+            distractingList: state.kanban.boards[props.boardId].distractionList || []
+        };
+    },
+    (dispatch: Dispatch, props: InputProps) => {
+        if (props.boardId == null) {
+            return {
+                setDistractingList: (rows: DistractingRow[]) =>
+                    actions.setDistractingList(rows)(dispatch)
+            };
+        }
+
+        return {
+            setDistractingList: (rows?: DistractingRow[]) =>
+                boardActions.setDistractionList(props.boardId!, rows)(dispatch)
+        };
+    },
     null,
     { forwardRef: true }
 )(PrivateDistractingList);
+
+export const DistractingListModalButton = (props: InputProps) => {
+    const [editingDistracting, setEditingDistracting] = React.useState(false);
+    // @ts-ignore
+    const formRef = React.useRef<DistractingList>();
+    const onOk = () => {
+        if (formRef.current) {
+            formRef.current.onSave();
+        }
+
+        setEditingDistracting(false);
+    };
+
+    return (
+        <>
+            {/* tslint:disable-next-line:jsx-no-lambda */}
+            <Button onClick={() => setEditingDistracting(true)}>Distracting App Setting</Button>
+            <Modal
+                title={'Distracting App Setting'}
+                visible={editingDistracting}
+                /* tslint:disable-next-line:jsx-no-lambda */
+                onCancel={() => setEditingDistracting(false)}
+                onOk={onOk}
+                destroyOnClose={true}
+                okText={'Save'}
+            >
+                <DistractingList ref={formRef} {...props} />
+            </Modal>
+        </>
+    );
+};
