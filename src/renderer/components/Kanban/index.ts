@@ -11,7 +11,9 @@ const mapStateToProps = (state: RootState) => {
     return state.kanban;
 };
 
-const mapDispatchToProps = genMapDispatchToProp<KanbanActionTypes & BoardActionTypes>({
+const mapDispatchToProps = genMapDispatchToProp<
+    KanbanActionTypes & BoardActionTypes & TimerActionTypes
+>({
     ...actions,
     ...boardActions,
     ...timerActions
