@@ -11,6 +11,10 @@ export function getEfficiency(isDistractionArr: boolean[], stayTimeArr: number[]
         0
     );
 
+    if (totalTime === focusedTime || (isDistractionArr.length === 1 && !isDistractionArr[0])) {
+        return 1;
+    }
+
     let prevEfficiency = 0;
     for (let i = 0; i < stayTimeArr.length; i += 1) {
         if (isDistractionArr[i]) {
@@ -18,7 +22,7 @@ export function getEfficiency(isDistractionArr: boolean[], stayTimeArr: number[]
         }
 
         let lossFactor = 1;
-        if (prevEfficiency !== 0) {
+        if (i > 0) {
             lossFactor = 1 - Math.sqrt(Math.min(stayTimeArr[i - 1] / 30, 1)) * 0.5 - 0.5;
         }
 
