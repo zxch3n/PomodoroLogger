@@ -27,6 +27,60 @@ export interface UserGuideProps {
 }
 
 const _UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
+    const setZ = () => {
+        if (!props.story) {
+            return;
+        }
+
+        const { pointerTargetSelector } = props.story;
+        if (!pointerTargetSelector) {
+            return;
+        }
+
+        const elem = document.querySelector(pointerTargetSelector) as HTMLElement;
+        if (!elem) {
+            return;
+        }
+
+        const originalZ = elem.style.zIndex;
+        const position = elem.style.position;
+        elem.style.zIndex = '2008';
+        elem.style.position = 'relative';
+        elem.addEventListener('click', onConfirm);
+        return () => {
+            elem.style.position = position;
+            elem.style.zIndex = originalZ;
+            elem.removeEventListener('click', onConfirm);
+        };
+    };
+
+    const setConfirmListener = () => {
+        if (!props.story) {
+            return;
+        }
+
+        const { confirmElementId } = props.story;
+        if (!confirmElementId) {
+            return;
+        }
+
+        const elem = document.getElementById(confirmElementId);
+        if (!elem) {
+            return;
+        }
+
+        const listener = (event: any) => {
+            next();
+        };
+        elem.addEventListener('click', listener);
+
+        return () => {
+            elem.removeEventListener('click', listener);
+        };
+    };
+
+    useEffect(setZ, [props.story]);
+    useEffect(setConfirmListener, [props.story]);
     if (!props.story) {
         return <></>;
     }
@@ -53,50 +107,6 @@ const _UserGuide: React.FC<UserGuideProps> = (props: UserGuideProps) => {
         setTimeout(next, 200);
     };
 
-    const setZ = () => {
-        if (!pointerTargetSelector) {
-            return;
-        }
-
-        const elem = document.querySelector(pointerTargetSelector) as HTMLElement;
-        if (!elem) {
-            return;
-        }
-
-        const originalZ = elem.style.zIndex;
-        const position = elem.style.position;
-        elem.style.zIndex = '2008';
-        elem.style.position = 'relative';
-        elem.addEventListener('click', onConfirm);
-        return () => {
-            elem.style.position = position;
-            elem.style.zIndex = originalZ;
-            elem.removeEventListener('click', onConfirm);
-        };
-    };
-
-    const setConfirmListener = () => {
-        if (!confirmElementId) {
-            return;
-        }
-
-        const elem = document.getElementById(confirmElementId);
-        if (!elem) {
-            return;
-        }
-
-        const listener = (event: any) => {
-            next();
-        };
-        elem.addEventListener('click', listener);
-
-        return () => {
-            elem.removeEventListener('click', listener);
-        };
-    };
-
-    useEffect(setConfirmListener, [confirmElementId]);
-    useEffect(setZ, [pointerTargetSelector]);
     return (
         <>
             {pointerTargetSelector ? (
