@@ -15,6 +15,7 @@ import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
 import { throttle } from 'lodash';
 import { DistractingListModalButton } from '../Setting/DistractingList';
+import { TimerActionTypes } from '../Timer/action';
 const { Option } = Select;
 
 const Content = styled.main`
@@ -59,7 +60,7 @@ interface FormValue {
     description: string;
 }
 
-interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes {}
+interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes, TimerActionTypes {}
 
 export const Kanban: FunctionComponent<Props> = (props: Props) => {
     const ref = useRef<Form>();
@@ -181,7 +182,11 @@ export const Kanban: FunctionComponent<Props> = (props: Props) => {
     const onKeyDown = (name: string) => {
         switch (name) {
             case 'esc':
-                goBack();
+                if (props.kanban.chosenBoardId) {
+                    goBack();
+                } else {
+                    props.changeAppTab('timer');
+                }
                 break;
             case 'ctrl+n':
                 if (!props.kanban.chosenBoardId) {
@@ -326,8 +331,8 @@ const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
                     onCancel={onCancel}
                     onOk={onSave}
                 >
-                    <Hotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
                     <Form layout="vertical">
+                        <Hotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
                         <Form.Item label="Name">
                             {getFieldDecorator('name', {
                                 rules: [

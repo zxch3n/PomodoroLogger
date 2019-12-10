@@ -23,6 +23,7 @@ import { WorkRestIcon } from './WorkRestIcon';
 import Board from '../Kanban/Board';
 import { HelpIcon } from '../UserGuide/HelpIcon';
 import dingMp3 from '../../../res/ding.mp3';
+import ReactHotkeys from 'react-hot-keys';
 import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 
@@ -593,6 +594,28 @@ class Timer extends Component<Props, State> {
         this.setState(state => ({ showSider: !state.showSider }));
     };
 
+    onKeyDown = (keyName: string) => {
+        switch (keyName) {
+            case 'f5':
+                if (this.props.timer.targetTime == null) {
+                    return this.onStart();
+                }
+
+                this.onResume();
+                break;
+
+            case 'f6':
+                this.onStop();
+                break;
+
+            case 'tab':
+                this.switchMode();
+                break;
+        }
+
+        return;
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
         const { isRunning, targetTime } = this.props.timer;
@@ -617,6 +640,7 @@ class Timer extends Component<Props, State> {
             boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
         return (
             <MyLayout style={{ backgroundColor: 'white' }} ref={this.selfRef}>
+                <ReactHotkeys keyName={'f5,f6,tab'} onKeyDown={this.onKeyDown} />
                 <TimerMask
                     extendCurrentSession={this.extendCurrentSession}
                     newPomodoro={this.stagedSession}
