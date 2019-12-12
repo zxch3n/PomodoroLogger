@@ -14,10 +14,7 @@ import { fatScrollBar, tabMaxHeight, thinScrollBar } from '../../style/scrollbar
 import { PomodoroNumView } from '../Timer/PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
 import { formatTimeYMD, formatTimeYmdHms } from '../Visualization/Timeline';
-import dbs from '../../dbs';
-import { AsyncDB } from '../../../utils/dbHelper';
 
-const db = new AsyncDB(dbs.sessionDB);
 const { Option } = Select;
 
 const Container = styled.div`
@@ -81,6 +78,8 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
     useEffect(resizeEffect, []);
     useEffect(() => {
         const searchArg = props.chosenId === undefined ? {} : { boardId: props.chosenId };
+        // Avoid using outdated cache; And use worker to avoid db blocking the process
+        const db = new DBWorker('sessionDB');
         db.find(searchArg, {})
             .then(docs => {
                 return getAggPomodoroInfo(docs);
