@@ -105,6 +105,7 @@ app.on('ready', async () => {
             }
         }
     ];
+
     // @ts-ignore
     const contextMenu = Menu.buildFromTemplate(menuItems);
     mGlobal.tray.setToolTip('Pomodoro Logger');
