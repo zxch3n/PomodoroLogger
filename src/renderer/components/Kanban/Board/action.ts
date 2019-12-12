@@ -3,6 +3,7 @@ import { Dispatch } from 'redux';
 import { actions as listActions } from '../List/action';
 import { actions as cardActions } from '../Card/action';
 import { actions as kanbanActions } from '../action';
+import { actions as historyActions } from '../../History/action';
 import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
 import { lang } from '../../../../lang/en';
@@ -307,6 +308,7 @@ export const actions = {
         cardIds: string[]
     ) => async (dispatch: Dispatch) => {
         dispatch(onTimerFinished(_id, sessionId, timeSpent));
+        dispatch(historyActions.setExpiringKey(_id));
         await db.update(
             { _id },
             { $push: { relatedSessions: sessionId }, $inc: { spentHours: timeSpent } }

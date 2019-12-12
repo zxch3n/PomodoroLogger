@@ -38,8 +38,7 @@ if (process.platform === 'win32') {
 
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
-    // const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-    const forceDownload = true;
+    const forceDownload = false;
     const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
     return Promise.all(
         extensions.map(name => installer.default(installer[name], forceDownload))
