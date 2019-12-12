@@ -99,7 +99,7 @@ interface Props extends KanbanBoard, InputProps {
 }
 
 type NewCard = Card & { isDone?: boolean };
-const _BoardBrief: React.FC<Props> = (props: Props) => {
+const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
     if (props._id === undefined) {
         return <></>;
     }
@@ -247,7 +247,7 @@ const _BoardBrief: React.FC<Props> = (props: Props) => {
             </BadgeHolder>
         </BriefCard>
     );
-};
+});
 
 interface InputProps {
     boardId: string;

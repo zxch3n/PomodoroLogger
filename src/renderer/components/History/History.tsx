@@ -43,7 +43,7 @@ interface Props extends HistoryActionCreatorTypes, HistoryState {
     chooseRecord: (r: PomodoroRecord) => void;
 }
 
-export const History: React.FunctionComponent<Props> = (props: Props) => {
+export const History: React.FunctionComponent<Props> = React.memo((props: Props) => {
     const [targetDate, setTargetDate] = useState<undefined | [number, number, number]>(undefined);
     const [shownPomodoros, setPomodoros] = useState<undefined | PomodoroRecord[]>(undefined);
     const [aggInfo, setAggInfo] = useState<AggPomodoroInfo>({
@@ -86,7 +86,6 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             })
             .then((ans: AggPomodoroInfo) => {
                 setAggInfo(ans);
-                console.log('set agg info');
             });
     }, [props.chosenId, props.expiringKey]);
     useEffect(() => {
@@ -94,12 +93,10 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             return;
         }
 
-        console.log('Date Effect');
         const db = new DBWorker('sessionDB');
         const dateStart = new Date(`${targetDate[0]}-${targetDate[1]}-${targetDate[2]}`).getTime();
         const nextDay = dateStart + 24 * 3600 * 1000;
         db.find({ startTime: { $lt: nextDay, $gte: dateStart } }, {}).then(docs => {
-            console.log('docs', docs);
             if (docs && docs.length) {
                 setPomodoros(docs);
             }
@@ -236,4 +233,4 @@ export const History: React.FunctionComponent<Props> = (props: Props) => {
             </SubContainer>
         </Container>
     );
-};
+});

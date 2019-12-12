@@ -3,7 +3,12 @@ import { Button, Divider, message, Tooltip, Popconfirm } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes } from '../Kanban/Board/action';
-import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes } from './action';
+import {
+    LONG_BREAK_INTERVAL,
+    TimerActionTypes as ThisActionTypes,
+    defaultState,
+    uiStateNames
+} from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
@@ -26,6 +31,7 @@ import dingMp3 from '../../../res/ding.mp3';
 import ReactHotkeys from 'react-hot-keys';
 import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
+import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -202,6 +208,20 @@ class Timer extends Component<Props, State> {
         workers.dbWorkers.sessionDB.count({}).then(size => {
             workers.knn.loadModel(size).catch(console.error);
         });
+    }
+
+    shouldComponentUpdate(
+        nextProps: Readonly<Props>,
+        nextState: Readonly<State>,
+        nextContext: any
+    ): boolean {
+        if (!isShallowEqual(this.state, nextState)) {
+            return true;
+        }
+
+        const next = nextProps.timer;
+        const _this = this.props.timer;
+        return !isShallowEqualByKeys(next, _this, uiStateNames);
     }
 
     addMenuItems(): void {
@@ -459,7 +479,6 @@ class Timer extends Component<Props, State> {
                 this.props.timer.distractingList.concat(boardDistractionList)
             );
             this.stagedSession.efficiency = this.efficiencyAnalyser.analyse(this.stagedSession);
-            console.log('efficiency', this.stagedSession.efficiency);
         }
     }
 

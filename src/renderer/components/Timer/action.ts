@@ -69,6 +69,16 @@ export const defaultState: TimerState = {
     currentTab: 'timer'
 };
 
+export const uiStateNames = [
+    'chosenRecord',
+    'targetTime',
+    'leftTime',
+    'isFocusing',
+    'isRunning',
+    'boardId',
+    'iBreak'
+];
+
 if (__DEV__) {
     defaultState.currentTab = 'analyser';
 }
@@ -178,7 +188,6 @@ export const actions = {
     },
     setDistractingList: (distractingList: DistractingRow[]) => async (dispatch: Dispatch) => {
         dispatch(setDistractingList(distractingList));
-        console.log(distractingList);
         await settingDB.update(
             { name: 'setting' },
             { $set: { distractingList } },
@@ -259,7 +268,6 @@ export const actions = {
 
         if (newProjectId !== undefined) {
             const newProject = await getNameFromBoardId(newProjectId);
-            console.log('predicted type', newProject);
             dispatch(setBoardId(newProject));
         }
     },

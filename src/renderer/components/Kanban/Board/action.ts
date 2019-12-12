@@ -36,7 +36,7 @@ export interface KanbanBoard {
     distractionList?: DistractingRow[];
 }
 
-const defaultBoard: KanbanBoard = {
+export const defaultBoard: KanbanBoard = {
     _id: '',
     lists: [],
     name: '',

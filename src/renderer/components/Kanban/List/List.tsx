@@ -113,7 +113,7 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
     cardsState: CardsState;
 }
 
-export const List: FC<Props> = (props: Props) => {
+export const List: FC<Props> = React.memo((props: Props) => {
     const { focused = false, searchReg, cards, cardsState, done = false } = props;
     const [estimatedTimeSum, actualTimeSum] = props.cards.reduce(
         (l: [number, number], r: string) => {
@@ -276,4 +276,4 @@ export const List: FC<Props> = (props: Props) => {
             )}
         </Draggable>
     );
-};
+});

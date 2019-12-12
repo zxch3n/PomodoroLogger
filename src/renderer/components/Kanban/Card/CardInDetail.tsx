@@ -5,19 +5,7 @@ import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
 import ReactHotkeys from 'react-hot-keys';
 import { genMapDispatchToProp } from '../../../utils';
-import {
-    Button,
-    Col,
-    Form,
-    Icon,
-    Input,
-    InputNumber,
-    Menu,
-    Modal,
-    Popconfirm,
-    Row,
-    Switch
-} from 'antd';
+import { Button, Col, Form, Input, InputNumber, Modal, Popconfirm, Row } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
 import styled from 'styled-components';
@@ -43,7 +31,7 @@ interface FormData {
     actualTime?: number;
 }
 
-const _CardInDetail: FC<Props> = (props: Props) => {
+const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     const { card, visible, form, onCancel, listId } = props;
     const isCreating = !card;
     const { getFieldDecorator, setFieldsValue, validateFields, resetFields } = form;
@@ -191,7 +179,7 @@ const _CardInDetail: FC<Props> = (props: Props) => {
             </Container>
         </Modal>
     );
-};
+});
 
 export const CardInDetail = connect(
     (state: RootState) => {

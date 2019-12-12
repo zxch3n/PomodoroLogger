@@ -13,7 +13,6 @@ export class AutoUpdater {
         });
         autoUpdater.on('update-available', info => {
             console.log('update available');
-            console.log(info);
             sendStatusToWindow('update-available', `Version: ${info.version}; ${info.releaseName}`);
         });
         autoUpdater.on('update-not-available', info => {

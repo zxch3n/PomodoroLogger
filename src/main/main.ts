@@ -120,7 +120,6 @@ app.on('ready', async () => {
 
     await createWindow();
     const autoUpdater = new AutoUpdater((type: string, info: any) => {
-        console.log(info);
         if (win) {
             win.webContents.send(type, info);
         }

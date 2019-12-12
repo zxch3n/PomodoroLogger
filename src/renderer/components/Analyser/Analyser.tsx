@@ -82,7 +82,6 @@ export const Analyser: React.FC<Props> = (props: Props) => {
                 console.error(err);
                 return;
             }
-            console.log(doc);
             doc.sort((a, b) => a.startTime - b.startTime);
             setRecord(doc[doc.length - 1]);
         });
