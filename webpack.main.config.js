@@ -8,7 +8,7 @@ const baseConfig = require('./webpack.base.config');
 module.exports = merge.smart(baseConfig, {
     target: 'electron-main',
     entry: {
-        main: './src/main/main.ts'
+        main: ['./src/main/main.ts', './src/main/db.ts', './src/main/AutoUpdater.ts']
     },
     module: {
         rules: [
@@ -47,5 +47,5 @@ module.exports = merge.smart(baseConfig, {
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
         }),
     ],
-    externals: [nodeExternals()],
+    // externals: [nodeExternals()],
 });

@@ -1,6 +1,5 @@
 import { autoUpdater } from 'electron-updater';
 import { GithubOptions } from 'builder-util-runtime';
-import { readFileSync } from 'fs';
 
 export class AutoUpdater {
     constructor(logger: any) {

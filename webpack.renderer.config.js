@@ -53,7 +53,7 @@ const fixNedbForElectronRenderer = {
 module.exports = merge.smart(baseConfig, {
     target: 'electron-renderer',
     entry: {
-        app: ['@babel/polyfill', './src/renderer/app.tsx']
+        app: ['./src/renderer/app.tsx']
     },
     output: {
         globalObject: 'this'

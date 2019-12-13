@@ -174,13 +174,13 @@
     "react": "^16.8.6",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "prop-types": "^15.7.2"
+    "prop-types": "^15.7.2",
+    "nedb": "^1.8.0",
+    "shortid": "^2.2.14",
+    "electron-updater": "^4.1.2",
+    "get-app-icon": "^1.0.0"
   },
   "dependencies": {
-    "active-win": "^5.1.2",
-    "electron-updater": "^4.1.2",
-    "get-app-icon": "^1.0.0",
-    "nedb": "^1.8.0",
-    "shortid": "^2.2.14"
+    "active-win": "^5.1.2"
   }
 }
