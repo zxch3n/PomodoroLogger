@@ -68,9 +68,12 @@ module.exports = merge.smart(baseConfig, {
                     cacheDirectory: true,
                     babelrc: false,
                     presets: [
-                        [
-                            '@babel/preset-env',
-                            { targets: { browsers: 'last 2 versions ' } }
+                       [
+                           '@babel/preset-env',
+                            { 
+                               targets: { browsers: 'last 2 versions ' },
+                               modules: false
+                            }
                         ],
                         '@babel/preset-typescript',
                         '@babel/preset-react'

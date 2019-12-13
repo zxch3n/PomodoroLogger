@@ -9,6 +9,7 @@ module.exports = merge.smart(baseConfig, {
             'react-dom': '@hot-loader/react-dom'
         }
     },
+    devtool: 'source-map',
     devServer: {
         port: 2003,
         compress: false,

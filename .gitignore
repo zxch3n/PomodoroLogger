@@ -13,3 +13,4 @@ junit.xml
 *.DS_Store
 .token
 dev-app-update.yml
+webpack-visualization/
