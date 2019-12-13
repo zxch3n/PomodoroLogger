@@ -53,7 +53,7 @@ const fixNedbForElectronRenderer = {
 module.exports = merge.smart(baseConfig, {
     target: 'electron-renderer',
     entry: {
-        app: ['@babel/polyfill', './src/renderer/app.tsx']
+        app: ['./src/renderer/app.tsx']
     },
     output: {
         globalObject: 'this'
@@ -68,9 +68,12 @@ module.exports = merge.smart(baseConfig, {
                     cacheDirectory: true,
                     babelrc: false,
                     presets: [
-                        [
-                            '@babel/preset-env',
-                            { targets: { browsers: 'last 2 versions ' } }
+                       [
+                           '@babel/preset-env',
+                            { 
+                               targets: { browsers: 'last 2 versions ' },
+                               modules: false
+                            }
                         ],
                         '@babel/preset-typescript',
                         '@babel/preset-react'

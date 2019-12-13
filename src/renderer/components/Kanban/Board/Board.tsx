@@ -1,10 +1,11 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import React, { FC } from 'react';
-import { BoardActionTypes, KanbanBoard } from './action';
+import { BoardActionTypes, defaultBoard, KanbanBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
 import { fatScrollBar } from '../../../style/scrollbar';
+import { isShallowEqualByKeys } from '../../../utils';
 
 const Container = styled.div`
     height: 100%;
@@ -39,71 +40,79 @@ export interface InputProps {
 }
 
 interface Props extends KanbanBoard, BoardActionTypes, InputProps {}
-export const Board: FC<Props> = (props: Props) => {
-    const handleDragEnd = ({ source, destination, type }: DropResult) => {
-        // dropped outside the list
-        if (!destination) {
-            return;
-        }
-        if (type === 'COLUMN') {
-            // Prevent update if nothing has changed
-            if (source.index !== destination.index) {
-                props.moveList(source.droppableId, source.index, destination.index);
+export const Board: FC<Props> = React.memo(
+    (props: Props) => {
+        const handleDragEnd = ({ source, destination, type }: DropResult) => {
+            // dropped outside the list
+            if (!destination) {
+                return;
             }
-            return;
-        }
-        // Move card
-        if (source.index !== destination.index || source.droppableId !== destination.droppableId) {
-            props.moveCard(
-                source.droppableId,
-                destination.droppableId,
-                source.index,
-                destination.index
+            if (type === 'COLUMN') {
+                // Prevent update if nothing has changed
+                if (source.index !== destination.index) {
+                    props.moveList(source.droppableId, source.index, destination.index);
+                }
+                return;
+            }
+            // Move card
+            if (
+                source.index !== destination.index ||
+                source.droppableId !== destination.droppableId
+            ) {
+                props.moveCard(
+                    source.droppableId,
+                    destination.droppableId,
+                    source.index,
+                    destination.index
+                );
+            }
+        };
+
+        const addList = async () => {
+            await props.addList(props._id, 'TestList');
+        };
+
+        const { doesOnlyShowFocusedList = false } = props;
+        let lists;
+        if (doesOnlyShowFocusedList) {
+            lists = (provided: any) => (
+                <ListContainer ref={provided.innerRef} {...provided.droppableProps}>
+                    <List listId={props.focusedList} index={0} key={0} boardId={props.boardId} />
+                    {provided.placeholder}
+                </ListContainer>
+            );
+        } else {
+            lists = (provided: any) => (
+                <ListContainer ref={provided.innerRef}>
+                    {props.lists.map((listId, index) => (
+                        <List
+                            listId={listId}
+                            index={index}
+                            key={listId}
+                            boardId={props.boardId}
+                            focused={listId === props.focusedList}
+                            done={listId === props.doneList}
+                        />
+                    ))}
+                    {provided.placeholder}
+                    <ListPlaceholder>
+                        <Button onClick={addList} icon={'plus'} shape="circle-outline" />
+                    </ListPlaceholder>
+                </ListContainer>
             );
         }
-    };
 
-    const addList = async () => {
-        await props.addList(props._id, 'TestList');
-    };
-
-    const { doesOnlyShowFocusedList = false } = props;
-    let lists;
-    if (doesOnlyShowFocusedList) {
-        lists = (provided: any) => (
-            <ListContainer ref={provided.innerRef} {...provided.droppableProps}>
-                <List listId={props.focusedList} index={0} key={0} boardId={props.boardId} />
-                {provided.placeholder}
-            </ListContainer>
+        return (
+            <Container>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId={props._id} type="COLUMN" direction="horizontal">
+                        {lists}
+                    </Droppable>
+                </DragDropContext>
+            </Container>
         );
-    } else {
-        lists = (provided: any) => (
-            <ListContainer ref={provided.innerRef}>
-                {props.lists.map((listId, index) => (
-                    <List
-                        listId={listId}
-                        index={index}
-                        key={listId}
-                        boardId={props.boardId}
-                        focused={listId === props.focusedList}
-                        done={listId === props.doneList}
-                    />
-                ))}
-                {provided.placeholder}
-                <ListPlaceholder>
-                    <Button onClick={addList} icon={'plus'} shape="circle-outline" />
-                </ListPlaceholder>
-            </ListContainer>
-        );
+    },
+    (prevProps, nextProps) => {
+        return !isShallowEqualByKeys(prevProps, nextProps, Object.keys(defaultBoard));
     }
-
-    return (
-        <Container>
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId={props._id} type="COLUMN" direction="horizontal">
-                    {lists}
-                </Droppable>
-            </DragDropContext>
-        </Container>
-    );
-};
+);

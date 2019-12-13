@@ -2,7 +2,11 @@ import { combineReducers } from 'redux';
 import { actions as boardActions, boardReducer, KanbanBoardState } from './Board/action';
 import { actions as listActions, ListsState, listReducer } from './List/action';
 import { actions as cardActions, cardReducer, CardsState } from './Card/action';
-import { actions as overallActions, KanbanState, reducer as kanbanReducer } from './action';
+import {
+    actions as overallActions,
+    KanbanState as OKanbanState,
+    reducer as kanbanReducer
+} from './action';
 
 export const reducer = combineReducers({
     boards: boardReducer,
@@ -15,8 +19,10 @@ export interface KanbanState {
     boards: KanbanBoardState;
     lists: ListsState;
     cards: CardsState;
-    kanban: KanbanState;
+    kanban: OKanbanState;
 }
+
+export const uiStateNames = ['boards', 'lists', 'cards', 'kanban'];
 
 export const kanbanActions = {
     boardActions,

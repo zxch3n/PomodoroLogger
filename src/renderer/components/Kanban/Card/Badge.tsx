@@ -102,7 +102,7 @@ interface TimeBadgeProps {
     leftTime?: number;
 }
 
-export const TimeBadge = (props: TimeBadgeProps) => {
+export const TimeBadge = React.memo((props: TimeBadgeProps) => {
     const [clipState, setClipState] = React.useState('default');
     const id = React.useMemo(shortid.generate, []);
     const id1 = id + '1';
@@ -219,4 +219,4 @@ export const TimeBadge = (props: TimeBadgeProps) => {
             </g>
         </AnimeSvg>
     );
-};
+});

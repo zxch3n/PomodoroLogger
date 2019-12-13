@@ -45,8 +45,8 @@ export interface InputProps {
 }
 
 interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {}
-export const Card: FC<Props> = (props: Props) => {
-    const { index, listId, title, content, _id, isDraggingOver } = props;
+export const Card: FC<Props> = React.memo((props: Props) => {
+    const { index, _id, isDraggingOver } = props;
     const onClick = () => {
         props.setEditCard(true, props.listId, props._id);
     };
@@ -105,4 +105,4 @@ export const Card: FC<Props> = (props: Props) => {
             </Draggable>
         </>
     );
-};
+});

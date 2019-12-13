@@ -1,17 +1,17 @@
 import { Dispatch } from 'redux';
 
-export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => (
-    dispatch: Dispatch
-) => {
-    const dict: Partial<T> = {};
-    for (const name in actions) {
-        // @ts-ignore
-        const actionCreator = actions[name];
-        // @ts-ignore
-        dict[name] = (...args: any) => dispatch(actionCreator(...args));
-    }
+export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => {
+    return (dispatch: Dispatch) => {
+        const dict: Partial<T> = {};
+        for (const name in actions) {
+            // @ts-ignore
+            const actionCreator = actions[name];
+            // @ts-ignore
+            dict[name] = (...args: any) => dispatch(actionCreator(...args));
+        }
 
-    return dict as T;
+        return dict as T;
+    };
 };
 
 export const generateRandomName = () => {
@@ -66,4 +66,44 @@ export function parseTime(formattedTime: string) {
     const hour = parseInt(matchedH.entries().next().value[1], 10);
     const minute = parseInt(matchedM.entries().next().value[1], 10);
     return hour + minute / 60;
+}
+
+export function isShallowEqual(v: { [key: string]: any }, o: { [key: string]: any }) {
+    for (const key in v) {
+        if (!(key in o) || v[key] !== o[key]) {
+            return false;
+        }
+    }
+
+    for (const key in o) {
+        if (!(key in v) || v[key] !== o[key]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function isShallowEqualByKeys(
+    v: { [key: string]: any },
+    o: { [key: string]: any },
+    keys: string[]
+) {
+    for (const key of keys) {
+        const hasNum = (key in o ? 1 : 0) + (key in v ? 1 : 0);
+        if (hasNum === 0) {
+            continue;
+        }
+
+        if (hasNum !== 2) {
+            return false;
+        }
+
+        // @ts-ignore
+        if (o[key] !== v[key]) {
+            return false;
+        }
+    }
+
+    return true;
 }

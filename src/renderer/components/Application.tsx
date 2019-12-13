@@ -7,6 +7,7 @@ import History from './History';
 import Analyser from './Analyser';
 import ReactHotkeys from 'react-hot-keys';
 import { connect } from 'react-redux';
+import { remote } from 'electron';
 import { actions as timerActions, switchTab, TimerActionTypes } from './Timer/action';
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { kanbanActions } from './Kanban/reducer';
@@ -19,7 +20,6 @@ import Timer from './Timer';
 import { UserGuide } from './UserGuide/UserGuide';
 import { UpdateController } from './UpdateController';
 import { CardInDetail } from './Kanban/Card/CardInDetail';
-import '../style/global.css';
 import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
 
 const Main = styled.div`
@@ -50,6 +50,10 @@ const Application = (props: Props) => {
                 break;
             case 'ctrl+shift+tab':
                 props.switchTab(-1);
+                break;
+            case 'ctrl+f12':
+                console.log('I hear you!');
+                remote.getCurrentWebContents().openDevTools({ activate: true, mode: 'detach' });
                 break;
         }
     };
@@ -124,7 +128,7 @@ const Application = (props: Props) => {
             <UpdateController />
             <CardInDetail />
             <ConnectedPomodoroSankey />
-            <ReactHotkeys keyName={'ctrl+tab,ctrl+shift+tab'} onKeyDown={onKeyDown} />
+            <ReactHotkeys keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12'} onKeyDown={onKeyDown} />
         </Main>
     );
 };

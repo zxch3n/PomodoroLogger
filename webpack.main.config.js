@@ -1,14 +1,13 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const nodeExternals = require('webpack-node-externals');
 
 const baseConfig = require('./webpack.base.config');
 
 module.exports = merge.smart(baseConfig, {
     target: 'electron-main',
     entry: {
-        main: './src/main/main.ts'
+        main: ['./src/main/main.ts', './src/main/db.ts', './src/main/AutoUpdater.ts']
     },
     module: {
         rules: [
@@ -39,13 +38,14 @@ module.exports = merge.smart(baseConfig, {
             }
         ]
     },
+    devtool: 'source-map',
     plugins: [
         new ForkTsCheckerWebpackPlugin({
-            reportFiles: ['src/main/**/*']
+            reportFiles: ['src/main/**/*'],
         }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
         }),
     ],
-    externals: [nodeExternals()],
+    // externals: [nodeExternals()],
 });

@@ -18,7 +18,6 @@ export class Tokenizer extends BaseWorker {
             },
             {
                 tokenize: (payload, done) => {
-                    console.log(payload);
                     done(payload);
                 }
             },

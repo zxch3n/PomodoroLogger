@@ -63,7 +63,7 @@ export async function addSession(record: PomodoroRecord) {
         // TODO: invoke ML inference
     }
     // @ts-ignore
-    await insert(record).catch(err => console.log(err));
+    await insert(record).catch(err => console.error(err));
 }
 
 export async function removeSession(startTime: number) {

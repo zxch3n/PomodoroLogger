@@ -4,11 +4,11 @@ import { addSession } from '../../monitor/sessionManager';
 import { actions as boardActions } from '../Kanban/Board/action';
 import { actions as kanbanActions } from '../Kanban/action';
 import { actions as historyActions } from '../History/action';
-import { throttle, debounce } from 'lodash';
+import { throttle } from 'lodash';
 import { promisify } from 'util';
 import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
-import { workers } from '../../workers';
+import { workers } from '../../workers/index';
 import { DEBUG_TIME_SCALE, __DEV__ } from '../../../config';
 import { AsyncDB } from '../../../utils/dbHelper';
 
@@ -68,6 +68,16 @@ export const defaultState: TimerState = {
     screenShotInterval: undefined,
     currentTab: 'timer'
 };
+
+export const uiStateNames = [
+    'chosenRecord',
+    'targetTime',
+    'leftTime',
+    'isFocusing',
+    'isRunning',
+    'boardId',
+    'iBreak'
+];
 
 if (__DEV__) {
     defaultState.currentTab = 'analyser';
@@ -178,7 +188,6 @@ export const actions = {
     },
     setDistractingList: (distractingList: DistractingRow[]) => async (dispatch: Dispatch) => {
         dispatch(setDistractingList(distractingList));
-        console.log(distractingList);
         await settingDB.update(
             { name: 'setting' },
             { $set: { distractingList } },
@@ -259,7 +268,6 @@ export const actions = {
 
         if (newProjectId !== undefined) {
             const newProject = await getNameFromBoardId(newProjectId);
-            console.log('predicted type', newProject);
             dispatch(setBoardId(newProject));
         }
     },

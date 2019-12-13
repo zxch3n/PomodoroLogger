@@ -1,6 +1,5 @@
 import { autoUpdater } from 'electron-updater';
 import { GithubOptions } from 'builder-util-runtime';
-import { readFileSync } from 'fs';
 
 export class AutoUpdater {
     constructor(logger: any) {
@@ -13,7 +12,6 @@ export class AutoUpdater {
         });
         autoUpdater.on('update-available', info => {
             console.log('update available');
-            console.log(info);
             sendStatusToWindow('update-available', `Version: ${info.version}; ${info.releaseName}`);
         });
         autoUpdater.on('update-not-available', info => {
