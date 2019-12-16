@@ -1,10 +1,11 @@
-import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain } from 'electron';
+import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
 import logo from '../res/icon_sm.png';
 import { build } from '../../package.json';
 import { AutoUpdater } from './AutoUpdater';
+import { appendFile } from 'fs';
 
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
@@ -37,12 +38,19 @@ if (process.platform === 'win32') {
 }
 
 const installExtensions = async () => {
-    const installer = require('electron-devtools-installer');
-    const forceDownload = false;
-    const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-    return Promise.all(
-        extensions.map(name => installer.default(installer[name], forceDownload))
-    ).catch(console.error);
+    return new Promise((res, rej) => {
+        const rejectTimer = setTimeout(() => {
+            rej();
+        }, 15000);
+        const installer = require('electron-devtools-installer');
+        const forceDownload = false;
+        const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+        return Promise.all(
+            extensions.map(name => installer.default(installer[name], forceDownload))
+        ).catch(rej);
+        clearTimeout(rejectTimer);
+        res();
+    });
 };
 
 const createWindow = async () => {
@@ -61,7 +69,7 @@ const createWindow = async () => {
     });
 
     if (process.env.NODE_ENV !== 'production') {
-        await installExtensions();
+        await installExtensions().catch(console.error);
     }
 
     if (process.env.NODE_ENV === 'production') {
@@ -86,6 +94,31 @@ const createWindow = async () => {
             event.preventDefault();
         }
     });
+
+    if (process.platform === 'darwin') {
+        globalShortcut.register('Command+Q', () => {
+            console.log('App Quit');
+            win = undefined;
+            app.exit();
+        });
+
+        let forceQuit = false;
+        app.on('before-quit', () => {
+            forceQuit = true;
+        });
+
+        win.on('close', event => {
+            if (!forceQuit) {
+                event.preventDefault();
+                return;
+            }
+
+            win = undefined;
+            app.exit();
+        });
+
+        win.webContents.openDevTools();
+    }
 };
 
 app.on('ready', async () => {
@@ -170,7 +203,6 @@ function setMenuItems(items: { label: string; type: string; click: any }[]) {
             }
         }
     ]);
-
     // @ts-ignore
     const contextMenu = Menu.buildFromTemplate(menuItems);
     mGlobal.tray.setContextMenu(contextMenu);
@@ -178,6 +210,7 @@ function setMenuItems(items: { label: string; type: string; click: any }[]) {
 
 mGlobal.setMenuItems = setMenuItems;
 app.on('window-all-closed', () => {
+    win = undefined;
     app.exit();
 });
 
