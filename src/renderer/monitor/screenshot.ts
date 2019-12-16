@@ -121,19 +121,19 @@ function getScreenCallback(
                 video: {
                     // @ts-ignore
                     mandatory: {
-                        chromeMediaSource: 'desktop',
-                        chromeMediaSourceId: `screen:${curScreen.id}`
-                        // minWidth: 3,
-                        // minHeight: 3,
-                        // maxWidth: maxSize,
-                        // maxHeight: maxSize
+                        chromeMediaSource: 'screen',
+                        maxWidth: 1920,
+                        maxHeight: 1080
                     }
                 }
             },
             (event: any) => {
                 handleStream(event);
             },
-            handleError
+            (err: Error) => {
+                console.trace(err);
+                handleError(err);
+            }
         );
     }
 }

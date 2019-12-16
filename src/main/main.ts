@@ -38,12 +38,19 @@ if (process.platform === 'win32') {
 }
 
 const installExtensions = async () => {
-    const installer = require('electron-devtools-installer');
-    const forceDownload = false;
-    const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-    return Promise.all(
-        extensions.map(name => installer.default(installer[name], forceDownload))
-    ).catch(console.error);
+    return new Promise((res, rej) => {
+        const rejectTimer = setTimeout(() => {
+            rej();
+        }, 15000);
+        const installer = require('electron-devtools-installer');
+        const forceDownload = false;
+        const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+        return Promise.all(
+            extensions.map(name => installer.default(installer[name], forceDownload))
+        ).catch(rej);
+        clearTimeout(rejectTimer);
+        res();
+    });
 };
 
 const createWindow = async () => {
@@ -62,7 +69,7 @@ const createWindow = async () => {
     });
 
     if (process.env.NODE_ENV !== 'production') {
-        await installExtensions();
+        await installExtensions().catch(console.error);
     }
 
     if (process.env.NODE_ENV === 'production') {
@@ -109,6 +116,8 @@ const createWindow = async () => {
             win = undefined;
             app.exit();
         });
+
+        win.webContents.openDevTools();
     }
 };
 
