@@ -39,6 +39,7 @@ export interface InputProps {
     showHeader?: boolean;
 }
 
+const usefulPropNames = Object.keys(defaultBoard).concat(['lists', 'cards']);
 interface Props extends KanbanBoard, BoardActionTypes, InputProps {}
 export const Board: FC<Props> = React.memo(
     (props: Props) => {
@@ -113,6 +114,6 @@ export const Board: FC<Props> = React.memo(
         );
     },
     (prevProps, nextProps) => {
-        return !isShallowEqualByKeys(prevProps, nextProps, Object.keys(defaultBoard));
+        return isShallowEqualByKeys(prevProps, nextProps, usefulPropNames);
     }
 );
