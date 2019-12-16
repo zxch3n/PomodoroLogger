@@ -7,12 +7,12 @@ const baseConfig = require('./webpack.base.config');
 module.exports = merge.smart(baseConfig, {
     target: 'electron-main',
     entry: {
-        main: ['./src/main/main.ts', './src/main/db.ts', './src/main/AutoUpdater.ts']
+        main: './src/main/main.ts'
     },
     module: {
         rules: [
             {
-                test: /\.ts$/,
+                test: [/\.jsx?$/, /\.tsx?$/],
                 exclude: /node_modules/,
                 loader: 'ts-loader'
             },
