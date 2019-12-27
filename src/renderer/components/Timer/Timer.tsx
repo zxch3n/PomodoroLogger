@@ -3,12 +3,7 @@ import { Button, Divider, message, Tooltip, Popconfirm } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes } from '../Kanban/Board/action';
-import {
-    LONG_BREAK_INTERVAL,
-    TimerActionTypes as ThisActionTypes,
-    defaultState,
-    uiStateNames
-} from './action';
+import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes, uiStateNames } from './action';
 import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
@@ -703,6 +698,7 @@ class Timer extends Component<Props, State> {
                         storyName={'allStories'}
                         style={{
                             position: 'absolute',
+                            zIndex: 50,
                             top: 14,
                             right: 14
                         }}

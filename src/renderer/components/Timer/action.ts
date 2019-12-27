@@ -8,7 +8,7 @@ import { throttle } from 'lodash';
 import { promisify } from 'util';
 import dbs, { getNameFromBoardId } from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
-import { workers } from '../../workers/index';
+import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE, __DEV__ } from '../../../config';
 import { AsyncDB } from '../../../utils/dbHelper';
 
@@ -70,7 +70,13 @@ export const defaultState: TimerState = {
 };
 
 export const uiStateNames = [
+    'focusDuration',
+    'restDuration',
+    'longBreakDuration',
+    'monitorInterval',
+    'screenShotInterval',
     'chosenRecord',
+    'currentTab',
     'targetTime',
     'leftTime',
     'isFocusing',
