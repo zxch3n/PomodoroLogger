@@ -144,6 +144,7 @@
     "native-ext-loader": "^2.3.0",
     "nedb": "^1.8.0",
     "node-sass": "^4.12.0",
+    "node-gyp": "6.0.1",
     "prettier": "^1.17.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
