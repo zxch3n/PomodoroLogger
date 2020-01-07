@@ -40,6 +40,7 @@ export const Pin: React.FC<Props> = (props: Props) => {
     const C = isRounded ? RoundedContainer : Container;
 
     return (
+        // @ts-ignore
         <C
             className={
                 isRounded

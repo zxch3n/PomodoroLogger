@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
 export type tabType = 'timer' | 'kanban' | 'history' | 'setting' | 'analyser';
 export type DistractingRow = { app?: string; title?: string };
 export interface Setting {
+    autoUpdate: boolean;
     focusDuration: number;
     restDuration: number;
     longBreakDuration: number;
@@ -55,6 +56,7 @@ export const defaultState: TimerState = {
             title: '邮件|Mail'
         }
     ],
+    autoUpdate: true,
     targetTime: undefined,
     focusDuration: 25 * 60,
     restDuration: 5 * 60,
@@ -94,6 +96,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const setAutoUpdate = createActionCreator(
+    '[Timer]SET_AUTO_UPDATE',
+    resolve => (value: boolean) => resolve(value)
+);
 export const setChosenRecord = createActionCreator(
     '[Timer]SET_CHOSEN_RECORD',
     resolve => (record?: PomodoroRecord) => resolve({ record })
@@ -173,7 +179,8 @@ export const actions = {
             ['screenShotInterval', setScreenShotInterval],
             ['startOnBoot', setStartOnBoot],
             ['longBreakDuration', setLongBreakDuration],
-            ['distractingList', setDistractingList]
+            ['distractingList', setDistractingList],
+            ['autoUpdate', setAutoUpdate]
         ];
         for (const key of settingKeywords) {
             if (key[0] in settings) {
@@ -182,6 +189,15 @@ export const actions = {
                 dispatch(action);
             }
         }
+    },
+    setAutoUpdate: (value: boolean) => async (dispatch: Dispatch) => {
+        dispatch(setAutoUpdate(value));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { autoUpdate: value } },
+            { upsert: true },
+            throwError
+        );
     },
     setFocusDuration: (focusDuration: number) => async (dispatch: Dispatch) => {
         dispatch(setFocusDuration(focusDuration));
@@ -340,7 +356,10 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
         // Project: persistence
         ({ ...state, restDuration: payload })
     ),
-
+    handle(setAutoUpdate, (state, { payload }) => ({
+        ...state,
+        autoUpdate: payload
+    })),
     handle(setMonitorInterval, (state, { payload }) => ({ ...state, monitorInterval: payload })),
 
     handle(setScreenShotInterval, (state, { payload }) => ({

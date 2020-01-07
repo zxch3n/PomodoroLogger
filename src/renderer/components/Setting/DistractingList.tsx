@@ -140,14 +140,20 @@ class DynamicFieldSet extends React.Component<
                 required={false}
                 key={k}
             >
-                {getFieldDecorator(`apps[${k}]`, {})(
+                {getFieldDecorator(
+                    `apps[${k}]`,
+                    {}
+                )(
                     <Input
                         placeholder="App RegExp"
                         style={{ width: '85%', marginRight: 8 }}
                         addonBefore={'App'}
                     />
                 )}
-                {getFieldDecorator(`titles[${k}]`, {})(
+                {getFieldDecorator(
+                    `titles[${k}]`,
+                    {}
+                )(
                     <Input
                         placeholder="Title RegExp"
                         style={{ width: '85%', marginRight: 8 }}
@@ -279,7 +285,10 @@ export const DistractingListModalButton = (props: InputProps) => {
                 destroyOnClose={true}
                 okText={'Save'}
             >
-                <DistractingList ref={formRef} {...props} />
+                {
+                    // @ts-ignore
+                    <DistractingList ref={formRef as any} {...props} />
+                }
             </Modal>
         </>
     );

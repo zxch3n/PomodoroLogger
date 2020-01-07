@@ -289,19 +289,16 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                         />
                     )}
                 </Content>
-                {
-                    // @ts-ignore
-                    <EditKanbanForm
-                        boardId={editingBoardId}
-                        wrappedComponentRef={ref}
-                        visible={visible}
-                        onSave={handleSave}
-                        onCancel={handleCancel}
-                        isCreating={!editingBoardId}
-                        onDelete={onDelete}
-                        nameValidator={boardNameValidator}
-                    />
-                }
+                <EditKanbanForm
+                    boardId={editingBoardId || ''}
+                    wrappedComponentRef={ref as any}
+                    visible={visible}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    isCreating={!editingBoardId}
+                    onDelete={onDelete}
+                    nameValidator={boardNameValidator}
+                />
             </Layout>
         );
     },
@@ -328,7 +325,9 @@ interface FormProps {
     nameValidator: (name: string) => boolean;
 }
 
-const EditKanbanForm = Form.create({ name: 'form_in_modal' })(
+const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
+    name: 'form_in_modal'
+})(
     class extends React.Component<FormProps> {
         validator = (rule: any, name: string, callback: Function) => {
             if (!this.props.isCreating || this.props.nameValidator(name)) {

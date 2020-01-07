@@ -153,6 +153,22 @@ app.on('ready', async () => {
     });
 
     await createWindow();
+
+    db.DBs.settingDB.findOne({ name: 'setting' }, (err, settings) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
+        if ('autoUpdate' in settings && !settings.autoUpdate) {
+            return;
+        }
+
+        update();
+    });
+});
+
+function update() {
     const autoUpdater = new AutoUpdater((type: string, info: any) => {
         if (win) {
             win.webContents.send(type, info);
@@ -177,7 +193,7 @@ app.on('ready', async () => {
     });
 
     autoUpdater.checkUpdate();
-});
+}
 
 function setMenuItems(items: { label: string; type: string; click: any }[]) {
     if (!mGlobal.tray) {

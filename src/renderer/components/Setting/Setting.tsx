@@ -1,23 +1,12 @@
 import React from 'react';
-import { DistractingRow, TimerActionTypes, TimerState } from '../Timer/action';
+import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
-import {
-    Button,
-    Col,
-    Icon,
-    message,
-    Modal,
-    notification,
-    Popconfirm,
-    Row,
-    Slider,
-    Switch
-} from 'antd';
+import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
 import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
 import { writeFile } from 'fs';
 import { shell, remote, app } from 'electron';
 import { promisify } from 'util';
-import { DistractingList, DistractingListModalButton } from './DistractingList';
+import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
 
 const dialog = remote.dialog;
@@ -34,10 +23,20 @@ const ButtonWrapper = styled.div`
     margin: 0.6em;
 `;
 
+const Footer = styled.footer`
+    border-top: 1px solid rgb(240, 240, 240);
+    padding: 0.6rem 0;
+    position: relative;
+    margin: 0.8rem auto;
+    width: 100%;
+    text-align: center;
+`;
+
 const StyledIcon = styled(Icon)`
-    font-size: 2.5rem;
+    font-size: 1.25rem;
     color: black;
     transition: color 0.1s;
+    margin: 0 0.3rem;
     :hover {
         color: rgb(87, 80, 89);
     }
@@ -63,6 +62,7 @@ const longBreakMarks = {
 const settingUiStates = [
     'focusDuration',
     'restDuration',
+    'autoUpdate',
     'longBreakDuration',
     'monitorInterval',
     'screenShotInterval',
@@ -110,6 +110,10 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 duration: 0,
                 icon: <Icon type="warning" />
             });
+        }, []);
+
+        const switchAutoUpdate = React.useCallback((v: boolean) => {
+            props.setAutoUpdate(v);
         }, []);
 
         const setStartOnBoot = React.useCallback((v: boolean) => {
@@ -211,6 +215,15 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                     style={{ margin: 8 }}
                 />
                 <br />
+                <span style={{ fontWeight: 500, fontSize: 14, color: 'rgba(0, 0, 0, 0.85' }}>
+                    Auto Update
+                </span>
+                <Switch
+                    onChange={switchAutoUpdate}
+                    checked={props.autoUpdate}
+                    style={{ margin: 8 }}
+                />
+                <br />
 
                 <span style={{ fontWeight: 500, fontSize: 14, color: 'rgba(0, 0, 0, 0.85' }}>
                     Screenshot
@@ -239,14 +252,14 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 <ButtonWrapper>
                     <DistractingListModalButton />
                 </ButtonWrapper>
-                <ButtonWrapper>
+                <Footer>
+                    Open-source @GitHub
                     <StyledIcon
                         type="github"
                         onClick={openGithubPage}
                         title="This project is open-source and hosted on GitHub"
                     />
-                    <br />
-                </ButtonWrapper>
+                </Footer>
             </Container>
         );
     },
