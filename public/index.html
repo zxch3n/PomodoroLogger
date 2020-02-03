@@ -1,0 +1,229 @@
+<html>
+<head>
+    <style>
+        @keyframes rotate-logo-l {
+            0% {
+                transform: rotate(-30deg);
+            }
+
+            10% {
+                transform: rotate(-30deg);
+            }
+
+            60% {
+                transform: rotate(+4deg);
+            }
+
+            70% {
+                transform: rotate(-4deg);
+            }
+
+            80% {
+                transform: rotate(+1deg);
+            }
+
+            90% {
+                transform: rotate(-1deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        @keyframes rotate-logo-r {
+            0% {
+                transform: rotate(-400deg);
+            }
+
+            10% {
+                transform: rotate(-400deg);
+            }
+
+            60% {
+                transform: rotate(10deg);
+            }
+
+            70% {
+                transform: rotate(-10deg);
+            }
+
+            80% {
+                transform: rotate(5deg);
+            }
+
+            90% {
+                transform: rotate(-5deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .logo-l {
+            animation: rotate-logo-l 1.6s cubic-bezier(0.54, 0, 0.54, 1.19);
+            transform-origin: 48.33% 56.67%;
+            transform: translateZ(0);
+        }
+
+        .logo-r {
+            animation: rotate-logo-r 1.6s ease;
+            transform-origin: 48.33% 56.67%;
+            transition: transform 0.5s;
+            transform: translateZ(0);
+        }
+
+        @keyframes logo {
+            0% {
+                transform: scale(0.95)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .splash-logo {
+            animation: logo 2s infinite alternate ease-in-out;
+        }
+
+        #logo-container svg{
+            transform-origin: 50% 50%;
+            transform: scale(1) rotate(0);
+            transition: transform 5s;
+        }
+
+        @keyframes logo-bg {
+            0% {
+                fill: #eee;
+            }
+
+            30% {
+                fill: #eee;
+            }
+
+            100% {
+                fill: #fff;
+            }
+        }
+
+        #splash-logo-bg {
+            animation: logo-bg 1.6s ease;
+        }
+
+        @keyframes logo-block {
+            0% {
+                transform: scale(0);
+            }
+
+            10% {
+                transform: scale(0);
+            }
+
+            60% {
+                transform: scale(1.0);
+            }
+
+            70% {
+                transform: scale(0.85);
+            }
+
+            80% {
+                transform: scale(1.0);
+            }
+
+            90% {
+                transform: scale(0.95);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .logo-block {
+            animation: logo-block 1.6s ease;
+            transform-origin: 48.33% 56.67%;
+        }
+
+        #logo-block1 {
+            animation: logo-block 1.5s ease;
+            transform: translateZ(0);
+        }
+
+        #logo-block2 {
+            animation: logo-block 1.4s ease;
+            transform: translateZ(0);
+        }
+
+        @keyframes logo-hover-r {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .splash-logo:hover .logo-r {
+            animation: logo-hover-r 0.3s infinite ease-in;
+        }
+
+        .splash-logo:hover .logo-l {
+            animation: logo-hover-r 18s infinite linear;
+        }
+
+        #logo-container {
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateZ(0);
+            z-index: 100000;
+            background: rgba(255,255,255,1);
+            transition: all 1s;
+        }
+
+        #root {
+            position: relative;
+        }
+
+        .ant-tabs-nav .ant-tabs-tab {
+            height: initial !important;
+        }
+    </style>
+</head>
+<body>
+<div id="logo-container">
+    <img src="animlogo.gif" width="200" height="200"/>
+<!--    <svg width="244" height="240" viewBox="0 0 304 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="splash-logo">-->
+<!--        <circle cx="151" cy="150" r="150" fill="white" id="splash-logo-bg"/>-->
+
+<!--        <path-->
+<!--                d="M144.034 177.6L18.2119 78C10.348 95.8388 -20.1245 156.293 21.1609 228.639C54.1892 286.516 118.149 300.325 146 299.994L144.034 177.6Z"-->
+<!--                fill="#0059DE" class="logo-block" id="logo-block1"/>-->
+<!--        <path-->
+<!--                d="M152.48 299.998L150 176.733L262 49C306.639 97.2127 320.621 165.301 279.453 232.898C246.52 286.976 181.082 300.164 152.48 299.998Z"-->
+<!--                fill="#FFCE3F" class="logo-block" id="logo-block2"/>-->
+<!--        <path-->
+<!--                d="M147.344 171C165.461 149.663 211.454 93.9273 256.5 43.5C239.5 27 211 0 147.344 0C82 0 35.2199 47.7007 22 72.2954L147.344 171Z"-->
+<!--                fill="#FF1E43" class="logo-block"/>-->
+
+<!--        <path d="M153.03 176.091L79.2912 102.083L63.1689 149.187L147.487 183.336L153.03 176.091Z" fill="black"-->
+<!--              fill-opacity="0.3" class="logo-l"/>-->
+<!--        <path d="M242.608 64.997L137.167 178.032L146.978 184.898L258.725 89.2158L242.608 64.997Z" fill="black"-->
+<!--              fill-opacity="0.3" class="logo-r"/>-->
+<!--        <path d="M154 175L84.5 90.5L63 138L147.5 182L154 175Z" fill="white" class="logo-l"/>-->
+<!--        <path d="M238.5 53.5L136.5 176L147 182.5L256.5 77.5L238.5 53.5Z" fill="white" class="logo-r"/>-->
+<!--    </svg>-->
+</div>
+<div id="root">
+
+</div>
+</body>
+</html>

@@ -1,5 +1,7 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { build } = require('./package');
@@ -7,9 +9,9 @@ const baseConfig = require('./webpack.base.config');
 const fixNedbForElectronRenderer = {
     apply(resolver) {
         resolver
-        // Plug in after the description file (package.json) has been
-        // identified for the import, which makes sure we're not getting
-        // mixed up with a different package.
+            // Plug in after the description file (package.json) has been
+            // identified for the import, which makes sure we're not getting
+            // mixed up with a different package.
             .getHook('beforeDescribed-relative')
             .tapAsync(
                 'FixNedbForElectronRenderer',
@@ -68,11 +70,11 @@ module.exports = merge.smart(baseConfig, {
                     cacheDirectory: true,
                     babelrc: false,
                     presets: [
-                       [
-                           '@babel/preset-env',
-                            { 
-                               targets: { browsers: 'last 2 versions ' },
-                               modules: false
+                        [
+                            '@babel/preset-env',
+                            {
+                                targets: { browsers: 'last 2 versions ' },
+                                modules: false
                             }
                         ],
                         '@babel/preset-typescript',
@@ -141,11 +143,18 @@ module.exports = merge.smart(baseConfig, {
         new ForkTsCheckerWebpackPlugin({
             reportFiles: ['src/renderer/**/*']
         }),
+        new CopyPlugin([
+            { from: path.resolve(__dirname, 'public'), to: path.resolve(__dirname, 'dist') },
+        ]),
         new webpack.NamedModulesPlugin(),
-        new HtmlWebpackPlugin({ title: build.productName }),
+        new HtmlWebpackPlugin({
+            title: build.productName,
+            template: 'public/index.html',
+            inject: true
+        }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-        }),
+        })
     ],
     resolve: {
         plugins: [

@@ -7,8 +7,10 @@ import Application from './components/Application';
 import store from './store';
 
 // Create main element
-const mainElement = document.createElement('div');
-document.body.appendChild(mainElement);
+const mainElement = document.getElementById('root');
+const splashElement = document.getElementById('logo-container');
+// const splashScreen = document.getElementById('logo-container');
+// document.body.removeChild(splashScreen!);
 // @ts-ignore
 window['__react-beautiful-dnd-disable-dev-warnings'] = true;
 
@@ -22,6 +24,13 @@ const render = (Component: any) => {
         </AppContainer>,
         mainElement
     );
+
+    setTimeout(() => {
+        splashElement!.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(splashElement!);
+        }, 1000);
+    }, 2000);
 };
 
 render(Application);
