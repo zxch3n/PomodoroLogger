@@ -10,7 +10,7 @@ import { isShallowEqualByKeys } from '../../../utils';
 const Container = styled.div`
     height: 100%;
     width: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
     margin: 0;
     ${fatScrollBar}
 `;
