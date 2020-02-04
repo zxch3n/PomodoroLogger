@@ -1,204 +1,207 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <style>
-        @keyframes rotate-logo-l {
-            0% {
-                transform: rotate(-30deg);
+    <meta charset="utf-8">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+        <style>
+            @keyframes rotate-logo-l {
+                0% {
+                    transform: rotate(-30deg);
+                }
+
+                10% {
+                    transform: rotate(-30deg);
+                }
+
+                60% {
+                    transform: rotate(+4deg);
+                }
+
+                70% {
+                    transform: rotate(-4deg);
+                }
+
+                80% {
+                    transform: rotate(+1deg);
+                }
+
+                90% {
+                    transform: rotate(-1deg);
+                }
+
+                100% {
+                    transform: rotate(0deg);
+                }
             }
 
-            10% {
-                transform: rotate(-30deg);
+            @keyframes rotate-logo-r {
+                0% {
+                    transform: rotate(-400deg);
+                }
+
+                10% {
+                    transform: rotate(-400deg);
+                }
+
+                60% {
+                    transform: rotate(10deg);
+                }
+
+                70% {
+                    transform: rotate(-10deg);
+                }
+
+                80% {
+                    transform: rotate(5deg);
+                }
+
+                90% {
+                    transform: rotate(-5deg);
+                }
+
+                100% {
+                    transform: rotate(0deg);
+                }
             }
 
-            60% {
-                transform: rotate(+4deg);
+            .logo-l {
+                animation: rotate-logo-l 1.6s cubic-bezier(0.54, 0, 0.54, 1.19);
+                transform-origin: 48.33% 56.67%;
+                transform: translateZ(0);
             }
 
-            70% {
-                transform: rotate(-4deg);
+            .logo-r {
+                animation: rotate-logo-r 1.6s ease;
+                transform-origin: 48.33% 56.67%;
+                transition: transform 0.5s;
+                transform: translateZ(0);
             }
 
-            80% {
-                transform: rotate(+1deg);
+            @keyframes logo {
+                0% {
+                    transform: scale(0.95)
+                }
+
+                100% {
+                    transform: scale(1)
+                }
             }
 
-            90% {
-                transform: rotate(-1deg);
+            .splash-logo {
+                animation: logo 2s infinite alternate ease-in-out;
             }
 
-            100% {
-                transform: rotate(0deg);
-            }
-        }
-
-        @keyframes rotate-logo-r {
-            0% {
-                transform: rotate(-400deg);
+            #logo-container svg{
+                transform-origin: 50% 50%;
+                transform: scale(1) rotate(0);
+                transition: transform 5s;
             }
 
-            10% {
-                transform: rotate(-400deg);
+            @keyframes logo-bg {
+                0% {
+                    fill: #eee;
+                }
+
+                30% {
+                    fill: #eee;
+                }
+
+                100% {
+                    fill: #fff;
+                }
             }
 
-            60% {
-                transform: rotate(10deg);
+            #splash-logo-bg {
+                animation: logo-bg 1.6s ease;
             }
 
-            70% {
-                transform: rotate(-10deg);
+            @keyframes logo-block {
+                0% {
+                    transform: scale(0);
+                }
+
+                10% {
+                    transform: scale(0);
+                }
+
+                60% {
+                    transform: scale(1.0);
+                }
+
+                70% {
+                    transform: scale(0.85);
+                }
+
+                80% {
+                    transform: scale(1.0);
+                }
+
+                90% {
+                    transform: scale(0.95);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
             }
 
-            80% {
-                transform: rotate(5deg);
+            .logo-block {
+                animation: logo-block 1.6s ease;
+                transform-origin: 48.33% 56.67%;
             }
 
-            90% {
-                transform: rotate(-5deg);
+            #logo-block1 {
+                animation: logo-block 1.5s ease;
+                transform: translateZ(0);
             }
 
-            100% {
-                transform: rotate(0deg);
-            }
-        }
-
-        .logo-l {
-            animation: rotate-logo-l 1.6s cubic-bezier(0.54, 0, 0.54, 1.19);
-            transform-origin: 48.33% 56.67%;
-            transform: translateZ(0);
-        }
-
-        .logo-r {
-            animation: rotate-logo-r 1.6s ease;
-            transform-origin: 48.33% 56.67%;
-            transition: transform 0.5s;
-            transform: translateZ(0);
-        }
-
-        @keyframes logo {
-            0% {
-                transform: scale(0.95)
+            #logo-block2 {
+                animation: logo-block 1.4s ease;
+                transform: translateZ(0);
             }
 
-            100% {
-                transform: scale(1)
-            }
-        }
-
-        .splash-logo {
-            animation: logo 2s infinite alternate ease-in-out;
-        }
-
-        #logo-container svg{
-            transform-origin: 50% 50%;
-            transform: scale(1) rotate(0);
-            transition: transform 5s;
-        }
-
-        @keyframes logo-bg {
-            0% {
-                fill: #eee;
+            @keyframes logo-hover-r {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
             }
 
-            30% {
-                fill: #eee;
+            .splash-logo:hover .logo-r {
+                animation: logo-hover-r 0.3s infinite ease-in;
             }
 
-            100% {
-                fill: #fff;
-            }
-        }
-
-        #splash-logo-bg {
-            animation: logo-bg 1.6s ease;
-        }
-
-        @keyframes logo-block {
-            0% {
-                transform: scale(0);
+            .splash-logo:hover .logo-l {
+                animation: logo-hover-r 18s infinite linear;
             }
 
-            10% {
-                transform: scale(0);
+            #logo-container {
+                width: 100%;
+                height: 100vh;
+                position: fixed;
+                left: 0;
+                top: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transform: translateZ(0);
+                z-index: 100000;
+                background: rgba(255,255,255,1);
+                transition: all 1s;
             }
 
-            60% {
-                transform: scale(1.0);
+            #root {
+                position: relative;
             }
-
-            70% {
-                transform: scale(0.85);
-            }
-
-            80% {
-                transform: scale(1.0);
-            }
-
-            90% {
-                transform: scale(0.95);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .logo-block {
-            animation: logo-block 1.6s ease;
-            transform-origin: 48.33% 56.67%;
-        }
-
-        #logo-block1 {
-            animation: logo-block 1.5s ease;
-            transform: translateZ(0);
-        }
-
-        #logo-block2 {
-            animation: logo-block 1.4s ease;
-            transform: translateZ(0);
-        }
-
-        @keyframes logo-hover-r {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .splash-logo:hover .logo-r {
-            animation: logo-hover-r 0.3s infinite ease-in;
-        }
-
-        .splash-logo:hover .logo-l {
-            animation: logo-hover-r 18s infinite linear;
-        }
-
-        #logo-container {
-            width: 100%;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform: translateZ(0);
-            z-index: 100000;
-            background: rgba(255,255,255,1);
-            transition: all 1s;
-        }
-
-        #root {
-            position: relative;
-        }
-
-        .ant-tabs-nav .ant-tabs-tab {
-            height: initial !important;
-        }
-    </style>
+        </style>
 </head>
+
 <body>
+<div id="root">
+
+</div>
 <div id="logo-container">
     <img src="animlogo.gif" width="200" height="200"/>
 <!--    <svg width="244" height="240" viewBox="0 0 304 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="splash-logo">-->
@@ -221,9 +224,6 @@
 <!--        <path d="M154 175L84.5 90.5L63 138L147.5 182L154 175Z" fill="white" class="logo-l"/>-->
 <!--        <path d="M238.5 53.5L136.5 176L147 182.5L256.5 77.5L238.5 53.5Z" fill="white" class="logo-r"/>-->
 <!--    </svg>-->
-</div>
-<div id="root">
-
 </div>
 </body>
 </html>
