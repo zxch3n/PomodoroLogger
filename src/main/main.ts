@@ -5,7 +5,6 @@ import * as db from './db';
 import logo from '../res/icon_sm.png';
 import { build } from '../../package.json';
 import { AutoUpdater } from './AutoUpdater';
-import { appendFile } from 'fs';
 
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
@@ -160,7 +159,7 @@ app.on('ready', async () => {
             return;
         }
 
-        if ('autoUpdate' in settings && !settings.autoUpdate) {
+        if (settings != null && 'autoUpdate' in settings && !settings.autoUpdate) {
             return;
         }
 
