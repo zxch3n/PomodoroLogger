@@ -1,5 +1,5 @@
 import { hot } from 'react-hot-loader/root';
-import { Icon, Layout, Tabs } from 'antd';
+import { Icon, Tabs } from 'antd';
 import * as React from 'react';
 import 'antd/dist/antd.css';
 import Setting from './Setting';
@@ -7,8 +7,8 @@ import History from './History';
 import Analyser from './Analyser';
 import ReactHotkeys from 'react-hot-keys';
 import { connect } from 'react-redux';
-import { remote } from 'electron';
-import { actions as timerActions, switchTab, TimerActionTypes } from './Timer/action';
+import { remote, ipcRenderer } from 'electron';
+import { actions as timerActions, TimerActionTypes } from './Timer/action';
 import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
 import { kanbanActions } from './Kanban/reducer';
 import { genMapDispatchToProp } from '../utils';
@@ -52,8 +52,10 @@ const Application = (props: Props) => {
                 props.switchTab(-1);
                 break;
             case 'ctrl+f12':
-                console.log('I hear you!');
                 remote.getCurrentWebContents().openDevTools({ activate: true, mode: 'detach' });
+                break;
+            case 'ctrl+q':
+                ipcRenderer.send('quit-app', 'quit');
                 break;
         }
     };
@@ -128,7 +130,10 @@ const Application = (props: Props) => {
             <UpdateController />
             <CardInDetail />
             <ConnectedPomodoroSankey />
-            <ReactHotkeys keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12'} onKeyDown={onKeyDown} />
+            <ReactHotkeys
+                keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12,ctrl+q'}
+                onKeyDown={onKeyDown}
+            />
         </Main>
     );
 };

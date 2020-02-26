@@ -94,13 +94,13 @@ const createWindow = async () => {
         }
     });
 
-    if (process.platform === 'darwin') {
-        globalShortcut.register('Command+Q', () => {
-            console.log('App Quit');
-            win = undefined;
-            app.exit();
-        });
+    ipcMain.addListener('quit-app', () => {
+        console.log('App Quit');
+        win = undefined;
+        app.exit();
+    });
 
+    if (process.platform === 'darwin') {
         let forceQuit = false;
         app.on('before-quit', () => {
             forceQuit = true;
@@ -115,8 +115,6 @@ const createWindow = async () => {
             win = undefined;
             app.exit();
         });
-
-        win.webContents.openDevTools();
     }
 };
 
