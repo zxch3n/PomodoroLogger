@@ -374,9 +374,8 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
                                 </Popconfirm>
                             </Form.Item>
                         ) : (
-                            undefined
+                            <DistractingListModalButton boardId={boardId} />
                         )}
-                        <DistractingListModalButton boardId={boardId} />
                     </Form>
                 </Modal>
             );
