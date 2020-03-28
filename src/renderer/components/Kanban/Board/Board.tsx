@@ -115,7 +115,6 @@ export const Board: FC<Props> = React.memo(
         );
     },
     (prevProps, nextProps) => {
-        console.log(nextProps);
         return isShallowEqualByKeys(prevProps, nextProps, usefulPropNames);
     }
 );

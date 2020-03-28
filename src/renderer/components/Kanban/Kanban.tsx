@@ -115,7 +115,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                 form.setFieldsValue(
                     {
                         name: '',
-                        description: ''
+                        description: '',
                     },
                     (err: Error) => {
                         if (err) throw err;
@@ -126,7 +126,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                 form.setFieldsValue(
                     {
                         name: board.name,
-                        description: board.description
+                        description: board.description,
                     },
                     (err: Error) => {
                         if (err) throw err;
@@ -163,7 +163,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
         };
 
         const boardNameValidator = (name: string) => {
-            return -1 === Object.values(props.boards).findIndex(v => v.name === name);
+            return -1 === Object.values(props.boards).findIndex((v) => v.name === name);
         };
 
         const goBack = () => {
@@ -230,7 +230,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                                 style={{
                                     paddingLeft: 10,
                                     paddingRight: 10,
-                                    margin: '0 4px 0 16px'
+                                    margin: '0 4px 0 16px',
                                 }}
                                 onClick={addBoard}
                                 id={'create-kanban-button'}
@@ -243,7 +243,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                                 value={props.kanban.sortedBy}
                                 onChange={props.setSortedBy}
                                 style={{
-                                    width: 140
+                                    width: 140,
                                 }}
                             >
                                 <Option value="recent">Last Visit</Option>
@@ -297,7 +297,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                 <Content
                     style={{
                         padding: 4,
-                        height: 'calc(100vh - 45px)'
+                        height: 'calc(100vh - 45px)',
                     }}
                 >
                     {props.kanban.chosenBoardId === undefined ? (
@@ -346,7 +346,7 @@ interface FormProps {
 }
 
 const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
-    name: 'form_in_modal'
+    name: 'form_in_modal',
 })(
     class extends React.Component<FormProps> {
         validator = (rule: any, name: string, callback: Function) => {
@@ -375,9 +375,8 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
                             {getFieldDecorator('name', {
                                 rules: [
                                     { required: true, message: 'Please input the name of board!' },
-                                    { max: 24, message: 'Max length of name is 24' },
-                                    { validator: this.validator }
-                                ]
+                                    { validator: this.validator },
+                                ],
                             })(<Input />)}
                         </Form.Item>
                         <Form.Item label="Description">
@@ -396,9 +395,7 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
                                 </Form.Item>
                                 <DistractingListModalButton boardId={boardId} />
                             </>
-                        ) : (
-                            undefined
-                        )}
+                        ) : undefined}
                     </Form>
                 </Modal>
             );
