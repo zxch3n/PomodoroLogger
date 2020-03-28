@@ -87,6 +87,10 @@ export interface AggPomodoroInfo {
         week?: number;
         month?: number;
     };
+    total: {
+        count?: number;
+        usedTime?: number;
+    };
     calendarCount?: any;
     wordWeights?: [string, number][];
     pieChart?: TimeSpentData;
@@ -98,6 +102,9 @@ export async function getAggPomodoroInfo(pomodoros: PomodoroRecord[]): Promise<A
             day: getPomodoroCount(0, pomodoros),
             week: getPomodoroCount(new Date().getDay(), pomodoros),
             month: getPomodoroCount(new Date().getDate() - 1, pomodoros)
+        },
+        total: {
+            count: pomodoros.length
         },
         wordWeights: await workers.tokenizer.tokenize(pomodoros),
         pieChart: await getTimeSpentDataFromRecords(pomodoros),

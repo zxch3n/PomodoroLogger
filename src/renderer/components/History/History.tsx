@@ -10,10 +10,14 @@ import { KanbanBoardState } from '../Kanban/Board/action';
 import { DBWorker } from '../../workers/DBWorker';
 import { Loading } from '../utils/Loading';
 import { debounce } from 'lodash';
-import { fatScrollBar, tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
+import { fatScrollBar } from '../../style/scrollbar';
 import { PomodoroNumView } from '../Timer/PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
-import { formatTimeYMD, formatTimeYmdHms } from '../Visualization/Timeline';
+import { formatTimeYMD } from '../Visualization/Timeline';
+import { Card as CardState } from '../Kanban/Card/action';
+import { BadgeHolder } from '../Kanban/style/Badge';
+import { PomodoroDot } from '../Visualization/PomodoroDot';
+import { TimeBadge } from '../Kanban/Card/Badge';
 
 const { Option } = Select;
 
@@ -41,6 +45,7 @@ interface Props extends HistoryActionCreatorTypes, HistoryState {
     chosenId?: string;
     boards: KanbanBoardState;
     chooseRecord: (r: PomodoroRecord) => void;
+    getCardsByBoardId: (boardId: string | undefined) => CardState[];
 }
 
 export const History: React.FunctionComponent<Props> = React.memo((props: Props) => {
@@ -51,6 +56,10 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
             day: undefined,
             month: undefined,
             week: undefined
+        },
+        total: {
+            count: undefined,
+            usedTime: undefined
         },
         calendarCount: undefined,
         pieChart: undefined,
@@ -77,7 +86,8 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
 
     useEffect(resizeEffect, []);
     useEffect(() => {
-        const searchArg = props.chosenId === undefined ? {} : { boardId: props.chosenId };
+        const boardId = props.chosenId;
+        const searchArg = props.chosenId === undefined ? {} : { boardId };
         // Avoid using outdated cache; And use worker to avoid db blocking the process
         const db = new DBWorker('sessionDB');
         db.find(searchArg, {})
@@ -85,7 +95,10 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                 return getAggPomodoroInfo(docs);
             })
             .then((ans: AggPomodoroInfo) => {
+                const cards = props.getCardsByBoardId(boardId);
+                ans.total.usedTime = cards.reduce((a, b) => a + b.spentTimeInHour.actual, 0);
                 setAggInfo(ans);
+                setPomodoros(undefined);
             });
     }, [props.chosenId, props.expiringKey]);
     useEffect(() => {
@@ -120,7 +133,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
     return (
         <Container>
             <SubContainer ref={container as any}>
-                <Row style={{ marginBottom: 20 }}>
+                <Row style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}>
                     <Select
                         onChange={onChange}
                         value={props.chosenId}
@@ -138,6 +151,18 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                             );
                         })}
                     </Select>
+                    <BadgeHolder style={{ marginLeft: 10 }}>
+                        {aggInfo.total.count != null ? (
+                            <PomodoroDot num={aggInfo.total.count} />
+                        ) : (
+                            undefined
+                        )}
+                        {aggInfo.total.usedTime != null ? (
+                            <TimeBadge spentTime={aggInfo.total.usedTime} leftTime={0} />
+                        ) : (
+                            undefined
+                        )}
+                    </BadgeHolder>
                 </Row>
                 <Row gutter={16}>
                     <Col span={8}>
