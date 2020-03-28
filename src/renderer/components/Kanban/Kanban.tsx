@@ -386,15 +386,18 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
                             )}
                         </Form.Item>
                         {!isCreating ? (
-                            <Form.Item>
-                                <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
-                                    <Button type={'danger'} icon={'delete'}>
-                                        Delete
-                                    </Button>
-                                </Popconfirm>
-                            </Form.Item>
+                            <>
+                                <Form.Item>
+                                    <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
+                                        <Button type={'danger'} icon={'delete'}>
+                                            Delete
+                                        </Button>
+                                    </Popconfirm>
+                                </Form.Item>
+                                <DistractingListModalButton boardId={boardId} />
+                            </>
                         ) : (
-                            <DistractingListModalButton boardId={boardId} />
+                            undefined
                         )}
                     </Form>
                 </Modal>
