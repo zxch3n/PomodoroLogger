@@ -1,4 +1,4 @@
-import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain, globalShortcut } from 'electron';
+import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain, webContents } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
@@ -86,6 +86,16 @@ const createWindow = async () => {
             })
         );
     }
+
+    const handleRedirect = (e: any, url: string) => {
+        if (url !== win?.webContents.getURL()) {
+            e.preventDefault();
+            require('electron').shell.openExternal(url);
+        }
+    };
+
+    win.webContents.on('will-navigate', handleRedirect);
+    win.webContents.on('new-window', handleRedirect);
 
     win.on('close', (event: Event) => {
         if (win) {

@@ -785,13 +785,17 @@ class Timer extends Component<Props, State> {
                                     onClick={this.onClear}
                                 />
                             </div>
-                            <Button
-                                id="more-timer-button"
-                                icon="more"
-                                shape="circle"
-                                title="Show More"
-                                onClick={this.toggleMode}
-                            />
+                            {this.state.pomodorosToday.length ? (
+                                <Button
+                                    id="more-timer-button"
+                                    icon="more"
+                                    shape="circle"
+                                    title="Show More"
+                                    onClick={this.toggleMode}
+                                />
+                            ) : (
+                                undefined
+                            )}
                         </ButtonRow>
 
                         <MoreInfo>
