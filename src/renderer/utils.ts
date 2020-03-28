@@ -41,8 +41,20 @@ export function to2digits(num: number) {
 }
 
 export function formatTime(timeInHour: number) {
+    if (timeInHour >= 1e6) {
+        return `${(timeInHour / 1e6).toFixed(2)}mh`;
+    }
+
+    if (timeInHour >= 1e5) {
+        return `${(timeInHour / 1000).toFixed(0)}kh`;
+    }
+
+    if (timeInHour >= 10000) {
+        return `${(timeInHour / 1000).toFixed(1)}kh`;
+    }
+
     if (timeInHour >= 1000) {
-        return `${timeInHour}h`;
+        return `${(timeInHour / 1000).toFixed(2)}kh`;
     }
 
     if (timeInHour >= 100) {

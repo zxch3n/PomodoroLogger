@@ -42,8 +42,8 @@ const CardContentWeight = 0.5;
 export const getWeightsFromPomodoros = (
     records: PomodoroRecord[],
     cards: Card[] = [],
-    targetMax: number = 42,
-    targetMin: number = 12
+    targetMax: number = 56,
+    targetMin: number = 8
 ): [string, number][] => {
     const tokenWeights = new Counter();
     const tokenizer = new Tokenizer();
