@@ -31,7 +31,10 @@ import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
 const KanbanName = styled.h1`
-    font-size: 2em;
+    max-width: 270px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.5em;
     padding-left: 12px;
     transition: color 0.2s;
     user-select: none;
