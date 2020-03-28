@@ -28,6 +28,19 @@ const Container = styled.div`
     padding: 20px;
     height: calc(100vh - 45px);
     ${fatScrollBar}
+
+    & .visible-pomodoros-view {
+        transform-origin: 0 0;
+        transition: transform 150ms;
+        margin: 6px;
+        height: 28px;
+    }
+
+    & .invisible-pomodoros-view {
+        transform: scale(1, 0);
+        margin: 6px;
+        height: 28px;
+    }
 `;
 
 const SubContainer = styled.div`
@@ -110,6 +123,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
         const db = workers.dbWorkers.sessionDB;
         const dateStart = new Date(`${targetDate[0]}-${targetDate[1]}-${targetDate[2]}`).getTime();
         const nextDay = dateStart + 24 * 3600 * 1000;
+        setPomodoros(undefined);
         db.find({ startTime: { $lt: nextDay, $gte: dateStart } }, {}).then(docs => {
             if (docs && docs.length) {
                 setPomodoros(docs);
@@ -217,28 +231,32 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                                 width={calendarWidth}
                                 clickDate={clickDate}
                             />
-                            {shownPomodoros ? (
-                                <div style={{ margin: 10 }}>
-                                    <span
-                                        style={{
-                                            fontSize: 14,
-                                            color: '#7f7f7f',
-                                            margin: '0 5px',
-                                            display: 'inline-block'
-                                        }}
-                                    >
-                                        {formatTimeYMD(shownPomodoros[0].startTime)}
-                                    </span>
-                                    <PomodoroNumView
-                                        inline={true}
-                                        pomodoros={shownPomodoros}
-                                        showNum={false}
-                                        chooseRecord={props.chooseRecord}
-                                    />
-                                </div>
-                            ) : (
-                                undefined
-                            )}
+                            <div
+                                className={
+                                    shownPomodoros
+                                        ? 'visible-pomodoros-view'
+                                        : 'invisible-pomodoros-view'
+                                }
+                            >
+                                <span
+                                    style={{
+                                        fontSize: 14,
+                                        color: '#7f7f7f',
+                                        margin: '0 5px',
+                                        display: 'inline-block'
+                                    }}
+                                >
+                                    {shownPomodoros
+                                        ? formatTimeYMD(shownPomodoros[0].startTime)
+                                        : 'No Data'}
+                                </span>
+                                <PomodoroNumView
+                                    inline={true}
+                                    pomodoros={shownPomodoros || []}
+                                    showNum={false}
+                                    chooseRecord={props.chooseRecord}
+                                />
+                            </div>
                             <DualPieChart
                                 {...aggInfo.pieChart}
                                 width={calendarWidth}
