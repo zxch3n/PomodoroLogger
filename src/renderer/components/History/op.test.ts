@@ -3,22 +3,23 @@ import { createRecord } from '../../../../test/utils';
 
 describe('History aggregating operations', () => {
     it('agg empty record', async () => {
-        const agg = await op.getAggPomodoroInfo([]);
+        const agg = await op.getAggPomodoroInfo([], []);
         expect(agg).toStrictEqual({
             count: {
                 day: 0,
                 week: 0,
-                month: 0
+                month: 0,
             },
             wordWeights: [],
             pieChart: {
                 projectData: [],
-                appData: []
+                appData: [],
             },
             total: {
-                count: []
+                count: 0,
+                usedTime: 0,
             },
-            calendarCount: {}
+            calendarCount: {},
         });
     });
 
@@ -26,16 +27,16 @@ describe('History aggregating operations', () => {
         const timeSpent = await op.getTimeSpentDataFromRecords([
             createRecord('pa', 11, [
                 ['a', 6],
-                ['b', 5]
+                ['b', 5],
             ]),
             createRecord('pb', 10, [
                 ['a', 5],
-                ['b', 5]
+                ['b', 5],
             ]),
             createRecord('pa', 10, [
                 ['c', 5],
-                ['d', 5]
-            ])
+                ['d', 5],
+            ]),
         ]);
 
         expect(timeSpent.appData[0].name).toBe('A');
@@ -61,7 +62,7 @@ describe('History aggregating operations', () => {
             ['k', 2],
             ['l', 2],
             ['m', 2],
-            ['n', 2]
+            ['n', 2],
         ] as [string, number][];
         const timeSpent = await op.getTimeSpentDataFromRecords([createRecord('pa', 100, appData)]);
 

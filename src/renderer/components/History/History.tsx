@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Card, Col, Row, Select, Spin, Statistic } from 'antd';
+import { Card, Col, Row, Select, Statistic } from 'antd';
 import { HistoryActionCreatorTypes, HistoryState } from './action';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import styled from 'styled-components';
@@ -7,7 +7,6 @@ import { DualPieChart } from '../Visualization/DualPieChart';
 import { AggPomodoroInfo, getAggPomodoroInfo } from './op';
 import { WordCloud } from '../Visualization/WordCloud';
 import { KanbanBoardState } from '../Kanban/Board/action';
-import { DBWorker } from '../../workers/DBWorker';
 import { Loading } from '../utils/Loading';
 import { debounce } from 'lodash';
 import { fatScrollBar } from '../../style/scrollbar';
@@ -63,21 +62,22 @@ interface Props extends HistoryActionCreatorTypes, HistoryState {
 }
 
 export const History: React.FunctionComponent<Props> = React.memo((props: Props) => {
+    const { expiringKey } = props;
     const [targetDate, setTargetDate] = useState<undefined | [number, number, number]>(undefined);
     const [shownPomodoros, setPomodoros] = useState<undefined | PomodoroRecord[]>(undefined);
     const [aggInfo, setAggInfo] = useState<AggPomodoroInfo>({
         count: {
             day: undefined,
             month: undefined,
-            week: undefined
+            week: undefined,
         },
         total: {
             count: undefined,
-            usedTime: undefined
+            usedTime: undefined,
         },
         calendarCount: undefined,
         pieChart: undefined,
-        wordWeights: undefined
+        wordWeights: undefined,
     });
     const container = useRef<HTMLDivElement>();
     const [calendarWidth, setCalendarWidth] = useState(800);
@@ -105,16 +105,14 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
         // Avoid using outdated cache; And use worker to avoid db blocking the process
         const db = workers.dbWorkers.sessionDB;
         db.find(searchArg, {})
-            .then(docs => {
-                return getAggPomodoroInfo(docs);
+            .then((docs) => {
+                return getAggPomodoroInfo(docs, props.getCardsByBoardId(boardId));
             })
             .then((ans: AggPomodoroInfo) => {
-                const cards = props.getCardsByBoardId(boardId);
-                ans.total.usedTime = cards.reduce((a, b) => a + b.spentTimeInHour.actual, 0);
                 setAggInfo(ans);
                 setPomodoros(undefined);
             });
-    }, [props.chosenId, props.expiringKey]);
+    }, [props.chosenId, expiringKey]);
     useEffect(() => {
         if (targetDate == null) {
             return;
@@ -124,7 +122,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
         const dateStart = new Date(`${targetDate[0]}-${targetDate[1]}-${targetDate[2]}`).getTime();
         const nextDay = dateStart + 24 * 3600 * 1000;
         setPomodoros(undefined);
-        db.find({ startTime: { $lt: nextDay, $gte: dateStart } }, {}).then(docs => {
+        db.find({ startTime: { $lt: nextDay, $gte: dateStart } }, {}).then((docs) => {
             if (docs && docs.length) {
                 setPomodoros(docs);
             }
@@ -136,7 +134,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
     };
 
     const onProjectClick = (name: string) => {
-        const v = Object.values(props.boards).find(v => v.name === name);
+        const v = Object.values(props.boards).find((v) => v.name === name);
         if (v) {
             props.setChosenProjectId(v._id);
         }
@@ -158,7 +156,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                         <Option value={undefined} key="All Projects">
                             All Projects
                         </Option>
-                        {Object.values(props.boards).map(v => {
+                        {Object.values(props.boards).map((v) => {
                             return (
                                 <Option value={v._id} key={v._id}>
                                     {v.name}
@@ -169,14 +167,10 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                     <BadgeHolder style={{ marginLeft: 10 }}>
                         {aggInfo.total.count != null ? (
                             <PomodoroDot num={aggInfo.total.count} />
-                        ) : (
-                            undefined
-                        )}
+                        ) : undefined}
                         {aggInfo.total.usedTime != null ? (
                             <TimeBadge spentTime={aggInfo.total.usedTime} leftTime={0} />
-                        ) : (
-                            undefined
-                        )}
+                        ) : undefined}
                     </BadgeHolder>
                 </Row>
                 <Row gutter={16}>
@@ -243,7 +237,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                                         fontSize: 14,
                                         color: '#7f7f7f',
                                         margin: '0 5px',
-                                        display: 'inline-block'
+                                        display: 'inline-block',
                                     }}
                                 >
                                     {shownPomodoros
@@ -268,9 +262,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                                 height={calendarWidth * 0.6}
                             />
                         </ChartContainer>
-                    ) : (
-                        undefined
-                    )
+                    ) : undefined
                 ) : (
                     <Loading size={'large'} />
                 )}

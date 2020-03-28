@@ -15,7 +15,7 @@ import { getTodaySessions } from '../../monitor/sessionManager';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
-import { workers } from '../../workers';
+import { restartDBWorkers, workers } from '../../workers';
 import { TimerMask } from './SessionEndingMask';
 import { __DEV__, DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';
@@ -165,7 +165,7 @@ class Timer extends Component<Props, State> {
             pomodorosToday: [],
             showMask: false,
             pomodoroNum: 0,
-            showSider: true
+            showSider: true,
         };
         this.mainDiv = React.createRef<HTMLDivElement>();
         this.sound = React.createRef<HTMLAudioElement>();
@@ -191,16 +191,16 @@ class Timer extends Component<Props, State> {
         this.win = remote.getCurrentWindow();
         this.updateLeftTime();
         this.selfRef.current!.addEventListener('resize', this.onResize);
-        getTodaySessions().then(finishedSessions => {
+        getTodaySessions().then((finishedSessions) => {
             finishedSessions.sort((a, b) => a.startTime - b.startTime);
             this.setState({
                 pomodorosToday: finishedSessions,
-                pomodoroNum: finishedSessions.length
+                pomodoroNum: finishedSessions.length,
             });
         });
 
         this.addMenuItems();
-        workers.dbWorkers.sessionDB.count({}).then(size => {
+        workers.dbWorkers.sessionDB.count({}).then((size) => {
             workers.knn.loadModel(size).catch(console.error);
         });
     }
@@ -232,7 +232,7 @@ class Timer extends Component<Props, State> {
                     if (!this.props.timer.isRunning) {
                         this.onStopResumeOrStart();
                     }
-                }
+                },
             },
             {
                 label: 'Start Break',
@@ -245,7 +245,7 @@ class Timer extends Component<Props, State> {
                     if (!this.props.timer.isRunning) {
                         this.onStopResumeOrStart();
                     }
-                }
+                },
             },
             {
                 label: 'Stop',
@@ -254,13 +254,13 @@ class Timer extends Component<Props, State> {
                     if (this.props.timer.isRunning) {
                         this.onStopResumeOrStart();
                     }
-                }
+                },
             },
             {
                 label: 'Clear',
                 type: 'normal',
-                click: this.onClear
-            }
+                click: this.onClear,
+            },
         ]);
     }
 
@@ -381,7 +381,7 @@ class Timer extends Component<Props, State> {
         setTrayImageWithMadeIcon(undefined).catch(console.error);
         this.setState((_, props) => ({
             leftTime: this.defaultLeftTime(props.timer.isFocusing),
-            percent: 0
+            percent: 0,
         }));
     };
 
@@ -403,13 +403,13 @@ class Timer extends Component<Props, State> {
             const notification = new remote.Notification({
                 title: 'Resting session ended',
                 body: `Completed ${this.state.pomodoroNum} sessions today. \n\n`,
-                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
+                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`),
             });
             notification.show();
         }
 
         this.setState({
-            showMask: true
+            showMask: true,
         });
         this.props.stopTimer();
         this.props.changeAppTab('timer');
@@ -430,7 +430,7 @@ class Timer extends Component<Props, State> {
             const notification = new remote.Notification({
                 title: 'Focusing finished. Start resting.',
                 body: `Completed ${this.state.pomodoroNum + 1} sessions today. \n\n`,
-                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`)
+                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`),
             });
             notification.show();
         }
@@ -499,6 +499,7 @@ class Timer extends Component<Props, State> {
             return;
         }
 
+        restartDBWorkers();
         this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
         this.extendedTimeInMinute = 0;
         if (this.props.timer.boardId !== undefined) {
@@ -524,7 +525,7 @@ class Timer extends Component<Props, State> {
     }
 
     toggleMode = () => {
-        this.setState(state => {
+        this.setState((state) => {
             // TODO: need better control
             const more = !state.more;
             return { more };
@@ -571,7 +572,7 @@ class Timer extends Component<Props, State> {
                 this.focusOnCurrentWindow();
                 if (this.sound.current) {
                     this.sound.current.volume = volume;
-                    this.sound.current.play().catch(err => console.error(err));
+                    this.sound.current.play().catch((err) => console.error(err));
                 }
             }
         }, timeout);
@@ -605,7 +606,7 @@ class Timer extends Component<Props, State> {
     };
 
     switchSider = () => {
-        this.setState(state => ({ showSider: !state.showSider }));
+        this.setState((state) => ({ showSider: !state.showSider }));
     };
 
     onKeyDown = (keyName: string) => {
@@ -643,7 +644,7 @@ class Timer extends Component<Props, State> {
                 if (!(appName in apps)) {
                     apps[appName] = {
                         appName,
-                        spentHours: 0
+                        spentHours: 0,
                     };
                 }
 
@@ -667,12 +668,10 @@ class Timer extends Component<Props, State> {
                     onStart={this.onMaskButtonClick}
                     pomodoros={this.state.pomodorosToday}
                 />
-                {listId === undefined || boardId === undefined ? (
-                    undefined
-                ) : (
+                {listId === undefined || boardId === undefined ? undefined : (
                     <MySider
                         style={{
-                            marginLeft: this.state.showSider ? 0 : -300
+                            marginLeft: this.state.showSider ? 0 : -300,
                         }}
                     >
                         <KanbanName onClick={this.switchToKanban}>
@@ -691,7 +690,7 @@ class Timer extends Component<Props, State> {
                                 top: 20,
                                 marginRight: -15,
                                 zIndex: 50,
-                                boxShadow: '4px 0 6px -1px rgba(234, 234, 234, 0.6)'
+                                boxShadow: '4px 0 6px -1px rgba(234, 234, 234, 0.6)',
                             }}
                             onClick={this.switchSider}
                         />
@@ -704,7 +703,7 @@ class Timer extends Component<Props, State> {
                             position: 'absolute',
                             zIndex: 50,
                             top: 14,
-                            right: 14
+                            right: 14,
                         }}
                     />
                     <TimerInnerLayout>
@@ -713,12 +712,12 @@ class Timer extends Component<Props, State> {
                                 type="circle"
                                 strokeColor={{
                                     '0%': '#108ee9',
-                                    '100%': '#87d068'
+                                    '100%': '#87d068',
                                 }}
                                 percent={percent}
                                 width={300}
                                 style={{
-                                    margin: '0 auto'
+                                    margin: '0 auto',
                                 }}
                             >
                                 <ProgressTextContainer>
@@ -793,9 +792,7 @@ class Timer extends Component<Props, State> {
                                     title="Show More"
                                     onClick={this.toggleMode}
                                 />
-                            ) : (
-                                undefined
-                            )}
+                            ) : undefined}
                         </ButtonRow>
 
                         <MoreInfo>
@@ -826,9 +823,7 @@ class Timer extends Component<Props, State> {
                                     style={{ margin: '0 auto' }}
                                 />
                             </MoreInfo>
-                        ) : (
-                            undefined
-                        )}
+                        ) : undefined}
                     </TimerInnerLayout>
                 </TimerLayout>
                 <audio src={dingMp3} ref={this.sound} />

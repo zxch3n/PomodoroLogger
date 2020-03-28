@@ -4,6 +4,7 @@ import WordCloud2 from 'wordcloud';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { Loading } from '../utils/Loading';
+import { Card } from '../Kanban/type';
 
 const tokenizer = workers.tokenizer;
 
@@ -33,7 +34,7 @@ export const WordCloud: React.FC<MProps> = (props: MProps) => {
             },
             rotateRatio: 0.5,
             rotationSteps: 2,
-            backgroundColor: '#ffe0e0'
+            backgroundColor: 'white',
         });
     }, [weights]);
 
@@ -43,15 +44,16 @@ export const WordCloud: React.FC<MProps> = (props: MProps) => {
 
 interface AsyncProps {
     records: PomodoroRecord[];
+    cards?: Card[];
 }
 
 type MAsyncProps = AsyncProps & { [name: string]: any };
 export const AsyncWordCloud: React.FC<MAsyncProps> = (props: MAsyncProps) => {
-    const { records, ...restProps } = props;
+    const { records, cards = [], ...restProps } = props;
     const [weights, setWeights] = React.useState<[string, number][]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
-        tokenizer.tokenize(records).then(weights => {
+        tokenizer.tokenize(records, cards).then((weights) => {
             setWeights(weights);
             setIsLoading(false);
         });

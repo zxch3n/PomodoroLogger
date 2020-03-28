@@ -18,7 +18,7 @@ describe('Tokenizer', () => {
             'spark',
             'lines',
             'Google',
-            'Chrome'
+            'Chrome',
         ]);
 
         expectTokenizer('C:\\CODE\\js\\pomodoro-logger', ['C', 'CODE', 'js', 'pomodoro-logger']);
@@ -27,7 +27,7 @@ describe('Tokenizer', () => {
             'home',
             'dat',
             'project',
-            'pomodoro-logger'
+            'pomodoro-logger',
         ]);
 
         expectTokenizer('/home/.bin/.vscode', ['home', 'bin', 'vscode']);
@@ -39,7 +39,7 @@ describe('Tokenizer', () => {
             'aaabbb',
             'bbbaaa',
             'Google',
-            'Chrome'
+            'Chrome',
         ]);
 
         expectTokenizer('time-logger [C:\\a\\b\\c-d] - ...\\.circleci\\config.yml - WebStorm', [
@@ -50,7 +50,7 @@ describe('Tokenizer', () => {
             'c-d',
             'circleci',
             'config.yml',
-            'WebStorm'
+            'WebStorm',
         ]);
     });
 
@@ -64,7 +64,7 @@ describe('Tokenizer', () => {
             'abcd',
             'pppp',
             'Google',
-            'Chrome'
+            'Chrome',
         ]);
 
         expectTokenizer('App.exe a.jpg b.test.js c.test.jpg End.', [
@@ -72,7 +72,7 @@ describe('Tokenizer', () => {
             'a.jpg',
             'b.test.js',
             'c.test.jpg',
-            'End'
+            'End',
         ]);
     });
 
@@ -83,7 +83,7 @@ describe('Tokenizer', () => {
             'Layer',
             '8',
             'RGB',
-            '8'
+            '8',
         ]);
     });
 });
@@ -95,7 +95,7 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
         apps: {},
         switchTimes: 10,
         startTime: 100,
-        spentTimeInHour: 0.3
+        spentTimeInHour: 0.3,
     };
 
     let index = 0;
@@ -106,7 +106,7 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
             titleSpentTime[pair[0]] = {
                 index,
                 normalizedWeight: pair[1],
-                occurrence: pair[1] * 100
+                occurrence: pair[1] * 100,
             };
 
             index += 1;
@@ -115,7 +115,7 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
         record.apps[i.toString()] = {
             titleSpentTime,
             spentTimeInHour: 0.1,
-            appName: i.toString()
+            appName: i.toString(),
         };
     }
 
@@ -143,13 +143,13 @@ describe('Tokenizer.getTokenWeightsFromRecords', () => {
 
     it('aggregates one record correctly', () => {
         const record = createRecordFromTitlesAndWeights([
-            ['expect(getWeightsFromPomodoros([])).toStrictEqual([]);', 1]
+            ['expect(getWeightsFromPomodoros([])).toStrictEqual([]);', 1],
         ]);
 
         expectWeights([record], {
             expect: 42,
             getWeightsFromPomodoros: 42,
-            toStrictEqual: 42
+            toStrictEqual: 42,
         });
     });
 
@@ -157,13 +157,13 @@ describe('Tokenizer.getTokenWeightsFromRecords', () => {
         const records = [
             createRecordFromTitlesAndWeights([
                 ['const weight normalizedWeight;', 3],
-                ['Math.min--;', 1]
+                ['Math.min--;', 1],
             ]),
             createRecordFromTitlesAndWeights([
                 ['targetMin: number = 12', 3],
                 ['MiddleSize', 2],
-                ['targetMax', 1]
-            ])
+                ['targetMax', 1],
+            ]),
         ];
 
         expectWeights(records, {
@@ -175,7 +175,11 @@ describe('Tokenizer.getTokenWeightsFromRecords', () => {
             number: 42,
             '12': 42,
             targetMax: 12,
-            MiddleSize: (12 + 42) / 2
+            MiddleSize: (12 + 42) / 2,
         });
     });
+});
+
+describe('Tokenizer.getTokenWeightsFromCards', () => {
+    it('should calc cards weight correctly', () => {});
 });

@@ -2,10 +2,11 @@ import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
 import { getBetterAppName, getNameFromBoardId } from '../../utils';
 import { workers } from '../../workers';
+import { Card } from '../Kanban/type';
 
 export const getPomodoroCalendarData = (pomodoros: PomodoroRecord[]) => {
     const counter = new Counter();
-    pomodoros.forEach(v => {
+    pomodoros.forEach((v) => {
         const date = _getDateFromTimestamp(v.startTime).getTime();
         counter.add(date);
     });
@@ -72,11 +73,11 @@ export const getTimeSpentDataFromRecords = async (
 
     const appData = appTimeCounter
         .getNameValuePairs({ toFixed: 2, topK: 10 })
-        .map(v => ({ ...v, name: getBetterAppName(v.name) }));
+        .map((v) => ({ ...v, name: getBetterAppName(v.name) }));
 
     return {
         projectData,
-        appData
+        appData,
     };
 };
 
@@ -95,18 +96,22 @@ export interface AggPomodoroInfo {
     pieChart?: TimeSpentData;
 }
 
-export async function getAggPomodoroInfo(pomodoros: PomodoroRecord[]): Promise<AggPomodoroInfo> {
+export async function getAggPomodoroInfo(
+    pomodoros: PomodoroRecord[],
+    cards: Card[]
+): Promise<AggPomodoroInfo> {
     return {
         count: {
             day: getPomodoroCount(0, pomodoros),
             week: getPomodoroCount(new Date().getDay(), pomodoros),
-            month: getPomodoroCount(new Date().getDate() - 1, pomodoros)
+            month: getPomodoroCount(new Date().getDate() - 1, pomodoros),
         },
         total: {
-            count: pomodoros.length
+            count: pomodoros.length,
+            usedTime: cards.reduce((a, b) => a + b.spentTimeInHour.actual, 0),
         },
-        wordWeights: await workers.tokenizer.tokenize(pomodoros),
+        wordWeights: await workers.tokenizer.tokenize(pomodoros, cards),
         pieChart: await getTimeSpentDataFromRecords(pomodoros),
-        calendarCount: getPomodoroCalendarData(pomodoros)
+        calendarCount: getPomodoroCalendarData(pomodoros),
     };
 }

@@ -17,6 +17,10 @@ class TrueDBWorker extends BaseWorker {
         return this.worker;
     }
 
+    setWorker(worker: Worker) {
+        this.worker = worker;
+    }
+
     genHandler = (op: string) => async (...args: any[]): Promise<any> => {
         return await this.createHandler(
             {
@@ -24,11 +28,11 @@ class TrueDBWorker extends BaseWorker {
                 payload: {
                     args,
                     // @ts-ignore
-                    path: dbPaths[this.dbType]
-                }
+                    path: dbPaths[this.dbType],
+                },
             },
             {
-                done: (payload, done) => done(payload)
+                done: (payload, done) => done(payload),
             },
             30000
         );
@@ -57,6 +61,8 @@ class FakeDBWorker {
     getWorker() {
         return undefined;
     }
+
+    setWorker(worker: Worker) {}
 
     genHandler = (op: string) => async (...args: any[]): Promise<any> => {
         return await new Promise((resolve, reject) => {
