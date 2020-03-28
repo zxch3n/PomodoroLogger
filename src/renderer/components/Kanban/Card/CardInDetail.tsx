@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { actions, Card, CardActionTypes } from './action';
+import { actions, CardActionTypes } from './action';
 import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
 import ReactHotkeys from 'react-hot-keys';
@@ -9,6 +9,7 @@ import { Button, Col, Form, Input, InputNumber, Modal, Popconfirm, Row } from 'a
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
 import styled from 'styled-components';
+import { Card } from '../type';
 
 const Container = styled.div`
     .ant-form-item {

@@ -15,15 +15,27 @@ describe('History aggregating operations', () => {
                 projectData: [],
                 appData: []
             },
+            total: {
+                count: []
+            },
             calendarCount: {}
         });
     });
 
     it('getTimeSpentTimeFromRecord', async () => {
         const timeSpent = await op.getTimeSpentDataFromRecords([
-            createRecord('pa', 11, [['a', 6], ['b', 5]]),
-            createRecord('pb', 10, [['a', 5], ['b', 5]]),
-            createRecord('pa', 10, [['c', 5], ['d', 5]])
+            createRecord('pa', 11, [
+                ['a', 6],
+                ['b', 5]
+            ]),
+            createRecord('pb', 10, [
+                ['a', 5],
+                ['b', 5]
+            ]),
+            createRecord('pa', 10, [
+                ['c', 5],
+                ['d', 5]
+            ])
         ]);
 
         expect(timeSpent.appData[0].name).toBe('A');

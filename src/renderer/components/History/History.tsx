@@ -14,11 +14,11 @@ import { fatScrollBar } from '../../style/scrollbar';
 import { PomodoroNumView } from '../Timer/PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
 import { formatTimeYMD } from '../Visualization/Timeline';
-import { Card as CardState } from '../Kanban/Card/action';
 import { BadgeHolder } from '../Kanban/style/Badge';
 import { PomodoroDot } from '../Visualization/PomodoroDot';
 import { TimeBadge } from '../Kanban/Card/Badge';
 import { workers } from '../../workers';
+import { Card as CardState } from '../Kanban/type';
 
 const { Option } = Select;
 

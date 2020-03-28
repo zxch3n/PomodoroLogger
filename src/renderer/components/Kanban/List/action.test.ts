@@ -1,4 +1,4 @@
-import { actions, List, listReducer, ListsState } from './action';
+import { actions, listReducer } from './action';
 import shortid from 'shortid';
 import { AsyncDB } from '../../../../utils/dbHelper';
 import dbs, { refreshDbs } from '../../../dbs';
@@ -7,6 +7,7 @@ import { existsSync, mkdir, unlink, stat } from 'fs';
 import { dbBaseDir, dbPaths } from '../../../../config';
 import { promisify } from 'util';
 import { Dispatch } from 'redux';
+import { List, ListsState } from '../type';
 
 jest.setTimeout(10000);
 let lock = false;

@@ -3,11 +3,9 @@ import {
     removeSession,
     getAllSession,
     renameIllegalName,
-    deleteAllUserData,
     loadDB,
     loadDBSync,
     getTodaySessions,
-    exportDBData,
     deleteFolderRecursive
 } from './sessionManager';
 import { join } from 'path';

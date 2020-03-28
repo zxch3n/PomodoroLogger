@@ -1,4 +1,4 @@
-import { actions, boardReducer, KanbanBoard, KanbanBoardState } from './action';
+import { actions, boardReducer, KanbanBoardState } from './action';
 import { Dispatch } from 'redux';
 import { dbBaseDir, dbPaths } from '../../../../config';
 import { existsSync, unlink, mkdir } from 'fs';
@@ -6,6 +6,7 @@ import { promisify } from 'util';
 import shortid = require('shortid');
 import dbs from '../../../dbs';
 import { AsyncDB } from '../../../../utils/dbHelper';
+import { KanbanBoard } from '../type';
 
 const db = new AsyncDB(dbs.kanbanDB);
 beforeEach(async () => {

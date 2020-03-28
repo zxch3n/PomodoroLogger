@@ -4,17 +4,10 @@ import { actions as cardAction } from '../Card/action';
 import { actions as boardActions } from '../Board/action';
 import shortid from 'shortid';
 import { workers } from '../../../workers';
+import { List, ListsState } from '../type';
 
 const db = workers.dbWorkers.listsDB;
 const moveDB = workers.dbWorkers.moveDB;
-
-export interface List {
-    _id: string;
-    title: string;
-    cards: string[]; // lists id in order
-}
-
-export type ListsState = { [_id: string]: List };
 
 const addList = createActionCreator('[List]ADD', resolve => (_id: string, title: string) =>
     resolve({ _id, title })

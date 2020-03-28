@@ -1,11 +1,12 @@
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import React, { FC } from 'react';
-import { BoardActionTypes, defaultBoard, KanbanBoard } from './action';
+import { BoardActionTypes, defaultBoard } from './action';
 import styled from 'styled-components';
 import List from '../List';
 import { Button } from 'antd';
 import { fatScrollBar } from '../../../style/scrollbar';
 import { isShallowEqualByKeys } from '../../../utils';
+import { KanbanBoard } from '../type';
 
 const Container = styled.div`
     height: 100%;

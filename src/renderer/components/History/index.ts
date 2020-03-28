@@ -5,7 +5,7 @@ import { RootState } from '../../reducers';
 import { genMapDispatchToProp } from '../../utils';
 import { HistoryActionCreatorTypes, actions } from './action';
 import { PomodoroRecord } from '../../monitor/type';
-import { Card } from '../Kanban/Card/action';
+import { Card } from '../Kanban/type';
 
 type CardGetter = (boardId: string | undefined) => Card[];
 let cardsGetter: undefined | CardGetter;

@@ -1,4 +1,6 @@
 import { Dispatch } from 'redux';
+import { workers } from './workers';
+import { KanbanBoard } from './components/Kanban/type';
 
 export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => {
     return (dispatch: Dispatch) => {
@@ -106,4 +108,10 @@ export function isShallowEqualByKeys(
     }
 
     return true;
+}
+
+export async function getNameFromBoardId(_id: string) {
+    const worker = workers.dbWorkers.kanbanDB;
+    const board: KanbanBoard = await worker.findOne({ _id });
+    return board.name;
 }

@@ -1,7 +1,6 @@
 import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
-import { getNameFromBoardId } from '../../dbs';
-import { getBetterAppName } from '../../utils';
+import { getBetterAppName, getNameFromBoardId } from '../../utils';
 import { workers } from '../../workers';
 
 export const getPomodoroCalendarData = (pomodoros: PomodoroRecord[]) => {

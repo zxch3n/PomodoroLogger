@@ -4,39 +4,13 @@ import { actions as listActions } from '../List/action';
 import { actions as cardActions } from '../Card/action';
 import { actions as kanbanActions } from '../action';
 import { actions as historyActions } from '../../History/action';
-import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
 import { lang } from '../../../../lang/en';
 import { DistractingRow } from '../../Timer/action';
 import { workers } from '../../../workers';
+import { AggInfo, KanbanBoard } from '../type';
 
 const db = workers.dbWorkers.kanbanDB;
-type ListId = string;
-type SessionId = string;
-
-export interface AggInfo {
-    lastUpdatedTime: number;
-    spentTime: number;
-    appSpentTime: { [app: string]: number };
-    keywordWeights: { [key: string]: number };
-}
-
-export interface KanbanBoard {
-    _id: string;
-    name: string;
-    spentHours: number;
-    description: string;
-    lists: ListId[]; // lists id in order
-    focusedList: string;
-    doneList: string;
-    relatedSessions: SessionId[];
-    dueTime?: number; // TODO: Add due time setting
-    lastVisitTime?: number;
-    aggInfo?: AggInfo;
-    pin?: boolean;
-    collapsed?: boolean;
-    distractionList?: DistractingRow[];
-}
 
 export const defaultBoard: KanbanBoard = {
     _id: '',

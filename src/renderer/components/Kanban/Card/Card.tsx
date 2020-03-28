@@ -1,6 +1,6 @@
 import { Draggable } from 'react-beautiful-dnd';
 import React, { FC } from 'react';
-import { Card as CardType, CardActionTypes } from './action';
+import { CardActionTypes } from './action';
 import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
 import { Divider } from 'antd';
@@ -9,6 +9,7 @@ import { TimeBadge } from './Badge';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
+import { Card as CardType } from '../type';
 
 const CardContainer = styled.div`
     word-break: break-word;

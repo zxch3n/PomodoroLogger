@@ -140,7 +140,7 @@
     "husky": "^2.3.0",
     "image-webpack-loader": "^4.6.0",
     "interpolate-html-plugin": "^3.0.0",
-    "jest": "^24.8.0",
+    "jest": "25.2.3",
     "jest-junit": "^7.0.0",
     "lint-staged": "^8.1.7",
     "lodash-es": "^4.17.15",

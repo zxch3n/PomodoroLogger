@@ -1,7 +1,7 @@
 import { BaseWorker } from './BaseWorker';
 import Worker from 'worker-loader!./db.worker';
 import nedb from 'nedb';
-import dbs from '../dbs';
+import { dbs } from '../dbs';
 import { dbPaths } from '../../config';
 
 /* istanbul ignore next */
@@ -49,9 +49,13 @@ class TrueDBWorker extends BaseWorker {
 class FakeDBWorker {
     private readonly db: nedb;
 
-    constructor(private dbType: string) {
+    constructor(private dbType: string, worker?: undefined) {
         // @ts-ignore
         this.db = dbs[dbType];
+    }
+
+    getWorker() {
+        return undefined;
     }
 
     genHandler = (op: string) => async (...args: any[]): Promise<any> => {

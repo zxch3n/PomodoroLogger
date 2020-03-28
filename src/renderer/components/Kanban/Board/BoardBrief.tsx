@@ -2,12 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { actions as timerActions } from '../../Timer/action';
 import { connect } from 'react-redux';
 import { RootState } from '../../../reducers';
-import { actions, KanbanBoard } from './action';
+import { actions } from './action';
 import { actions as kanbanActions } from '../action';
 import { Dispatch } from 'redux';
 import styled, { keyframes } from 'styled-components';
-import { Card, CardsState } from '../Card/action';
-import { ListsState } from '../List/action';
+import { CardsState } from '../Card/action';
 import { Button, Divider } from 'antd';
 import { Badge, TimeBadge } from '../Card/Badge';
 import formatMarkdown from '../Card/formatMarkdown';
@@ -17,6 +16,7 @@ import { Markdown } from '../style/Markdown';
 import { ListsCountBar } from '../../Visualization/Bar';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Pin } from '../../Visualization/Pin';
+import { Card, KanbanBoard, ListsState } from '../type';
 
 const BriefCard = styled.div`
     word-break: break-word;

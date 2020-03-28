@@ -2,10 +2,9 @@ import React, { FC, useEffect, useState } from 'react';
 import { Table } from 'antd';
 import { RootState } from '../../../reducers';
 import { Dispatch } from 'redux';
-import { KanbanBoard, KanbanBoardState } from './action';
-import { ListsState } from '../List/action';
+import { KanbanBoardState } from './action';
 import { connect } from 'react-redux';
-import { Card, CardsState } from '../Card/action';
+import { CardsState } from '../Card/action';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import styled from 'styled-components';
 import { formatTimeWithoutZero } from '../../../utils';
@@ -13,6 +12,7 @@ import { BoardBrief } from './BoardBrief';
 import { actions, SortType } from '../action';
 // @ts-ignore
 import StackGrid from 'react-stack-grid';
+import { Card, KanbanBoard, ListsState } from '../type';
 
 const Container = styled.div``;
 

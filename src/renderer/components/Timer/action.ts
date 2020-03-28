@@ -6,11 +6,12 @@ import { actions as kanbanActions } from '../Kanban/action';
 import { actions as historyActions } from '../History/action';
 import { throttle } from 'lodash';
 import { promisify } from 'util';
-import dbs, { getNameFromBoardId } from '../../dbs';
+import dbs from '../../dbs';
 import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE, __DEV__ } from '../../../config';
 import { AsyncDB } from '../../../utils/dbHelper';
+import { getNameFromBoardId } from '../../utils';
 
 export const LONG_BREAK_INTERVAL = 4;
 const settingDB = new AsyncDB(dbs.settingDB);

@@ -2,13 +2,14 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FocusIcon from '../../../../res/Focus.svg';
 import DoneIcon from '../../../../res/done.svg';
 import React, { FC, useRef, useState } from 'react';
-import { List as ListType, ListActionTypes } from './action';
+import { ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
 import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm, Tooltip } from 'antd';
 import { KanbanActionTypes } from '../action';
 import { CardsState } from '../Card/action';
 import { thinScrollBar } from '../../../style/scrollbar';
+import { List as ListType } from '../type';
 
 const Container = styled.div`
     padding: 4px;

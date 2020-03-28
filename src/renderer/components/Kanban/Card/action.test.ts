@@ -1,4 +1,4 @@
-import { actions, Card, cardReducer, CardsState } from './action';
+import { actions, cardReducer, CardsState } from './action';
 import { existsSync, mkdir, unlink } from 'fs';
 import { promisify } from 'util';
 import { dbBaseDir, dbPaths } from '../../../../config';
@@ -7,6 +7,7 @@ import { AsyncDB } from '../../../../utils/dbHelper';
 import dbs, { refreshDbs } from '../../../dbs';
 import { Dispatch } from 'redux';
 import { boardReducer } from '../Board/action';
+import { Card } from '../type';
 
 const db = new AsyncDB(dbs.cardsDB);
 
