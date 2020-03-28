@@ -8,8 +8,9 @@ import { DBWorker } from '../../../workers/DBWorker';
 import shortid from 'shortid';
 import { lang } from '../../../../lang/en';
 import { DistractingRow } from '../../Timer/action';
+import { workers } from '../../../workers';
 
-const db = new DBWorker('kanbanDB');
+const db = workers.dbWorkers.kanbanDB;
 type ListId = string;
 type SessionId = string;
 

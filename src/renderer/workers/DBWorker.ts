@@ -6,10 +6,15 @@ import { dbPaths } from '../../config';
 
 /* istanbul ignore next */
 class TrueDBWorker extends BaseWorker {
-    protected worker = new Worker();
+    protected worker: Worker;
 
-    constructor(private dbType: keyof typeof dbPaths) {
+    constructor(private dbType: keyof typeof dbPaths, worker?: Worker) {
         super();
+        this.worker = worker || new Worker();
+    }
+
+    getWorker() {
+        return this.worker;
     }
 
     genHandler = (op: string) => async (...args: any[]): Promise<any> => {

@@ -163,6 +163,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                 fill={`hsl(50, ${v.count === 0 ? '0%' : '60%'}, ${92 -
                     (v.count / maxCountInADay) * 70}%`}
                 key={index}
+                stroke={index === chosenIndex ? 'rgb(200, 180, 240)' : ''}
                 onMouseEnter={onEnter}
                 onClick={onClick}
                 style={{

@@ -18,6 +18,7 @@ import { Card as CardState } from '../Kanban/Card/action';
 import { BadgeHolder } from '../Kanban/style/Badge';
 import { PomodoroDot } from '../Visualization/PomodoroDot';
 import { TimeBadge } from '../Kanban/Card/Badge';
+import { workers } from '../../workers';
 
 const { Option } = Select;
 
@@ -89,7 +90,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
         const boardId = props.chosenId;
         const searchArg = props.chosenId === undefined ? {} : { boardId };
         // Avoid using outdated cache; And use worker to avoid db blocking the process
-        const db = new DBWorker('sessionDB');
+        const db = workers.dbWorkers.sessionDB;
         db.find(searchArg, {})
             .then(docs => {
                 return getAggPomodoroInfo(docs);
@@ -106,7 +107,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
             return;
         }
 
-        const db = new DBWorker('sessionDB');
+        const db = workers.dbWorkers.sessionDB;
         const dateStart = new Date(`${targetDate[0]}-${targetDate[1]}-${targetDate[2]}`).getTime();
         const nextDay = dateStart + 24 * 3600 * 1000;
         db.find({ startTime: { $lt: nextDay, $gte: dateStart } }, {}).then(docs => {

@@ -12,9 +12,13 @@ import { DBWorker } from './DBWorker';
 
 // @ts-ignore
 const dbWorkers: { [name in keyof typeof dbPaths]: DBWorker } = {};
+let actualWorker;
 for (const key in dbPaths) {
     // @ts-ignore
-    dbWorkers[key] = new DBWorker(key);
+    const worker: DBWorker = actualWorker ? new DBWorker(key, actualWorker) : new DBWorker(key);
+    // @ts-ignore
+    dbWorkers[key] = worker;
+    actualWorker = worker.getWorker();
 }
 
 export const workers = {

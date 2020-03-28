@@ -3,10 +3,10 @@ import { Dispatch } from 'redux';
 import { actions as cardAction } from '../Card/action';
 import { actions as boardActions } from '../Board/action';
 import shortid from 'shortid';
-import { DBWorker } from '../../../workers/DBWorker';
+import { workers } from '../../../workers';
 
-let db = new DBWorker('listsDB');
-const moveDB = new DBWorker('moveDB');
+const db = workers.dbWorkers.listsDB;
+const moveDB = workers.dbWorkers.moveDB;
 
 export interface List {
     _id: string;
@@ -105,7 +105,6 @@ export const listReducer = createReducer<ListsState, any>({}, handle => [
 
 export const actions = {
     fetchLists: () => async (dispatch: Dispatch) => {
-        db = new DBWorker('listsDB');
         const all: List[] = await db.find({}, {});
         const listMap: ListsState = {};
         for (const list of all) {

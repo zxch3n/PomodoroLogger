@@ -60,4 +60,8 @@ export abstract class BaseWorker {
             }
         });
     }
+
+    destroy() {
+        this.worker.terminate();
+    }
 }

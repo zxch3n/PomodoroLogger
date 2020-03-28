@@ -3,6 +3,7 @@ import { remote } from 'electron';
 import { DBs, refreshDbs as _refresh } from '../main/db';
 import { DBWorker } from './workers/DBWorker';
 import { KanbanBoard } from './components/Kanban/Board/action';
+import { workers } from './workers';
 
 let dbs: typeof DBs;
 if (remote) {
@@ -33,7 +34,7 @@ export async function getIdFromProjectName(name: string) {
 }
 
 export async function getNameFromBoardId(_id: string) {
-    const worker = new DBWorker('kanbanDB');
+    const worker = workers.dbWorkers.kanbanDB;
     const board: KanbanBoard = await worker.findOne({ _id });
     return board.name;
 }

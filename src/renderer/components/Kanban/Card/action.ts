@@ -2,7 +2,8 @@ import { createActionCreator, createReducer } from 'deox';
 import { Dispatch } from 'redux';
 import { actions as listActions } from '../List/action';
 import { DBWorker } from '../../../workers/DBWorker';
-const db = new DBWorker('cardsDB');
+import { workers } from '../../../workers';
+const db = workers.dbWorkers.cardsDB;
 
 type History = { listId: string; time: number }[];
 export interface Card {
