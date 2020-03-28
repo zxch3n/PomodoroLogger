@@ -39,6 +39,9 @@ const Content = styled.main`
 
 const Title = styled.h1`
     user-select: none;
+    max-width: calc(100vw - 380px);
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: inline-block;
     margin: 0;
     font-size: 22px;
@@ -375,6 +378,7 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
                             {getFieldDecorator('name', {
                                 rules: [
                                     { required: true, message: 'Please input the name of board!' },
+                                    { max: 48, message: 'Max length of name is 48' },
                                     { validator: this.validator },
                                 ],
                             })(<Input />)}
