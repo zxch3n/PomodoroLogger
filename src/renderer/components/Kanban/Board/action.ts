@@ -33,6 +33,7 @@ export interface KanbanBoard {
     lastVisitTime?: number;
     aggInfo?: AggInfo;
     pin?: boolean;
+    collapsed?: boolean;
     distractionList?: DistractingRow[];
 }
 
@@ -43,7 +44,7 @@ export const defaultBoard: KanbanBoard = {
     focusedList: '',
     doneList: '',
     description: '',
-
+    collapsed: false,
     relatedSessions: [],
     spentHours: 0
 };
@@ -116,6 +117,11 @@ const setDistractionList = createActionCreator(
     '[Board]SET_DISTRACTION_LIST',
     resolve => (_id: string, distractionList?: DistractingRow[]) =>
         resolve({ _id, distractionList })
+);
+
+const setCollapsed = createActionCreator(
+    '[Board]SET_COLLAPSED',
+    resolve => (_id: string, collapsed: boolean) => resolve({ _id, collapsed })
 );
 
 export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
@@ -216,6 +222,14 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         [_id]: {
             ...state[_id],
             distractionList
+        }
+    })),
+
+    handle(setCollapsed, (state, { payload: { _id, collapsed } }) => ({
+        ...state,
+        [_id]: {
+            ...state[_id],
+            collapsed
         }
     }))
 ]);
@@ -335,6 +349,11 @@ export const actions = {
     ) => {
         dispatch(setDistractionList(_id, distractionList));
         await db.update({ _id }, { $set: { distractionList } });
+    },
+
+    setCollapsed: (_id: string, collapsed: boolean) => async (dispatch: Dispatch) => {
+        dispatch(setCollapsed(_id, collapsed));
+        await db.update({ _id }, { $set: { collapsed } });
     }
 };
 

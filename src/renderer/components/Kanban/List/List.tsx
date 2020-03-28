@@ -256,6 +256,7 @@ export const List: FC<Props> = React.memo((props: Props) => {
                                         <BeforePlaceHolder />
                                         {filteredCards.map((cardId, index) => (
                                             <Card
+                                                boardId={props.boardId}
                                                 cardId={cardId}
                                                 index={index}
                                                 key={cardId}

@@ -1,8 +1,8 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import { KanbanActionTypes } from './action';
 import { KanbanState, uiStateNames } from './reducer';
 import { BoardActionTypes } from './Board/action';
-import { Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select, Switch } from 'antd';
+import { Row, Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select, Switch } from 'antd';
 import Board from './Board';
 import styled from 'styled-components';
 import TextArea from 'antd/es/input/TextArea';
@@ -135,9 +135,9 @@ export const Kanban: FunctionComponent<Props> = React.memo(
             }
         };
 
-        const addBoard = () => {
+        const addBoard = useCallback(() => {
             showConfigById();
-        };
+        }, []);
 
         const overviewId = '31h89s190v-vg';
         const onSelectChange = (value: string) => {
@@ -180,22 +180,34 @@ export const Kanban: FunctionComponent<Props> = React.memo(
             props.setIsSearching(!props.kanban.isSearching);
         };
 
-        const onKeyDown = (name: string) => {
-            switch (name) {
-                case 'esc':
-                    if (props.kanban.chosenBoardId) {
-                        goBack();
-                    } else {
-                        props.changeAppTab('timer');
-                    }
-                    break;
-                case 'ctrl+n':
-                    if (!props.kanban.chosenBoardId) {
-                        addBoard();
-                    }
-                    break;
-            }
-        };
+        const onKeyDown = React.useCallback(
+            (name: string) => {
+                switch (name) {
+                    case 'esc':
+                        if (props.kanban.chosenBoardId) {
+                            goBack();
+                        } else {
+                            props.changeAppTab('timer');
+                        }
+                        break;
+                    case 'ctrl+n':
+                        if (!props.kanban.chosenBoardId) {
+                            addBoard();
+                        }
+                        break;
+                }
+            },
+            [props.kanban.chosenBoardId, addBoard, goBack]
+        );
+
+        const onCollapsedChange = React.useCallback(
+            (v: boolean) => {
+                if (props.kanban.chosenBoardId) {
+                    props.setCollapsed(props.kanban.chosenBoardId, v);
+                }
+            },
+            [props.kanban.chosenBoardId]
+        );
 
         return (
             <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
@@ -246,25 +258,33 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                     <div className="header-right">
                         {props.kanban.chosenBoardId ? (
                             <>
-                                <Button
-                                    shape={'circle'}
-                                    icon={'search'}
-                                    onClick={switchIsSearching}
-                                    style={{ marginRight: 6 }}
-                                />
-                                <Button
-                                    type={'default'}
-                                    shape={'circle'}
-                                    icon={'caret-right'}
-                                    onClick={choose}
-                                    style={{ marginRight: 6 }}
-                                />
-                                <Button
-                                    shape={'circle'}
-                                    icon={'setting'}
-                                    onClick={showBoardSettingMenu}
-                                />
-                                <SearchBar />
+                                <LabelButton>
+                                    <label>Collapse View</label>
+                                    <Switch
+                                        checked={props.boards[props.kanban.chosenBoardId].collapsed}
+                                        onChange={onCollapsedChange}
+                                        size={'small'}
+                                    />
+                                    <Button
+                                        shape={'circle'}
+                                        icon={'search'}
+                                        onClick={switchIsSearching}
+                                        style={{ marginRight: 6 }}
+                                    />
+                                    <Button
+                                        type={'default'}
+                                        shape={'circle'}
+                                        icon={'caret-right'}
+                                        onClick={choose}
+                                        style={{ marginRight: 6 }}
+                                    />
+                                    <Button
+                                        shape={'circle'}
+                                        icon={'setting'}
+                                        onClick={showBoardSettingMenu}
+                                    />
+                                    <SearchBar />
+                                </LabelButton>
                             </>
                         ) : (
                             <LabelButton>

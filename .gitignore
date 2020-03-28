@@ -14,3 +14,4 @@ junit.xml
 .token
 dev-app-update.yml
 webpack-visualization/
+yarn-error.log

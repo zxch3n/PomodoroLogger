@@ -1,12 +1,11 @@
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable } from 'react-beautiful-dnd';
 import React, { FC } from 'react';
 import { Card as CardType, CardActionTypes } from './action';
 import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
-import { Icon, Divider, Dropdown } from 'antd';
+import { Divider } from 'antd';
 import formatMarkdown from './formatMarkdown';
-import { Badge, TimeBadge } from './Badge';
-import { formatTime } from '../../../utils';
+import { TimeBadge } from './Badge';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
@@ -41,15 +40,18 @@ export interface InputProps {
     cardId: string;
     index: number;
     listId: string;
+    boardId: string;
     isDraggingOver: boolean;
 }
 
-interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {}
+interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {
+    collapsed?: boolean;
+}
 export const Card: FC<Props> = React.memo((props: Props) => {
     const { index, _id, isDraggingOver } = props;
-    const onClick = () => {
+    const onClick = React.useCallback(() => {
         props.setEditCard(true, props.listId, props._id);
-    };
+    }, [props.listId, props._id]);
 
     return (
         <>
@@ -67,36 +69,67 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                     (snapshot.isDragging ? 'is-dragging' : undefined)
                                 }
                             >
-                                <CardContent>
-                                    <h1 style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}>
-                                        {props.title}
-                                    </h1>
-                                    <Markdown
-                                        dangerouslySetInnerHTML={{
-                                            __html: formatMarkdown(props.content)
-                                        }}
-                                    />
-                                    <Divider style={{ margin: '4px 0' }} />
-                                    <BadgeHolder>
-                                        {props.sessionIds.length > 0 ? (
-                                            <PomodoroDot num={props.sessionIds.length} />
-                                        ) : (
-                                            undefined
-                                        )}
-                                        {props.spentTimeInHour.estimated ||
-                                        props.spentTimeInHour.actual ? (
-                                            <TimeBadge
-                                                spentTime={props.spentTimeInHour.actual}
-                                                leftTime={
-                                                    props.spentTimeInHour.estimated -
-                                                    props.spentTimeInHour.actual
-                                                }
-                                            />
-                                        ) : (
-                                            undefined
-                                        )}
-                                    </BadgeHolder>
-                                </CardContent>
+                                {props.collapsed ? (
+                                    <CardContent>
+                                        <h2
+                                            style={{ margin: 0, fontSize: 16, lineHeight: '1.3em' }}
+                                        >
+                                            {props.title}
+                                        </h2>
+                                        <BadgeHolder>
+                                            {props.sessionIds.length > 0 ? (
+                                                <PomodoroDot num={props.sessionIds.length} />
+                                            ) : (
+                                                undefined
+                                            )}
+                                            {props.spentTimeInHour.estimated ||
+                                            props.spentTimeInHour.actual ? (
+                                                <TimeBadge
+                                                    spentTime={props.spentTimeInHour.actual}
+                                                    leftTime={
+                                                        props.spentTimeInHour.estimated -
+                                                        props.spentTimeInHour.actual
+                                                    }
+                                                />
+                                            ) : (
+                                                undefined
+                                            )}
+                                        </BadgeHolder>
+                                    </CardContent>
+                                ) : (
+                                    <CardContent>
+                                        <h1
+                                            style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}
+                                        >
+                                            {props.title}
+                                        </h1>
+                                        <Markdown
+                                            dangerouslySetInnerHTML={{
+                                                __html: formatMarkdown(props.content)
+                                            }}
+                                        />
+                                        <Divider style={{ margin: '4px 0' }} />
+                                        <BadgeHolder>
+                                            {props.sessionIds.length > 0 ? (
+                                                <PomodoroDot num={props.sessionIds.length} />
+                                            ) : (
+                                                undefined
+                                            )}
+                                            {props.spentTimeInHour.estimated ||
+                                            props.spentTimeInHour.actual ? (
+                                                <TimeBadge
+                                                    spentTime={props.spentTimeInHour.actual}
+                                                    leftTime={
+                                                        props.spentTimeInHour.estimated -
+                                                        props.spentTimeInHour.actual
+                                                    }
+                                                />
+                                            ) : (
+                                                undefined
+                                            )}
+                                        </BadgeHolder>
+                                    </CardContent>
+                                )}
                             </CardContainer>
                             {isDraggingOver && provided.placeholder}
                         </>
