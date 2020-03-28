@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Divider, message, Tooltip, Popconfirm } from 'antd';
+import { Button, Divider, message, Tooltip } from 'antd';
 import Progress from './Progress';
 import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes } from '../Kanban/Board/action';
