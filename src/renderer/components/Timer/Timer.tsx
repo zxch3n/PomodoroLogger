@@ -8,7 +8,7 @@ import { RootState } from '../../reducers';
 import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
 import styled from 'styled-components';
-import { BrowserWindow, nativeImage, remote } from 'electron';
+import { BrowserWindow, ipcRenderer, nativeImage, remote } from 'electron';
 import AppIcon from '../../../res/icon.png';
 import { setTrayImageWithMadeIcon } from './iconMaker';
 import { getTodaySessions } from '../../monitor/sessionManager';
@@ -629,6 +629,10 @@ class Timer extends Component<Props, State> {
 
         return;
     };
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+        ipcRenderer.send('restart-app', 'error');
+    }
 
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;

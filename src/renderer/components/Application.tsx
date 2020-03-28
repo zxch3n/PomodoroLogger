@@ -36,20 +36,20 @@ interface Props extends TimerActionTypes, HistoryActionCreatorTypes {
     fetchKanban: () => void;
 }
 
-const Application = (props: Props) => {
-    React.useEffect(() => {
-        props.fetchSettings();
-        props.fetchKanban();
-        setTrayImageWithMadeIcon(undefined);
-    }, []);
+class Application extends React.Component<Props> {
+    componentDidMount(): void {
+        this.props.fetchSettings();
+        this.props.fetchKanban();
+        setTrayImageWithMadeIcon(undefined).then();
+    }
 
-    const onKeyDown = (keyname: string) => {
+    onKeyDown = (keyname: string) => {
         switch (keyname) {
             case 'ctrl+tab':
-                props.switchTab(1);
+                this.props.switchTab(1);
                 break;
             case 'ctrl+shift+tab':
-                props.switchTab(-1);
+                this.props.switchTab(-1);
                 break;
             case 'ctrl+f12':
                 remote.getCurrentWebContents().openDevTools({ activate: true, mode: 'detach' });
@@ -60,83 +60,90 @@ const Application = (props: Props) => {
         }
     };
 
-    return (
-        <Main>
-            <Tabs activeKey={props.currentTab} onChange={props.changeAppTab as any}>
-                <TabPane
-                    tab={
-                        <span>
-                            <Icon type="clock-circle" />
-                            Pomodoro
-                        </span>
-                    }
-                    key="timer"
-                >
-                    <Timer />
-                </TabPane>
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+        ipcRenderer.send('restart-app', 'error');
+    }
 
-                <TabPane
-                    tab={
-                        <span>
-                            <Icon type="project" />
-                            Kanban
-                        </span>
-                    }
-                    key="kanban"
-                >
-                    <Kanban />
-                </TabPane>
-
-                <TabPane
-                    tab={
-                        <span>
-                            <Icon type="history" />
-                            History
-                        </span>
-                    }
-                    key="history"
-                >
-                    <History />
-                </TabPane>
-
-                <TabPane
-                    tab={
-                        <span>
-                            <Icon type="setting" />
-                            Setting
-                        </span>
-                    }
-                    key="setting"
-                >
-                    <Setting />
-                </TabPane>
-                {process.env.NODE_ENV !== 'production' ? (
+    render() {
+        const { currentTab, changeAppTab } = this.props;
+        return (
+            <Main>
+                <Tabs activeKey={currentTab} onChange={changeAppTab as any}>
                     <TabPane
                         tab={
                             <span>
-                                <Icon type="bar-chart" />
-                                Analyser
+                                <Icon type="clock-circle" />
+                                Pomodoro
                             </span>
                         }
-                        key="analyser"
+                        key="timer"
                     >
-                        <Analyser />
+                        <Timer />
                     </TabPane>
-                ) : (
-                    undefined
-                )}
-            </Tabs>
-            <UserGuide />
-            <UpdateController />
-            <CardInDetail />
-            <ConnectedPomodoroSankey />
-            <ReactHotkeys
-                keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12,ctrl+q'}
-                onKeyDown={onKeyDown}
-            />
-        </Main>
-    );
-};
+
+                    <TabPane
+                        tab={
+                            <span>
+                                <Icon type="project" />
+                                Kanban
+                            </span>
+                        }
+                        key="kanban"
+                    >
+                        <Kanban />
+                    </TabPane>
+
+                    <TabPane
+                        tab={
+                            <span>
+                                <Icon type="history" />
+                                History
+                            </span>
+                        }
+                        key="history"
+                    >
+                        <History />
+                    </TabPane>
+
+                    <TabPane
+                        tab={
+                            <span>
+                                <Icon type="setting" />
+                                Setting
+                            </span>
+                        }
+                        key="setting"
+                    >
+                        <Setting />
+                    </TabPane>
+                    {process.env.NODE_ENV !== 'production' ? (
+                        <TabPane
+                            tab={
+                                <span>
+                                    <Icon type="bar-chart" />
+                                    Analyser
+                                </span>
+                            }
+                            key="analyser"
+                        >
+                            <Analyser />
+                        </TabPane>
+                    ) : (
+                        undefined
+                    )}
+                </Tabs>
+                <UserGuide />
+                <UpdateController />
+                <CardInDetail />
+                <ConnectedPomodoroSankey />
+                <ReactHotkeys
+                    keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12,ctrl+q'}
+                    onKeyDown={this.onKeyDown}
+                />
+            </Main>
+        );
+    }
+}
 
 const ApplicationContainer = connect(
     (state: RootState) => ({ currentTab: state.timer.currentTab }),

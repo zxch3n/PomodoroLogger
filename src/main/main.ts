@@ -95,8 +95,13 @@ const createWindow = async () => {
     });
 
     ipcMain.addListener('quit-app', () => {
-        console.log('App Quit');
         win = undefined;
+        app.exit();
+    });
+
+    ipcMain.addListener('restart-app', () => {
+        win = undefined;
+        app.relaunch();
         app.exit();
     });
 

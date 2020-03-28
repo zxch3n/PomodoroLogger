@@ -7,13 +7,9 @@ import { workers } from '../../workers';
 import { Bar } from '../Visualization/Bar';
 import { GridCalendar } from '../Visualization/GridCalendar';
 import { createRecord } from '../../../../test/utils';
-import { PomodoroSankey } from '../Visualization/PomodoroSankey';
-import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 import dbs from '../../dbs';
 import { fatScrollBar, tabMaxHeight } from '../../style/scrollbar';
 import { PomodoroRecord } from '../../monitor/type';
-import { PomodoroTimeline } from '../Visualization/Timeline';
-import { PomodoroBlockVis } from '../Visualization/PomodoroBlockVis';
 
 const Container = styled.div`
     position: relative;
