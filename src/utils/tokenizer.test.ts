@@ -125,7 +125,7 @@ function createRecordFromTitlesAndWeights(pairs: [string, number][]) {
 function pairToDict(pairs: [string, number][]): { [name: string]: number } {
     const ans: { [n: string]: number } = {};
     for (const pair of pairs) {
-        ans[pair[0]] = pair[1];
+        ans[pair[0]] = Math.floor(pair[1] + 0.5);
     }
 
     return ans;
@@ -147,9 +147,9 @@ describe('Tokenizer.getTokenWeightsFromRecords', () => {
         ]);
 
         expectWeights([record], {
-            expect: 42,
-            getWeightsFromPomodoros: 42,
-            toStrictEqual: 42,
+            expect: 56,
+            getWeightsFromPomodoros: 56,
+            toStrictEqual: 56,
         });
     });
 
@@ -167,15 +167,15 @@ describe('Tokenizer.getTokenWeightsFromRecords', () => {
         ];
 
         expectWeights(records, {
-            const: 42,
-            weight: 42,
-            normalizedWeight: 42,
-            'Math.min': 12,
-            targetMin: 42,
-            number: 42,
-            '12': 42,
-            targetMax: 12,
-            MiddleSize: (12 + 42) / 2,
+            const: 56,
+            weight: 56,
+            normalizedWeight: 56,
+            'Math.min': 8,
+            targetMin: 56,
+            number: 56,
+            '12': 56,
+            targetMax: 8,
+            MiddleSize: 32,
         });
     });
 });
