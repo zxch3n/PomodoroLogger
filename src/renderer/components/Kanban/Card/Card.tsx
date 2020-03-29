@@ -72,30 +72,32 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                             >
                                 {props.collapsed ? (
                                     <CardContent>
-                                        <h2
-                                            style={{ margin: 0, fontSize: 16, lineHeight: '1.3em' }}
+                                        <h3
+                                            style={{
+                                                margin: 0,
+                                                fontSize: 16,
+                                                lineHeight: '1.3rem',
+                                            }}
                                         >
                                             {props.title}
-                                        </h2>
-                                        <BadgeHolder>
-                                            {props.sessionIds.length > 0 ? (
-                                                <PomodoroDot num={props.sessionIds.length} />
-                                            ) : (
-                                                undefined
-                                            )}
-                                            {props.spentTimeInHour.estimated ||
-                                            props.spentTimeInHour.actual ? (
-                                                <TimeBadge
-                                                    spentTime={props.spentTimeInHour.actual}
-                                                    leftTime={
-                                                        props.spentTimeInHour.estimated -
-                                                        props.spentTimeInHour.actual
-                                                    }
-                                                />
-                                            ) : (
-                                                undefined
-                                            )}
-                                        </BadgeHolder>
+                                        </h3>
+                                        {props.spentTimeInHour.actual ? (
+                                            <BadgeHolder>
+                                                {props.sessionIds.length > 0 ? (
+                                                    <PomodoroDot num={props.sessionIds.length} />
+                                                ) : undefined}
+                                                {props.spentTimeInHour.estimated ||
+                                                props.spentTimeInHour.actual ? (
+                                                    <TimeBadge
+                                                        spentTime={props.spentTimeInHour.actual}
+                                                        leftTime={
+                                                            props.spentTimeInHour.estimated -
+                                                            props.spentTimeInHour.actual
+                                                        }
+                                                    />
+                                                ) : undefined}
+                                            </BadgeHolder>
+                                        ) : undefined}
                                     </CardContent>
                                 ) : (
                                     <CardContent>
@@ -106,16 +108,14 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                         </h1>
                                         <Markdown
                                             dangerouslySetInnerHTML={{
-                                                __html: formatMarkdown(props.content)
+                                                __html: formatMarkdown(props.content),
                                             }}
                                         />
                                         <Divider style={{ margin: '4px 0' }} />
                                         <BadgeHolder>
                                             {props.sessionIds.length > 0 ? (
                                                 <PomodoroDot num={props.sessionIds.length} />
-                                            ) : (
-                                                undefined
-                                            )}
+                                            ) : undefined}
                                             {props.spentTimeInHour.estimated ||
                                             props.spentTimeInHour.actual ? (
                                                 <TimeBadge
@@ -125,9 +125,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                         props.spentTimeInHour.actual
                                                     }
                                                 />
-                                            ) : (
-                                                undefined
-                                            )}
+                                            ) : undefined}
                                         </BadgeHolder>
                                     </CardContent>
                                 )}
