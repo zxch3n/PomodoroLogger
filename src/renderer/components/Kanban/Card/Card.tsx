@@ -14,11 +14,10 @@ import { Card as CardType } from '../type';
 const CardContainer = styled.div`
     word-break: break-word;
     background-color: white;
-    margin: 8px 4px;
+    margin: 8px 4px 0 4px;
     border-radius: 6px;
     cursor: grab;
     box-shadow: 0 0 rgba(0, 0, 0, 0);
-    transition: box-shadow 0.2s, transform 0.2s, background-color 0.1s;
     &.is-dragging {
         box-shadow: 0 0 18px 8px rgba(0, 0, 0, 0.2);
     }
@@ -80,9 +79,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                         <BadgeHolder>
                                             {props.sessionIds.length > 0 ? (
                                                 <PomodoroDot num={props.sessionIds.length} />
-                                            ) : (
-                                                undefined
-                                            )}
+                                            ) : undefined}
                                             {props.spentTimeInHour.estimated ||
                                             props.spentTimeInHour.actual ? (
                                                 <TimeBadge
@@ -92,9 +89,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                         props.spentTimeInHour.actual
                                                     }
                                                 />
-                                            ) : (
-                                                undefined
-                                            )}
+                                            ) : undefined}
                                         </BadgeHolder>
                                     </CardContent>
                                 ) : (
@@ -106,16 +101,14 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                         </h1>
                                         <Markdown
                                             dangerouslySetInnerHTML={{
-                                                __html: formatMarkdown(props.content)
+                                                __html: formatMarkdown(props.content),
                                             }}
                                         />
                                         <Divider style={{ margin: '4px 0' }} />
                                         <BadgeHolder>
                                             {props.sessionIds.length > 0 ? (
                                                 <PomodoroDot num={props.sessionIds.length} />
-                                            ) : (
-                                                undefined
-                                            )}
+                                            ) : undefined}
                                             {props.spentTimeInHour.estimated ||
                                             props.spentTimeInHour.actual ? (
                                                 <TimeBadge
@@ -125,9 +118,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                         props.spentTimeInHour.actual
                                                     }
                                                 />
-                                            ) : (
-                                                undefined
-                                            )}
+                                            ) : undefined}
                                         </BadgeHolder>
                                     </CardContent>
                                 )}
