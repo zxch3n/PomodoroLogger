@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Col, Row } from 'antd';
 import { PomodoroRecord } from '../../monitor/type';
 import styled, { keyframes } from 'styled-components';
-import { generateRandomName, to2digits } from '../../utils';
+import { to2digits } from '../../utils';
 import shortid from 'shortid';
 
 const SvgDot = styled.svg`
@@ -13,6 +13,21 @@ const SvgDot = styled.svg`
 `;
 
 const Div = styled.div``;
+
+const swayLeft = keyframes`
+    0% { transform: translateX(-18px); }
+    25% { transform: translateX(0px); } 
+    75% { transform: translateX(0px); } 
+    100% { transform: translateX(-18px); } 
+`;
+
+const swayRight = keyframes`
+    0% { transform: translateX(0px); }
+    25% { transform: translateX(0px); }
+    50% { transform: translateX(18px); }
+    75% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+`;
 
 const scale = keyframes`
   0% {
@@ -56,6 +71,14 @@ const AnimeSvgDot = styled(SvgDot)`
     animation: ${scale} 1s linear infinite;
 `;
 
+const SwayLeftDot = styled(SvgDot)`
+    animation: ${swayLeft} 1.2s linear infinite;
+`;
+
+const SwayRightDot = styled(SvgDot)`
+    animation: ${swayRight} 1.2s linear infinite;
+`;
+
 interface Props {
     pomodoros: PomodoroRecord[];
     color?: string;
@@ -75,7 +98,7 @@ function getTime(date: number) {
     return `${to2digits(d.getHours())}:${to2digits(d.getMinutes())}`;
 }
 
-export class PomodoroNumView extends React.Component<Props> {
+export class PomodoroNumView extends React.PureComponent<Props> {
     state: State = { transform: [] };
     iFrame: number = 0;
     key: string;
@@ -85,41 +108,23 @@ export class PomodoroNumView extends React.Component<Props> {
         this.key = shortid.generate();
     }
 
-    update = () => {
-        if (this.props.pomodoros.length < 2 || !this.props.animation) {
-            return;
-        }
-
-        this.iFrame += 1;
-        const newTransform = Array(this.props.pomodoros.length)
-            .fill(0)
-            .map(() => ({ x: 0, y: 0 }));
-        switch (this.iFrame % 4) {
-            case 0:
-                newTransform[0].x = -15;
-                newTransform[0].y = -4;
-                break;
-            case 1:
-                break;
-            case 2:
-                newTransform[newTransform.length - 1].x = 15;
-                newTransform[newTransform.length - 1].y = -4;
-                break;
-            case 3:
-                break;
-        }
-
-        this.setState({ transform: newTransform });
-    };
-
-    componentDidMount() {
-        setInterval(this.update, 500);
-    }
-
-    createDot = (v: PomodoroRecord, index: number, isNew: boolean = false) => {
+    createDot = (
+        v: PomodoroRecord,
+        index: number,
+        isNew: boolean = false,
+        isRunning: boolean = false
+    ) => {
         const { color = 'red', animation = false } = this.props;
         const { transform } = this.state;
-        const Svg = isNew ? AnimeSvgDot : SvgDot;
+        let Svg = isNew ? AnimeSvgDot : SvgDot;
+        const n = this.props.pomodoros.length;
+        if (!isNew && isRunning && n > 1) {
+            if (index === 0) {
+                Svg = SwayLeftDot;
+            } else if (index === n - 1) {
+                Svg = SwayRightDot;
+            }
+        }
         const chooseThis = this.props.chooseRecord ? () => this.props.chooseRecord!(v) : undefined;
         return (
             <Svg
@@ -137,7 +142,7 @@ export class PomodoroNumView extends React.Component<Props> {
                     transform:
                         animation && transform[index]
                             ? `translate(${transform[index].x}px, ${transform[index].y}px)`
-                            : undefined
+                            : undefined,
                 }}
             >
                 <defs>
@@ -172,8 +177,14 @@ export class PomodoroNumView extends React.Component<Props> {
     };
 
     render() {
-        const { showNum = true, pomodoros, newPomodoro, inline = false } = this.props;
-        const dots = pomodoros.map((v, index) => this.createDot(v, index));
+        const {
+            showNum = true,
+            pomodoros,
+            newPomodoro,
+            inline = false,
+            animation = false,
+        } = this.props;
+        const dots = pomodoros.map((v, index) => this.createDot(v, index, false, animation));
         if (newPomodoro != null) {
             dots.push(this.createDot(newPomodoro, dots.length, true));
         }

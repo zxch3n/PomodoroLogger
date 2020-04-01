@@ -95,7 +95,10 @@ class Application extends React.Component<Props> {
                         forceRender={false}
                         key="kanban"
                     >
-                        <DestroyOnTimeoutWrapper isVisible={currentTab === 'kanban'} timeout={10}>
+                        <DestroyOnTimeoutWrapper
+                            isVisible={currentTab === 'kanban'}
+                            timeout={10000}
+                        >
                             <Kanban />
                         </DestroyOnTimeoutWrapper>
                     </TabPane>
@@ -110,7 +113,10 @@ class Application extends React.Component<Props> {
                         forceRender={false}
                         key="history"
                     >
-                        <DestroyOnTimeoutWrapper isVisible={currentTab === 'history'} timeout={10}>
+                        <DestroyOnTimeoutWrapper
+                            isVisible={currentTab === 'history'}
+                            timeout={10000}
+                        >
                             <History />
                         </DestroyOnTimeoutWrapper>
                     </TabPane>
@@ -124,9 +130,7 @@ class Application extends React.Component<Props> {
                         }
                         key="setting"
                     >
-                        <DestroyOnTimeoutWrapper isVisible={currentTab === 'setting'} timeout={60}>
-                            <Setting />
-                        </DestroyOnTimeoutWrapper>
+                        <Setting />
                     </TabPane>
                     {process.env.NODE_ENV !== 'production' ? (
                         <TabPane
