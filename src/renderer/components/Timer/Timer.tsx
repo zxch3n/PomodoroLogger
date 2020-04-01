@@ -635,7 +635,9 @@ class Timer extends Component<Props, State> {
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-        ipcRenderer.send('restart-app', 'error');
+        if (process.env.NODE_ENV === 'production') {
+            ipcRenderer.send('restart-app', 'error');
+        }
     }
 
     render() {

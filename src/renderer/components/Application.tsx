@@ -21,6 +21,7 @@ import { UserGuide } from './UserGuide/UserGuide';
 import { UpdateController } from './UpdateController';
 import { CardInDetail } from './Kanban/Card/CardInDetail';
 import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
+import { DestroyOnTimeoutWrapper } from './DestroyOnTimeoutWrapper';
 
 const Main = styled.div`
     .ant-tabs-bar {
@@ -61,7 +62,9 @@ class Application extends React.Component<Props> {
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-        ipcRenderer.send('restart-app', 'error');
+        if (process.env.NODE_ENV === 'production') {
+            ipcRenderer.send('restart-app', 'error');
+        }
     }
 
     render() {
@@ -76,6 +79,7 @@ class Application extends React.Component<Props> {
                                 Pomodoro
                             </span>
                         }
+                        forceRender={false}
                         key="timer"
                     >
                         <Timer />
@@ -88,9 +92,12 @@ class Application extends React.Component<Props> {
                                 Kanban
                             </span>
                         }
+                        forceRender={false}
                         key="kanban"
                     >
-                        <Kanban />
+                        <DestroyOnTimeoutWrapper isVisible={currentTab === 'kanban'} timeout={10}>
+                            <Kanban />
+                        </DestroyOnTimeoutWrapper>
                     </TabPane>
 
                     <TabPane
@@ -100,9 +107,12 @@ class Application extends React.Component<Props> {
                                 History
                             </span>
                         }
+                        forceRender={false}
                         key="history"
                     >
-                        <History />
+                        <DestroyOnTimeoutWrapper isVisible={currentTab === 'history'} timeout={10}>
+                            <History />
+                        </DestroyOnTimeoutWrapper>
                     </TabPane>
 
                     <TabPane
@@ -114,7 +124,9 @@ class Application extends React.Component<Props> {
                         }
                         key="setting"
                     >
-                        <Setting />
+                        <DestroyOnTimeoutWrapper isVisible={currentTab === 'setting'} timeout={60}>
+                            <Setting />
+                        </DestroyOnTimeoutWrapper>
                     </TabPane>
                     {process.env.NODE_ENV !== 'production' ? (
                         <TabPane
@@ -128,9 +140,7 @@ class Application extends React.Component<Props> {
                         >
                             <Analyser />
                         </TabPane>
-                    ) : (
-                        undefined
-                    )}
+                    ) : undefined}
                 </Tabs>
                 <UserGuide />
                 <UpdateController />
@@ -150,7 +160,7 @@ const ApplicationContainer = connect(
     genMapDispatchToProp<TimerActionTypes & HistoryActionCreatorTypes>({
         ...timerActions,
         ...historyActions,
-        fetchKanban: kanbanActions.boardActions.fetchBoards
+        fetchKanban: kanbanActions.boardActions.fetchBoards,
     })
 )(Application);
 

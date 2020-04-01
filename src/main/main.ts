@@ -88,6 +88,7 @@ const createWindow = async () => {
 
     if (process.env.NODE_ENV === 'development') {
         win.loadURL(`http://localhost:2003`);
+        win.webContents.openDevTools({ mode: 'detach' });
     } else {
         win.loadURL(
             url.format({
