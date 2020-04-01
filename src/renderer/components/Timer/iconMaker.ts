@@ -1,6 +1,5 @@
 import AppIcon from '../../../res/icon.png';
-import { remote } from 'electron';
-const { nativeImage } = remote;
+import { ipcRenderer } from 'electron';
 
 function drawText(ctx: CanvasRenderingContext2D, isMac: boolean, size: number, leftTime: string) {
     ctx.fillStyle = 'white';
@@ -8,7 +7,7 @@ function drawText(ctx: CanvasRenderingContext2D, isMac: boolean, size: number, l
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(leftTime, size / 2, (size / 9) * 5);
+    ctx.fillText(leftTime, size / 2, size / 2);
 }
 
 function drawPause(ctx: CanvasRenderingContext2D, size: number) {
@@ -35,7 +34,7 @@ async function makeIcon(
     let size = 100;
     const isMac = process.platform === 'darwin';
     if (isMac) {
-        size = 18;
+        size = 32;
     }
 
     canvas.width = size;
@@ -47,11 +46,11 @@ async function makeIcon(
 
     const img = document.createElement('img');
     return new Promise<string>((resolve, reject) => {
-        img.addEventListener('error', e => {
+        img.addEventListener('error', (e) => {
             console.error(e);
             reject(e);
         });
-        img.addEventListener('load', e => {
+        img.addEventListener('load', (e) => {
             if (leftTime !== undefined && !isPause) {
                 if (progress !== undefined) {
                     drawCircleProgress(ctx, !!isFocus, size, progress);
@@ -118,7 +117,5 @@ export async function setTrayImageWithMadeIcon(
     isPause?: boolean
 ) {
     const src = await makeIcon(leftTime, progress, isFocus, isPause);
-    const tray = remote.getGlobal('tray');
-    const img = nativeImage.createFromDataURL(src);
-    tray.setImage(img);
+    ipcRenderer.send('set-tray', src);
 }

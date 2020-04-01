@@ -251,7 +251,7 @@ class Timer extends Component<Props, State> {
                 },
             },
             {
-                label: 'Stop',
+                label: 'Pause',
                 type: 'normal',
                 click: () => {
                     if (this.props.timer.isRunning) {
@@ -260,7 +260,7 @@ class Timer extends Component<Props, State> {
                 },
             },
             {
-                label: 'Clear',
+                label: 'Stop',
                 type: 'normal',
                 click: this.onClear,
             },
@@ -635,7 +635,9 @@ class Timer extends Component<Props, State> {
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-        ipcRenderer.send('restart-app', 'error');
+        if (process.env.NODE_ENV === 'production') {
+            ipcRenderer.send('restart-app', 'error');
+        }
     }
 
     render() {

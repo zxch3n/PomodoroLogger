@@ -1,8 +1,19 @@
-import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain, webContents } from 'electron';
+import {
+    nativeImage,
+    app,
+    Tray,
+    BrowserWindow,
+    Menu,
+    ipcMain,
+    webContents,
+    MenuItem,
+} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
 import logo from '../res/icon_sm.png';
+import fs from 'fs';
+import { dbBaseDir } from '../config';
 import { build } from '../../package.json';
 import { AutoUpdater } from './AutoUpdater';
 
@@ -45,7 +56,7 @@ const installExtensions = async () => {
         const forceDownload = false;
         const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
         return Promise.all(
-            extensions.map(name => installer.default(installer[name], forceDownload))
+            extensions.map((name) => installer.default(installer[name], forceDownload))
         ).catch(rej);
         clearTimeout(rejectTimer);
         res();
@@ -63,8 +74,8 @@ const createWindow = async () => {
         title: 'Pomodoro Logger',
         webPreferences: {
             nodeIntegrationInWorker: true,
-            nodeIntegration: true
-        }
+            nodeIntegration: true,
+        },
     });
 
     if (process.env.NODE_ENV !== 'production') {
@@ -77,12 +88,13 @@ const createWindow = async () => {
 
     if (process.env.NODE_ENV === 'development') {
         win.loadURL(`http://localhost:2003`);
+        win.webContents.openDevTools({ mode: 'detach' });
     } else {
         win.loadURL(
             url.format({
                 pathname: path.join(__dirname, 'index.html'),
                 protocol: 'file:',
-                slashes: true
+                slashes: true,
             })
         );
     }
@@ -115,13 +127,21 @@ const createWindow = async () => {
         app.exit();
     });
 
+    ipcMain.addListener('set-tray', (event: any, src: string) => {
+        const pngBuffer = nativeImage.createFromDataURL(src).toPNG();
+        const imgFile = path.join(dbBaseDir, 'tray@2x.png');
+        fs.writeFile(imgFile, pngBuffer, {}, () => {
+            mGlobal.tray?.setImage(imgFile);
+        });
+    });
+
     if (process.platform === 'darwin') {
         let forceQuit = false;
         app.on('before-quit', () => {
             forceQuit = true;
         });
 
-        win.on('close', event => {
+        win.on('close', (event) => {
             if (!forceQuit) {
                 event.preventDefault();
                 return;
@@ -147,22 +167,31 @@ app.on('ready', async () => {
             type: 'normal',
             click: () => {
                 app.quit();
-            }
-        }
+            },
+        },
     ];
 
     // @ts-ignore
     const contextMenu = Menu.buildFromTemplate(menuItems);
     mGlobal.tray.setToolTip('Pomodoro Logger');
-    mGlobal.tray.setContextMenu(contextMenu);
-
-    mGlobal.tray.on('double-click', async () => {
-        if (!win) {
-            await createWindow();
-        } else {
-            win.show();
-        }
-    });
+    if (process.platform === 'darwin') {
+        mGlobal.tray.on('click', async () => {
+            if (!win) {
+                await createWindow();
+            } else {
+                win.show();
+            }
+        });
+    } else {
+        mGlobal.tray.setContextMenu(contextMenu);
+        mGlobal.tray.on('double-click', async () => {
+            if (!win) {
+                await createWindow();
+            } else {
+                win.show();
+            }
+        });
+    }
 
     await createWindow();
 
@@ -213,6 +242,9 @@ function setMenuItems(items: { label: string; type: string; click: any }[]) {
     }
 
     const menuItems = items.concat([
+        new MenuItem({
+            type: 'separator',
+        }),
         {
             label: 'Open',
             type: 'normal',
@@ -220,7 +252,7 @@ function setMenuItems(items: { label: string; type: string; click: any }[]) {
                 if (win) {
                     win.show();
                 }
-            }
+            },
         },
         {
             label: 'Quit',
@@ -228,8 +260,8 @@ function setMenuItems(items: { label: string; type: string; click: any }[]) {
             click: () => {
                 win = undefined;
                 app.exit();
-            }
-        }
+            },
+        },
     ]);
     // @ts-ignore
     const contextMenu = Menu.buildFromTemplate(menuItems);

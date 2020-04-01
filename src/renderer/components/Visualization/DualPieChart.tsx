@@ -5,12 +5,6 @@ import { PomodoroRecord } from '../../monitor/type';
 import { getTimeSpentDataFromRecords, TimeSpentData } from '../History/op';
 import { Loading } from '../utils/Loading';
 
-const Container = styled.div`
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-`;
-
 interface Props {
     width?: number;
     projectData: { name: string; value: number }[];
@@ -22,13 +16,13 @@ function getOption(props: Props) {
     const option = {
         tooltip: {
             trigger: 'item',
-            formatter: '{a} <br/>{b}: {c} ({d}%)'
+            formatter: '{a} <br/>{b}: {c} ({d}%)',
         },
         legend: {
             orient: 'vertical',
             // @ts-ignore
             x: 'left',
-            data: props.appData.map(v => v.name).concat(props.projectData.map(v => v.name))
+            data: props.appData.map((v) => v.name).concat(props.projectData.map((v) => v.name)),
         },
         series: [
             {
@@ -39,15 +33,15 @@ function getOption(props: Props) {
 
                 label: {
                     normal: {
-                        position: 'inner'
-                    }
+                        position: 'inner',
+                    },
                 },
                 labelLine: {
                     normal: {
-                        show: false
-                    }
+                        show: false,
+                    },
                 },
-                data: props.projectData
+                data: props.projectData,
             },
             {
                 name: 'Application Hours',
@@ -64,30 +58,30 @@ function getOption(props: Props) {
                             a: {
                                 color: '#999',
                                 lineHeight: 22,
-                                align: 'center'
+                                align: 'center',
                             },
                             hr: {
                                 borderColor: '#aaa',
                                 width: '100%',
                                 borderWidth: 0.5,
-                                height: 0
+                                height: 0,
                             },
                             b: {
                                 fontSize: 16,
-                                lineHeight: 33
+                                lineHeight: 33,
                             },
                             per: {
                                 color: '#eee',
                                 backgroundColor: '#334455',
                                 padding: [2, 4],
-                                borderRadius: 2
-                            }
-                        }
-                    }
+                                borderRadius: 2,
+                            },
+                        },
+                    },
                 },
-                data: props.appData
-            }
-        ]
+                data: props.appData,
+            },
+        ],
     };
 
     return option;
@@ -112,11 +106,11 @@ export const PomodoroDualPieChart: React.FC<PomodoroPieChartProps> = (
     const { pomodoros, ...restProps } = props;
     const [timeSpent, setTimeSpent] = React.useState<TimeSpentData>({
         projectData: [],
-        appData: []
+        appData: [],
     });
     const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
-        getTimeSpentDataFromRecords(pomodoros).then(v => {
+        getTimeSpentDataFromRecords(pomodoros).then((v) => {
             setTimeSpent(v);
             setIsLoading(false);
         });
