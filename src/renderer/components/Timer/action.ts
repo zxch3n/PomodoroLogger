@@ -29,6 +29,7 @@ export interface Setting {
     monitorInterval: number;
     screenShotInterval?: number;
     startOnBoot: boolean;
+    useHardwareAcceleration: boolean;
     distractingList: DistractingRow[];
 }
 
@@ -48,14 +49,14 @@ export const defaultState: TimerState = {
     distractingList: [
         {
             app: 'Chrome|Edge|Iexplore|Safari|Firefox|Brave',
-            title: 'Facebook|微博|Twitter|哔哩哔哩|YouTube|Twitch|微信'
+            title: 'Facebook|微博|Twitter|哔哩哔哩|YouTube|Twitch|微信',
         },
         {
-            app: 'WeChatStore'
+            app: 'WeChatStore',
         },
         {
-            title: '邮件|Mail'
-        }
+            title: '邮件|Mail',
+        },
     ],
     autoUpdate: true,
     targetTime: undefined,
@@ -66,10 +67,11 @@ export const defaultState: TimerState = {
     isRunning: false,
     isFocusing: true,
     startOnBoot: false,
+    useHardwareAcceleration: false,
 
     monitorInterval: 1000,
     screenShotInterval: undefined,
-    currentTab: 'timer'
+    currentTab: 'timer',
 };
 
 export const uiStateNames = [
@@ -85,7 +87,7 @@ export const uiStateNames = [
     'isFocusing',
     'isRunning',
     'boardId',
-    'iBreak'
+    'iBreak',
 ];
 
 if (__DEV__) {
@@ -99,53 +101,58 @@ export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
 export const setAutoUpdate = createActionCreator(
     '[Timer]SET_AUTO_UPDATE',
-    resolve => (value: boolean) => resolve(value)
+    (resolve) => (value: boolean) => resolve(value)
 );
 export const setChosenRecord = createActionCreator(
     '[Timer]SET_CHOSEN_RECORD',
-    resolve => (record?: PomodoroRecord) => resolve({ record })
+    (resolve) => (record?: PomodoroRecord) => resolve({ record })
 );
 export const setDistractingList = createActionCreator(
     '[Setting]SET_DISTRACTING_LIST',
-    resolve => (rows: DistractingRow[]) => resolve(rows)
+    (resolve) => (rows: DistractingRow[]) => resolve(rows)
 );
 export const extendCurrentSession = createActionCreator(
     '[Timer]EXTEND_CURRENT_SESSION',
-    resolve => (time: number) => resolve(time)
+    (resolve) => (time: number) => resolve(time)
 );
 export const setLongBreakDuration = createActionCreator(
     '[Timer]SET_LONG_BREAK',
-    resolve => (longBreakDuration: number) => resolve({ longBreakDuration })
+    (resolve) => (longBreakDuration: number) => resolve({ longBreakDuration })
 );
 export const setStartOnBoot = createActionCreator(
     '[Timer]SWITCH_START_ON_BOOT',
-    resolve => (check: boolean) => resolve(check)
+    (resolve) => (check: boolean) => resolve(check)
+);
+export const setUseHardwareAcceleration = createActionCreator(
+    '[Timer]SWITCH_SET_USE_HARDWARE_ACCELERATION',
+    (resolve) => (check: boolean) => resolve(check)
 );
 export const setFocusDuration = createActionCreator(
     '[Timer]SET_FOCUS_DURATION',
-    resolve => (duration: number) => resolve(duration)
+    (resolve) => (duration: number) => resolve(duration)
 );
 export const setRestDuration = createActionCreator(
     '[Timer]SET_REST_DURATION',
-    resolve => (duration: number) => resolve(duration)
+    (resolve) => (duration: number) => resolve(duration)
 );
 export const setBoardId = createActionCreator(
     '[Timer]SET_BOARD_ID',
-    resolve => (boardId?: string) => resolve({ boardId })
+    (resolve) => (boardId?: string) => resolve({ boardId })
 );
 export const setMonitorInterval = createActionCreator(
     '[Timer]SET_MONITOR_INTERVAL',
-    resolve => (interval: number) => resolve(interval)
+    (resolve) => (interval: number) => resolve(interval)
 );
 export const setScreenShotInterval = createActionCreator(
     '[Timer]SET_SCREEN_SHOT_INTERVAL',
-    resolve => (interval?: number) => resolve(interval)
+    (resolve) => (interval?: number) => resolve(interval)
 );
 export const switchFocusRestMode = createActionCreator('[Timer]SWITCH_FOCUS_MODE');
-export const changeAppTab = createActionCreator('[App]CHANGE_APP_TAB', resolve => (tab: tabType) =>
-    resolve(tab)
+export const changeAppTab = createActionCreator(
+    '[App]CHANGE_APP_TAB',
+    (resolve) => (tab: tabType) => resolve(tab)
 );
-export const switchTab = createActionCreator('[App]SWITCH_TAB', resolve => (direction: 1 | -1) =>
+export const switchTab = createActionCreator('[App]SWITCH_TAB', (resolve) => (direction: 1 | -1) =>
     resolve(direction)
 );
 
@@ -179,9 +186,10 @@ export const actions = {
             ['monitorInterval', setMonitorInterval],
             ['screenShotInterval', setScreenShotInterval],
             ['startOnBoot', setStartOnBoot],
+            ['useHardwareAcceleration', setUseHardwareAcceleration],
             ['longBreakDuration', setLongBreakDuration],
             ['distractingList', setDistractingList],
-            ['autoUpdate', setAutoUpdate]
+            ['autoUpdate', setAutoUpdate],
         ];
         for (const key of settingKeywords) {
             if (key[0] in settings) {
@@ -244,6 +252,15 @@ export const actions = {
             throwError
         );
     },
+    setUseHardwareAcceleration: (check: boolean) => async (dispatch: Dispatch) => {
+        dispatch(setUseHardwareAcceleration(check));
+        dbs.settingDB.update(
+            { name: 'setting' },
+            { $set: { useHardwareAcceleration: check } },
+            { upsert: true },
+            throwError
+        );
+    },
     setMonitorInterval: (monitorInterval: number) => async (dispatch: Dispatch) => {
         dispatch(setMonitorInterval(monitorInterval));
         dbs.settingDB.update(
@@ -270,7 +287,7 @@ export const actions = {
         dispatch(timerFinished());
         dispatch(historyActions.setExpiringKey(new Date().toString()));
         if (sessionData) {
-            await addSession(sessionData).catch(err => console.error(err));
+            await addSession(sessionData).catch((err) => console.error(err));
             if (boardId !== undefined) {
                 await boardActions.onTimerFinished(
                     boardId,
@@ -284,7 +301,7 @@ export const actions = {
     /* istanbul ignore next */
     inferProject: (sessionData: PomodoroRecord) => async (dispatch: Dispatch) => {
         // Predict session's project
-        const newProjectId = (await workers.knn.predict(sessionData).catch(err => {
+        const newProjectId = (await workers.knn.predict(sessionData).catch((err) => {
             console.error('predicting error', err);
             return undefined;
         })) as string | undefined;
@@ -297,11 +314,11 @@ export const actions = {
     switchToKanban: (kanbanId: string) => (dispatch: Dispatch) => {
         dispatch(actions.changeAppTab('kanban'));
         kanbanActions.setChosenBoardId(kanbanId)(dispatch);
-    }
+    },
 };
 
 export type TimerActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
-export const reducer = createReducer<TimerState, any>(defaultState, handle => [
+export const reducer = createReducer<TimerState, any>(defaultState, (handle) => [
     handle(startTimer, (state: TimerState) => {
         const duration: number = state.isFocusing
             ? state.focusDuration
@@ -313,29 +330,29 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
             return {
                 ...state,
                 isRunning: true,
-                targetTime: now + (duration * 1000) / DEBUG_TIME_SCALE
+                targetTime: now + (duration * 1000) / DEBUG_TIME_SCALE,
             };
         }
 
         return { ...state, isRunning: true, targetTime: now + duration * 1000 };
     }),
 
-    handle(stopTimer, state => ({
+    handle(stopTimer, (state) => ({
         ...state,
         isRunning: false,
-        leftTime: state.targetTime ? state.targetTime - new Date().getTime() : undefined
+        leftTime: state.targetTime ? state.targetTime - new Date().getTime() : undefined,
     })),
 
-    handle(continueTimer, state => ({
+    handle(continueTimer, (state) => ({
         ...state,
         isRunning: true,
-        targetTime: state.leftTime ? new Date().getTime() + state.leftTime : state.targetTime
+        targetTime: state.leftTime ? new Date().getTime() + state.leftTime : state.targetTime,
     })),
-    handle(clearTimer, state => ({
+    handle(clearTimer, (state) => ({
         ...state,
         leftTime: undefined,
         isRunning: false,
-        targetTime: undefined
+        targetTime: undefined,
     })),
     handle(timerFinished, (state: TimerState) => {
         return {
@@ -344,7 +361,7 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
             targetTime: undefined,
             isFocusing: !state.isFocusing,
             iBreak: state.iBreak + (state.isFocusing ? 1 : 0),
-            leftTime: undefined
+            leftTime: undefined,
         };
     }),
 
@@ -359,7 +376,7 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
     ),
     handle(setAutoUpdate, (state, { payload }) => ({
         ...state,
-        autoUpdate: payload
+        autoUpdate: payload,
     })),
     handle(setMonitorInterval, (state, { payload }) => ({ ...state, monitorInterval: payload })),
 
@@ -370,46 +387,50 @@ export const reducer = createReducer<TimerState, any>(defaultState, handle => [
                 ? payload
                 : process.env.NODE_ENV !== 'development'
                 ? payload
-                : payload / DEBUG_TIME_SCALE
+                : payload / DEBUG_TIME_SCALE,
     })),
 
-    handle(switchFocusRestMode, state => ({
+    handle(switchFocusRestMode, (state) => ({
         ...state,
         isFocusing: !state.isFocusing,
         leftTime: undefined,
         targetTime: undefined,
-        isRunning: false
+        isRunning: false,
     })),
 
     handle(setBoardId, (state, { payload: { boardId } }) => ({ ...state, boardId })),
     handle(changeAppTab, (state, { payload }) => ({ ...state, currentTab: payload })),
     handle(setStartOnBoot, (state, { payload }) => ({
         ...state,
-        startOnBoot: payload
+        startOnBoot: payload,
+    })),
+    handle(setUseHardwareAcceleration, (state, { payload }) => ({
+        ...state,
+        useHardwareAcceleration: payload,
     })),
     handle(setLongBreakDuration, (state, { payload: { longBreakDuration } }) => ({
         ...state,
-        longBreakDuration
+        longBreakDuration,
     })),
     handle(extendCurrentSession, (state, { payload }) => ({
         ...state,
         targetTime: new Date().getTime() + payload * 1000,
         isFocusing: true,
-        isRunning: true
+        isRunning: true,
     })),
     handle(setDistractingList, (state, { payload }) => ({
         ...state,
-        distractingList: payload
+        distractingList: payload,
     })),
     handle(switchTab, (state, { payload }) => {
         const index = (TABS.indexOf(state.currentTab) + payload + TABS.length) % TABS.length;
         return {
             ...state,
-            currentTab: TABS[index]
+            currentTab: TABS[index],
         };
     }),
     handle(setChosenRecord, (state, { payload: { record } }) => ({
         ...state,
-        chosenRecord: record
-    }))
+        chosenRecord: record,
+    })),
 ]);

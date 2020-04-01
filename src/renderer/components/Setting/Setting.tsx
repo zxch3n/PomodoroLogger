@@ -45,18 +45,18 @@ const StyledIcon = styled(Icon)`
 const marks = {
     25: '25min',
     35: '35min',
-    45: '45min'
+    45: '45min',
 };
 
 const restMarks = {
     5: '5min',
-    10: '10min'
+    10: '10min',
 };
 
 const longBreakMarks = {
     10: '10min',
     15: '15min',
-    20: '20min'
+    20: '20min',
 };
 
 const settingUiStates = [
@@ -66,8 +66,9 @@ const settingUiStates = [
     'longBreakDuration',
     'monitorInterval',
     'screenShotInterval',
+    'useHardwareAcceleration',
     'startOnBoot',
-    'distractingList'
+    'distractingList',
 ];
 
 interface Props extends TimerState, TimerActionTypes {}
@@ -108,7 +109,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 message: 'Restart App to Apply Changes',
                 description: 'Screenshot setting change needs restart to be applied',
                 duration: 0,
-                icon: <Icon type="warning" />
+                icon: <Icon type="warning" />,
             });
         }, []);
 
@@ -121,13 +122,23 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
             if (v) {
                 app.setLoginItemSettings({
                     openAtLogin: true,
-                    openAsHidden: true
+                    openAsHidden: true,
                 });
             } else {
                 app.setLoginItemSettings({
-                    openAtLogin: false
+                    openAtLogin: false,
                 });
             }
+        }, []);
+
+        const setUseHardwareAcceleration = React.useCallback((v: boolean) => {
+            props.setUseHardwareAcceleration(v);
+            notification.open({
+                message: 'Restart App to Apply Changes',
+                description: 'Hardware acceleration setting change needs restart to be applied',
+                duration: 0,
+                icon: <Icon type="warning" />,
+            });
         }, []);
 
         function onDeleteData() {
@@ -143,9 +154,9 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 filters: [
                     {
                         name: 'Data File',
-                        extensions: ['dat']
-                    }
-                ]
+                        extensions: ['dat'],
+                    },
+                ],
             });
 
             if (!canceled && filePath) {
@@ -205,6 +216,15 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                         </SliderContainer>
                     </Col>
                 </Row>
+                <span style={{ fontWeight: 500, fontSize: 14, color: 'rgba(0, 0, 0, 0.85)' }}>
+                    Hardware Acceleration
+                </span>
+                <Switch
+                    onChange={setUseHardwareAcceleration}
+                    checked={props.useHardwareAcceleration}
+                    style={{ margin: 8 }}
+                />
+                <br />
 
                 <span style={{ fontWeight: 500, fontSize: 14, color: 'rgba(0, 0, 0, 0.85)' }}>
                     Start On Boot

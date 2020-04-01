@@ -1,30 +1,39 @@
-import {
-    nativeImage,
-    app,
-    Tray,
-    BrowserWindow,
-    Menu,
-    ipcMain,
-    webContents,
-    MenuItem,
-} from 'electron';
+import { nativeImage, Tray, BrowserWindow, Menu, ipcMain, MenuItem, app } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
 import logo from '../res/icon_sm.png';
 import fs from 'fs';
-import { dbBaseDir } from '../config';
+import { dbBaseDir, dbPaths } from '../config';
 import { build } from '../../package.json';
 import { AutoUpdater } from './AutoUpdater';
+
+let win: BrowserWindow | undefined;
+
+let useHardwareAcceleration = false;
+try {
+    const settings = fs.readFileSync(dbPaths.settingDB, { encoding: 'utf-8' });
+    console.log({ settings });
+    if (settings) {
+        const json = JSON.parse(
+            settings
+                .split('\n')
+                .filter((x) => !!x)
+                .slice(-1)[0]
+        );
+        console.log(json);
+        useHardwareAcceleration = json.useHardwareAcceleration;
+    }
+} catch (e) {}
+if (!useHardwareAcceleration) {
+    app.commandLine.appendSwitch('disable-gpu');
+    app.commandLine.appendSwitch('disable-software-rasterizer');
+    app.disableHardwareAcceleration();
+}
 
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
 app.commandLine.appendSwitch('disable-background-timer-throttling');
-app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('disable-software-rasterizer');
-app.disableHardwareAcceleration();
-
-let win: BrowserWindow | undefined;
 const gotTheLock = process.env.NODE_ENV !== 'production' || app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
