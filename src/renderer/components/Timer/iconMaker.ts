@@ -7,7 +7,11 @@ function drawText(ctx: CanvasRenderingContext2D, isMac: boolean, size: number, l
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(leftTime, size / 2, size / 2);
+    if (isMac) {
+        ctx.fillText(leftTime, size / 2, size / 2);
+    } else {
+        ctx.fillText(leftTime, size / 2, (size / 9) * 5);
+    }
 }
 
 function drawPause(ctx: CanvasRenderingContext2D, size: number) {
