@@ -20,6 +20,9 @@ import { AutoUpdater } from './AutoUpdater';
 // Fix setTimeout not reliable problem
 // See https://github.com/electron/electron/issues/7079#issuecomment-325706135
 app.commandLine.appendSwitch('disable-background-timer-throttling');
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('disable-software-rasterizer');
+app.disableHardwareAcceleration();
 
 let win: BrowserWindow | undefined;
 const gotTheLock = process.env.NODE_ENV !== 'production' || app.requestSingleInstanceLock();
