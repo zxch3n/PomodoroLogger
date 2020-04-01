@@ -264,6 +264,9 @@ class Timer extends Component<Props, State> {
                 type: 'normal',
                 click: this.onClear,
             },
+            {
+                type: 'separator',
+            },
         ]);
     }
 

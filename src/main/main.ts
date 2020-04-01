@@ -1,4 +1,13 @@
-import { nativeImage, app, Tray, BrowserWindow, Menu, ipcMain, webContents } from 'electron';
+import {
+    nativeImage,
+    app,
+    Tray,
+    BrowserWindow,
+    Menu,
+    ipcMain,
+    webContents,
+    MenuItem,
+} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as db from './db';
@@ -164,15 +173,24 @@ app.on('ready', async () => {
     // @ts-ignore
     const contextMenu = Menu.buildFromTemplate(menuItems);
     mGlobal.tray.setToolTip('Pomodoro Logger');
-    mGlobal.tray.setContextMenu(contextMenu);
-
-    mGlobal.tray.on('double-click', async () => {
-        if (!win) {
-            await createWindow();
-        } else {
-            win.show();
-        }
-    });
+    if (process.platform === 'darwin') {
+        mGlobal.tray.on('click', async () => {
+            if (!win) {
+                await createWindow();
+            } else {
+                win.show();
+            }
+        });
+    } else {
+        mGlobal.tray.setContextMenu(contextMenu);
+        mGlobal.tray.on('double-click', async () => {
+            if (!win) {
+                await createWindow();
+            } else {
+                win.show();
+            }
+        });
+    }
 
     await createWindow();
 
@@ -223,6 +241,9 @@ function setMenuItems(items: { label: string; type: string; click: any }[]) {
     }
 
     const menuItems = items.concat([
+        new MenuItem({
+            type: 'separator',
+        }),
         {
             label: 'Open',
             type: 'normal',
