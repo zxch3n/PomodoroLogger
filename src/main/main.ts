@@ -26,8 +26,10 @@ try {
     }
 } catch (e) {}
 if (!useHardwareAcceleration) {
-    app.commandLine.appendSwitch('disable-gpu');
-    app.commandLine.appendSwitch('disable-software-rasterizer');
+    if (process.platform !== 'darwin') {
+        app.commandLine.appendSwitch('disable-gpu');
+        app.commandLine.appendSwitch('disable-software-rasterizer');
+    }
     app.disableHardwareAcceleration();
 }
 
