@@ -97,7 +97,7 @@ class Application extends React.Component<Props> {
                     >
                         <DestroyOnTimeoutWrapper
                             isVisible={currentTab === 'kanban'}
-                            timeout={10000}
+                            timeout={600000}
                         >
                             <Kanban />
                         </DestroyOnTimeoutWrapper>
@@ -115,7 +115,7 @@ class Application extends React.Component<Props> {
                     >
                         <DestroyOnTimeoutWrapper
                             isVisible={currentTab === 'history'}
-                            timeout={10000}
+                            timeout={600000}
                         >
                             <History />
                         </DestroyOnTimeoutWrapper>

@@ -81,7 +81,6 @@ export const uiStateNames = [
     'monitorInterval',
     'screenShotInterval',
     'chosenRecord',
-    'currentTab',
     'targetTime',
     'leftTime',
     'isFocusing',

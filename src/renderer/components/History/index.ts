@@ -11,7 +11,7 @@ type CardGetter = (boardId: string | undefined) => Card[];
 let cardsGetter: undefined | CardGetter;
 let lastRootState: undefined | RootState;
 const getCardsGetter = (state: RootState): CardGetter => {
-    if (state === lastRootState) {
+    if (state.kanban === lastRootState?.kanban) {
         return cardsGetter!;
     }
 
@@ -26,7 +26,7 @@ const getCardsGetter = (state: RootState): CardGetter => {
             cardIds.concat(state.kanban.lists[listId].cards);
         }
 
-        return cardIds.map(id => state.kanban.cards[id]);
+        return cardIds.map((id) => state.kanban.cards[id]);
     };
 
     return cardsGetter;
@@ -36,13 +36,13 @@ const mapStateToProps = (state: RootState) => ({
     chosenId: state.history.chosenProjectId,
     expiringKey: state.history.expiringKey,
     boards: state.kanban.boards,
-    getCardsByBoardId: getCardsGetter(state)
+    getCardsByBoardId: getCardsGetter(state),
 });
 const mapDispatchToProps = genMapDispatchToProp<
     HistoryActionCreatorTypes & { chooseRecord: (r: PomodoroRecord) => void }
 >({
     ...actions,
-    chooseRecord: timerActions.setChosenRecord
+    chooseRecord: timerActions.setChosenRecord,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(History);
