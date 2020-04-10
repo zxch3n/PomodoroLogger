@@ -5,15 +5,16 @@ import { actions as cardActions, cardReducer, CardsState } from './Card/action';
 import {
     actions as overallActions,
     KanbanState as OKanbanState,
-    reducer as kanbanReducer
+    reducer as kanbanReducer,
 } from './action';
 import { ListsState } from './type';
+import { EqualKey } from '../../utils';
 
 export const reducer = combineReducers({
     boards: boardReducer,
     lists: listReducer,
     cards: cardReducer,
-    kanban: kanbanReducer
+    kanban: kanbanReducer,
 });
 
 export interface KanbanState {
@@ -23,13 +24,20 @@ export interface KanbanState {
     kanban: OKanbanState;
 }
 
-export const uiStateNames = ['boards', 'lists', 'cards', 'kanban'];
+export const uiStateNames: EqualKey[] = [
+    'boards',
+    'lists',
+    'cards',
+    {
+        kanban: ['sortedBy', 'chosenBoardId', 'isSearching', 'searchReg', 'configuringBoardId'],
+    },
+];
 
 export const kanbanActions = {
     boardActions,
     listActions,
     cardActions,
-    overallActions
+    overallActions,
 };
 
 export type KanbanActionTypes = { [key in keyof typeof kanbanActions]: typeof kanbanActions[key] };

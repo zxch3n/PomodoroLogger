@@ -44,14 +44,14 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                 title: card.title,
                 content: card.content,
                 estimatedTime: time ? time : undefined,
-                actualTime: actual ? actual : undefined
+                actualTime: actual ? actual : undefined,
             } as FormData);
         } else {
             setFieldsValue({
                 title: '',
                 content: '',
                 estimatedTime: undefined,
-                actualTime: undefined
+                actualTime: undefined,
             } as FormData);
         }
     }, [card]);
@@ -68,10 +68,6 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     const onSwitchIsEditing = () => {
         setIsEditingActualTime(!isEditingActualTime);
     };
-
-    if (!visible) {
-        return <span style={{ display: 'none' }} />;
-    }
 
     const saveValues = ({ title, content, estimatedTime, actualTime }: FormData) => {
         const time = estimatedTime || 0;
@@ -116,7 +112,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                 <Form layout="vertical">
                     <Form.Item label="Title">
                         {getFieldDecorator('title', {
-                            rules: [{ required: true, message: 'Please input the name of board!' }]
+                            rules: [{ required: true, message: 'Please input the name of board!' }],
                         })(<Input placeholder={'Title'} />)}
                     </Form.Item>
                     <Form.Item label="Content">
@@ -142,9 +138,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            {isCreating ? (
-                                undefined
-                            ) : (
+                            {isCreating ? undefined : (
                                 <Form.Item label="Actual Spent Time In Hour">
                                     {getFieldDecorator('actualTime')(
                                         <InputNumber
@@ -165,9 +159,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                             )}
                         </Col>
                     </Row>
-                    {isCreating ? (
-                        undefined
-                    ) : (
+                    {isCreating ? undefined : (
                         <Row>
                             <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
                                 <Button type={'danger'} icon={'delete'}>
@@ -188,11 +180,12 @@ export const CardInDetail = connect(
         return {
             listId,
             card: _id === undefined ? undefined : state.kanban.cards[_id],
-            visible: isEditing
+            visible: isEditing,
         };
     },
     genMapDispatchToProp<CardActionTypes>({
         ...actions,
-        onCancel: () => (dispatch: any) => dispatch(kanbanActions.setEditCard(false, '', undefined))
+        onCancel: () => (dispatch: any) =>
+            dispatch(kanbanActions.setEditCard(false, '', undefined)),
     })
 )(Form.create({})(_CardInDetail));

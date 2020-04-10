@@ -140,9 +140,9 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
         }
     };
 
-    const clickDate = (year: number, month: number, day: number) => {
+    const clickDate = React.useCallback((year: number, month: number, day: number) => {
         setTargetDate([year, month, day]);
-    };
+    }, []);
     return (
         <Container>
             <SubContainer ref={container as any}>

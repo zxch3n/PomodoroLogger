@@ -1,20 +1,62 @@
 import { Dispatch } from 'redux';
 import { workers } from './workers';
 import { KanbanBoard } from './components/Kanban/type';
+import { MapDispatchToPropsParam } from 'react-redux';
 
+const creatorMap = new WeakMap();
 export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => {
     return (dispatch: Dispatch) => {
-        const dict: Partial<T> = {};
+        const dict: any = {};
         for (const name in actions) {
-            // @ts-ignore
             const actionCreator = actions[name];
-            // @ts-ignore
-            dict[name] = (...args: any) => dispatch(actionCreator(...args));
+            if (creatorMap.has(actionCreator)) {
+                dict[name] = creatorMap.get(actionCreator);
+            } else {
+                dict[name] = (...args: any) => dispatch(actionCreator(...args));
+                creatorMap.set(actionCreator, dict[name]);
+            }
         }
 
         return dict as T;
     };
 };
+
+export function memorizeDispatchToProps<Props, T extends { [name: string]: Function }>(
+    funcMap: (dispatch: Dispatch, props: Props) => T,
+    cacheMap: (props: Props) => { [name in keyof T]: any[] }
+): MapDispatchToPropsParam<T, Props> {
+    const cacheKeys: { [name in keyof T]?: any[] } = {};
+    const cachedFunctions: Partial<T> = {};
+    return (dispatch: Dispatch, props: Props) => {
+        const newCacheMap = cacheMap(props);
+        let newFunctions: T | undefined;
+        for (const name in newCacheMap) {
+            if (!cacheKeys[name] || newCacheMap[name].some((x, i) => x !== cacheKeys[name]![i])) {
+                cacheKeys[name] = newCacheMap[name];
+                if (!newFunctions) {
+                    newFunctions = funcMap(dispatch, props);
+                }
+
+                cachedFunctions[name] = newFunctions[name];
+            }
+        }
+
+        return { ...cachedFunctions } as T;
+    };
+}
+
+export function getMemorizedFunc<T extends Function>() {
+    let lastFunc: T | undefined;
+    let lastKeys: any[] | undefined;
+    return (func: T, cacheKeys: any[]) => {
+        if (lastKeys == null || lastKeys.some((x, i) => x !== cacheKeys[i])) {
+            lastKeys = cacheKeys;
+            lastFunc = func;
+        }
+
+        return lastFunc as T;
+    };
+}
 
 export const generateRandomName = () => {
     const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -98,28 +140,60 @@ export function isShallowEqual(v: { [key: string]: any }, o: { [key: string]: an
     return true;
 }
 
+export type EqualKey = string | { [key: string]: EqualKey[] };
 export function isShallowEqualByKeys(
     v: { [key: string]: any },
     o: { [key: string]: any },
-    keys: string[]
+    keys: EqualKey[]
 ) {
+    const stack = keys.concat();
+    while (stack.length) {
+        const top = stack.pop();
+        if (typeof top === 'string') {
+            if (!equal(v, o, top)) {
+                return false;
+            }
+        } else {
+            for (const key in top) {
+                for (const value of top[key]) {
+                    if (typeof value === 'string') {
+                        stack.push(key + '.' + value);
+                    } else {
+                        Object.keys(value).forEach((k) => {
+                            value[key + '.' + k] = value[k];
+                            delete value[k];
+                        });
+                        stack.push(value);
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+function equal(a: any, b: any, equalKey: string) {
+    const keys = equalKey.split('.');
     for (const key of keys) {
-        const hasNum = (key in o ? 1 : 0) + (key in v ? 1 : 0);
+        const hasNum = (key in a ? 1 : 0) + (key in b ? 1 : 0);
         if (hasNum === 0) {
-            continue;
+            return true;
         }
 
         if (hasNum !== 2) {
             return false;
         }
 
-        // @ts-ignore
-        if (o[key] !== v[key]) {
+        if (a[key] !== b[key]) {
             return false;
         }
+
+        a = a[key];
+        b = b[key];
     }
 
-    return true;
+    return a === b;
 }
 
 export async function getNameFromBoardId(_id: string) {

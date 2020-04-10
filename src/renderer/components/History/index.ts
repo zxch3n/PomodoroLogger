@@ -11,7 +11,11 @@ type CardGetter = (boardId: string | undefined) => Card[];
 let cardsGetter: undefined | CardGetter;
 let lastRootState: undefined | RootState;
 const getCardsGetter = (state: RootState): CardGetter => {
-    if (state.kanban === lastRootState?.kanban) {
+    if (
+        state.kanban.boards === lastRootState?.kanban.boards &&
+        state.kanban.lists === lastRootState?.kanban.lists &&
+        state.kanban.cards === lastRootState?.kanban.cards
+    ) {
         return cardsGetter!;
     }
 

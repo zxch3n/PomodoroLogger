@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { actions as timerActions } from '../../Timer/action';
-import { connect } from 'react-redux';
+import { connect, MapDispatchToPropsParam } from 'react-redux';
 import { RootState } from '../../../reducers';
 import { actions } from './action';
 import { actions as kanbanActions } from '../action';
@@ -17,6 +17,7 @@ import { ListsCountBar } from '../../Visualization/Bar';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Pin } from '../../Visualization/Pin';
 import { Card, KanbanBoard, ListsState } from '../type';
+import { memorizeDispatchToProps } from '../../../utils';
 
 const BriefCard = styled.div`
     word-break: break-word;
@@ -134,7 +135,7 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
                 l[0] + (r.isDone ? 0 : Math.max(0, estimated - actual)),
                 l[1] + actual,
                 l[2] + err,
-                l[3] + (r.isDone ? 1 : 0)
+                l[3] + (r.isDone ? 1 : 0),
             ];
         },
         [0, 0, 0, 0]
@@ -181,7 +182,7 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
                         isPin={!!props.pin}
                         onClick={useCallback(() => props.setPin(!props.pin), [
                             props._id,
-                            props.pin
+                            props.pin,
                         ])}
                         isHover={hover}
                         style={{ marginLeft: 4 }}
@@ -204,9 +205,7 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
                             onClick={onSettingClick}
                             size={'small'}
                         />
-                    ) : (
-                        undefined
-                    )}
+                    ) : undefined}
                 </span>
             </Header>
             <Content>
@@ -214,26 +213,20 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
                     <Markdown
                         dangerouslySetInnerHTML={{ __html: formatMarkdown(props.description) }}
                     />
-                ) : (
-                    undefined
-                )}
+                ) : undefined}
                 <ListsCountBar boardId={props._id} height={40} />
                 {props.relatedSessions.length ? (
                     <AnimTrend style={{ display: hover ? undefined : 'none' }}>
                         <IdTrend boardId={props._id} />
                     </AnimTrend>
-                ) : (
-                    undefined
-                )}
+                ) : undefined}
             </Content>
             <Divider style={{ margin: '6px 0' }} />
             <BadgeHolder>
                 <PomodoroDot num={props.relatedSessions.length} />
                 {actualTimeSum + estimatedLeftTimeSum ? (
                     <TimeBadge spentTime={actualTimeSum} leftTime={estimatedLeftTimeSum} />
-                ) : (
-                    undefined
-                )}
+                ) : undefined}
                 {showErr ? (
                     <Badge
                         type={'accuracy'}
@@ -241,9 +234,7 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
                         color={accColor}
                         title={'Estimate accuracy'}
                     />
-                ) : (
-                    undefined
-                )}
+                ) : undefined}
             </BadgeHolder>
         </BriefCard>
     );
@@ -254,18 +245,31 @@ interface InputProps {
     onSettingClick?: () => void;
 }
 
-export const BoardBrief = connect(
-    (state: RootState, props: InputProps) => ({
-        ...state.kanban.boards[props.boardId],
-        listsById: state.kanban.lists,
-        cardsById: state.kanban.cards
-    }),
+const memorizedMapping = memorizeDispatchToProps(
     (dispatch: Dispatch, props: InputProps) => ({
         choose: () => {
             dispatch(timerActions.changeAppTab('timer'));
             dispatch(timerActions.setBoardId(props.boardId));
         },
-        configure: () => dispatch(kanbanActions.setConfiguringBoardId(props.boardId)),
-        setPin: (pin: boolean) => actions.setPin(props.boardId, pin)(dispatch)
+        configure: () => {
+            dispatch(kanbanActions.setConfiguringBoardId(props.boardId));
+        },
+        setPin: (pin: boolean) => {
+            actions.setPin(props.boardId, pin)(dispatch);
+        },
+    }),
+    (props: InputProps) => ({
+        choose: [props.boardId],
+        configure: [props.boardId],
+        setPin: [props.boardId],
     })
+);
+
+export const BoardBrief = connect(
+    (state: RootState, props: InputProps) => ({
+        ...state.kanban.boards[props.boardId],
+        listsById: state.kanban.lists,
+        cardsById: state.kanban.cards,
+    }),
+    memorizedMapping
 )(_BoardBrief);

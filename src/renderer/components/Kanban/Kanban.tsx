@@ -15,7 +15,7 @@ import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
 import { DistractingListModalButton } from '../Setting/DistractingList';
 import { TimerActionTypes } from '../Timer/action';
-import { isShallowEqual } from '../../utils';
+import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
 
 const { Option } = Select;
 
@@ -326,14 +326,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
         );
     },
     (prevProps, nextProps) => {
-        for (const key of uiStateNames) {
-            // @ts-ignore
-            if (!isShallowEqual(prevProps[key], nextProps[key])) {
-                return false;
-            }
-        }
-
-        return true;
+        return isShallowEqualByKeys(prevProps, nextProps, uiStateNames);
     }
 );
 
