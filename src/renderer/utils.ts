@@ -3,10 +3,17 @@ import { workers } from './workers';
 import { KanbanBoard } from './components/Kanban/type';
 import { MapDispatchToPropsParam } from 'react-redux';
 
-const creatorMap = new WeakMap();
+let creatorMap = new WeakMap();
+let cachedDispatch: Dispatch | undefined;
 export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => {
     return (dispatch: Dispatch) => {
         const dict: any = {};
+        if (dispatch !== cachedDispatch) {
+            creatorMap = new WeakMap();
+            cachedDispatch = dispatch;
+        }
+
+        console.log(actions);
         for (const name in actions) {
             const actionCreator = actions[name];
             if (creatorMap.has(actionCreator)) {
