@@ -40,7 +40,7 @@ const monthList = [
     'Sep',
     'Oct',
     'Nov',
-    'Dec'
+    'Dec',
 ];
 
 interface GridData {
@@ -82,20 +82,24 @@ function getGridData(data: Data, till: number, shownGrids: number): GridData[] {
             date: date.getDate(),
             week: Math.floor(index / 7),
             day: date.getDay(),
-            count: v
+            count: v,
         };
     });
     return grids;
 }
 
-export const GridCalendar: React.FC<Props> = (props: Props) => {
+export const GridCalendar = React.memo((props: Props) => {
     const [chosenIndex, setChosenIndex] = React.useState<undefined | number>(undefined);
     const { till = new Date(), width = 800, data, shownWeeks = 53 } = props;
     const tillTimestamp = getLastDayTimestamp(till);
     const day = (new Date(till).getDay() + 1) % 7;
     const shownGrids = (day === 0 ? 7 : day) + (shownWeeks - 1) * 7;
-    const grids = getGridData(data, tillTimestamp, shownGrids);
-    const maxCountInADay = Math.max(5, Math.max(...grids.map(v => v.count)));
+    const grids = React.useMemo(() => getGridData(data, tillTimestamp, shownGrids), [
+        tillTimestamp,
+        data,
+        shownGrids,
+    ]);
+    const maxCountInADay = Math.max(5, Math.max(...grids.map((v) => v.count)));
     const axisMargin = 32;
     const innerWidth = width - axisMargin;
 
@@ -125,7 +129,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                 wordBreak: 'keep-all',
                 color: 'white',
                 position: 'absolute',
-                transition: 'all 0.2s',
+                transition: 'all 0.1s',
                 left: tooltipPositionLeft,
                 maxWidth: 180,
                 top: toolTipTop,
@@ -134,7 +138,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
                 zIndex: 10,
                 overflow: 'hidden',
                 textOverflow: 'clip',
-                display: chosenIndex ? undefined : 'none'
+                display: chosenIndex ? undefined : 'none',
             }}
         >
             <span style={{ fontWeight: 700 }}>
@@ -148,48 +152,63 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         </div>
     );
 
-    const rects = grids.map((v, index) => {
+    const createRect = (v: GridData, index: number, chosen: boolean) => {
         const onEnter = () => setChosenIndex(index);
-        const onClick = React.useMemo(
-            () => (props.clickDate ? () => props.clickDate!(v.year, v.month, v.date) : undefined),
-            [props.clickDate, v]
-        );
+        const onClick = () =>
+            props.clickDate ? () => props.clickDate!(v.year, v.month, v.date) : undefined;
         return (
             <rect
                 width={gridWidth}
                 height={gridHeight}
                 x={v.week * (gridWidth + gridMargin)}
                 y={v.day * (gridWidth + gridMargin)}
-                fill={`hsl(50, ${v.count === 0 ? '0%' : '60%'}, ${92 -
-                    (v.count / maxCountInADay) * 70}%`}
+                fill={`hsl(50, ${v.count === 0 ? '0%' : '60%'}, ${
+                    92 - (v.count / maxCountInADay) * 70
+                }%`}
                 key={index}
-                stroke={index === chosenIndex ? 'rgb(200, 180, 240)' : ''}
+                stroke={chosen ? 'rgb(200, 180, 240)' : ''}
                 onMouseEnter={onEnter}
+                onMouseLeave={() => index === chosenIndex && setChosenIndex(undefined)}
                 onClick={onClick}
                 style={{
-                    cursor: props.clickDate ? 'pointer' : undefined
+                    cursor: props.clickDate ? 'pointer' : undefined,
                 }}
             />
         );
-    });
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'].map((v, index) => {
-        return (
-            <SvgText
-                x={axisMargin - gridMargin}
-                y={index * (gridWidth + gridMargin)}
-                key={index}
-                alignmentBaseline="hanging"
-                textAnchor="end"
-                style={{ fontSize: gridWidth }}
-            >
-                {v}
-            </SvgText>
-        );
-    });
+    };
+
+    let rects = React.useMemo(() => grids.map((v, index) => createRect(v, index, false)), [
+        grids,
+        gridWidth,
+        gridMargin,
+        gridHeight,
+    ]);
+    if (chosenIndex) {
+        rects = rects.concat();
+        rects[chosenIndex] = createRect(grids[chosenIndex], chosenIndex, true);
+    }
+    const weekdays = React.useMemo(
+        () =>
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'].map((v, index) => {
+                return (
+                    <SvgText
+                        x={axisMargin - gridMargin}
+                        y={index * (gridWidth + gridMargin)}
+                        key={index}
+                        alignmentBaseline="hanging"
+                        textAnchor="end"
+                        style={{ fontSize: gridWidth }}
+                    >
+                        {v}
+                    </SvgText>
+                );
+            }),
+        []
+    );
 
     const weekMonthMap: number[] = [];
     function getMonthText() {
-        grids.forEach(v => {
+        grids.forEach((v) => {
             weekMonthMap[v.week] = v.month;
         });
         const firstMonthWeekPair: [number, number][] = [];
@@ -206,7 +225,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
             firstMonthWeekPair.splice(0, 1);
         }
 
-        return firstMonthWeekPair.map(v => (
+        return firstMonthWeekPair.map((v) => (
             <SvgText
                 x={v[1] * (gridWidth + gridMargin)}
                 y={axisMargin - gridMargin * 2}
@@ -219,7 +238,7 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
         ));
     }
 
-    const onMouseLeave = () => setChosenIndex(undefined);
+    const onMouseLeave = React.useCallback(() => setChosenIndex(undefined), []);
     const monthText = getMonthText();
     maxWidth = weekMonthMap.length * (gridWidth + gridMargin) + axisMargin;
     const maxHeight = 7 * (gridMargin + gridHeight) + axisMargin;
@@ -235,4 +254,6 @@ export const GridCalendar: React.FC<Props> = (props: Props) => {
             {Tooltip}
         </Container>
     );
-};
+});
+
+GridCalendar.displayName = 'GridCalendar';

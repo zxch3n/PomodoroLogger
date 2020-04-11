@@ -22,6 +22,7 @@
         "jsx-equals-spacing": [true, "never"],
         "jsx-no-string-ref": true,
         "jsx-self-close": true,
+        "jsx-no-lambda": false,
         "import-name": false,
         "prefer-template": false,
         "no-parameter-properties": false
