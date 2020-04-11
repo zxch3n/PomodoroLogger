@@ -99,7 +99,11 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                 ) : (
                                     <CardContent>
                                         <h1
-                                            style={{ margin: 0, fontSize: 18, lineHeight: '1.3em' }}
+                                            style={{
+                                                margin: 0,
+                                                fontSize: '1.1rem',
+                                                lineHeight: '1.3em',
+                                            }}
                                         >
                                             {props.title}
                                         </h1>

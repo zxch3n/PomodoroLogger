@@ -1,7 +1,11 @@
 import styled from 'styled-components';
+import { thinScrollBar } from '../../../style/scrollbar';
 
 export const Markdown = styled.div`
+    max-height: 250px;
+    overflow: auto;
     font-size: 14px;
+    ${thinScrollBar};
     h1 {
         font-size: 1.2em;
         margin: 0 !important;
