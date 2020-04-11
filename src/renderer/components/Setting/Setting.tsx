@@ -8,6 +8,7 @@ import { shell, remote, app } from 'electron';
 import { promisify } from 'util';
 import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
+import pkg from '../../../../package.json';
 
 const dialog = remote.dialog;
 
@@ -272,13 +273,14 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 <ButtonWrapper>
                     <DistractingListModalButton />
                 </ButtonWrapper>
-                <Footer>
-                    Open-source @GitHub
+                <Footer style={{ position: 'fixed', bottom: 0, margin: 0 }}>
+                    Open Source @GitHub
                     <StyledIcon
                         type="github"
                         onClick={openGithubPage}
                         title="This project is open-source and hosted on GitHub"
                     />
+                    Version v{pkg.version}
                 </Footer>
             </Container>
         );
