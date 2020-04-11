@@ -18,11 +18,15 @@ const CardContainer = styled.div`
     border-radius: 6px;
     cursor: grab;
     box-shadow: 0 0 rgba(0, 0, 0, 0);
+    transition: box-shadow 200ms;
+    z-index: 0;
     &.is-dragging {
+        z-index: 1;
         box-shadow: 0 0 18px 8px rgba(0, 0, 0, 0.2);
     }
     :hover {
-        background-color: rgba(244, 244, 248);
+        z-index: 1;
+        box-shadow: 0 0 18px 8px rgba(0, 0, 0, 0.1);
     }
 `;
 
@@ -112,7 +116,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                 __html: formatMarkdown(props.content),
                                             }}
                                         />
-                                        <Divider style={{ margin: '4px 0' }} />
+                                        <Divider style={{ margin: '0 0 4px 0' }} />
                                         <BadgeHolder>
                                             {props.sessionIds.length > 0 ? (
                                                 <PomodoroDot num={props.sessionIds.length} />

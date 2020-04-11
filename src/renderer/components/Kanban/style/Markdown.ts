@@ -5,7 +5,37 @@ export const Markdown = styled.div`
     max-height: 250px;
     overflow: auto;
     font-size: 14px;
+    position: relative;
+    padding: 0 0 4px 0;
     ${thinScrollBar};
+
+    ::before {
+        content: '';
+        top: 0px;
+        position: sticky;
+        display: block;
+        width: 100%;
+        height: 0.4rem;
+        background: linear-gradient(
+            rgba(255, 255, 255, 1),
+            rgba(255, 255, 255, 0.001)
+        ); /* transparent keyword is broken in Safari */
+        pointer-events: none;
+    }
+
+    ::after {
+        content: '';
+        bottom: -4px;
+        position: sticky;
+        display: block;
+        width: 100%;
+        height: 0.4rem;
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.001),
+            rgba(255, 255, 255, 1)
+        ); /* transparent keyword is broken in Safari */
+        pointer-events: none;
+    }
     h1 {
         font-size: 1.2em;
         margin: 0 !important;
