@@ -273,7 +273,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 <ButtonWrapper>
                     <DistractingListModalButton />
                 </ButtonWrapper>
-                <Footer style={{ position: 'fixed', bottom: 0, margin: 0 }}>
+                <Footer style={{ position: 'fixed', bottom: 0, margin: 0, left: 0 }}>
                     Open Source @GitHub
                     <StyledIcon
                         type="github"
