@@ -203,7 +203,7 @@ export const GridCalendar = React.memo((props: Props) => {
                     </SvgText>
                 );
             }),
-        []
+        [gridWidth, gridHeight, axisMargin, gridMargin]
     );
 
     const weekMonthMap: number[] = [];
