@@ -5,12 +5,16 @@ import { actions as kanbanActions } from '../action';
 import { RootState } from '../../../reducers';
 import ReactHotkeys from 'react-hot-keys';
 import { genMapDispatchToProp } from '../../../utils';
-import { Button, Col, Form, Input, InputNumber, Modal, Popconfirm, Row } from 'antd';
+import { Button, Col, Form, Input, InputNumber, Modal, Popconfirm, Row, Tabs } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
 import styled from 'styled-components';
 import { Card } from '../type';
 import { thinScrollBar } from '../../../style/scrollbar';
+import { Markdown } from '../style/Markdown';
+import formatMarkdown from './formatMarkdown';
+
+const { TabPane } = Tabs;
 
 const Container = styled.div`
     .ant-form-item {
@@ -18,6 +22,8 @@ const Container = styled.div`
     }
 
     textarea {
+        max-height: calc(100vh - 600px) !important;
+        min-height: 120px;
         ${thinScrollBar}
     }
 `;
@@ -38,13 +44,18 @@ interface FormData {
 }
 
 const _CardInDetail: FC<Props> = React.memo((props: Props) => {
+    const [showMarkdownPreview, setShowMarkdownPreview] = useState(true);
+    const [cardContent, setCardContent] = useState('');
     const { card, visible, form, onCancel, listId } = props;
     const isCreating = !card;
     const { getFieldDecorator, setFieldsValue, validateFields, resetFields } = form;
     useEffect(() => {
+        setIsEditingActualTime(false);
         if (card) {
+            setShowMarkdownPreview(true);
             const time = card.spentTimeInHour.estimated;
             const actual = card.spentTimeInHour.actual;
+            setCardContent(card.content);
             setFieldsValue({
                 title: card.title,
                 content: card.content,
@@ -52,6 +63,8 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                 actualTime: actual ? actual : undefined,
             } as FormData);
         } else {
+            setCardContent('');
+            setShowMarkdownPreview(false);
             setFieldsValue({
                 title: '',
                 content: '',
@@ -76,6 +89,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
 
     const saveValues = ({ title, content, estimatedTime, actualTime }: FormData) => {
         const time = estimatedTime || 0;
+        setCardContent(content);
         if (!card) {
             // Creating
             const _id = shortid.generate();
@@ -110,12 +124,25 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
         }
     }, []);
 
+    const onTabChange = React.useCallback((name: string) => {
+        if (name === 'edit') {
+            setShowMarkdownPreview(false);
+        } else {
+            validateFields((err: Error, values: FormData) => {
+                setCardContent(values.content);
+                setShowMarkdownPreview(true);
+            });
+        }
+    }, []);
+
     return (
         <Modal
             visible={visible}
             title={isCreating ? 'Create a new card' : 'Edit'}
             okText={isCreating ? 'Create' : 'Save'}
             onCancel={onCancel}
+            style={{ minWidth: 300 }}
+            width={'60vw'}
             onOk={onSave}
         >
             <ReactHotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
@@ -126,15 +153,37 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                             rules: [{ required: true, message: 'Please input the name of board!' }],
                         })(<Input placeholder={'Title'} onKeyDown={keydownEventHandler} />)}
                     </Form.Item>
-                    <Form.Item label="Content">
-                        {getFieldDecorator('content')(
-                            <TextArea
-                                autosize={{ minRows: 3, maxRows: 8 }}
-                                placeholder={'Description'}
-                                onKeyDown={keydownEventHandler}
+                    <Tabs
+                        onChange={onTabChange}
+                        type="card"
+                        size="small"
+                        activeKey={showMarkdownPreview ? 'preview' : 'edit'}
+                        style={{ marginBottom: 10, minHeight: 120 }}
+                    >
+                        <TabPane tab="Edit" key="edit">
+                            {getFieldDecorator('content')(
+                                <TextArea
+                                    autoSize={{ minRows: 3 }}
+                                    placeholder={'Description'}
+                                    onKeyDown={keydownEventHandler}
+                                />
+                            )}
+                        </TabPane>
+                        <TabPane tab="Preview" key="preview">
+                            <Markdown
+                                style={{
+                                    padding: '0px 10px',
+                                    border: '1px solid rgb(220, 220, 220)',
+                                    borderRadius: 4,
+                                    maxHeight: 'calc(100vh - 600px)',
+                                    minHeight: 120,
+                                }}
+                                dangerouslySetInnerHTML={{
+                                    __html: formatMarkdown(cardContent),
+                                }}
                             />
-                        )}
-                    </Form.Item>
+                        </TabPane>
+                    </Tabs>
                     <Row>
                         <Col span={12}>
                             <Form.Item label="Estimated Time In Hour">

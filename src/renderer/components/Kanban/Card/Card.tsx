@@ -115,6 +115,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                             dangerouslySetInnerHTML={{
                                                 __html: formatMarkdown(props.content),
                                             }}
+                                            style={{ maxHeight: 250 }}
                                         />
                                         <Divider style={{ margin: '0 0 4px 0' }} />
                                         <BadgeHolder>
