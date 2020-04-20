@@ -13,7 +13,6 @@ export const genMapDispatchToProp = <T>(actions: { [key: string]: any }) => {
             cachedDispatch = dispatch;
         }
 
-        console.log(actions);
         for (const name in actions) {
             const actionCreator = actions[name];
             if (creatorMap.has(actionCreator)) {

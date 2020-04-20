@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState, KeyboardEvent } from 'react';
 import { connect } from 'react-redux';
 import { actions, CardActionTypes } from './action';
 import { actions as kanbanActions } from '../action';
@@ -10,10 +10,15 @@ import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
 import styled from 'styled-components';
 import { Card } from '../type';
+import { thinScrollBar } from '../../../style/scrollbar';
 
 const Container = styled.div`
     .ant-form-item {
         margin-bottom: 8px;
+    }
+
+    textarea {
+        ${thinScrollBar}
     }
 `;
 
@@ -99,6 +104,12 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
         });
     };
 
+    const keydownEventHandler = React.useCallback((event: KeyboardEvent<any>) => {
+        if (event.ctrlKey && !event.altKey && (event.which === 13 || event.keyCode === 13)) {
+            onSave();
+        }
+    }, []);
+
     return (
         <Modal
             visible={visible}
@@ -113,13 +124,14 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                     <Form.Item label="Title">
                         {getFieldDecorator('title', {
                             rules: [{ required: true, message: 'Please input the name of board!' }],
-                        })(<Input placeholder={'Title'} />)}
+                        })(<Input placeholder={'Title'} onKeyDown={keydownEventHandler} />)}
                     </Form.Item>
                     <Form.Item label="Content">
                         {getFieldDecorator('content')(
                             <TextArea
-                                autosize={{ minRows: 3, maxRows: 5 }}
+                                autosize={{ minRows: 3, maxRows: 8 }}
                                 placeholder={'Description'}
+                                onKeyDown={keydownEventHandler}
                             />
                         )}
                     </Form.Item>
