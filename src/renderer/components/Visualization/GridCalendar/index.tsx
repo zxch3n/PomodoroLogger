@@ -154,8 +154,9 @@ export const GridCalendar = React.memo((props: Props) => {
 
     const createRect = (v: GridData, index: number, chosen: boolean) => {
         const onEnter = () => setChosenIndex(index);
-        const onClick = () =>
-            props.clickDate ? () => props.clickDate!(v.year, v.month, v.date) : undefined;
+        const onClick = props.clickDate
+            ? () => props.clickDate!(v.year, v.month, v.date)
+            : undefined;
         return (
             <rect
                 width={gridWidth}
