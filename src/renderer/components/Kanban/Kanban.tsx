@@ -1,4 +1,11 @@
-import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+    FunctionComponent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    KeyboardEvent,
+} from 'react';
 import { KanbanActionTypes } from './action';
 import { KanbanState, uiStateNames } from './reducer';
 import { BoardActionTypes } from './Board/action';
@@ -354,6 +361,12 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
             callback(`Board "${name}" already exists`);
         };
 
+        onKeyDown = (event: KeyboardEvent<any>) => {
+            if (event.ctrlKey && !event.altKey && (event.keyCode === 13 || event.which === 13)) {
+                this.props.onSave();
+            }
+        };
+
         render() {
             const { visible, onCancel, onSave, form, isCreating, onDelete, boardId } = this.props;
             const { getFieldDecorator } = form;
@@ -374,11 +387,14 @@ const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
                                     { max: 48, message: 'Max length of name is 48' },
                                     { validator: this.validator },
                                 ],
-                            })(<Input />)}
+                            })(<Input onKeyDown={this.onKeyDown} />)}
                         </Form.Item>
                         <Form.Item label="Description">
                             {getFieldDecorator('description')(
-                                <TextArea autosize={{ minRows: 3, maxRows: 5 }} />
+                                <TextArea
+                                    autosize={{ minRows: 3, maxRows: 5 }}
+                                    onKeyDown={this.onKeyDown}
+                                />
                             )}
                         </Form.Item>
                         {!isCreating ? (
