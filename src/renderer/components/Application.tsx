@@ -19,7 +19,7 @@ import styled from 'styled-components';
 import Timer from './Timer';
 import { UserGuide } from './UserGuide/UserGuide';
 import { UpdateController } from './UpdateController';
-import { CardInDetail } from './Kanban/Card/CardInDetail';
+import { CardInDetail } from './Kanban/Card/CardEditor';
 import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
 import { DestroyOnTimeoutWrapper } from './DestroyOnTimeoutWrapper';
 

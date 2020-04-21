@@ -18,6 +18,7 @@ import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Pin } from '../../Visualization/Pin';
 import { Card, KanbanBoard, ListsState } from '../type';
 import { memorizeDispatchToProps } from '../../../utils';
+import { thinScrollBar } from '../../../style/scrollbar';
 
 const BriefCard = styled.div`
     word-break: break-word;

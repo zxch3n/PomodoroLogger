@@ -1,18 +1,10 @@
-import React, {
-    FunctionComponent,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-    KeyboardEvent,
-} from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import { KanbanActionTypes } from './action';
 import { KanbanState, uiStateNames } from './reducer';
 import { BoardActionTypes } from './Board/action';
-import { Row, Button, Form, Icon, Input, Layout, Modal, Popconfirm, Select, Switch } from 'antd';
+import { Row, Button, Form, Icon, Layout, Select, Switch } from 'antd';
 import Board from './Board';
 import styled from 'styled-components';
-import TextArea from 'antd/es/input/TextArea';
 import { SearchBar } from './SearchBar';
 import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
@@ -20,9 +12,10 @@ import backIcon from '../../../res/back.svg';
 import { Label } from './style/Form';
 import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
-import { DistractingListModalButton } from '../Setting/DistractingList';
 import { TimerActionTypes } from '../Timer/action';
 import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
+import { thinScrollBar } from '../../style/scrollbar';
+import { EditKanbanForm } from './BoardEditor';
 
 const { Option } = Select;
 
@@ -41,6 +34,12 @@ const Content = styled.main`
     ::-webkit-scrollbar-track {
         border-radius: 8px;
         background-color: rgba(200, 200, 200, 0.5);
+    }
+`;
+
+export const TextAreaContainer = styled.div`
+    textarea {
+        ${thinScrollBar}
     }
 `;
 
@@ -222,7 +221,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
         return (
             <Layout style={{ padding: 4, height: 'calc(100vh - 45px)' }}>
                 <Header>
-                    <Hotkeys keyName={'ctrl+n,esc'} onKeyDown={onKeyDown} />
+                    <Hotkeys keyName={'ctrl+n'} onKeyDown={onKeyDown} />
                     {props.kanban.chosenBoardId ? (
                         <>
                             <Title>{props.boards[props.kanban.chosenBoardId].name}</Title>
@@ -334,84 +333,5 @@ export const Kanban: FunctionComponent<Props> = React.memo(
     },
     (prevProps, nextProps) => {
         return isShallowEqualByKeys(prevProps, nextProps, uiStateNames);
-    }
-);
-
-interface FormProps {
-    boardId: string;
-    onSave?: any;
-    onCancel?: any;
-    form: any;
-    visible: boolean;
-    isCreating: boolean;
-    onDelete: () => void;
-    nameValidator: (name: string) => boolean;
-}
-
-const EditKanbanForm = Form.create<FormProps & { wrappedComponentRef: any }>({
-    name: 'form_in_modal',
-})(
-    class extends React.Component<FormProps> {
-        validator = (rule: any, name: string, callback: Function) => {
-            if (!this.props.isCreating || this.props.nameValidator(name)) {
-                callback();
-                return;
-            }
-
-            callback(`Board "${name}" already exists`);
-        };
-
-        onKeyDown = (event: KeyboardEvent<any>) => {
-            if (event.ctrlKey && !event.altKey && (event.keyCode === 13 || event.which === 13)) {
-                this.props.onSave();
-            }
-        };
-
-        render() {
-            const { visible, onCancel, onSave, form, isCreating, onDelete, boardId } = this.props;
-            const { getFieldDecorator } = form;
-            return (
-                <Modal
-                    visible={visible}
-                    title={isCreating ? 'Create a new board' : 'Edit'}
-                    okText={isCreating ? 'Create' : 'Save'}
-                    onCancel={onCancel}
-                    onOk={onSave}
-                >
-                    <Form layout="vertical">
-                        <Hotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
-                        <Form.Item label="Name">
-                            {getFieldDecorator('name', {
-                                rules: [
-                                    { required: true, message: 'Please input the name of board!' },
-                                    { max: 48, message: 'Max length of name is 48' },
-                                    { validator: this.validator },
-                                ],
-                            })(<Input onKeyDown={this.onKeyDown} />)}
-                        </Form.Item>
-                        <Form.Item label="Description">
-                            {getFieldDecorator('description')(
-                                <TextArea
-                                    autosize={{ minRows: 3, maxRows: 5 }}
-                                    onKeyDown={this.onKeyDown}
-                                />
-                            )}
-                        </Form.Item>
-                        {!isCreating ? (
-                            <>
-                                <Form.Item>
-                                    <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
-                                        <Button type={'danger'} icon={'delete'}>
-                                            Delete
-                                        </Button>
-                                    </Popconfirm>
-                                </Form.Item>
-                                <DistractingListModalButton boardId={boardId} />
-                            </>
-                        ) : undefined}
-                    </Form>
-                </Modal>
-            );
-        }
     }
 );

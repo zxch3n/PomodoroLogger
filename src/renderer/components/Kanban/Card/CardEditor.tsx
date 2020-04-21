@@ -8,25 +8,11 @@ import { genMapDispatchToProp } from '../../../utils';
 import { Button, Col, Form, Input, InputNumber, Modal, Popconfirm, Row, Tabs } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import shortid from 'shortid';
-import styled from 'styled-components';
 import { Card } from '../type';
-import { thinScrollBar } from '../../../style/scrollbar';
 import { Markdown } from '../style/Markdown';
 import formatMarkdown from './formatMarkdown';
-
+import { EditorContainer } from '../style/editorStyle';
 const { TabPane } = Tabs;
-
-const Container = styled.div`
-    .ant-form-item {
-        margin-bottom: 8px;
-    }
-
-    textarea {
-        max-height: calc(100vh - 600px) !important;
-        min-height: 120px;
-        ${thinScrollBar}
-    }
-`;
 
 interface Props extends CardActionTypes {
     visible: boolean;
@@ -50,6 +36,10 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     const isCreating = !card;
     const { getFieldDecorator, setFieldsValue, validateFields, resetFields } = form;
     useEffect(() => {
+        if (!visible) {
+            return;
+        }
+
         setIsEditingActualTime(false);
         if (card) {
             setShowMarkdownPreview(true);
@@ -73,14 +63,15 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             } as FormData);
         }
     }, [card]);
-    const onDelete = () => {
+
+    const onDelete = React.useCallback(() => {
         if (!card) {
             return;
         }
 
         props.deleteCard(card._id, listId);
         onCancel();
-    };
+    }, [card?._id, listId, onCancel]);
 
     const [isEditingActualTime, setIsEditingActualTime] = useState(false);
     const onSwitchIsEditing = () => {
@@ -121,6 +112,9 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     const keydownEventHandler = React.useCallback((event: KeyboardEvent<any>) => {
         if (event.ctrlKey && !event.altKey && (event.which === 13 || event.keyCode === 13)) {
             onSave();
+        } else if (event.keyCode === 27) {
+            onCancel();
+            event.stopPropagation();
         }
     }, []);
 
@@ -146,7 +140,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             onOk={onSave}
         >
             <ReactHotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
-            <Container>
+            <EditorContainer>
                 <Form layout="vertical">
                     <Form.Item label="Title">
                         {getFieldDecorator('title', {
@@ -230,7 +224,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                         </Row>
                     )}
                 </Form>
-            </Container>
+            </EditorContainer>
         </Modal>
     );
 });

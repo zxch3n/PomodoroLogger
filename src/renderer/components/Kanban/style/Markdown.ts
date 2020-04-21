@@ -70,4 +70,8 @@ export const Markdown = styled.div`
         padding-left: 24px;
         margin-bottom: 0;
     }
+
+    .search-highlight {
+        background-color: rgba(208, 227, 66, 1);
+    }
 `;

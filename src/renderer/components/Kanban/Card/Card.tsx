@@ -46,6 +46,7 @@ export interface InputProps {
     listId: string;
     boardId: string;
     isDraggingOver: boolean;
+    searchReg?: string;
 }
 
 interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {
@@ -56,6 +57,30 @@ export const Card: FC<Props> = React.memo((props: Props) => {
     const onClick = React.useCallback(() => {
         props.setEditCard(true, props.listId, props._id);
     }, [props.listId, props._id]);
+    const content = React.useMemo(() => {
+        if (!props.searchReg) {
+            return props.content;
+        }
+
+        const reg = new RegExp(props.searchReg, 'gimsu');
+        const oldContent = props.content;
+        let newContent = '';
+        let lastEnd = 0;
+        let matched = reg.exec(oldContent);
+        while (matched) {
+            if (!matched.length) {
+                break;
+            }
+
+            newContent += oldContent.slice(lastEnd, matched.index);
+            newContent += `<span class="search-highlight">${matched[0]}</span>`;
+            lastEnd = matched.index + matched[0].length;
+            matched = reg.exec(oldContent);
+        }
+
+        newContent += oldContent.slice(lastEnd);
+        return newContent;
+    }, [props.content, props.searchReg]);
 
     return (
         <>
@@ -113,7 +138,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                         </h1>
                                         <Markdown
                                             dangerouslySetInnerHTML={{
-                                                __html: formatMarkdown(props.content),
+                                                __html: formatMarkdown(content),
                                             }}
                                             style={{ maxHeight: 250 }}
                                         />

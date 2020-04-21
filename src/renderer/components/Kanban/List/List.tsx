@@ -116,11 +116,12 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
 
 export const List: FC<Props> = React.memo((props: Props) => {
     const { focused = false, searchReg, cards, cardsState, done = false } = props;
+    const reg = searchReg ? new RegExp(searchReg, 'gimsu') : undefined;
     const [estimatedTimeSum, actualTimeSum] = props.cards.reduce(
         (l: [number, number], r: string) => {
             return [
                 l[0] + props.cardsState[r].spentTimeInHour.estimated,
-                l[1] + props.cardsState[r].spentTimeInHour.actual
+                l[1] + props.cardsState[r].spentTimeInHour.actual,
             ] as [number, number];
         },
         [0, 0] as [number, number]
@@ -128,11 +129,11 @@ export const List: FC<Props> = React.memo((props: Props) => {
     const overallTimeInfo =
         estimatedTimeSum > 0 ? `${actualTimeSum.toFixed(1)}h/${estimatedTimeSum.toFixed(1)}h` : '';
     const filteredCards =
-        searchReg === undefined
+        reg === undefined
             ? cards
-            : cards.filter(id => {
+            : cards.filter((id) => {
                 const card = cardsState[id];
-                return card.title.match(searchReg) || card.content.match(searchReg);
+                return card.title.match(reg) || card.content.match(reg);
             });
 
     const [isEditing, setIsEditing] = useState(false);
@@ -208,7 +209,7 @@ export const List: FC<Props> = React.memo((props: Props) => {
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'row',
-                                        justifyContent: 'space-between'
+                                        justifyContent: 'space-between',
                                     }}
                                 >
                                     <Input maxLength={25} value={value} onChange={onValueChange} />
@@ -231,18 +232,14 @@ export const List: FC<Props> = React.memo((props: Props) => {
                                                     <Icon component={FocusIcon} />
                                                 </span>
                                             </Tooltip>
-                                        ) : (
-                                            undefined
-                                        )}
+                                        ) : undefined}
                                         {done ? (
                                             <Tooltip title={'Done List'}>
                                                 <span style={{ color: 'green', marginRight: 8 }}>
                                                     <Icon component={DoneIcon} />
                                                 </span>
                                             </Tooltip>
-                                        ) : (
-                                            undefined
-                                        )}
+                                        ) : undefined}
                                         <Dropdown overlay={menu} trigger={['click']}>
                                             <Icon type="menu" />
                                         </Dropdown>
@@ -263,6 +260,7 @@ export const List: FC<Props> = React.memo((props: Props) => {
                                                 key={cardId}
                                                 listId={props.listId}
                                                 isDraggingOver={isDraggingOver}
+                                                searchReg={searchReg}
                                             />
                                         ))}
                                         {provided.placeholder}
