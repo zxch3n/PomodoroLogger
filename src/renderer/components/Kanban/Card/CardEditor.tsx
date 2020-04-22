@@ -150,7 +150,6 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                     <Tabs
                         onChange={onTabChange}
                         type="card"
-                        size="small"
                         activeKey={showMarkdownPreview ? 'preview' : 'edit'}
                         style={{ marginBottom: 10, minHeight: 120 }}
                     >

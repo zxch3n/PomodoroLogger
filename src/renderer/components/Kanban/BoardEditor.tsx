@@ -1,10 +1,15 @@
 import React, { KeyboardEvent } from 'react';
-import { Button, Form, Input, Modal, Popconfirm } from 'antd';
+import { Button, Form, Input, Modal, Popconfirm, Tabs } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import Hotkeys from 'react-hot-keys';
 import { DistractingListModalButton } from '../Setting/DistractingList';
-import { TextAreaContainer } from './Kanban';
 import { EditorContainer } from './style/editorStyle';
+import formatMarkdown from './Card/formatMarkdown';
+import { string } from 'prop-types';
+import { Markdown } from './style/Markdown';
+
+const { TabPane } = Tabs;
+
 interface FormProps {
     boardId: string;
     onSave?: any;
@@ -16,6 +21,12 @@ interface FormProps {
     nameValidator: (name: string) => boolean;
 }
 
+interface State {
+    showMarkdownPreview: boolean;
+    isCreating: boolean;
+    description: string;
+}
+
 export const EditKanbanForm = Form.create<
     FormProps & {
         wrappedComponentRef: any;
@@ -23,7 +34,36 @@ export const EditKanbanForm = Form.create<
 >({
     name: 'form_in_modal',
 })(
-    class extends React.Component<FormProps> {
+    class extends React.Component<FormProps, State> {
+        constructor(props: FormProps) {
+            super(props);
+            this.state = {
+                showMarkdownPreview: true,
+                isCreating: false,
+                description: '',
+            };
+        }
+
+        componentDidMount() {
+            this.setDescriptionState();
+        }
+
+        setDescriptionState = () => {
+            this.setState({ description: this.props.form.getFieldValue('description') || '' });
+        };
+
+        static getDerivedStateFromProps(nextProps: FormProps, prevState: State) {
+            const nextState = { description: nextProps.form.getFieldValue('description') || '' };
+            if (nextProps.isCreating !== prevState.isCreating) {
+                Object.assign(nextState, {
+                    isCreating: nextProps.isCreating,
+                    showMarkdownPreview: !nextProps.isCreating,
+                });
+            }
+
+            return nextState;
+        }
+
         validator = (rule: any, name: string, callback: Function) => {
             if (!this.props.isCreating || this.props.nameValidator(name)) {
                 callback();
@@ -31,11 +71,22 @@ export const EditKanbanForm = Form.create<
             }
             callback(`Board "${name}" already exists`);
         };
+
         onKeyDown = (event: KeyboardEvent<any>) => {
             if (event.ctrlKey && !event.altKey && (event.keyCode === 13 || event.which === 13)) {
                 this.props.onSave();
             }
         };
+
+        onTabChange = (key: string) => {
+            const toPreview = key === 'preview';
+            if (toPreview) {
+                this.setDescriptionState();
+            }
+
+            this.setState({ showMarkdownPreview: toPreview });
+        };
+
         render() {
             const { visible, onCancel, onSave, form, isCreating, onDelete, boardId } = this.props;
             const { getFieldDecorator } = form;
@@ -64,14 +115,35 @@ export const EditKanbanForm = Form.create<
                                     ],
                                 })(<Input onKeyDown={this.onKeyDown} />)}
                             </Form.Item>
-                            <Form.Item label="Description">
-                                {getFieldDecorator('description')(
-                                    <TextArea
-                                        autosize={{ minRows: 3, maxRows: 5 }}
-                                        onKeyDown={this.onKeyDown}
+                            <Tabs
+                                onChange={this.onTabChange}
+                                type="card"
+                                activeKey={this.state.showMarkdownPreview ? 'preview' : 'edit'}
+                                style={{ marginBottom: 10, minHeight: 120 }}
+                            >
+                                <TabPane tab="Edit" key="edit">
+                                    {getFieldDecorator('description')(
+                                        <TextArea
+                                            autosize={{ minRows: 3, maxRows: 5 }}
+                                            onKeyDown={this.onKeyDown}
+                                        />
+                                    )}
+                                </TabPane>
+                                <TabPane tab="Preview" key="preview">
+                                    <Markdown
+                                        style={{
+                                            padding: '0px 10px',
+                                            border: '1px solid rgb(220, 220, 220)',
+                                            borderRadius: 4,
+                                            maxHeight: 'calc(100vh - 600px)',
+                                            minHeight: 120,
+                                        }}
+                                        dangerouslySetInnerHTML={{
+                                            __html: formatMarkdown(this.state.description),
+                                        }}
                                     />
-                                )}
-                            </Form.Item>
+                                </TabPane>
+                            </Tabs>
                             {!isCreating ? (
                                 <>
                                     <Form.Item>

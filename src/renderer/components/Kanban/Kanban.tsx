@@ -148,15 +148,6 @@ export const Kanban: FunctionComponent<Props> = React.memo(
             showConfigById();
         }, []);
 
-        const overviewId = '31h89s190v-vg';
-        const onSelectChange = (value: string) => {
-            if (value === overviewId) {
-                props.setChosenBoardId(undefined);
-            } else {
-                props.setChosenBoardId(value);
-            }
-        };
-
         const showBoardSettingMenu = () => {
             showConfigById(props.kanban.chosenBoardId);
         };
