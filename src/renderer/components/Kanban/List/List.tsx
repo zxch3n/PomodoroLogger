@@ -116,7 +116,10 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
 
 export const List: FC<Props> = React.memo((props: Props) => {
     const { focused = false, searchReg, cards, cardsState, done = false } = props;
-    const reg = searchReg ? new RegExp(searchReg, 'gimsu') : undefined;
+    let reg: RegExp | undefined;
+    try {
+        reg = searchReg ? new RegExp(searchReg, 'gimsu') : undefined;
+    } catch (e) {}
     const [estimatedTimeSum, actualTimeSum] = props.cards.reduce(
         (l: [number, number], r: string) => {
             return [
@@ -132,6 +135,7 @@ export const List: FC<Props> = React.memo((props: Props) => {
         reg === undefined
             ? cards
             : cards.filter((id) => {
+                if (!reg) return true;
                 const card = cardsState[id];
                 return card.title.match(reg) || card.content.match(reg);
             });
@@ -220,8 +224,16 @@ export const List: FC<Props> = React.memo((props: Props) => {
                                     <span className="list-head-text">
                                         <h1>{props.title}</h1>
                                         <span>
-                                            {props.cards.length} Card
-                                            {props.cards.length > 1 ? 's ' : ' '}
+                                            {reg == null ? (
+                                                <span>
+                                                    {props.cards.length} Card
+                                                    {props.cards.length > 1 ? 's ' : ' '}
+                                                </span>
+                                            ) : (
+                                                <span>
+                                                    {filteredCards.length} / {props.cards.length}
+                                                </span>
+                                            )}
                                             {overallTimeInfo}
                                         </span>
                                     </span>

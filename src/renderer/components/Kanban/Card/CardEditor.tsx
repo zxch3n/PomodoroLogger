@@ -62,7 +62,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                 actualTime: undefined,
             } as FormData);
         }
-    }, [card]);
+    }, [card, visible]);
 
     const onDelete = React.useCallback(() => {
         if (!card) {
@@ -80,7 +80,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
 
     const saveValues = ({ title, content, estimatedTime, actualTime }: FormData) => {
         const time = estimatedTime || 0;
-        setCardContent(content);
+        setCardContent(content || '');
         if (!card) {
             // Creating
             const _id = shortid.generate();
@@ -123,7 +123,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             setShowMarkdownPreview(false);
         } else {
             validateFields((err: Error, values: FormData) => {
-                setCardContent(values.content);
+                setCardContent(values.content || '');
                 setShowMarkdownPreview(true);
             });
         }
@@ -172,7 +172,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                                     minHeight: 120,
                                 }}
                                 dangerouslySetInnerHTML={{
-                                    __html: formatMarkdown(cardContent),
+                                    __html: formatMarkdown(cardContent || ''),
                                 }}
                             />
                         </TabPane>

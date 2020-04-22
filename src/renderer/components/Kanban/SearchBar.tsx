@@ -8,7 +8,7 @@ import { Icon } from 'antd';
 
 const Bar = styled.div`
     position: fixed;
-    top: 60px;
+    top: 90px;
     right: 30px;
     z-index: 10000;
     box-shadow: 2px 2px 4px 4px rgba(40, 40, 40, 0.2);
@@ -54,17 +54,21 @@ const _SearchBar: FC<Props> = (props: Props) => {
         });
     }, []);
 
-    const quit = React.useCallback(() => {
+    const hide = () => {
         props.setIsSearching(false);
-    }, []);
+    };
+
+    const quit = React.useCallback(() => {
+        props.setReg(undefined);
+        hide();
+    }, [props.setIsSearching, props.setReg]);
 
     const onKeyDown = React.useCallback(
         (event: KeyboardEvent<any>) => {
             if (event.keyCode === 27) {
-                props.setReg(undefined);
                 quit();
             } else if (event.keyCode === 13) {
-                quit();
+                hide();
             }
         },
         [props.setIsSearching]
@@ -82,7 +86,7 @@ const _SearchBar: FC<Props> = (props: Props) => {
             <input
                 // @ts-ignore
                 ref={ref}
-                placeholder="input search text"
+                placeholder="Search by RegExp"
                 onKeyDown={onKeyDown}
                 onChange={onChange}
                 value={props.reg}

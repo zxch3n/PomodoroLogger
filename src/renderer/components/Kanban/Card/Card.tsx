@@ -62,7 +62,14 @@ export const Card: FC<Props> = React.memo((props: Props) => {
             return props.content;
         }
 
-        const reg = new RegExp(props.searchReg, 'gimsu');
+        let reg: undefined | RegExp;
+        try {
+            reg = new RegExp(props.searchReg, 'gimsu');
+        } catch (e) {}
+        if (!reg) {
+            return props.content;
+        }
+
         const oldContent = props.content;
         let newContent = '';
         let lastEnd = 0;
