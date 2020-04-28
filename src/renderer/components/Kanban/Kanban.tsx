@@ -2,7 +2,7 @@ import React, { FunctionComponent, useCallback, useEffect, useRef, useState } fr
 import { KanbanActionTypes } from './action';
 import { KanbanState, uiStateNames } from './reducer';
 import { BoardActionTypes } from './Board/action';
-import { Row, Button, Form, Icon, Layout, Select, Switch } from 'antd';
+import { message, Button, Form, Icon, Layout, Select, Switch } from 'antd';
 import Board from './Board';
 import styled from 'styled-components';
 import { SearchBar } from './SearchBar';
@@ -12,10 +12,11 @@ import backIcon from '../../../res/back.svg';
 import { Label } from './style/Form';
 import Hotkeys from 'react-hot-keys';
 import shortid from 'shortid';
-import { TimerActionTypes } from '../Timer/action';
-import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
+import { TimerActionTypes, TimerManager } from '../Timer/action';
+import { isShallowEqualByKeys } from '../../utils';
 import { thinScrollBar } from '../../style/scrollbar';
 import { EditKanbanForm } from './BoardEditor';
+import { PlayPauseButton } from './Board/PlayPauseButton';
 
 const { Option } = Select;
 
@@ -70,7 +71,11 @@ interface FormValue {
     description: string;
 }
 
-interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes, TimerActionTypes {}
+interface Props extends KanbanState, KanbanActionTypes, BoardActionTypes, TimerActionTypes {
+    timerManager?: TimerManager;
+    isFocusingOnChosenBoard: boolean;
+    isTimerRunning: boolean;
+}
 
 export const Kanban: FunctionComponent<Props> = React.memo(
     (props: Props) => {
@@ -170,11 +175,24 @@ export const Kanban: FunctionComponent<Props> = React.memo(
             props.setChosenBoardId(undefined);
         };
 
-        const choose = () => {
-            if (props.kanban.chosenBoardId) {
-                props.focusOn(props.kanban.chosenBoardId);
+        const choose = React.useCallback(() => {
+            if (!props.kanban.chosenBoardId) {
+                return;
             }
-        };
+
+            props.focusOn(props.kanban.chosenBoardId);
+            if (!props.timerManager) {
+                return;
+            }
+
+            if (props.isFocusingOnChosenBoard && props.isTimerRunning) {
+                message.info('Paused');
+                props.timerManager.pause();
+            } else {
+                message.success('Start Focusing');
+                props.timerManager.start();
+            }
+        }, [props.kanban.chosenBoardId, props.timerManager, props.isTimerRunning]);
 
         const switchIsSearching = () => {
             props.setIsSearching(!props.kanban.isSearching);
@@ -271,12 +289,11 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                                         onClick={switchIsSearching}
                                         style={{ marginRight: 6 }}
                                     />
-                                    <Button
-                                        type={'default'}
-                                        shape={'circle'}
-                                        icon={'caret-right'}
+                                    <PlayPauseButton
+                                        showPlay={
+                                            !(props.isFocusingOnChosenBoard && props.isTimerRunning)
+                                        }
                                         onClick={choose}
-                                        style={{ marginRight: 6 }}
                                     />
                                     <Button
                                         shape={'circle'}
@@ -323,6 +340,10 @@ export const Kanban: FunctionComponent<Props> = React.memo(
         );
     },
     (prevProps, nextProps) => {
-        return isShallowEqualByKeys(prevProps, nextProps, uiStateNames);
+        return isShallowEqualByKeys(
+            prevProps,
+            nextProps,
+            uiStateNames.concat(['isFocusingOnChosenBoard', 'isTimerRunning'])
+        );
     }
 );

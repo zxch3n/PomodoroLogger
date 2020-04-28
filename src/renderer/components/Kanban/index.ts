@@ -8,7 +8,12 @@ import { actions as boardActions, BoardActionTypes } from './Board/action';
 import { genMapDispatchToProp } from '../../utils';
 
 const mapStateToProps = (state: RootState) => {
-    return state.kanban;
+    return {
+        ...state.kanban,
+        timerManager: state.timer.timerManager,
+        isFocusingOnChosenBoard: state.timer.boardId === state.kanban.kanban.chosenBoardId,
+        isTimerRunning: state.timer.isRunning,
+    };
 };
 
 const mapDispatchToProps = genMapDispatchToProp<
@@ -16,9 +21,6 @@ const mapDispatchToProps = genMapDispatchToProp<
 >({
     ...actions,
     ...boardActions,
-    ...timerActions
+    ...timerActions,
 });
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Kanban);
+export default connect(mapStateToProps, mapDispatchToProps)(Kanban);

@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { actions as timerActions } from '../../Timer/action';
+import React, { useCallback, useState, MouseEvent } from 'react';
+import { actions as timerActions, TimerManager } from '../../Timer/action';
 import { connect, MapDispatchToPropsParam } from 'react-redux';
 import { RootState } from '../../../reducers';
 import { actions } from './action';
@@ -7,7 +7,7 @@ import { actions as kanbanActions } from '../action';
 import { Dispatch } from 'redux';
 import styled, { keyframes } from 'styled-components';
 import { CardsState } from '../Card/action';
-import { Button, Divider } from 'antd';
+import { Button, Divider, message } from 'antd';
 import { Badge, TimeBadge } from '../Card/Badge';
 import formatMarkdown from '../Card/formatMarkdown';
 import { IdTrend } from '../../Visualization/ProjectTrend';
@@ -18,7 +18,7 @@ import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Pin } from '../../Visualization/Pin';
 import { Card, KanbanBoard, ListsState } from '../type';
 import { memorizeDispatchToProps } from '../../../utils';
-import { thinScrollBar } from '../../../style/scrollbar';
+import { PlayPauseButton } from './PlayPauseButton';
 
 const BriefCard = styled.div`
     word-break: break-word;
@@ -93,11 +93,14 @@ interface InputProps {
 }
 
 interface Props extends KanbanBoard, InputProps {
-    choose: () => void;
+    setCurrentBoardAsFocusingTarget: () => void;
+    timerManager?: TimerManager;
+    isTimerRunning: boolean;
     configure: () => void;
     listsById: ListsState;
     cardsById: CardsState;
     setPin: (pin: boolean) => void;
+    isFocusingOnThisBoard: boolean;
 }
 
 type NewCard = Card & { isDone?: boolean };
@@ -106,7 +109,16 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
         return <></>;
     }
 
-    const { name, lists, listsById, doneList, cardsById, onClick, spentHours } = props;
+    const {
+        name,
+        lists,
+        listsById,
+        doneList,
+        cardsById,
+        onClick,
+        isFocusingOnThisBoard,
+        isTimerRunning,
+    } = props;
     const [hover, setHover] = useState(false);
     const onMouseEnter = () => {
         setHover(true);
@@ -169,6 +181,25 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
         props.onSettingClick!();
     };
 
+    const onStartFocusingClick = React.useCallback(
+        (event: MouseEvent) => {
+            event.stopPropagation();
+            props.setCurrentBoardAsFocusingTarget();
+            if (!props.timerManager) {
+                return;
+            }
+
+            if (isFocusingOnThisBoard && isTimerRunning) {
+                props.timerManager.pause();
+                message.info('Paused');
+            } else {
+                props.timerManager.start();
+                message.success('Start Focusing');
+            }
+        },
+        [props._id, isFocusingOnThisBoard, isTimerRunning, props.timerManager]
+    );
+
     return (
         <BriefCard
             onClick={onClick}
@@ -190,13 +221,10 @@ const _BoardBrief: React.FC<Props> = React.memo((props: Props) => {
                     />
                 </h1>
                 <span>
-                    <Button
-                        type={'default'}
-                        shape={'circle'}
-                        icon={'caret-right'}
-                        onClick={props.choose}
+                    <PlayPauseButton
+                        onClick={onStartFocusingClick}
+                        showPlay={!(isFocusingOnThisBoard && isTimerRunning)}
                         size={'small'}
-                        style={{ marginRight: 6 }}
                     />
                     {props.onSettingClick ? (
                         <Button
@@ -248,8 +276,7 @@ interface InputProps {
 
 const memorizedMapping = memorizeDispatchToProps(
     (dispatch: Dispatch, props: InputProps) => ({
-        choose: () => {
-            dispatch(timerActions.changeAppTab('timer'));
+        setCurrentBoardAsFocusingTarget: () => {
             dispatch(timerActions.setBoardId(props.boardId));
         },
         configure: () => {
@@ -260,7 +287,7 @@ const memorizedMapping = memorizeDispatchToProps(
         },
     }),
     (props: InputProps) => ({
-        choose: [props.boardId],
+        setCurrentBoardAsFocusingTarget: [props.boardId],
         configure: [props.boardId],
         setPin: [props.boardId],
     })
@@ -271,6 +298,9 @@ export const BoardBrief = connect(
         ...state.kanban.boards[props.boardId],
         listsById: state.kanban.lists,
         cardsById: state.kanban.cards,
+        isFocusingOnThisBoard: state.timer.boardId === props.boardId,
+        isTimerRunning: state.timer.isRunning,
+        timerManager: state.timer.timerManager,
     }),
     memorizedMapping
 )(_BoardBrief);

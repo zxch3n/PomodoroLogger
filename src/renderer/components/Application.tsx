@@ -42,6 +42,7 @@ class Application extends React.Component<Props> {
         this.props.fetchSettings();
         this.props.fetchKanban();
         setTrayImageWithMadeIcon(undefined).then();
+        window.addEventListener('error', this.restartApp);
     }
 
     onKeyDown = (keyname: string) => {
@@ -61,9 +62,17 @@ class Application extends React.Component<Props> {
         }
     };
 
+    componentWillUnmount() {
+        window.removeEventListener('error', this.restartApp);
+    }
+
+    restartApp = () => {
+        ipcRenderer.send('restart-app', 'error');
+    };
+
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         if (process.env.NODE_ENV === 'production') {
-            ipcRenderer.send('restart-app', 'error');
+            this.restartApp();
         }
     }
 
@@ -79,7 +88,7 @@ class Application extends React.Component<Props> {
                                 Pomodoro
                             </span>
                         }
-                        forceRender={false}
+                        forceRender={true}
                         key="timer"
                     >
                         <Timer />

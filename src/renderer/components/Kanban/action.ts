@@ -23,36 +23,37 @@ const defaultState: KanbanState = {
     sortedBy: 'recent',
     editCard: {
         isEditing: false,
-        listId: ''
-    }
+        listId: '',
+    },
 };
 
 const setIsSearching = createActionCreator(
     '[KANBAN]SET_IS_SEARCHING',
-    resolve => (isSearching: boolean) => resolve(isSearching)
+    (resolve) => (isSearching: boolean) => resolve(isSearching)
 );
 
 const setConfiguringBoardId = createActionCreator(
     '[KANBAN]CONFIGURING_BOARD_ID',
-    resolve => (_id?: string) => resolve({ _id })
+    (resolve) => (_id?: string) => resolve({ _id })
 );
 
 const setChosenBoardId = createActionCreator(
     '[KANBAN]SET_CHOSEN_BOARD_ID',
-    resolve => (_id?: string) => resolve({ _id })
+    (resolve) => (_id?: string) => resolve({ _id })
 );
 
-const setSortedBy = createActionCreator('[KANBAN]SET_SORTED_BY', resolve => (sortedBy: SortType) =>
-    resolve({ sortedBy })
+const setSortedBy = createActionCreator(
+    '[KANBAN]SET_SORTED_BY',
+    (resolve) => (sortedBy: SortType) => resolve({ sortedBy })
 );
 
 const setEditCard = createActionCreator(
     '[KANBAN]EDIT_CARD',
-    resolve => (isEditing: boolean, listId: string, _id?: string) =>
+    (resolve) => (isEditing: boolean, listId: string, _id?: string) =>
         resolve({ isEditing, _id, listId })
 );
 
-const setSearchReg = createActionCreator('[KANBAN]SET_SEARCH_REG', resolve => (reg?: string) =>
+const setSearchReg = createActionCreator('[KANBAN]SET_SEARCH_REG', (resolve) => (reg?: string) =>
     resolve({ reg })
 );
 
@@ -69,18 +70,17 @@ export const actions = {
         }
     },
     focusOn: (_id: string) => (dispatch: Dispatch) => {
-        dispatch(timerActions.changeAppTab('timer'));
         dispatch(timerActions.setBoardId(_id));
-    }
+    },
 };
 
 export type KanbanActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
-export const reducer = createReducer<KanbanState, any>(defaultState, handle => [
+export const reducer = createReducer<KanbanState, any>(defaultState, (handle) => [
     handle(setChosenBoardId, (state, { payload: { _id } }) => {
         return {
             ...state,
             chosenBoardId: _id,
-            searchReg: undefined
+            searchReg: undefined,
         };
     }),
     handle(setEditCard, (state, { payload: { _id, isEditing, listId } }) => {
@@ -89,24 +89,24 @@ export const reducer = createReducer<KanbanState, any>(defaultState, handle => [
             editCard: {
                 _id,
                 isEditing,
-                listId
-            }
+                listId,
+            },
         };
     }),
     handle(setSortedBy, (state, { payload: { sortedBy } }) => ({
         ...state,
-        sortedBy
+        sortedBy,
     })),
     handle(setSearchReg, (state, { payload: { reg } }) => ({
         ...state,
-        searchReg: reg
+        searchReg: reg,
     })),
     handle(setConfiguringBoardId, (state, { payload: { _id } }) => ({
         ...state,
-        configuringBoardId: _id
+        configuringBoardId: _id,
     })),
     handle(setIsSearching, (state, { payload }) => ({
         ...state,
-        isSearching: payload
-    }))
+        isSearching: payload,
+    })),
 ]);

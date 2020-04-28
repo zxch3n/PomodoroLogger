@@ -194,6 +194,11 @@ class Timer extends Component<Props, State> {
         this.win = remote.getCurrentWindow();
         this.updateLeftTime();
         this.selfRef.current!.addEventListener('resize', this.onResize);
+        this.props.setTimerManager({
+            clear: this.onClear,
+            pause: this.onStop,
+            start: this.startOrResume,
+        });
         getTodaySessions().then((finishedSessions) => {
             finishedSessions.sort((a, b) => a.startTime - b.startTime);
             this.setState({
@@ -318,6 +323,16 @@ class Timer extends Component<Props, State> {
         if (this.props.timer.isRunning) {
             this.onStop();
         } else {
+            this.startOrResume();
+        }
+    };
+
+    startOrResume = () => {
+        if (!this.props.timer.isRunning) {
+            if (!this.props.timer.isFocusing) {
+                this.switchMode();
+            }
+
             if (this.props.timer.targetTime == null) {
                 return this.onStart();
             }
@@ -339,7 +354,7 @@ class Timer extends Component<Props, State> {
         }
     }
 
-    private onStop() {
+    onStop = () => {
         this.props.stopTimer();
         setTrayImageWithMadeIcon(
             this.state.leftTime.slice(0, 2),
@@ -350,7 +365,7 @@ class Timer extends Component<Props, State> {
         if (this.monitor) {
             this.monitor.stop();
         }
-    }
+    };
 
     onStart = () => {
         if (this.props.timer.isFocusing) {

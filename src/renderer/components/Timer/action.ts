@@ -33,7 +33,14 @@ export interface Setting {
     distractingList: DistractingRow[];
 }
 
+export interface TimerManager {
+    start: () => void;
+    pause: () => void;
+    clear: () => void;
+}
+
 export interface TimerState extends Setting {
+    timerManager?: TimerManager;
     chosenRecord?: PomodoroRecord;
     targetTime?: number;
     leftTime?: number;
@@ -102,6 +109,10 @@ export const setAutoUpdate = createActionCreator(
     '[Timer]SET_AUTO_UPDATE',
     (resolve) => (value: boolean) => resolve(value)
 );
+export const setTimerManager = createActionCreator(
+    '[Timer]StartOrResumeTimer',
+    (resolve) => (manager?: TimerManager) => resolve({ manager })
+);
 export const setChosenRecord = createActionCreator(
     '[Timer]SET_CHOSEN_RECORD',
     (resolve) => (record?: PomodoroRecord) => resolve({ record })
@@ -169,6 +180,7 @@ export const actions = {
     changeAppTab,
     extendCurrentSession,
     setChosenRecord,
+    setTimerManager,
     switchFocusRestMode: throttle(switchFocusRestMode, 500),
     switchTab: throttle((direction: 1 | -1) => switchTab(direction), 500),
     fetchSettings: () => async (dispatch: Dispatch) => {
@@ -431,5 +443,9 @@ export const reducer = createReducer<TimerState, any>(defaultState, (handle) => 
     handle(setChosenRecord, (state, { payload: { record } }) => ({
         ...state,
         chosenRecord: record,
+    })),
+    handle(setTimerManager, (state, { payload: { manager } }) => ({
+        ...state,
+        timerManager: manager,
     })),
 ]);
