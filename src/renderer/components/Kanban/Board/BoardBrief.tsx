@@ -299,7 +299,7 @@ export const BoardBrief = connect(
         listsById: state.kanban.lists,
         cardsById: state.kanban.cards,
         isFocusingOnThisBoard: state.timer.boardId === props.boardId,
-        isTimerRunning: state.timer.isRunning,
+        isTimerRunning: state.timer.isRunning && state.timer.isFocusing,
         timerManager: state.timer.timerManager,
     }),
     memorizedMapping

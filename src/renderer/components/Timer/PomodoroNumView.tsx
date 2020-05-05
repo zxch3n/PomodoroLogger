@@ -128,7 +128,7 @@ export class PomodoroNumView extends React.PureComponent<Props> {
         const chooseThis = this.props.chooseRecord ? () => this.props.chooseRecord!(v) : undefined;
         return (
             <Svg
-                key={v._id}
+                key={v._id + (isNew ? 'new' : '')}
                 width="1em"
                 height="1em"
                 fill="currentColor"

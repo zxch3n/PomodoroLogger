@@ -197,7 +197,7 @@ class Timer extends Component<Props, State> {
         this.props.setTimerManager({
             clear: this.onClear,
             pause: this.onStop,
-            start: this.startOrResume,
+            start: this.startFocusing,
         });
         getTodaySessions().then((finishedSessions) => {
             finishedSessions.sort((a, b) => a.startTime - b.startTime);
@@ -327,18 +327,33 @@ class Timer extends Component<Props, State> {
         }
     };
 
-    startOrResume = () => {
-        if (!this.props.timer.isRunning) {
-            if (!this.props.timer.isFocusing) {
-                this.switchMode();
+    startFocusing = async () => {
+        if (this.props.timer.isRunning) {
+            if (this.props.timer.isFocusing) {
+                return;
             }
 
-            if (this.props.timer.targetTime == null) {
-                return this.onStart();
-            }
-
-            this.onResume();
+            this.onClear();
+            await new Promise((r) => requestAnimationFrame(r));
         }
+
+        if (!this.props.timer.isFocusing) {
+            this.switchMode();
+        }
+
+        this.startOrResume();
+    };
+
+    startOrResume = () => {
+        if (this.props.timer.isRunning) {
+            return;
+        }
+
+        if (this.props.timer.targetTime == null) {
+            return this.onStart();
+        }
+
+        this.onResume();
     };
 
     private onResume() {
@@ -351,6 +366,9 @@ class Timer extends Component<Props, State> {
         ).catch(console.error);
         if (this.monitor) {
             this.monitor.resume();
+        } else {
+            this.monitor = new Monitor(() => {}, 1000, this.props.timer.screenShotInterval);
+            this.monitor.start();
         }
     }
 
