@@ -109,14 +109,17 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
         });
     };
 
-    const keydownEventHandler = React.useCallback((event: KeyboardEvent<any>) => {
-        if (event.ctrlKey && !event.altKey && (event.which === 13 || event.keyCode === 13)) {
-            onSave();
-        } else if (event.keyCode === 27) {
-            onCancel();
-            event.stopPropagation();
-        }
-    }, []);
+    const keydownEventHandler = React.useCallback(
+        (event: KeyboardEvent<any>) => {
+            if (event.ctrlKey && !event.altKey && (event.which === 13 || event.keyCode === 13)) {
+                onSave();
+            } else if (event.keyCode === 27) {
+                onCancel();
+                event.stopPropagation();
+            }
+        },
+        [onSave, onCancel]
+    );
 
     const onTabChange = React.useCallback((name: string) => {
         if (name === 'edit') {
