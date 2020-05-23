@@ -574,6 +574,10 @@ class Timer extends Component<Props, State> {
             return;
         }
 
+        if (this.state.showMask) {
+            return;
+        }
+
         this.props.switchFocusRestMode();
         this.clearStat();
         if (this.monitor) {
