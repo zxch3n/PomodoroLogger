@@ -181,8 +181,8 @@ export const actions = {
     extendCurrentSession,
     setChosenRecord,
     setTimerManager,
-    switchFocusRestMode: throttle(switchFocusRestMode, 500),
-    switchTab: throttle((direction: 1 | -1) => switchTab(direction), 500),
+    switchFocusRestMode,
+    switchTab: throttle((direction: 1 | -1) => switchTab(direction), 100),
     fetchSettings: () => async (dispatch: Dispatch) => {
         const settings: Partial<Setting> = await promisify(
             dbs.settingDB.findOne.bind(dbs.settingDB)

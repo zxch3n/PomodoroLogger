@@ -392,7 +392,7 @@ class Timer extends Component<Props, State> {
         }
 
         this.props.startTimer();
-        this.updateLeftTime();
+        requestAnimationFrame(this.updateLeftTime);
     };
 
     private getDuration = (isFocusing?: boolean) => {
