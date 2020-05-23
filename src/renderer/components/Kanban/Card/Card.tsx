@@ -31,7 +31,7 @@ const CardContainer = styled.div`
 `;
 
 const CardContent = styled.div`
-    padding: 2px 12px 4px 12px;
+    padding: 4px 12px 4px 12px;
     font-size: 14px;
 
     .card-icon {
@@ -116,7 +116,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                         >
                                             {props.title}
                                         </h3>
-                                        <BadgeHolder>
+                                        <BadgeHolder className="collapsed">
                                             {props.sessionIds.length > 0 ? (
                                                 <PomodoroDot num={props.sessionIds.length} />
                                             ) : undefined}
@@ -128,6 +128,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                         props.spentTimeInHour.estimated -
                                                         props.spentTimeInHour.actual
                                                     }
+                                                    collapsed={true}
                                                 />
                                             ) : undefined}
                                         </BadgeHolder>

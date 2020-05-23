@@ -27,10 +27,11 @@ function formatThousand(num: number) {
     return `${thousand}.${hundred}k`;
 }
 
-export const PomodoroDot: React.FC<Props> = props => {
+export const PomodoroDot: React.FC<Props> = (props) => {
     const num = formatThousand(props.num);
     return (
         <Svg
+            className="pomodoro-dot"
             width="20"
             height="20"
             style={{ margin: '0 0 2px 0', cursor: 'pointer' }}

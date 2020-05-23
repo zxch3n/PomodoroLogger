@@ -100,9 +100,11 @@ export const Badge = (props: Props) => {
 interface TimeBadgeProps {
     spentTime?: number;
     leftTime?: number;
+    collapsed?: boolean;
 }
 
 export const TimeBadge = React.memo((props: TimeBadgeProps) => {
+    const { collapsed = false } = props;
     const [clipState, setClipState] = React.useState('default');
     const id = React.useMemo(shortid.generate, []);
     const id1 = id + '1';
@@ -140,6 +142,30 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
             break;
     }
 
+    if (collapsed) {
+        return (
+            <AnimeSvg
+                width={totalWidth}
+                height="20"
+                style={{ margin: '0 0 2px 6px', fontSize: 12 }}
+                onMouseLeave={onLeave}
+            >
+                <g onMouseOver={onHoverSpent} clipPath={`url(#${id1})`}>
+                    <text
+                        x={0}
+                        y={10}
+                        textLength={sSpentTime.length * 6.2}
+                        textAnchor={'start'}
+                        alignmentBaseline={'central'}
+                        fill={'black'}
+                    >
+                        {sSpentTime}
+                    </text>
+                </g>
+            </AnimeSvg>
+        );
+    }
+
     return (
         <AnimeSvg
             width={totalWidth}
@@ -151,8 +177,9 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
                 <clipPath id={id}>
                     <path
                         className={'clip-path'}
-                        d={`M ${spentWidth} -10 L ${spentWidth} 30 L ${totalWidth *
-                            2} 30 L ${totalWidth * 2} -10 Z`}
+                        d={`M ${spentWidth} -10 L ${spentWidth} 30 L ${totalWidth * 2} 30 L ${
+                            totalWidth * 2
+                        } -10 Z`}
                         fill={'white'}
                         transform={transform}
                     />
