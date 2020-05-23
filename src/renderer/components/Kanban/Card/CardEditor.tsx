@@ -159,7 +159,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                         <TabPane tab="Edit" key="edit">
                             {getFieldDecorator('content')(
                                 <TextArea
-                                    autoSize={{ minRows: 3 }}
+                                    autoSize={{ minRows: 6 }}
                                     placeholder={'Description'}
                                     onKeyDown={keydownEventHandler}
                                 />
