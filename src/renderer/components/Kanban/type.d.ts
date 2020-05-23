@@ -9,6 +9,7 @@ export interface Card {
         estimated: number;
         actual: number;
     };
+    createdTime?: number;
 }
 
 export interface AggInfo {

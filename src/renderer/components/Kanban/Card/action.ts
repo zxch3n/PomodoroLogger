@@ -10,44 +10,45 @@ export type CardsState = { [_id: string]: Card };
 
 const addSession = createActionCreator(
     '[Card]ADD_SESSION',
-    resolve => (_id: string, sessionId: string, spentTime: number) =>
+    (resolve) => (_id: string, sessionId: string, spentTime: number) =>
         resolve({ _id, sessionId, spentTime })
 );
 
 const addCard = createActionCreator(
     '[Card]ADD',
-    resolve => (_id: string, title?: string, content?: string) => resolve({ _id, title, content })
+    (resolve) => (_id: string, title?: string, content?: string, createdTime?: number) =>
+        resolve({ _id, title, content, createdTime })
 );
 
-const renameCard = createActionCreator('[Card]RENAME', resolve => (_id: string, title: string) =>
+const renameCard = createActionCreator('[Card]RENAME', (resolve) => (_id: string, title: string) =>
     resolve({ _id, title })
 );
 
 const setContent = createActionCreator(
     '[Card]SET_CONTENT',
-    resolve => (_id: string, content: string) => resolve({ _id, content })
+    (resolve) => (_id: string, content: string) => resolve({ _id, content })
 );
 
 const setEstimatedTime = createActionCreator(
     '[Card]SET_ESTIMATED_TIME',
-    resolve => (_id: string, estimatedTime: number) => resolve({ _id, estimatedTime })
+    (resolve) => (_id: string, estimatedTime: number) => resolve({ _id, estimatedTime })
 );
 
 const setActualTime = createActionCreator(
     '[Card]SET_ACTUAL_TIME',
-    resolve => (_id: string, actualTime: number) => resolve({ _id, actualTime })
+    (resolve) => (_id: string, actualTime: number) => resolve({ _id, actualTime })
 );
 
 const addActualTime = createActionCreator(
     '[Card]ADD_ACTUAL_TIME',
-    resolve => (_id: string, plus: number) => resolve({ _id, plus })
+    (resolve) => (_id: string, plus: number) => resolve({ _id, plus })
 );
 
-const deleteCard = createActionCreator('[Card]DELETE_CARD', resolve => (_id: string) =>
+const deleteCard = createActionCreator('[Card]DELETE_CARD', (resolve) => (_id: string) =>
     resolve({ _id })
 );
 
-const setCards = createActionCreator('[Card]SET_CARDS', resolve => (cards: CardsState) =>
+const setCards = createActionCreator('[Card]SET_CARDS', (resolve) => (cards: CardsState) =>
     resolve(cards)
 );
 
@@ -94,14 +95,15 @@ export const actions = {
             { _id },
             {
                 $push: { sessionIds: sessionId },
-                $inc: { 'spentTimeInHour.actual': spentTimeInHour }
+                $inc: { 'spentTimeInHour.actual': spentTimeInHour },
             }
         );
     },
     addCard: (_id: string, listId: string, title: string, content: string = '') => async (
         dispatch: Dispatch
     ) => {
-        dispatch(addCard(_id, title, content));
+        const now = +new Date();
+        dispatch(addCard(_id, title, content, now));
         await listActions.addCardById(listId, _id)(dispatch);
         await db.insert({
             _id,
@@ -110,36 +112,41 @@ export const actions = {
             sessionIds: [],
             spentTimeInHour: {
                 estimated: 0,
-                actual: 0
-            }
-        });
-    }
+                actual: 0,
+            },
+            createdTime: now,
+        } as Card);
+    },
 };
 
-export const cardReducer = createReducer<CardsState, any>({}, handle => [
-    handle(addCard, (state, { payload: { _id, title = '', content = '' } }) => {
-        return {
-            ...state,
-            [_id]: {
-                _id,
-                title,
-                content,
-                sessionIds: [],
-                spentTimeInHour: {
-                    actual: 0,
-                    estimated: 0
-                }
-            }
-        };
-    }),
+export const cardReducer = createReducer<CardsState, any>({}, (handle) => [
+    handle(
+        addCard,
+        (state, { payload: { _id, title = '', content = '', createdTime = +new Date() } }) => {
+            return {
+                ...state,
+                [_id]: {
+                    _id,
+                    title,
+                    content,
+                    createdTime,
+                    sessionIds: [],
+                    spentTimeInHour: {
+                        actual: 0,
+                        estimated: 0,
+                    },
+                },
+            };
+        }
+    ),
 
     handle(renameCard, (state, { payload: { _id, title } }) => {
         return {
             ...state,
             [_id]: {
                 ...state[_id],
-                title
-            }
+                title,
+            },
         };
     }),
 
@@ -148,8 +155,8 @@ export const cardReducer = createReducer<CardsState, any>({}, handle => [
             ...state,
             [_id]: {
                 ...state[_id],
-                content
-            }
+                content,
+            },
         };
     }),
 
@@ -160,9 +167,9 @@ export const cardReducer = createReducer<CardsState, any>({}, handle => [
                 ...state[_id],
                 spentTimeInHour: {
                     actual: state[_id].spentTimeInHour.actual,
-                    estimated: estimatedTime
-                }
-            }
+                    estimated: estimatedTime,
+                },
+            },
         };
     }),
 
@@ -173,9 +180,9 @@ export const cardReducer = createReducer<CardsState, any>({}, handle => [
                 ...state[_id],
                 spentTimeInHour: {
                     actual: actualTime,
-                    estimated: state[_id].spentTimeInHour.estimated
-                }
-            }
+                    estimated: state[_id].spentTimeInHour.estimated,
+                },
+            },
         };
     }),
 
@@ -192,9 +199,9 @@ export const cardReducer = createReducer<CardsState, any>({}, handle => [
                 ...state[_id],
                 spentTimeInHour: {
                     ...state[_id].spentTimeInHour,
-                    actual: state[_id].spentTimeInHour.actual + plus
-                }
-            }
+                    actual: state[_id].spentTimeInHour.actual + plus,
+                },
+            },
         };
     }),
 
@@ -207,11 +214,11 @@ export const cardReducer = createReducer<CardsState, any>({}, handle => [
                 sessionIds: [...card.sessionIds, sessionId],
                 spentTimeInHour: {
                     actual: card.spentTimeInHour.actual + spentTime,
-                    estimated: card.spentTimeInHour.estimated
-                }
-            }
+                    estimated: card.spentTimeInHour.estimated,
+                },
+            },
         };
-    })
+    }),
 ]);
 
 export type CardActionTypes = { [key in keyof typeof actions]: typeof actions[key] };
