@@ -1,7 +1,7 @@
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FocusIcon from '../../../../res/Focus.svg';
 import DoneIcon from '../../../../res/done.svg';
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useRef, useState, useEffect } from 'react';
 import { ListActionTypes } from './action';
 import styled from 'styled-components';
 import Card from '../Card';
@@ -116,30 +116,42 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
 
 export const List: FC<Props> = React.memo((props: Props) => {
     const { focused = false, searchReg, cards, cardsState, done = false } = props;
-    let reg: RegExp | undefined;
-    try {
-        reg = searchReg ? new RegExp(searchReg, 'gimsu') : undefined;
-    } catch (e) {}
-    const [estimatedTimeSum, actualTimeSum] = props.cards.reduce(
-        (l: [number, number], r: string) => {
-            return [
-                l[0] + props.cardsState[r].spentTimeInHour.estimated,
-                l[1] + props.cardsState[r].spentTimeInHour.actual,
-            ] as [number, number];
-        },
-        [0, 0] as [number, number]
+    const visibleCards = React.useMemo(() => {
+        let reg: RegExp | undefined;
+        try {
+            reg = searchReg ? new RegExp(searchReg, 'gimsu') : undefined;
+        } catch (e) {}
+
+        if (reg == null) {
+            props.setVisibleCards(props._id, undefined);
+            return undefined;
+        }
+
+        const visibleCards_ = cards.filter((id) => {
+            if (!reg) return true;
+            const card = cardsState[id];
+            return card.title.match(reg) || card.content.match(reg);
+        });
+        props.setVisibleCards(props._id, visibleCards_);
+        return visibleCards_;
+    }, [props._id, searchReg, props.cardsState, cards]);
+
+    const filteredCards = visibleCards || props.cards;
+    const [estimatedTimeSum, actualTimeSum] = React.useMemo(
+        () =>
+            filteredCards.reduce(
+                (l: [number, number], r: string) => {
+                    return [
+                        l[0] + props.cardsState[r].spentTimeInHour.estimated,
+                        l[1] + props.cardsState[r].spentTimeInHour.actual,
+                    ] as [number, number];
+                },
+                [0, 0] as [number, number]
+            ),
+        [filteredCards, props.cardsState]
     );
     const overallTimeInfo =
         estimatedTimeSum > 0 ? `${actualTimeSum.toFixed(1)}h/${estimatedTimeSum.toFixed(1)}h` : '';
-    const filteredCards =
-        reg === undefined
-            ? cards
-            : cards.filter((id) => {
-                if (!reg) return true;
-                const card = cardsState[id];
-                return card.title.match(reg) || card.content.match(reg);
-            });
-
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState('');
     const inputRef = useRef<Input>();
@@ -224,17 +236,17 @@ export const List: FC<Props> = React.memo((props: Props) => {
                                     <span className="list-head-text">
                                         <h1>{props.title}</h1>
                                         <span>
-                                            {reg == null ? (
-                                                <span>
+                                            {searchReg == null ? (
+                                                <>
                                                     {props.cards.length} Card
                                                     {props.cards.length > 1 ? 's ' : ' '}
-                                                </span>
+                                                </>
                                             ) : (
-                                                <span>
+                                                <>
                                                     {filteredCards.length} / {props.cards.length}
-                                                </span>
+                                                </>
                                             )}
-                                            {overallTimeInfo}
+                                            &nbsp; {overallTimeInfo}
                                         </span>
                                     </span>
                                     <div className="list-head-icon">

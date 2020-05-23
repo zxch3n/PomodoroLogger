@@ -13,7 +13,7 @@ jest.setTimeout(10000);
 let lock = false;
 beforeEach(async () => {
     while (lock) {
-        await new Promise(r => setTimeout(r, Math.random() * 1000));
+        await new Promise((r) => setTimeout(r, Math.random() * 1000));
     }
 
     lock = true;
@@ -66,8 +66,8 @@ describe('listActions', () => {
             type: '[List]ADD',
             payload: {
                 _id,
-                title: _id
-            }
+                title: _id,
+            },
         });
 
         const docs: List[] = await db.find({}, {});
@@ -82,8 +82,8 @@ describe('listActions', () => {
             type: '[List]ADD_CARD',
             payload: {
                 _id,
-                cardId: 'cardId'
-            }
+                cardId: 'cardId',
+            },
         });
 
         const doc: List = await db.findOne({ _id });
@@ -91,19 +91,12 @@ describe('listActions', () => {
     });
 
     it('moveCard 0', async () => {
-        const dispatch = jest.fn();
-        const [_id0, _id1] = await moveCardSetup();
+        let state: ListsState = {};
+        const dispatch: any = (action: any) => {
+            state = listReducer(state, action);
+        };
+        const [_id0, _id1] = await moveCardSetup(dispatch);
         await actions.moveCard(_id0, _id1, 0, 2)(dispatch);
-        expect(dispatch.mock.calls[0][0]).toStrictEqual({
-            type: '[List]MOVE_CARD',
-            payload: {
-                fromListId: _id0,
-                toListId: _id1,
-                fromIndex: 0,
-                toIndex: 2
-            }
-        });
-
         const doc0: List = await db.findOne({ _id: _id0 });
         expect(doc0.cards).toStrictEqual(['1', '2']);
         const doc1: List = await db.findOne({ _id: _id1 });
@@ -111,19 +104,12 @@ describe('listActions', () => {
     });
 
     it('moveCard 1', async () => {
-        const dispatch = jest.fn();
-        const [_id0, _id1] = await moveCardSetup();
+        let state: ListsState = {};
+        const dispatch: any = (action: any) => {
+            state = listReducer(state, action);
+        };
+        const [_id0, _id1] = await moveCardSetup(dispatch);
         await actions.moveCard(_id0, _id1, 0, 0)(dispatch);
-        expect(dispatch.mock.calls[0][0]).toStrictEqual({
-            type: '[List]MOVE_CARD',
-            payload: {
-                fromListId: _id0,
-                toListId: _id1,
-                fromIndex: 0,
-                toIndex: 0
-            }
-        });
-
         const doc0: List = await db.findOne({ _id: _id0 });
         expect(doc0.cards).toStrictEqual(['1', '2']);
         const doc1: List = await db.findOne({ _id: _id1 });
@@ -131,23 +117,62 @@ describe('listActions', () => {
     });
 
     it('moveCard 2', async () => {
-        const dispatch = jest.fn();
-        const [_id0, _id1] = await moveCardSetup();
+        let state: ListsState = {};
+        const dispatch: any = (action: any) => {
+            state = listReducer(state, action);
+        };
+        const [_id0, _id1] = await moveCardSetup(dispatch);
         await actions.moveCard(_id0, _id0, 0, 2)(dispatch);
-        expect(dispatch.mock.calls[0][0]).toStrictEqual({
-            type: '[List]MOVE_CARD',
-            payload: {
-                fromListId: _id0,
-                toListId: _id0,
-                fromIndex: 0,
-                toIndex: 2
-            }
-        });
-
         const doc0: List = await db.findOne({ _id: _id0 });
         expect(doc0.cards).toStrictEqual(['1', '2', '0']);
         const doc1: List = await db.findOne({ _id: _id1 });
         expect(doc1.cards).toStrictEqual(['10', '11', '12']);
+    });
+
+    it('moveCard by visibleCard state', async () => {
+        let state: ListsState = {};
+        const dispatch: any = (action: any) => {
+            state = listReducer(state, action);
+        };
+        const [_id0, _id1] = await moveCardSetup(dispatch);
+        await actions.setVisibleCards(_id0, ['2'])(dispatch);
+        await actions.moveCard(_id0, _id1, 0, 0)(dispatch);
+        const doc0: List = await db.findOne({ _id: _id0 });
+        expect(doc0.cards).toStrictEqual(['0', '1']);
+        const doc1: List = await db.findOne({ _id: _id1 });
+        expect(doc1.cards).toStrictEqual(['2', '10', '11', '12']);
+        await actions.setVisibleCards(_id1, ['10', '11'])(dispatch);
+        await actions.moveCard(_id1, _id0, 0, 0)(dispatch);
+        {
+            const doc0: List = await db.findOne({ _id: _id0 });
+            expect(doc0.cards).toStrictEqual(['10', '0', '1']);
+            const doc1: List = await db.findOne({ _id: _id1 });
+            expect(doc1.cards).toStrictEqual(['2', '11', '12']);
+        }
+    });
+
+    it('moveCard by visibleCard state even when moving in the same list', async () => {
+        let state: ListsState = {};
+        const dispatch: any = (action: any) => {
+            state = listReducer(state, action);
+        };
+        const [_id0, _id1] = await moveCardSetup(dispatch);
+        await addCard(_id0, '3', dispatch);
+        await addCard(_id0, '4', dispatch);
+        await addCard(_id0, '5', dispatch);
+        await addCard(_id0, '6', dispatch);
+        await actions.setVisibleCards(_id0, ['2', '4', '6'])(dispatch);
+        await actions.moveCard(_id0, _id0, 0, 1)(dispatch);
+        {
+            const doc0: List = await db.findOne({ _id: _id0 });
+            expect(doc0.cards).toStrictEqual(['0', '1', '3', '4', '2', '5', '6']);
+        }
+        await actions.setVisibleCards(_id0, ['4', '2', '6'])(dispatch);
+        await actions.moveCard(_id0, _id0, 0, 2)(dispatch);
+        {
+            const doc0: List = await db.findOne({ _id: _id0 });
+            expect(doc0.cards).toStrictEqual(['0', '1', '3', '2', '5', '6', '4']);
+        }
     });
 });
 
@@ -170,7 +195,7 @@ describe('listReducer', () => {
         // test delete card
         const cardId = state[_id1].cards[0];
         await actions.deleteCard(_id1, cardId)(dispatch);
-        expect(state[_id1].cards.every(v => v !== cardId)).toBeTruthy();
+        expect(state[_id1].cards.every((v) => v !== cardId)).toBeTruthy();
 
         // test delete list
         await actions.deleteList(_id0)(dispatch);
@@ -184,7 +209,7 @@ describe('listReducer', () => {
         // expect(state).toStrictEqual(oldState);
     });
 
-    it('should update', async done => {
+    it('should update', async (done) => {
         let state: ListsState = {};
 
         // @ts-ignore

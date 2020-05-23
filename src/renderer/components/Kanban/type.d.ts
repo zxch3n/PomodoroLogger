@@ -39,6 +39,7 @@ export interface List {
     _id: string;
     title: string;
     cards: string[]; // lists id in order
+    visibleCards?: string[];
 }
 
 export type ListsState = { [_id: string]: List };
