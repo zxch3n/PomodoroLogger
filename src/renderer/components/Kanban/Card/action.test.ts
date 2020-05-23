@@ -28,14 +28,15 @@ describe("Cards' actions", () => {
         const _id = shortid.generate();
         const dispatch = jest.fn();
         await actions.addCard(_id, '', 'abc')(dispatch);
-        expect(dispatch.mock.calls[0][0]).toStrictEqual({
-            type: '[Card]ADD',
-            payload: {
+        expectExcept(
+            dispatch.mock.calls[0][0].payload,
+            {
                 _id,
                 title: 'abc',
-                content: ''
-            }
-        });
+                content: '',
+            },
+            ['createdTime']
+        );
 
         const card = await db.findOne({ _id });
         expect(card).not.toBeFalsy();
@@ -50,8 +51,8 @@ describe("Cards' actions", () => {
         expect(dispatch.mock.calls[3][0]).toStrictEqual({
             type: '[Card]DELETE_CARD',
             payload: {
-                _id
-            }
+                _id,
+            },
         });
 
         const card = await db.findOne({ _id });
@@ -68,8 +69,8 @@ describe("Cards' actions", () => {
             type: '[Card]RENAME',
             payload: {
                 _id,
-                title: 'newName'
-            }
+                title: 'newName',
+            },
         });
 
         const card = await db.findOne({ _id });
@@ -90,8 +91,8 @@ describe("Cards' actions", () => {
             payload: {
                 _id,
                 sessionId: 'session',
-                spentTime: 0.33
-            }
+                spentTime: 0.33,
+            },
         });
 
         const card: Card = await db.findOne({ _id });
@@ -101,6 +102,15 @@ describe("Cards' actions", () => {
         expect(card.spentTimeInHour.estimated).toBe(0);
     });
 
+    function expectExcept(actual: any, expected: any, except: string[]) {
+        for (const param of except) {
+            expected[param] = undefined;
+            actual[param] = undefined;
+        }
+
+        expect(actual).toEqual(expected);
+    }
+
     it('fetch cards from local db', async () => {
         const _d = jest.fn();
         const dispatch = jest.fn();
@@ -109,36 +119,48 @@ describe("Cards' actions", () => {
         await actions.addCard('c', 'c', 'abc', '')(_d);
         await actions.fetchCards()(dispatch);
         expect(dispatch.mock.calls[0][0].type).toBe('[Card]SET_CARDS');
-        expect(dispatch.mock.calls[0][0].payload.a).toEqual({
-            _id: 'a',
-            title: 'abc',
-            content: '',
-            sessionIds: [],
-            spentTimeInHour: {
-                estimated: 0,
-                actual: 0
-            }
-        });
-        expect(dispatch.mock.calls[0][0].payload.b).toEqual({
-            _id: 'b',
-            title: 'abc',
-            content: '',
-            sessionIds: [],
-            spentTimeInHour: {
-                estimated: 0,
-                actual: 0
-            }
-        });
-        expect(dispatch.mock.calls[0][0].payload.c).toEqual({
-            _id: 'c',
-            title: 'abc',
-            content: '',
-            sessionIds: [],
-            spentTimeInHour: {
-                estimated: 0,
-                actual: 0
-            }
-        });
+        expectExcept(
+            dispatch.mock.calls[0][0].payload.a,
+            {
+                _id: 'a',
+                title: 'abc',
+                content: '',
+                sessionIds: [],
+                spentTimeInHour: {
+                    estimated: 0,
+                    actual: 0,
+                },
+            },
+            ['createdTime']
+        );
+        expectExcept(
+            dispatch.mock.calls[0][0].payload.b,
+            {
+                _id: 'b',
+                title: 'abc',
+                content: '',
+                sessionIds: [],
+                spentTimeInHour: {
+                    estimated: 0,
+                    actual: 0,
+                },
+            },
+            ['createdTime']
+        );
+        expectExcept(
+            dispatch.mock.calls[0][0].payload.c,
+            {
+                _id: 'c',
+                title: 'abc',
+                content: '',
+                sessionIds: [],
+                spentTimeInHour: {
+                    estimated: 0,
+                    actual: 0,
+                },
+            },
+            ['createdTime']
+        );
     });
 
     it('should update', async () => {
