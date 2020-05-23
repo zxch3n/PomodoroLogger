@@ -131,11 +131,21 @@ const createWindow = async () => {
     });
 
     ipcMain.addListener('quit-app', () => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('receive quit-app');
+            return;
+        }
+
         win = undefined;
         app.exit();
     });
 
     ipcMain.addListener('restart-app', () => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('receive restart-app');
+            return;
+        }
+
         win = undefined;
         app.relaunch();
         app.exit();

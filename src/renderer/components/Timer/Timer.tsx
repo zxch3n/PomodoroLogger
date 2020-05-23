@@ -45,6 +45,7 @@ const KanbanName = styled.h1`
 `;
 
 const ProgressTextContainer = styled.div`
+    user-select: none;
     margin-top: -50px;
     padding: 12px;
     text-align: center;

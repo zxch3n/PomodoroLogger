@@ -150,7 +150,6 @@ export const listReducer = createReducer<ListsState, any>({}, (handle) => [
 
 export const actions = {
     setVisibleCards: (listId: string, cards?: string[]) => (dispatch: Dispatch) => {
-        console.log('setVisibleCards', { listId, cards });
         dispatch(setVisibleCards(listId, cards));
     },
     fetchLists: () => async (dispatch: Dispatch) => {

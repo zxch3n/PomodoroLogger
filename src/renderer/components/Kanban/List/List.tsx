@@ -161,8 +161,8 @@ export const List: FC<Props> = React.memo((props: Props) => {
     };
 
     const onDelete = () => {
-        if (props.focused) {
-            message.warn('Cannot delete the focused list.');
+        if (focused || done) {
+            message.warn('Cannot delete the focused / done list.');
             return;
         }
 
@@ -195,18 +195,32 @@ export const List: FC<Props> = React.memo((props: Props) => {
         }
     }, []);
 
-    const menu = (
-        <Menu>
-            <Menu.Item key="1" onClick={onEdit}>
-                <Icon type={'setting'} /> Edit
-            </Menu.Item>
-            <Menu.Divider />
-            <Menu.Item key="3" onClick={onPreDelete}>
-                <Popconfirm title={'Are you sure?'} onConfirm={onDelete} ref={popConfirmRef as any}>
-                    <Icon type={'delete'} /> Delete
-                </Popconfirm>
-            </Menu.Item>
-        </Menu>
+    const menu = React.useMemo(
+        () =>
+            !focused && !done ? (
+                <Menu>
+                    <Menu.Item key="1" onClick={onEdit}>
+                        <Icon type={'setting'} /> Edit
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item key="3" onClick={onPreDelete}>
+                        <Popconfirm
+                            title={'Are you sure?'}
+                            onConfirm={onDelete}
+                            ref={popConfirmRef as any}
+                        >
+                            <Icon type={'delete'} /> Delete
+                        </Popconfirm>
+                    </Menu.Item>
+                </Menu>
+            ) : (
+                <Menu>
+                    <Menu.Item key="1" onClick={onEdit}>
+                        <Icon type={'setting'} /> Edit
+                    </Menu.Item>
+                </Menu>
+            ),
+        [onDelete, focused, done, onPreDelete]
     );
 
     return (

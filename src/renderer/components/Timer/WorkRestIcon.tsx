@@ -15,6 +15,7 @@ const fade = keyframes`
 `;
 
 const FadeEffect = styled.div`
+    user-select: none;
     position: absolute;
     left: 50%;
     text-align: center;

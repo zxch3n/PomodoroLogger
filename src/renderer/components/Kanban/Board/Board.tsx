@@ -79,7 +79,13 @@ export const Board: FC<Props> = React.memo(
         if (doesOnlyShowFocusedList) {
             lists = (provided: any) => (
                 <ListContainer ref={provided.innerRef} {...provided.droppableProps}>
-                    <List listId={props.focusedList} index={0} key={0} boardId={props.boardId} />
+                    <List
+                        listId={props.focusedList}
+                        index={0}
+                        key={0}
+                        boardId={props.boardId}
+                        focused={true}
+                    />
                     {provided.placeholder}
                 </ListContainer>
             );
