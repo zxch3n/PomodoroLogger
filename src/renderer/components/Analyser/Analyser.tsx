@@ -10,6 +10,7 @@ import { createRecord } from '../../../../test/utils';
 import dbs from '../../dbs';
 import { fatScrollBar, tabMaxHeight } from '../../style/scrollbar';
 import { PomodoroRecord } from '../../monitor/type';
+import { SearchBar } from '../Kanban/SearchBar';
 
 const Container = styled.div`
     position: relative;
@@ -23,5 +24,9 @@ const Container = styled.div`
 
 interface Props extends RootState, HistoryActionCreatorTypes {}
 export const Analyser: React.FC<Props> = React.memo((props: Props) => {
-    return <Container />;
+    return (
+        <Container>
+            <SearchBar />
+        </Container>
+    );
 });
