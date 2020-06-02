@@ -11,6 +11,7 @@ import { Markdown } from '../style/Markdown';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Card as CardType } from '../type';
 
+// TODO: set a fixed width
 const CardContainer = styled.div`
     word-break: break-word;
     background-color: white;

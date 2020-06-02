@@ -624,6 +624,9 @@ class Timer extends Component<Props, State> {
             this.monitor.resume();
         } else if (__DEV__) {
             throw new Error();
+        } else {
+            this.monitor = new Monitor(() => {}, 1000, this.props.timer.screenShotInterval);
+            this.monitor.start();
         }
 
         this.extendedTimeInMinute += timeInMinutes;
