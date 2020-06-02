@@ -5,6 +5,7 @@ import { KanbanActionTypes } from '../Kanban/action';
 import { BoardActionTypes } from '../Kanban/Board/action';
 import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes, uiStateNames } from './action';
 import { RootState } from '../../reducers';
+import { debounce } from 'lodash';
 import { FocusSelector } from './FocusSelector';
 import { Monitor } from '../../monitor';
 import styled from 'styled-components';
@@ -27,6 +28,7 @@ import ReactHotkeys from 'react-hot-keys';
 import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
 import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
+import { waitUntil } from './wait';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -153,6 +155,7 @@ class Timer extends Component<Props, State> {
     interval?: any;
     monitor?: Monitor;
     win?: BrowserWindow;
+    willStartNextSessionImmediately = false;
     mainDiv: React.RefObject<HTMLDivElement>;
     sound: React.RefObject<HTMLAudioElement>;
     extendedTimeInMinute: number;
@@ -340,6 +343,7 @@ class Timer extends Component<Props, State> {
 
         if (!this.props.timer.isFocusing) {
             this.switchMode();
+            await waitUntil(() => this.props.timer.isFocusing);
         }
 
         this.startOrResume();
@@ -523,7 +527,7 @@ class Timer extends Component<Props, State> {
         return duration - leftTimeInSec;
     }
 
-    private onSessionConfirmed = async () => {
+    private onSessionConfirmed = debounce(async () => {
         if (this.monitor) {
             this.monitor.clear();
             this.monitor = undefined;
@@ -532,27 +536,32 @@ class Timer extends Component<Props, State> {
         this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
         if (this.stagedSession === undefined) {
             // Resting session
-            this.props.timerFinished();
-            return;
-        }
-
-        restartDBWorkers();
-        this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
-        this.extendedTimeInMinute = 0;
-        if (this.props.timer.boardId !== undefined) {
-            this.stagedSession.boardId = this.props.timer.boardId;
-            const kanban = this.props.kanban;
-            const cards: string[] =
-                kanban.lists[kanban.boards[this.props.timer.boardId].focusedList].cards;
-            await this.props.timerFinished(this.stagedSession, cards, this.props.timer.boardId);
+            await this.props.timerFinished();
         } else {
-            await this.props.timerFinished(this.stagedSession);
+            restartDBWorkers();
+            this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
+            this.extendedTimeInMinute = 0;
+            if (this.props.timer.boardId !== undefined) {
+                this.stagedSession.boardId = this.props.timer.boardId;
+                const kanban = this.props.kanban;
+                const cards: string[] =
+                    kanban.lists[kanban.boards[this.props.timer.boardId].focusedList].cards;
+                await this.props.timerFinished(this.stagedSession, cards, this.props.timer.boardId);
+            } else {
+                await this.props.timerFinished(this.stagedSession);
+            }
+
+            const finishedSessions = this.state.pomodorosToday.concat([this.stagedSession]);
+            this.setState({ pomodorosToday: finishedSessions, leftTime: '' });
+            this.stagedSession = undefined;
         }
 
-        const finishedSessions = this.state.pomodorosToday.concat([this.stagedSession]);
-        this.setState({ pomodorosToday: finishedSessions, leftTime: '' });
-        this.stagedSession = undefined;
-    };
+        if (this.willStartNextSessionImmediately) {
+            this.willStartNextSessionImmediately = false;
+            await new Promise((r) => setTimeout(r, 30));
+            this.onStart();
+        }
+    }, 50);
 
     private focusOnCurrentWindow() {
         if (this.win) {
@@ -592,13 +601,10 @@ class Timer extends Component<Props, State> {
         this.onSessionConfirmed().catch(console.error);
     };
 
-    private onMaskButtonClick = () => {
+    private onMaskButtonClick = async () => {
         this.setState({ showMask: false });
-        this.onSessionConfirmed()
-            .then(() => {
-                this.onStart();
-            })
-            .catch(console.error);
+        this.willStartNextSessionImmediately = true;
+        this.onSessionConfirmed();
     };
 
     private switchToKanban = () => {
