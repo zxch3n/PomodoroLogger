@@ -42,7 +42,7 @@ class Application extends React.Component<Props> {
         this.props.fetchSettings();
         this.props.fetchKanban();
         setTrayImageWithMadeIcon(undefined).then();
-        window.addEventListener('error', this.restartApp);
+        window.addEventListener('error', this.onError);
     }
 
     onKeyDown = (keyname: string) => {
@@ -63,16 +63,19 @@ class Application extends React.Component<Props> {
     };
 
     componentWillUnmount() {
-        window.removeEventListener('error', this.restartApp);
+        window.removeEventListener('error', this.onError);
     }
 
-    restartApp = () => {
-        ipcRenderer.send('restart-app', 'error');
+    onError = (event: ErrorEvent) => this.handleError(event.error);
+    handleError = (err: Error) => {
+        if (process.env.NODE_ENV === 'production') {
+            ipcRenderer.send('restart-app', 'error');
+        }
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         if (process.env.NODE_ENV === 'production') {
-            this.restartApp();
+            this.handleError(error);
         }
     }
 

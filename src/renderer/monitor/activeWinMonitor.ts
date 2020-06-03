@@ -52,12 +52,16 @@ export class Monitor {
     watch = async () => {
         const data = await activeWin();
         if (data) {
-            if (this.shouldTakeScreenshot) {
-                this.shouldTakeScreenshot = false;
-                const screenshot = await getScreen(500);
-                this.listener(data, screenshot);
-            } else {
-                this.listener(data);
+            try {
+                if (this.shouldTakeScreenshot) {
+                    this.shouldTakeScreenshot = false;
+                    const screenshot = await getScreen(500);
+                    this.listener(data, screenshot);
+                } else {
+                    this.listener(data);
+                }
+            } catch (e) {
+                console.error(e);
             }
         }
     };

@@ -598,7 +598,7 @@ class Timer extends Component<Props, State> {
 
     private onMaskClick = () => {
         this.setState({ showMask: false });
-        this.onSessionConfirmed().catch(console.error);
+        this.onSessionConfirmed();
     };
 
     private onMaskButtonClick = async () => {
@@ -682,9 +682,7 @@ class Timer extends Component<Props, State> {
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-        if (process.env.NODE_ENV === 'production') {
-            ipcRenderer.send('restart-app', 'error');
-        }
+        message.error(error.toString());
     }
 
     render() {

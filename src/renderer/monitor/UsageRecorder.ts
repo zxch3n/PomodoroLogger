@@ -28,7 +28,7 @@ export class UsageRecorder {
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
-            startTime: 0
+            startTime: 0,
         };
 
         this.monitorListener = monitorListener;
@@ -51,7 +51,7 @@ export class UsageRecorder {
             apps: {},
             spentTimeInHour: 0,
             switchTimes: 0,
-            startTime: 0
+            startTime: 0,
         };
 
         this.maxIndex = 0;
@@ -82,7 +82,7 @@ export class UsageRecorder {
 
     /**
      *
-     * @param result, undefined means the timer is stopped
+     * @param result, undefined means the timer is stopped, letting recorder to record the last app info
      * @param screenshot, the path to screenshot
      */
     listener: ActiveWinListener = async (result?: BaseResult, screenshot?: string) => {
@@ -97,7 +97,7 @@ export class UsageRecorder {
 
             this.record.screenshots.push({
                 time: new Date().getTime(),
-                path: screenshot
+                path: screenshot,
             });
         }
 
@@ -111,7 +111,8 @@ export class UsageRecorder {
             this.updateLastAppUsageInfo(this.lastUsingApp);
         }
 
-        if (!appName || !result) {
+        if (!appName || !result || !this.isRunning) {
+            // the app may have stopped, but the listener may still be invoked
             return;
         }
 
@@ -120,7 +121,7 @@ export class UsageRecorder {
             this.record.apps[appName] = {
                 appName,
                 spentTimeInHour: 0,
-                titleSpentTime: {}
+                titleSpentTime: {},
             };
         }
 
@@ -133,7 +134,7 @@ export class UsageRecorder {
     private updateLastAppUsageInfo = (lastAppName: string) => {
         const row = this.record.apps[lastAppName];
         if (!row) {
-            throw new Error(
+            console.error(
                 `App "${lastAppName}" does not exists in ${JSON.stringify(this.record.apps)}`
             );
         }
@@ -155,7 +156,7 @@ export class UsageRecorder {
             row.titleSpentTime[title] = {
                 index: this.maxIndex,
                 normalizedWeight: 0,
-                occurrence: 0
+                occurrence: 0,
             };
 
             this.maxIndex += 1;
