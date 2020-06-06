@@ -184,7 +184,7 @@ export const GridCalendar = React.memo((props: Props) => {
         gridMargin,
         gridHeight,
     ]);
-    if (chosenIndex) {
+    if (chosenIndex != null) {
         rects = rects.concat();
         rects[chosenIndex] = createRect(grids[chosenIndex], chosenIndex, true);
     }
@@ -258,3 +258,4 @@ export const GridCalendar = React.memo((props: Props) => {
 });
 
 GridCalendar.displayName = 'GridCalendar';
+export default GridCalendar;

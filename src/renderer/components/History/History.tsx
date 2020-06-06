@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, Col, Row, Select, Statistic } from 'antd';
 import { HistoryActionCreatorTypes, HistoryState } from './action';
-import { GridCalendar } from '../Visualization/GridCalendar';
+import { GridCalendar } from '../../../components/Visualization/GridCalendar/GridCalendar';
 import styled from 'styled-components';
 import { DualPieChart } from '../Visualization/DualPieChart';
 import { AggPomodoroInfo, getAggPomodoroInfo } from './op';

@@ -23,7 +23,9 @@
     "dist-mac": "npm run build && electron-builder --mac -p onTagOrDraft",
     "dist-linux": "npm run build && electron-builder --linux -p onTagOrDraft",
     "dist-all": "npm run build && electron-builder -mwl",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "style": "styleguidist server",
+    "style-pack": "webpack --config webpack.style.js "
   },
   "husky": {
     "hooks": {
@@ -85,8 +87,9 @@
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@babel/plugin-transform-runtime": "^7.5.5",
-    "@babel/polyfill": "^7.4.4",
+    "@babel/polyfill": "^7.10.1",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.8.3",
@@ -153,11 +156,14 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^12.2.0",
+    "react-docgen-typescript": "^1.16.5",
+    "react-docgen-typescript-loader": "^3.7.2",
     "react-dom": "^16.8.6",
     "react-hot-keys": "^2.4.4",
     "react-hot-loader": "^4.8.8",
     "react-redux": "^7.0.3",
     "react-stack-grid": "^0.7.1",
+    "react-styleguidist": "^11.0.8",
     "react-test-renderer": "^16.8.6",
     "react-trend": "zxch3n/react-trend",
     "redux": "^4.0.1",
