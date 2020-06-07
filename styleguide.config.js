@@ -196,16 +196,15 @@ module.exports = {
     webpackConfig: require('./webpack.style.js'),
     sections: [
         {
-            name: 'Components',
+            name: 'Visualization',
             components: () => [
-                path.resolve(__dirname, 'src/components/**/', '*.tsx'),
+                path.resolve(__dirname, 'src/components/Visualization/**/', '*.tsx'),
             ],
         },
         {
-            name: 'Visualization',
+            name: 'Components',
             components: () => [
-                path.resolve(__dirname, 'src/components/Trend', 'Trend.tsx'),
-                path.resolve(__dirname, 'src/components/Timer', 'Timer.tsx'),
+                path.resolve(__dirname, 'src/components/common/**/', '*.tsx'),
             ],
         },
     ],

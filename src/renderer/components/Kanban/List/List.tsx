@@ -136,7 +136,7 @@ export const List: FC<Props> = React.memo((props: Props) => {
         return visibleCards_;
     }, [props._id, searchReg, props.cardsState, cards]);
 
-    const filteredCards = visibleCards || props.cards;
+    const filteredCards = visibleCards || props.cards || [];
     const [estimatedTimeSum, actualTimeSum] = React.useMemo(
         () =>
             filteredCards.reduce(

@@ -96,10 +96,6 @@ export const uiStateNames = [
     'iBreak',
 ];
 
-if (__DEV__) {
-    defaultState.currentTab = 'analyser';
-}
-
 export const startTimer = createActionCreator('[Timer]START_TIMER');
 export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');

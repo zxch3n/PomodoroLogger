@@ -144,19 +144,6 @@ class Application extends React.Component<Props> {
                     >
                         <Setting />
                     </TabPane>
-                    {process.env.NODE_ENV !== 'production' ? (
-                        <TabPane
-                            tab={
-                                <span>
-                                    <Icon type="bar-chart" />
-                                    Analyser
-                                </span>
-                            }
-                            key="analyser"
-                        >
-                            <Analyser />
-                        </TabPane>
-                    ) : undefined}
                 </Tabs>
                 <UserGuide />
                 <UpdateController />

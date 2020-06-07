@@ -15,10 +15,10 @@ import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { ListsCountBar } from '../../Visualization/Bar';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
-import { Pin } from '../../Visualization/Pin';
 import { Card, KanbanBoard, ListsState } from '../type';
 import { memorizeDispatchToProps } from '../../../utils';
 import { PlayPauseButton } from './PlayPauseButton';
+import { Pin } from '../../../../components/common/Pin/Pin';
 
 const BriefCard = styled.div`
     word-break: break-word;

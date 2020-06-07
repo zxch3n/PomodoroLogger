@@ -3,7 +3,6 @@ import { Card, Col, Row, Select, Statistic } from 'antd';
 import { HistoryActionCreatorTypes, HistoryState } from './action';
 import { GridCalendar } from '../../../components/Visualization/GridCalendar/GridCalendar';
 import styled from 'styled-components';
-import { DualPieChart } from '../Visualization/DualPieChart';
 import { AggPomodoroInfo, getAggPomodoroInfo } from './op';
 import { WordCloud } from '../Visualization/WordCloud';
 import { KanbanBoardState } from '../Kanban/Board/action';
@@ -18,6 +17,7 @@ import { PomodoroDot } from '../Visualization/PomodoroDot';
 import { TimeBadge } from '../Kanban/Card/Badge';
 import { workers } from '../../workers';
 import { Card as CardState } from '../Kanban/type';
+import { DualPieChart } from '../../../components/Visualization/DualPieChart';
 
 const { Option } = Select;
 

@@ -57,7 +57,7 @@ export const Pin: React.FC<Props> = (props: Props) => {
                 style={{
                     transform: `rotate(${(props.isPin ? 0 : 45) + (isHover ? 8 : 0)}deg)`,
                     transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    opacity: isRounded || props.isPin || isHover || props.isHover ? 1 : 0
+                    opacity: isRounded || props.isPin || isHover || props.isHover ? 1 : 0,
                 }}
             />
         </C>
