@@ -35,21 +35,21 @@ interface BarProps {
 
 export const Bar: React.FC<BarProps> = (props: BarProps) => {
     const { height = '100%' } = props;
-    const ref = useRef<SVGElement>();
+    const ref = useRef<any>(null);
     const [maxItemInCol, setMaxItemInCol] = useState(20);
     const [w2h, setW2H] = useState(1);
     const minHeightInPixel = 4;
     useEffect(() => {
-        if (ref.current === undefined) return;
+        if (ref.current == null) return;
         const lis = () => {
-            if (ref.current === undefined) return;
+            if (ref.current == null) return;
             setMaxItemInCol(Math.floor(ref.current.clientHeight / minHeightInPixel));
             setW2H(ref.current.clientWidth / ref.current.clientHeight);
         };
         ref.current.addEventListener('resize', lis);
         lis();
         return () => {
-            if (ref.current === undefined) return;
+            if (ref.current == null) return;
             ref.current.removeEventListener('resize', lis);
         };
     }, []);

@@ -635,6 +635,10 @@ class Timer extends Component<Props, State> {
             this.monitor.start();
         }
 
+        if (__DEV__) {
+            timeInMinutes = 1 / 60;
+        }
+
         this.extendedTimeInMinute += timeInMinutes;
         this.props.extendCurrentSession(timeInMinutes * 60);
         this.setState({ showMask: false });
