@@ -533,11 +533,11 @@ class Timer extends Component<Props, State> {
             this.monitor = undefined;
         }
 
-        this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
         if (this.stagedSession === undefined) {
             // Resting session
             await this.props.timerFinished();
         } else {
+            this.setState({ pomodoroNum: this.state.pomodoroNum + 1 });
             this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
             this.extendedTimeInMinute = 0;
             if (this.props.timer.boardId !== undefined) {
