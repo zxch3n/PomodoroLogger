@@ -1,14 +1,10 @@
-import dbs from '../dbs';
-import { promisify } from 'util';
+import { workers } from '../workers';
 import { PomodoroRecord } from './type';
 import { dbBaseDir } from '../../config';
 import * as fs from 'fs';
 import nedb from 'nedb';
 
-const [find, insert, remove] = [dbs.sessionDB.find, dbs.sessionDB.insert, dbs.sessionDB.remove].map(
-    m => promisify(m.bind(dbs.sessionDB))
-);
-
+const dbWorkers = workers.dbWorkers;
 export function renameIllegalName(record: PomodoroRecord) {
     for (const app in record.apps) {
         const appRow = record.apps[app];
@@ -63,23 +59,26 @@ export async function addSession(record: PomodoroRecord) {
         // TODO: invoke ML inference
     }
     // @ts-ignore
-    await insert(record).catch(err => console.error(err));
+    await dbWorkers.sessionDB.insert(record).catch((err) => console.error(err));
 }
 
 export async function removeSession(startTime: number) {
     // @ts-ignore
-    await remove({ startTime });
+    await dbWorkers.sessionDB.remove({ startTime });
 }
 
 export async function getTodaySessions(): Promise<PomodoroRecord[]> {
     const todayStartTime = new Date(new Date().toDateString()).getTime();
-    // @ts-ignore
-    return ((await find({ startTime: { $gt: todayStartTime } })) as unknown) as PomodoroRecord[];
+    const ans = ((await dbWorkers.sessionDB.find(
+        { startTime: { $gt: todayStartTime } },
+        {}
+    )) as unknown) as PomodoroRecord[];
+    return ans;
 }
 
 export async function getAllSession(): Promise<PomodoroRecord[]> {
     // @ts-ignore
-    return (await find({})) as PomodoroRecord[];
+    return (await dbWorkers.sessionDB.find({}, {})) as PomodoroRecord[];
 }
 
 export async function loadDB(path: string): Promise<nedb> {
@@ -87,7 +86,7 @@ export async function loadDB(path: string): Promise<nedb> {
     return new Promise((resolve, reject) => {
         let times = 0;
         const load = () => {
-            db.loadDatabase(err => {
+            db.loadDatabase((err) => {
                 if (!err) {
                     resolve(db);
                     return;
@@ -111,7 +110,7 @@ export function loadDBSync(path: string) {
     const db = new nedb({ filename: path });
     let times = 0;
     const load = () => {
-        db.loadDatabase(err => {
+        db.loadDatabase((err) => {
             if (!err) {
                 return;
             }
@@ -149,21 +148,6 @@ export async function deleteAllUserData() {
     if (fs.existsSync(dbBaseDir)) {
         deleteFolderRecursive(dbBaseDir);
     }
-}
-
-/* istanbul ignore next */
-export async function exportDBData() {
-    const [projectDB, sessionDB, settingDB] = await Promise.all([
-        promisify(dbs.projectDB.find.bind(dbs.projectDB, {}, {}))(),
-        promisify(dbs.sessionDB.find.bind(dbs.sessionDB, {}, {}))(),
-        promisify(dbs.settingDB.find.bind(dbs.settingDB, {}, {}))()
-    ]);
-
-    return {
-        projectDB,
-        sessionDB,
-        settingDB
-    };
 }
 
 export function getIndexToTitleApp(record: PomodoroRecord): [string, string][] {

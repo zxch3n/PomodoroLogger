@@ -2,15 +2,11 @@ import React from 'react';
 import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
 import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
-import { deleteAllUserData, exportDBData } from '../../monitor/sessionManager';
-import { writeFile } from 'fs';
+import { deleteAllUserData } from '../../monitor/sessionManager';
 import { shell, remote, app } from 'electron';
-import { promisify } from 'util';
 import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
 import pkg from '../../../../package.json';
-
-const dialog = remote.dialog;
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -148,25 +144,6 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
             });
         }
 
-        async function onExportingData() {
-            const { canceled, filePath } = await dialog.showSaveDialog(remote.getCurrentWindow(), {
-                title: 'Pomodoro Data Export',
-                defaultPath: 'pomodoroDB.dat',
-                filters: [
-                    {
-                        name: 'Data File',
-                        extensions: ['dat'],
-                    },
-                ],
-            });
-
-            if (!canceled && filePath) {
-                const data = await exportDBData();
-                await promisify(writeFile)(filePath, JSON.stringify(data), { encoding: 'utf-8' });
-                message.success('Data Exported');
-            }
-        }
-
         function openIssuePage() {
             shell.openExternal('https://github.com/zxch3n/PomodoroLogger/issues/new');
         }
@@ -256,10 +233,6 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                 />
 
                 <h4>Data Management</h4>
-                <ButtonWrapper>
-                    <Button onClick={onExportingData}>Export Data</Button>
-                    <br />
-                </ButtonWrapper>
                 <ButtonWrapper>
                     <Popconfirm title={'Sure to delete?'} onConfirm={onDeleteData}>
                         <Button type="danger">Delete All Data</Button>

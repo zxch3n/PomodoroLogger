@@ -538,7 +538,6 @@ class Timer extends Component<Props, State> {
             // Resting session
             await this.props.timerFinished();
         } else {
-            restartDBWorkers();
             this.stagedSession.spentTimeInHour += this.extendedTimeInMinute / 60;
             this.extendedTimeInMinute = 0;
             if (this.props.timer.boardId !== undefined) {
