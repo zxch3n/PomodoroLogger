@@ -3,7 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import { message } from 'antd';
 import { actions } from '../Timer/action';
 import { PomodoroRecord } from '../../monitor/type';
-import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
+import { EfficiencyAnalyser } from '../../../shared/efficiency/efficiency';
 import { ColorEncoder } from './ColorEncoder';
 import { cloneDeep } from 'lodash';
 import { connect } from 'react-redux';
@@ -100,39 +100,39 @@ const getLinkAndNode = (
         name: 'Focused',
         itemStyle: {
             color: '#34cb23',
-            borderColor: '#34cb23'
+            borderColor: '#34cb23',
         },
         label: {
-            fontWeight: 700
-        }
+            fontWeight: 700,
+        },
     });
     nodes.push({
         name: 'Distracted',
         itemStyle: {
             color: '#55409c',
-            borderColor: '#55409c'
+            borderColor: '#55409c',
         },
         label: {
-            fontWeight: 700
-        }
+            fontWeight: 700,
+        },
     });
     const colorEncoder = new ColorEncoder();
     for (const app in record.apps) {
         const _app = record.apps[app];
         const color = colorEncoder.getAColor();
         let appKey = app[0].toUpperCase() + app.slice(1);
-        while (nodes.find(v => v.name === appKey)) {
+        while (nodes.find((v) => v.name === appKey)) {
             appKey += '[App]';
         }
         nodes.push({
             name: appKey,
             label: {
-                fontWeight: 700
+                fontWeight: 700,
             },
             itemStyle: {
                 color,
-                borderColor: color
-            }
+                borderColor: color,
+            },
         });
         for (const title in _app.titleSpentTime) {
             const new_title = title.replace(/-,-/g, '.');
@@ -145,7 +145,7 @@ const getLinkAndNode = (
             }
 
             const _title = _app.titleSpentTime[title];
-            while (nodes.find(v => v.name === key)) {
+            while (nodes.find((v) => v.name === key)) {
                 key += '.';
             }
             const value = getStayTimeSum(_title.index);
@@ -154,7 +154,7 @@ const getLinkAndNode = (
                 name: key,
                 label: {
                     show: value > 30,
-                    fontSize: 12
+                    fontSize: 12,
                 },
                 tooltip: {
                     formatter: (params: any) => {
@@ -174,13 +174,13 @@ const getLinkAndNode = (
                             `${source} --- ${target}: ${dataValue.toFixed(1)}`,
                             '<br/>'
                         );
-                    }
-                }
+                    },
+                },
             });
             links.push({
                 value,
                 source: appKey,
-                target: key
+                target: key,
             });
 
             if (!showSwitch) {
@@ -188,13 +188,13 @@ const getLinkAndNode = (
                     links.push({
                         target: 'Distracted',
                         source: key,
-                        value: getStayTimeSum(_title.index)
+                        value: getStayTimeSum(_title.index),
                     });
                 } else {
                     links.push({
                         target: 'Focused',
                         source: key,
-                        value: getStayTimeSum(_title.index)
+                        value: getStayTimeSum(_title.index),
                     });
                 }
             }
@@ -209,25 +209,25 @@ const getLinkAndNode = (
             nodes.push({
                 name,
                 label: {
-                    show: false
-                }
+                    show: false,
+                },
             });
             links.push({
                 source: titleKey,
                 target: name,
-                value: record.stayTimeInSecond![i]
+                value: record.stayTimeInSecond![i],
             });
             if (efficiencyAnalyser.getIsDistracting(app, title)) {
                 links.push({
                     target: 'Distracted',
                     source: name,
-                    value: record.stayTimeInSecond![i]
+                    value: record.stayTimeInSecond![i],
                 });
             } else {
                 links.push({
                     target: 'Focused',
                     source: name,
-                    value: record.stayTimeInSecond![i]
+                    value: record.stayTimeInSecond![i],
                 });
             }
         }
@@ -235,7 +235,7 @@ const getLinkAndNode = (
 
     return {
         nodes,
-        links
+        links,
     };
 };
 
@@ -243,11 +243,11 @@ const getOption = (props: Props) => {
     const data = getLinkAndNode(props.record!, props.efficiencyAnalyser, props.showSwitch);
     return {
         title: {
-            text: ''
+            text: '',
         },
         tooltip: {
             trigger: 'item',
-            triggerOn: 'mousemove'
+            triggerOn: 'mousemove',
         },
         series: [
             {
@@ -260,62 +260,62 @@ const getOption = (props: Props) => {
                         depth: 0,
                         lineStyle: {
                             color: 'source',
-                            opacity: 0.6
-                        }
+                            opacity: 0.6,
+                        },
                     },
                     {
                         depth: 1,
                         itemStyle: {
                             color: '#b48ee3',
-                            borderColor: '#b48ee3'
+                            borderColor: '#b48ee3',
                         },
                         lineStyle: {
                             color: 'target',
-                            opacity: 0.6
-                        }
+                            opacity: 0.6,
+                        },
                     },
                     {
                         depth: 2,
                         itemStyle: {
                             color: '#abe38f',
-                            borderColor: '#abe38f'
+                            borderColor: '#abe38f',
                         },
                         lineStyle: {
                             color: 'target',
-                            opacity: 0.6
-                        }
+                            opacity: 0.6,
+                        },
                     },
                     {
                         depth: 3,
                         lineStyle: {
                             color: 'target',
-                            opacity: 0.6
-                        }
-                    }
+                            opacity: 0.6,
+                        },
+                    },
                 ],
                 label: {
                     normal: {
                         textStyle: {
                             color: 'rgba(0,0,0,0.7)',
                             fontFamily: 'Arial',
-                            fontSize: 14
-                        }
-                    }
+                            fontSize: 14,
+                        },
+                    },
                 },
                 lineStyle: {
                     normal: {
                         color: 'target',
-                        curveness: 0.5
-                    }
+                        curveness: 0.5,
+                    },
                 },
                 itemStyle: {
                     normal: {
                         color: '#1f77b4',
-                        borderColor: '#1f77b4'
-                    }
-                }
-            }
-        ]
+                        borderColor: '#1f77b4',
+                    },
+                },
+            },
+        ],
     };
 };
 
@@ -365,7 +365,7 @@ export const PomodoroSankey = (props: Props) => {
                     style={{
                         width,
                         height: 'calc(100vh - 140px)',
-                        minHeight: '640px'
+                        minHeight: '640px',
                     }}
                 />
             </InnerContainer>
@@ -384,10 +384,10 @@ export const ConnectedPomodoroSankey = connect(
                 state.timer.distractingList.concat(boardDistractingList)
             ),
             record: state.timer.chosenRecord,
-            boardName: board ? board.name : undefined
+            boardName: board ? board.name : undefined,
         };
     },
-    dispatch => ({
-        cancel: () => dispatch(actions.setChosenRecord(undefined))
+    (dispatch) => ({
+        cancel: () => dispatch(actions.setChosenRecord(undefined)),
     })
 )(PomodoroSankey);

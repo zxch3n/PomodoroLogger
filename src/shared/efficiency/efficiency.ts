@@ -1,5 +1,5 @@
-import { PomodoroRecord, TitleSpentTimeDict } from '../renderer/monitor/type';
-import { DistractingRow } from '../renderer/components/Timer/action';
+import { PomodoroRecord, TitleSpentTimeDict } from '../../renderer/monitor/type';
+import { DistractingRow } from '../../renderer/components/Timer/action';
 import { cloneDeep } from 'lodash';
 
 export const EFFICIENCY_INC_RATE = 1 / 90;
@@ -72,8 +72,8 @@ export class EfficiencyAnalyser {
     }
 
     init(appTitleRegs: DistractingRow[]) {
-        this.appRegs = appTitleRegs.map(v => (v.app ? new RegExp(v.app, 'i') : undefined));
-        this.titleRegs = appTitleRegs.map(v => (v.title ? new RegExp(v.title, 'i') : undefined));
+        this.appRegs = appTitleRegs.map((v) => (v.app ? new RegExp(v.app, 'i') : undefined));
+        this.titleRegs = appTitleRegs.map((v) => (v.title ? new RegExp(v.title, 'i') : undefined));
         this.bk = appTitleRegs;
     }
 

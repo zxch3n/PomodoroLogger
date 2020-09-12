@@ -2,7 +2,7 @@ import { Timeline } from 'antd';
 import * as React from 'react';
 import { PomodoroRecord } from '../../monitor/type';
 import { getIndexToTitleApp } from '../../monitor/sessionManager';
-import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
+import { EfficiencyAnalyser } from '../../../shared/efficiency/efficiency';
 import { to2digits } from '../../utils';
 
 interface Props {

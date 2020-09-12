@@ -25,7 +25,7 @@ import Board from '../Kanban/Board';
 import { HelpIcon } from '../UserGuide/HelpIcon';
 import dingMp3 from '../../../res/ding.mp3';
 import ReactHotkeys from 'react-hot-keys';
-import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
+import { EfficiencyAnalyser } from '../../../shared/efficiency/efficiency';
 import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
 import { waitUntil } from './wait';

@@ -1,4 +1,4 @@
-import { DistractingRow } from '../Timer/action';
+import type { DistractingRow } from '../Timer/action';
 
 export interface Card {
     _id: string;
@@ -44,3 +44,10 @@ export interface List {
 }
 
 export type ListsState = { [_id: string]: List };
+
+export interface MoveInfo {
+    fromListId: string;
+    toListId: string;
+    cardId: string;
+    time: number;
+}

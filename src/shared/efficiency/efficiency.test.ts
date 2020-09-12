@@ -2,9 +2,9 @@ import {
     EfficiencyAnalyser,
     compressArray,
     getEfficiency,
-    EFFICIENCY_INC_RATE
+    EFFICIENCY_INC_RATE,
 } from './efficiency';
-import { createRecord } from '../../test/utils';
+import { createRecord } from '../../../test/utils';
 
 describe('Efficiency Analysis', () => {
     it('compress arr correctly', () => {
@@ -54,7 +54,7 @@ describe('EfficiencyAnalyser', () => {
         record.apps['Facebook'].titleSpentTime['a'] = {
             occurrence: 1,
             normalizedWeight: 1,
-            index: 0
+            index: 0,
         };
         record.stayTimeInSecond = [3600 * 100];
         record.switchActivities = [0];
@@ -64,7 +64,7 @@ describe('EfficiencyAnalyser', () => {
         record.apps['assbook'].titleSpentTime['a'] = {
             occurrence: 1,
             normalizedWeight: 1,
-            index: 0
+            index: 0,
         };
         record.stayTimeInSecond = [10 * 3600];
         record.switchActivities = [0];
@@ -74,22 +74,25 @@ describe('EfficiencyAnalyser', () => {
         record.apps.assbook.titleSpentTime['title'] = {
             occurrence: 1,
             normalizedWeight: 1,
-            index: 0
+            index: 0,
         };
         record.stayTimeInSecond = [10 * 3600];
         record.switchActivities = [0];
         expect(ef.analyse(record)).toBe(0);
 
-        record = createRecord('aa', 10, [['assbook', 10], ['bb', 0]]);
+        record = createRecord('aa', 10, [
+            ['assbook', 10],
+            ['bb', 0],
+        ]);
         record.apps.assbook.titleSpentTime['bb'] = {
             occurrence: 1,
             normalizedWeight: 0.5,
-            index: 0
+            index: 0,
         };
         record.apps.assbook.titleSpentTime['title'] = {
             occurrence: 1,
             normalizedWeight: 0.5,
-            index: 1
+            index: 1,
         };
         record.stayTimeInSecond = [5 * 3600, 1 * 3600, 4 * 3600];
         record.switchActivities = [0, 1, 0];
@@ -102,17 +105,17 @@ describe('EfficiencyAnalyser', () => {
         record.apps.assbook.titleSpentTime['bb'] = {
             occurrence: 100,
             normalizedWeight: 0.3,
-            index: 0
+            index: 0,
         };
         record.apps.assbook.titleSpentTime['title'] = {
             occurrence: 100,
             normalizedWeight: 0.3,
-            index: 1
+            index: 1,
         };
         record.apps.assbook.titleSpentTime['aa'] = {
             occurrence: 100,
             normalizedWeight: 0.4,
-            index: 2
+            index: 2,
         };
         record.stayTimeInSecond = [5 * 3600, 5 * 3600, 5 * 3600];
         record.switchActivities = [0, 1, 2];
@@ -125,26 +128,29 @@ describe('EfficiencyAnalyser', () => {
         for (let i = 0; i < 10000; i += 1) {
             ef.update([{ app: 'facebook' }, { title: 'biubiu' }]);
         }
-        const record = createRecord('aa', 10, [['assbook', 10], ['facebook', 20]]);
+        const record = createRecord('aa', 10, [
+            ['assbook', 10],
+            ['facebook', 20],
+        ]);
         record.apps.assbook.titleSpentTime['biubiu 0'] = {
             occurrence: 100,
             normalizedWeight: 0.25,
-            index: 0
+            index: 0,
         };
         record.apps.assbook.titleSpentTime['title'] = {
             occurrence: 100,
             normalizedWeight: 0.25,
-            index: 1
+            index: 1,
         };
         record.apps.assbook.titleSpentTime['biubiu'] = {
             occurrence: 100,
             normalizedWeight: 0.25,
-            index: 2
+            index: 2,
         };
         record.apps.facebook.titleSpentTime['lala'] = {
             index: 3,
             occurrence: 100,
-            normalizedWeight: 0.25
+            normalizedWeight: 0.25,
         };
         record.stayTimeInSecond = [5 * 3600, 5 * 3600, 5 * 3600, 5 * 3600];
         record.switchActivities = [0, 1, 2, 3];

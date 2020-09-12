@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { PomodoroRecord } from '../../monitor/type';
 import { getIndexToTitleApp } from '../../monitor/sessionManager';
-import { EfficiencyAnalyser } from '../../../efficiency/efficiency';
+import { EfficiencyAnalyser } from '../../../shared/efficiency/efficiency';
 import { ColorScheme } from './ColorEncoder';
 import { formatTimeHMS } from './Timeline';
 
@@ -43,7 +43,7 @@ function getState(props: Props): Row[] {
             isDistracting,
             time,
             ratio: stay / props.record.spentTimeInHour / 3600,
-            activityIndex: index
+            activityIndex: index,
         });
 
         time += stay;
