@@ -7,8 +7,6 @@ export enum IpcEventName {
     DownloadUpdate = 'download-update',
     ExportData = 'export-data',
     ImportData = 'import-data',
-    ReleaseDB = 'release-db',
-    LoadDB = 'load-db',
 }
 
 export enum WorkerMessageType {

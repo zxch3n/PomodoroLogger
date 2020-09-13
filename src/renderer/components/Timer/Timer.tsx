@@ -16,7 +16,7 @@ import { getTodaySessions } from '../../monitor/sessionManager';
 import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
 import { PomodoroNumView } from './PomodoroNumView';
 import { PomodoroRecord } from '../../monitor/type';
-import { restartDBWorkers, workers } from '../../workers';
+import { workers } from '../../workers';
 import { TimerMask } from './SessionEndingMask';
 import { __DEV__, DEBUG_TIME_SCALE } from '../../../config';
 import { AsyncWordCloud } from '../Visualization/WordCloud';

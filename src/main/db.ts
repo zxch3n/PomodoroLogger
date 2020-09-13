@@ -71,7 +71,7 @@ export async function compact() {
         (db) =>
             new Promise((r) => {
                 db.once('compaction.done', r);
-                (db as nedb).persistence.compactDatafile(r);
+                (db as nedb).persistence.persistCachedDatabase(r);
             })
     );
 

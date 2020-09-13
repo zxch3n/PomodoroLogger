@@ -9,6 +9,7 @@ import { isShallowEqualByKeys } from '../../utils';
 import pkg from '../../../../package.json';
 import { IpcEventName } from '../../../main/ipc/type';
 import { refreshDbs, compact } from '../../../main/db';
+import { restartDBWorkers } from '../../workers';
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -288,14 +289,8 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 );
 
 async function onExportData() {
-    await ipcRenderer.invoke(IpcEventName.ReleaseDB);
-    console.log('RELEASE');
     await refreshDbs();
-    console.log('REFRESH');
-    await ipcRenderer.invoke(IpcEventName.LoadDB);
-    console.log('LOAD');
     await ipcRenderer.invoke(IpcEventName.ExportData);
-    console.log('DONE');
 }
 
 async function onImportData() {

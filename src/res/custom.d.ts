@@ -273,6 +273,15 @@ interface Window {
 
 declare namespace Nedb {
     interface Persistence {
-        compactDatafile(cb: () => void): void;
+        persistCachedDatabase(cb: () => void): void;
+        closeDatabase(cb: () => void): void;
     }
+
+    interface Datastore {
+        closeDatabase(cb: () => void): void;
+    }
+}
+
+declare interface Nedb {
+    closeDatabase(cb: () => void): void;
 }
