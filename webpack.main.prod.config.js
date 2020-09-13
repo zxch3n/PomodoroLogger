@@ -10,6 +10,7 @@ if (!fs.existsSync('./webpack-visualization')) {
 
 // disable source-map in production build
 baseConfig.devtool = undefined;
+baseConfig.watch = false;
 module.exports = merge.smart(baseConfig, {
     mode: 'production',
     plugins: [
