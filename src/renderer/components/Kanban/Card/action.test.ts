@@ -21,7 +21,7 @@ describe("Cards' actions", () => {
             await promisify(mkdir)(dbBaseDir).catch(() => {});
         }
 
-        refreshDbs();
+        await refreshDbs();
     });
 
     it('add card', async () => {

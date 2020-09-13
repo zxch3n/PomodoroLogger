@@ -270,3 +270,9 @@ interface ResizeObserverEntryBoxSize {
 interface Window {
     ResizeObserver: typeof ResizeObserver;
 }
+
+declare namespace Nedb {
+    interface Persistence {
+        compactDatafile(cb: () => void): void;
+    }
+}

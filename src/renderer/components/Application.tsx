@@ -22,6 +22,8 @@ import { UpdateController } from './UpdateController';
 import { CardInDetail } from './Kanban/Card/CardEditor';
 import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
 import { DestroyOnTimeoutWrapper } from './DestroyOnTimeoutWrapper';
+import { IpcEventName } from '../../main/ipc/type';
+import { loadDBs } from '../dbs';
 
 const Main = styled.div`
     .ant-tabs-bar {
@@ -39,8 +41,11 @@ interface Props extends TimerActionTypes, HistoryActionCreatorTypes {
 
 class Application extends React.Component<Props> {
     componentDidMount(): void {
-        this.props.fetchSettings();
-        this.props.fetchKanban();
+        loadDBs().then(() => {
+            this.props.fetchSettings();
+            this.props.fetchKanban();
+        });
+
         setTrayImageWithMadeIcon(undefined).then();
         window.addEventListener('error', this.onError);
     }
@@ -57,7 +62,7 @@ class Application extends React.Component<Props> {
                 remote.getCurrentWebContents().openDevTools({ activate: true, mode: 'detach' });
                 break;
             case 'ctrl+q':
-                ipcRenderer.send('quit-app', 'quit');
+                ipcRenderer.send(IpcEventName.Quit, 'quit');
                 break;
         }
     };
@@ -69,7 +74,7 @@ class Application extends React.Component<Props> {
     onError = (event: ErrorEvent) => this.handleError(event.error);
     handleError = (err: Error) => {
         if (process.env.NODE_ENV === 'production') {
-            ipcRenderer.send('restart-app', 'error');
+            ipcRenderer.send(IpcEventName.Restart, 'error');
         }
     };
 

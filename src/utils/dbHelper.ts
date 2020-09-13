@@ -43,4 +43,8 @@ export class AsyncDB {
     async remove(...args: any) {
         return await this.promisify(this.db.remove)(...args);
     }
+
+    async getAll(): Promise<any> {
+        return await this.promisify(this.db.getAllData)();
+    }
 }

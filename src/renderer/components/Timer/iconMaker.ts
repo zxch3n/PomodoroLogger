@@ -1,5 +1,6 @@
 import AppIcon from '../../../res/icon.png';
 import { ipcRenderer } from 'electron';
+import { IpcEventName } from '../../../main/ipc/type';
 
 function drawText(ctx: CanvasRenderingContext2D, isMac: boolean, size: number, leftTime: string) {
     ctx.fillStyle = 'white';
@@ -121,5 +122,5 @@ export async function setTrayImageWithMadeIcon(
     isPause?: boolean
 ) {
     const src = await makeIcon(leftTime, progress, isFocus, isPause);
-    ipcRenderer.send('set-tray', src);
+    ipcRenderer.send(IpcEventName.SetTray, src);
 }

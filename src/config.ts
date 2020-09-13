@@ -14,8 +14,10 @@ if (!existsSync(baseDir)) {
 }
 
 const dbDir = process.env.NODE_ENV !== 'test' ? 'db' : '__test__db';
+const dbBkDir = process.env.NODE_ENV !== 'test' ? 'db-bk' : '__test__db-bk';
 const scDir = process.env.NODE_ENV !== 'test' ? 'screenshots' : '__test__screenshots';
 export const dbBaseDir = process.env.NODE_ENV === 'production' ? join(baseDir, dbDir) : dbDir;
+export const dbBkBaseDir = process.env.NODE_ENV === 'production' ? join(baseDir, dbBkDir) : dbBkDir;
 export const screenshotDir = process.env.NODE_ENV === 'production' ? join(baseDir, scDir) : scDir;
 
 if (!existsSync(dbBaseDir)) {
@@ -33,7 +35,7 @@ export const dbPaths = {
     kanbanDB: join(dbBaseDir, 'kanban.nedb'),
     cardsDB: join(dbBaseDir, 'cards.nedb'),
     listsDB: join(dbBaseDir, 'lists.nedb'),
-    moveDB: join(dbBaseDir, 'moveCard.nedb')
+    moveDB: join(dbBaseDir, 'moveCard.nedb'),
 };
 
 if (process.env.NODE_ENV === 'test') {
@@ -61,11 +63,11 @@ if (dir.endsWith('.asar')) {
 
 export const env = {
     electronAsarDir: asarDirName ? join(asarDirName, 'electron.asar') : undefined,
-    appAsarDir: asarDirName ? join(asarDirName, 'app.asar') : undefined
+    appAsarDir: asarDirName ? join(asarDirName, 'app.asar') : undefined,
 };
 
 export const modelPath = {
-    knnPath: join(dbBaseDir, 'modelKnn.json')
+    knnPath: join(dbBaseDir, 'modelKnn.json'),
 };
 
 export const DEBUG_TIME_SCALE = 120;

@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
 import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
 import { deleteAllUserData } from '../../monitor/sessionManager';
-import { shell, remote, app } from 'electron';
+import { shell, app, ipcRenderer } from 'electron';
 import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
 import pkg from '../../../../package.json';
+import { IpcEventName } from '../../../main/ipc/type';
+import { refreshDbs, compact } from '../../../main/db';
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -71,6 +73,8 @@ const settingUiStates = [
 interface Props extends TimerState, TimerActionTypes {}
 export const Setting: React.FunctionComponent<Props> = React.memo(
     (props: Props) => {
+        const [importing, setImporting] = useState(false);
+        const [exporting, setExporting] = useState(false);
         const onChangeFocus = React.useCallback((v: number | [number, number]) => {
             if (v instanceof Array) {
                 return;
@@ -128,7 +132,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
             }
         }, []);
 
-        const setUseHardwareAcceleration = React.useCallback((v: boolean) => {
+        const setUseHardwareAcceleration = useCallback((v: boolean) => {
             props.setUseHardwareAcceleration(v);
             notification.open({
                 message: 'Restart App to Apply Changes',
@@ -138,19 +142,26 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
             });
         }, []);
 
-        function onDeleteData() {
+        const onDeleteData = useCallback(() => {
             deleteAllUserData().then(() => {
                 message.info('All user data is removed. Pomodoro needs to restart.');
+                setTimeout(() => {
+                    ipcRenderer.send(IpcEventName.Restart);
+                }, 3000);
             });
-        }
+        }, [deleteAllUserData]);
 
-        function openIssuePage() {
-            shell.openExternal('https://github.com/zxch3n/PomodoroLogger/issues/new');
-        }
+        const onImportClick = useCallback(async () => {
+            setImporting(true);
+            await onImportData();
+            setImporting(false);
+        }, []);
 
-        function openGithubPage() {
-            shell.openExternal('https://github.com/zxch3n/PomodoroLogger');
-        }
+        const onExportClick = useCallback(async () => {
+            setExporting(true);
+            await onExportData();
+            setExporting(false);
+        }, []);
 
         return (
             <Container>
@@ -234,6 +245,19 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 
                 <h4>Data Management</h4>
                 <ButtonWrapper>
+                    <Button onClick={onExportClick} loading={exporting}>
+                        Export Data
+                    </Button>
+                </ButtonWrapper>
+                <ButtonWrapper>
+                    <Popconfirm
+                        title={'Pomodoro Logger will restart after importing. Continue?'}
+                        onConfirm={onImportClick}
+                    >
+                        <Button loading={importing}>Import Data</Button>
+                    </Popconfirm>
+                </ButtonWrapper>
+                <ButtonWrapper>
                     <Popconfirm title={'Sure to delete?'} onConfirm={onDeleteData}>
                         <Button type="danger">Delete All Data</Button>
                     </Popconfirm>
@@ -262,3 +286,27 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
         return isShallowEqualByKeys(prevProps, nextProps, settingUiStates);
     }
 );
+
+async function onExportData() {
+    await ipcRenderer.invoke(IpcEventName.ReleaseDB);
+    console.log('RELEASE');
+    await refreshDbs();
+    console.log('REFRESH');
+    await ipcRenderer.invoke(IpcEventName.LoadDB);
+    console.log('LOAD');
+    await ipcRenderer.invoke(IpcEventName.ExportData);
+    console.log('DONE');
+}
+
+async function onImportData() {
+    await refreshDbs();
+    await ipcRenderer.invoke(IpcEventName.ImportData);
+}
+
+function openIssuePage() {
+    shell.openExternal('https://github.com/zxch3n/PomodoroLogger/issues/new');
+}
+
+function openGithubPage() {
+    shell.openExternal('https://github.com/zxch3n/PomodoroLogger');
+}
