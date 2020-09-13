@@ -14,6 +14,10 @@ if (remote) {
     loadDBs = utils.loadDBs;
 }
 
+if (process.env.NODE_ENV === 'test') {
+    loadDBs();
+}
+
 // @ts-ignore
 if (!dbs) {
     dbs = DBs;

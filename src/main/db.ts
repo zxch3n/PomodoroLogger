@@ -28,7 +28,6 @@ export async function loadDBs() {
                             return;
                         }
 
-                        console.error(err);
                         if (times > 20) {
                             reject(
                                 `Cannot load database ${db} after 10 times tries. (${err.toString()})`
@@ -52,6 +51,7 @@ export async function loadDBs() {
 }
 
 export async function refreshDbs() {
+    await compact();
     DBs = {
         projectDB: new nedb({ filename: projectDB }),
         sessionDB: new nedb({ filename: sessionDB }),

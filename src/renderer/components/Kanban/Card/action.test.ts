@@ -6,7 +6,6 @@ import shortid from 'shortid';
 import { AsyncDB } from '../../../../utils/dbHelper';
 import dbs, { refreshDbs } from '../../../dbs';
 import { Dispatch } from 'redux';
-import { boardReducer } from '../Board/action';
 import { Card } from '../type';
 
 const db = new AsyncDB(dbs.cardsDB);
