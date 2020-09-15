@@ -8,8 +8,9 @@ import Card from '../Card';
 import { Button, Dropdown, Icon, Input, Menu, message, Popconfirm, Tooltip } from 'antd';
 import { KanbanActionTypes } from '../action';
 import { CardsState } from '../Card/action';
-import { thinScrollBar } from '../../../style/scrollbar';
 import { List as ListType } from '../type';
+import { mergeRefs } from '../../../utils';
+import { throttle, debounce } from 'lodash';
 
 const Container = styled.div`
     padding: 4px;
@@ -58,6 +59,7 @@ const BeforePlaceHolder = styled.div`
     top: -2px;
     width: 100%;
     height: 0.6rem;
+    margin-bottom: 10px;
     background: linear-gradient(
         rgba(222, 222, 222, 1),
         rgba(222, 222, 222, 0.001)
@@ -67,6 +69,7 @@ const BeforePlaceHolder = styled.div`
 
 const AfterPlaceHolder = styled.div`
     content: '';
+    margin-top: 20px;
     position: sticky;
     display: block;
     bottom: -2px;
@@ -79,16 +82,53 @@ const AfterPlaceHolder = styled.div`
     pointer-events: none;
 `;
 
-const Cards = styled.div`
+interface CardsProps {
+    displayScrollbar: boolean;
+}
+
+const displayScrollbarFn = ({ displayScrollbar }: CardsProps) => {
+    if (displayScrollbar) {
+        return `
+            color: rgba(0, 0, 0, 0.2);
+            transition: color 250ms;
+        `;
+    }
+
+    return `
+        color: rgba(0, 0, 0, 0);
+        transition: color 250ms;
+    `;
+};
+
+const Cards = styled.div<CardsProps>`
     position: relative;
     padding: 0 0 0 2px;
     background-color: #dedede;
     border-radius: 4px;
     max-height: calc(100vh - 230px);
-    overflow-y: scroll;
+    overflow-y: overlay;
     min-height: 200px;
     max-width: 270px;
-    ${thinScrollBar}
+    & > * {
+        color: black;
+    }
+
+    ${displayScrollbarFn} ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    ::-webkit-scrollbar-track {
+        width: 4px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        box-shadow: inset 0 0 0 10px;
+        width: 4px;
+        border-radius: 4px;
+    }
 `;
 
 const ButtonWrapper = styled.div`
@@ -116,6 +156,29 @@ interface Props extends ListType, InputProps, ListActionTypes, KanbanActionTypes
 
 export const List: FC<Props> = React.memo((props: Props) => {
     const { focused = false, searchReg, cards, cardsState, done = false } = props;
+    const cardListRef = React.useRef<HTMLElement>(null);
+    const [showScrollBar, setShowScrollBar] = useState(true);
+    React.useEffect(() => {
+        if (!cardListRef.current) {
+            return;
+        }
+
+        const hideScrollBar = debounce(() => {
+            setShowScrollBar(false);
+        }, 600);
+
+        const onScroll = throttle(() => {
+            setShowScrollBar(true);
+            hideScrollBar();
+        }, 30);
+
+        cardListRef.current.addEventListener('scroll', onScroll);
+        hideScrollBar();
+        return () => {
+            cardListRef.current?.removeEventListener('scroll', onScroll);
+        };
+    }, []);
+
     const visibleCards = React.useMemo(() => {
         let reg: RegExp | undefined;
         try {
@@ -287,8 +350,16 @@ export const List: FC<Props> = React.memo((props: Props) => {
                         </ListHead>
                         <Droppable droppableId={props._id}>
                             {(provided, { isDraggingOver }) => {
+                                const mergedRef = mergeRefs([
+                                    provided.innerRef,
+                                    cardListRef,
+                                ]) as React.RefObject<HTMLDivElement>;
                                 return (
-                                    <Cards ref={provided.innerRef} {...provided.droppableProps}>
+                                    <Cards
+                                        ref={mergedRef}
+                                        displayScrollbar={showScrollBar}
+                                        {...provided.droppableProps}
+                                    >
                                         <BeforePlaceHolder />
                                         {filteredCards.map((cardId, index) => (
                                             <Card

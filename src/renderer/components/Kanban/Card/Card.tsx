@@ -12,7 +12,14 @@ import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Card as CardType } from '../type';
 
 // TODO: set a fixed width
+
+/**
+ * If you're using z-index, make sure the element has a defined position attribute or it won't work.
+ * Wherever you use z-index in your css, define the position of that element. (Absolute, relative, inherit...)
+ * https://stackoverflow.com/a/23067835/8169341
+ */
 const CardContainer = styled.div`
+    position: relative;
     word-break: break-word;
     background-color: white;
     margin: 8px 4px 0 4px;
@@ -26,7 +33,7 @@ const CardContainer = styled.div`
         box-shadow: 0 0 18px 8px rgba(0, 0, 0, 0.2);
     }
     :hover {
-        z-index: 1;
+        z-index: 5;
         box-shadow: 0 0 18px 8px rgba(0, 0, 0, 0.1);
     }
 `;

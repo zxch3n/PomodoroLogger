@@ -207,3 +207,17 @@ export async function getNameFromBoardId(_id: string) {
     const board: KanbanBoard = await worker.findOne({ _id });
     return board.name;
 }
+
+export function mergeRefs<T = any>(
+    refs: (React.MutableRefObject<T> | React.LegacyRef<T>)[]
+): React.Ref<T> {
+    return (value) => {
+        refs.forEach((ref) => {
+            if (typeof ref === 'function') {
+                ref(value);
+            } else if (ref != null) {
+                (ref as React.MutableRefObject<T | null>).current = value;
+            }
+        });
+    };
+}
