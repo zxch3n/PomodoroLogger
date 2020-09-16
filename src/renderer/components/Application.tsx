@@ -1,29 +1,28 @@
-import { hot } from 'react-hot-loader/root';
 import { Icon, Tabs } from 'antd';
-import * as React from 'react';
 import 'antd/dist/antd.css';
-import Setting from './Setting';
-import History from './History';
-import Analyser from './Analyser';
+import { ipcRenderer, remote } from 'electron';
+import * as React from 'react';
 import ReactHotkeys from 'react-hot-keys';
+import { hot } from 'react-hot-loader/root';
 import { connect } from 'react-redux';
-import { remote, ipcRenderer } from 'electron';
-import { actions as timerActions, TimerActionTypes } from './Timer/action';
-import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
-import { kanbanActions } from './Kanban/reducer';
-import { genMapDispatchToProp } from '../utils';
-import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
-import { RootState } from '../reducers';
-import Kanban from './Kanban';
 import styled from 'styled-components';
-import Timer from './Timer';
-import { UserGuide } from './UserGuide/UserGuide';
-import { UpdateController } from './UpdateController';
-import { CardInDetail } from './Kanban/Card/CardEditor';
-import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
-import { DestroyOnTimeoutWrapper } from './DestroyOnTimeoutWrapper';
 import { IpcEventName } from '../../main/ipc/type';
 import { loadDBs } from '../dbs';
+import { RootState } from '../reducers';
+import { genMapDispatchToProp } from '../utils';
+import { DestroyOnTimeoutWrapper } from './DestroyOnTimeoutWrapper';
+import History from './History';
+import { actions as historyActions, HistoryActionCreatorTypes } from './History/action';
+import Kanban from './Kanban';
+import { CardInDetail } from './Kanban/Card/CardEditor';
+import { kanbanActions } from './Kanban/reducer';
+import Setting from './Setting';
+import Timer from './Timer';
+import { actions as timerActions, TimerActionTypes } from './Timer/action';
+import { setTrayImageWithMadeIcon } from './Timer/iconMaker';
+import { UpdateController } from './UpdateController';
+import { UserGuide } from './UserGuide/UserGuide';
+import { ConnectedPomodoroSankey } from './Visualization/PomodoroSankey';
 
 const Main = styled.div`
     .ant-tabs-bar {

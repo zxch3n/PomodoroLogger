@@ -3,13 +3,14 @@ import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
 import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
 import { deleteAllUserData } from '../../monitor/sessionManager';
-import { shell, app, ipcRenderer } from 'electron';
+import { shell, remote, ipcRenderer } from 'electron';
 import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
 import pkg from '../../../../package.json';
 import { IpcEventName } from '../../../main/ipc/type';
-import { refreshDbs, compact } from '../../../main/db';
-import { restartDBWorkers } from '../../workers';
+import { refreshDbs } from '../../../main/db';
+
+const {app} = remote.require('electron')
 
 const Container = styled.div`
     padding: 12px 36px;
