@@ -36,7 +36,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     const { card, visible, form, onCancel, listId } = props;
     const isCreating = !card;
     const lastIsCreating = React.useRef<boolean | null>(null);
-    const thisIsCreating = visible ? isCreating : (lastIsCreating.current ?? isCreating);
+    const thisIsCreating = visible ? isCreating : lastIsCreating.current ?? isCreating;
     const { getFieldDecorator, setFieldsValue, validateFields, resetFields } = form;
     useEffect(() => {
         lastIsCreating.current = isCreating;
@@ -110,7 +110,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             }
 
             saveValues(values);
-            resetFields();
+            setTimeout(resetFields, 200);
             onCancel();
         });
     };
@@ -143,7 +143,8 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             visible={visible}
             title={thisIsCreating ? 'Create a new card' : 'Edit'}
             okText={thisIsCreating ? 'Create' : 'Save'}
-            onCancel={onCancel}
+            onCancel={onSave}
+            cancelButtonProps={{ style: { display: 'none' } }}
             style={{ minWidth: 300 }}
             width={'60vw'}
             onOk={onSave}

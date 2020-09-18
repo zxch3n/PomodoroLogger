@@ -5,7 +5,6 @@ import Hotkeys from 'react-hot-keys';
 import { DistractingListModalButton } from '../Setting/DistractingList';
 import { EditorContainer } from './style/editorStyle';
 import formatMarkdown from './Card/formatMarkdown';
-import { string } from 'prop-types';
 import { Markdown } from './style/Markdown';
 
 const { TabPane } = Tabs;
@@ -88,14 +87,15 @@ export const EditKanbanForm = Form.create<
         };
 
         render() {
-            const { visible, onCancel, onSave, form, isCreating, onDelete, boardId } = this.props;
+            const { visible, onSave, form, isCreating, onDelete, boardId } = this.props;
             const { getFieldDecorator } = form;
             return (
                 <Modal
                     visible={visible}
                     title={isCreating ? 'Create a new board' : 'Edit'}
                     okText={isCreating ? 'Create' : 'Save'}
-                    onCancel={onCancel}
+                    onCancel={onSave}
+                    cancelButtonProps={{ style: { display: 'none' } }}
                     onOk={onSave}
                     style={{ minWidth: 300 }}
                     width={'60vw'}
