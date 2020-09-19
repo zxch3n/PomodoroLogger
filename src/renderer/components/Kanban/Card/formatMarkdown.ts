@@ -1,16 +1,28 @@
-// This file is copied from https://github.com/markusenglund/react-kanban
 import marked from 'marked';
 
-// Create HTML string from user generated markdown.
-// There is some serious hacks going on here with regards to checkboxes.
-// Checkboxes are not a feature of marked so are added manually with an id that
-// corresponds to its index in the order of all checkboxes on the card.
-// The id attribute is then used in the clickhandler of the card to identify which checkbox is clicked.
-const formatMarkdown = (markdown: string) => {
+export interface MarkdownContext {
+    stringColorMap: (name: string) => { background: string; color: string };
+}
+
+const defaultContext: MarkdownContext = {
+    stringColorMap: () => ({
+        background: 'hsl(35, 100%, 55%)',
+        color: 'hsl(207, 95%, 8%)',
+    }),
+};
+
+export function parseTag(html: string, { stringColorMap }: MarkdownContext = defaultContext) {
+    return html.replace(/(#[^\s\\]+)(\s|$)/i, (_, p1) => {
+        const { background, color } = stringColorMap(p1);
+        return `<span class="pl-tag" style="background:${background}; color=${color};">${p1}</span>&nbsp;`;
+    });
+}
+
+const formatMarkdown = (markdown: string, context: MarkdownContext = defaultContext) => {
     let i = 0;
-    return marked(markdown, { gfm: true, breaks: true })
+    const html = marked(markdown, { gfm: true, breaks: true })
         .replace(/<a/g, '<a target="_blank"')
-        .replace(/\[(\s|x)\]/g, match => {
+        .replace(/\[(\s|x)\]/g, (match) => {
             let newString;
             if (match === '[ ]') {
                 newString = `<input id=${i} onclick="return false" type="checkbox">`;
@@ -20,6 +32,8 @@ const formatMarkdown = (markdown: string) => {
             i += 1;
             return newString;
         });
+
+    return parseTag(html, context);
 };
 
 export default formatMarkdown;
