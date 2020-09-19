@@ -106,7 +106,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                 }
 
                 valueHandler(values);
-                form.resetFields();
+                setTimeout(() => form.resetFields(), 200);
                 setVisible(false);
             });
         };

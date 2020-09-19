@@ -12,6 +12,7 @@ import { Card } from '../type';
 import { Markdown } from '../style/Markdown';
 import formatMarkdown from './formatMarkdown';
 import { EditorContainer } from '../style/editorStyle';
+import { debounce, last } from 'lodash';
 const { TabPane } = Tabs;
 
 interface Props extends CardActionTypes {
@@ -34,7 +35,12 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     const [cardContent, setCardContent] = useState('');
     const { card, visible, form, onCancel, listId } = props;
     const isCreating = !card;
+    const lastIsCreating = React.useRef<boolean | null>(null);
+    const thisIsCreating = visible ? isCreating : lastIsCreating.current ?? isCreating;
     const { getFieldDecorator, setFieldsValue, validateFields, resetFields } = form;
+    useEffect(() => {
+        lastIsCreating.current = isCreating;
+    }, [isCreating]);
     useEffect(() => {
         if (!visible) {
             return;
@@ -104,7 +110,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             }
 
             saveValues(values);
-            resetFields();
+            setTimeout(resetFields, 200);
             onCancel();
         });
     };
@@ -135,9 +141,10 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
     return (
         <Modal
             visible={visible}
-            title={isCreating ? 'Create a new card' : 'Edit'}
-            okText={isCreating ? 'Create' : 'Save'}
-            onCancel={onCancel}
+            title={thisIsCreating ? 'Create a new card' : 'Edit'}
+            okText={thisIsCreating ? 'Create' : 'Save'}
+            onCancel={onSave}
+            cancelButtonProps={{ style: { display: 'none' } }}
             style={{ minWidth: 300 }}
             width={'60vw'}
             onOk={onSave}
@@ -195,7 +202,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            {isCreating ? undefined : (
+                            {thisIsCreating ? undefined : (
                                 <Form.Item label="Actual Spent Time In Hour">
                                     {getFieldDecorator('actualTime')(
                                         <InputNumber
@@ -216,7 +223,7 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
                             )}
                         </Col>
                     </Row>
-                    {isCreating ? undefined : (
+                    {thisIsCreating ? undefined : (
                         <Row>
                             <Popconfirm title={'Are you sure?'} onConfirm={onDelete}>
                                 <Button type={'danger'} icon={'delete'}>
