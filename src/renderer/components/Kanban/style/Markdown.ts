@@ -35,6 +35,17 @@ export const Markdown = styled.div`
         ); /* transparent keyword is broken in Safari */
         pointer-events: none;
     }
+
+    .pl-tag {
+        border-radius: 1em;
+        padding: 0px 0.5em;
+        cursor: pointer;
+        transition: transform 150ms;
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+
     h1 {
         font-size: 1.2em;
         margin: 0 !important;
