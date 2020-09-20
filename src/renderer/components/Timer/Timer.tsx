@@ -198,6 +198,7 @@ class Timer extends Component<Props, State> {
         this.win = remote.getCurrentWindow();
         this.updateLeftTime();
         this.selfRef.current!.addEventListener('resize', this.onResize);
+        this.selfRef.current!.addEventListener('keydown', this.handleNativeKeydown);
         this.props.setTimerManager({
             clear: this.onClear,
             pause: this.onStop,
@@ -216,6 +217,12 @@ class Timer extends Component<Props, State> {
             workers.knn.loadModel(size).catch(console.error);
         });
     }
+
+    handleNativeKeydown = (event: KeyboardEvent) => {
+        if (event.key === 'Tab' || event.which === 9 || event.keyCode === 9) {
+            event.preventDefault();
+        }
+    };
 
     shouldComponentUpdate(
         nextProps: Readonly<Props>,
@@ -286,7 +293,8 @@ class Timer extends Component<Props, State> {
             clearInterval(this.interval);
         }
 
-        this.selfRef.current!.removeEventListener('resize', this.onResize);
+        this.selfRef.current?.removeEventListener('resize', this.onResize);
+        this.selfRef.current?.removeEventListener('keydown', this.handleNativeKeydown);
     }
 
     updateLeftTime = () => {
