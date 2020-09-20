@@ -18,6 +18,7 @@ import { thinScrollBar } from '../../style/scrollbar';
 import { EditKanbanForm } from './BoardEditor';
 import { PlayPauseButton } from './Board/PlayPauseButton';
 import { Search } from '../../../components/common/Search/Search';
+import { debounce } from 'lodash';
 
 const { Option } = Select;
 
@@ -87,6 +88,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
         const onShowTableChange = (value: boolean) => {
             setShowTable(value);
         };
+        const search = debounce(props.setSearchReg, 200);
         const valueHandler: (values: FormValue) => void = ({ name, description }: FormValue) => {
             if (editingBoardId === undefined) {
                 props.addBoard(shortid.generate(), name, description);
@@ -274,7 +276,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                         {props.kanban.chosenBoardId ? (
                             <>
                                 <LabelButton>
-                                    <Search setSearchStr={props.setSearchReg} />
+                                    <Search setSearchStr={search} />
                                     <div
                                         style={{
                                             display: 'flex',
