@@ -29,6 +29,10 @@ const Main = styled.div`
         margin: 0;
     }
 
+    .ant-btn-icon-only > i {
+        transform: translateY(-0.5px);
+    }
+
     * {
         outline: none;
     }
