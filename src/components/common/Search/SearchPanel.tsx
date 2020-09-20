@@ -9,11 +9,12 @@ interface PanelProps {
 }
 
 const StyledPanel = styled(Markdown)`
-    line-height: 1.8;
+    line-height: 1.5;
     max-width: 280px;
 `;
 
 const Title = styled.p`
+    user-select: none;
     color: #777;
     font-size: 0.8rem;
 `;

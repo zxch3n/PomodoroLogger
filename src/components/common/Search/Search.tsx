@@ -16,12 +16,15 @@ interface StyledProps {
 }
 
 const StyledSearch = styled.div<StyledProps>`
+    font-size: 0.9rem;
+    background-color: white;
+    margin: 0 4px;
     box-sizing: border-box;
-    padding: 4px;
-    height: 26px;
-    border-radius: 14px;
+    padding: 5px;
+    height: 32px;
+    border-radius: 16px;
     transition: width 120ms, padding 120ms;
-    border: 1px solid grey;
+    border: 1px solid #dadada;
     outline: none;
     color: #555;
     z-index: 5;
@@ -29,12 +32,12 @@ const StyledSearch = styled.div<StyledProps>`
     ${({ isSearching }) =>
         isSearching
             ? `
-        width: 260px; 
-        padding: 4px 8px;
+        width: 280px; 
+        padding: 5px 12px;
         `
-            : `width: 26px; 
+            : `width: 32px; 
         cursor: pointer;
-        input, .close { visibility: hidden;}
+        input, .close { opacity: 0; z-index: -100; visibility: hidden;}
     `}
 
     ${({ showPanel, isSearching }) => (isSearching && showPanel ? `height: auto;` : ``)}
@@ -42,24 +45,25 @@ const StyledSearch = styled.div<StyledProps>`
     header {
         display: flex;
         flex-direction: row;
+        align-items: center;
 
         i {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
             outline: none;
-        }
-
-        .close {
-            width: 16px;
-            height: 16px;
-            box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 3px;
-            font-size: 10px;
+        }
+
+        .close {
+            box-sizing: border-box;
+            padding: 4px;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: 10px;
             z-index: 6;
-            transition: background-color 300ms;
+            transition: background-color 300ms, opacity 200ms;
 
             &:hover {
                 background-color: #d5d5d5;
@@ -67,21 +71,22 @@ const StyledSearch = styled.div<StyledProps>`
         }
 
         input {
+            background: transparent;
             flex-grow: 1;
             border: none;
             outline: none;
             margin: 0 6px;
             padding: 0;
-            line-height: 16px;
-            height: 16px;
+            line-height: 20px;
+            height: 20px;
         }
     }
 
     :focus {
-        border: 1px solid #0064d3;
+        border: 1px solid #aaaaaa;
     }
     :hover {
-        border: 1px solid #3b5998;
+        border: 1px solid #aba9a6;
     }
 `;
 
@@ -137,6 +142,7 @@ export const Search = ({ setSearchStr, searchHistory, searchStr, tags }: SearchP
         if (event.key === 'Escape' || event.keyCode === 27) {
             setText('');
             textRef.current = '';
+            setSearchStr('');
             setIsSearching(false);
             setShowPanel(false);
         } else if (event.key === 'Enter' || event.keyCode === 13) {
@@ -161,9 +167,19 @@ export const Search = ({ setSearchStr, searchHistory, searchStr, tags }: SearchP
             setShowPanel(false);
         };
 
-        window.addEventListener('click', handler);
+        const onKeydown = (e: KeyboardEvent) => {
+            if ((e.key === 'f' || e.keyCode === 70) && e.ctrlKey) {
+                e.preventDefault();
+                setIsSearching(true);
+                inputRef.current?.focus();
+            }
+        };
+
+        window.addEventListener('mousedown', handler);
+        window.addEventListener('keydown', onKeydown);
         return () => {
-            window.removeEventListener('click', handler);
+            window.removeEventListener('mousedown', handler);
+            window.removeEventListener('keyboard', onKeydown);
         };
     }, []);
 
@@ -180,7 +196,7 @@ export const Search = ({ setSearchStr, searchHistory, searchStr, tags }: SearchP
             ref={selfRef}
         >
             <header>
-                <Icon type="search" />
+                <Icon type="search" style={{ padding: 1 }} />
                 <input ref={inputRef} onChange={onChange} value={text} />
                 <Icon
                     type={'down'}

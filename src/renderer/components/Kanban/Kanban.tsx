@@ -17,6 +17,7 @@ import { isShallowEqualByKeys } from '../../utils';
 import { thinScrollBar } from '../../style/scrollbar';
 import { EditKanbanForm } from './BoardEditor';
 import { PlayPauseButton } from './Board/PlayPauseButton';
+import { Search } from '../../../components/common/Search/Search';
 
 const { Option } = Select;
 
@@ -194,10 +195,6 @@ export const Kanban: FunctionComponent<Props> = React.memo(
             }
         }, [props.kanban.chosenBoardId, props.timerManager, props.isTimerRunning]);
 
-        const switchIsSearching = () => {
-            props.setIsSearching(!props.kanban.isSearching);
-        };
-
         const onKeyDown = React.useCallback(
             (name: string) => {
                 switch (name) {
@@ -277,18 +274,24 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                         {props.kanban.chosenBoardId ? (
                             <>
                                 <LabelButton>
-                                    <label>Collapse View</label>
-                                    <Switch
-                                        checked={props.boards[props.kanban.chosenBoardId].collapsed}
-                                        onChange={onCollapsedChange}
-                                        size={'small'}
-                                    />
-                                    <Button
-                                        shape={'circle'}
-                                        icon={'search'}
-                                        onClick={switchIsSearching}
-                                        style={{ marginRight: 6 }}
-                                    />
+                                    <Search setSearchStr={props.setSearchReg} />
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            paddingTop: 6,
+                                        }}
+                                    >
+                                        <label>Collapse View</label>
+                                        <Switch
+                                            checked={
+                                                props.boards[props.kanban.chosenBoardId].collapsed
+                                            }
+                                            onChange={onCollapsedChange}
+                                            size={'small'}
+                                        />
+                                    </div>
                                     <PlayPauseButton
                                         showPlay={
                                             !(props.isFocusingOnChosenBoard && props.isTimerRunning)
@@ -300,7 +303,6 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                                         icon={'setting'}
                                         onClick={showBoardSettingMenu}
                                     />
-                                    <SearchBar />
                                 </LabelButton>
                             </>
                         ) : (
