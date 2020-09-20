@@ -80,7 +80,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
         wordWeights: undefined,
     });
     const container = useRef<HTMLDivElement>();
-    const [calendarWidth, setCalendarWidth] = useState(800);
+    const [calendarWidth, setCalendarWidth] = useState(document.body.clientWidth - 40);
 
     const resizeEffect = () => {
         const setWidth = debounce(() => {
