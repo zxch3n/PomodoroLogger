@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { SearchPanel } from './SearchPanel';
 import { Icon } from 'antd';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export interface SearchProps {
     searchStr?: string;
@@ -15,6 +15,15 @@ interface StyledProps {
     showPanel: boolean;
 }
 
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+`;
+
 const StyledSearch = styled.div<StyledProps>`
     font-size: 0.9rem;
     background-color: white;
@@ -23,7 +32,7 @@ const StyledSearch = styled.div<StyledProps>`
     padding: 5px;
     height: 32px;
     border-radius: 16px;
-    transition: width 120ms, padding 120ms;
+    transition: width 200ms, padding 200ms;
     border: 1px solid #dadada;
     outline: none;
     color: #555;
@@ -32,12 +41,12 @@ const StyledSearch = styled.div<StyledProps>`
     ${({ isSearching }) =>
         isSearching
             ? `
-        width: 280px; 
+        width: 250px; 
         padding: 5px 12px;
         `
             : `width: 32px; 
         cursor: pointer;
-        input, .close { opacity: 0; z-index: -100; visibility: hidden;}
+        input, .close { display: none;}
     `}
 
     ${({ showPanel, isSearching }) => (isSearching && showPanel ? `height: auto;` : ``)}
@@ -64,6 +73,7 @@ const StyledSearch = styled.div<StyledProps>`
             border-radius: 10px;
             z-index: 6;
             transition: background-color 300ms, opacity 200ms;
+            animation: ${fadeIn} 300ms ease;
 
             &:hover {
                 background-color: #d5d5d5;
@@ -71,6 +81,7 @@ const StyledSearch = styled.div<StyledProps>`
         }
 
         input {
+            width: 140px;
             background: transparent;
             flex-grow: 1;
             border: none;
@@ -179,7 +190,7 @@ export const Search = ({ setSearchStr, searchHistory, searchStr, tags }: SearchP
         window.addEventListener('keydown', onKeydown);
         return () => {
             window.removeEventListener('mousedown', handler);
-            window.removeEventListener('keyboard', onKeydown);
+            window.removeEventListener('keyboard', onKeydown as any);
         };
     }, []);
 
