@@ -6,15 +6,17 @@ export interface MarkdownContext {
 
 const defaultContext: MarkdownContext = {
     stringColorMap: () => ({
-        background: 'hsl(35, 100%, 55%)',
-        color: 'hsl(207, 95%, 8%)',
+        background: '#dddddd',
+        color: '#222',
     }),
 };
 
 export function parseTag(html: string, { stringColorMap }: MarkdownContext = defaultContext) {
     return html.replace(/(#[^\s\\]+)(\s|$)/i, (_, p1) => {
         const { background, color } = stringColorMap(p1);
-        return `<span class="pl-tag" style="background:${background}; color=${color};">${p1}</span>&nbsp;`;
+        return `<span class="pl-tag" style="background:${background}; color:${color}; --hover-background: ${
+            background + 'aa'
+        }">${p1}</span>&nbsp;`;
     });
 }
 

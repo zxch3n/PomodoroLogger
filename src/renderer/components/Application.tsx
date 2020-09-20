@@ -28,6 +28,10 @@ const Main = styled.div`
     .ant-tabs-bar {
         margin: 0;
     }
+
+    * {
+        outline: none;
+    }
 `;
 
 const { TabPane } = Tabs;
