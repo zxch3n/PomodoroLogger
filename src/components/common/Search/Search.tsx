@@ -74,7 +74,6 @@ export const Search = ({setSearchStr}: SearchProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const onClick = useCallback(() => {
         if (!isSearching) {
-            console.log("Show")
             setIsSearching(true);
             setTimeout(() => {
                 inputRef.current?.focus();
@@ -83,7 +82,6 @@ export const Search = ({setSearchStr}: SearchProps) => {
     }, [isSearching]);
 
     const clear = useCallback((event: React.MouseEvent) => {
-        console.log("CLEAR");
         event.stopPropagation();
         setIsSearching(false);
         setText('');
