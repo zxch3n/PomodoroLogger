@@ -3,7 +3,7 @@ import { Icon } from 'antd';
 import styled from 'styled-components';
 
 export interface SearchProps {
-    setSearchStr(str: string):void;
+    setSearchStr(str: string): void;
 }
 
 interface StyledProps {
@@ -19,36 +19,45 @@ const StyledSearch = styled.div<StyledProps>`
     border: 1px solid grey;
     outline: none;
     display: flex;
+    color: #555;
     flex-direction: row;
     z-index: 5;
 
-    ${({ isSearching }) => (isSearching ? `
+    ${({ isSearching }) =>
+        isSearching
+            ? `
         width: 260px; 
         padding: 4px 8px;
-        ` : 
-        `width: 26px; 
+        `
+            : `width: 26px; 
         cursor: pointer;
         input, .close { visibility: hidden;}
-    `)}
+    `}
 
-    i { outline: none;}
+    i {
+        outline: none;
+    }
 
-    .close { 
+    .close {
         width: 16px;
         height: 16px;
         box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         padding: 3px;
         font-size: 10px;
         cursor: pointer;
         border-radius: 12px;
         z-index: 6;
+        transition: background-color 300ms;
 
         &:hover {
-            background-color: #b5b5b5;
+            background-color: #d5d5d5;
         }
     }
 
-    input { 
+    input {
         flex-grow: 1;
         border: none;
         outline: none;
@@ -66,7 +75,7 @@ const StyledSearch = styled.div<StyledProps>`
     }
 `;
 
-export const Search = ({setSearchStr}: SearchProps) => {
+export const Search = ({ setSearchStr }: SearchProps) => {
     const [isSearching, setIsSearching] = useState(false);
     const [text, setText] = useState('');
     const textRef = useRef<string>('');
@@ -77,7 +86,7 @@ export const Search = ({setSearchStr}: SearchProps) => {
             setIsSearching(true);
             setTimeout(() => {
                 inputRef.current?.focus();
-            }, 200)
+            }, 200);
         }
     }, [isSearching]);
 
@@ -86,15 +95,28 @@ export const Search = ({setSearchStr}: SearchProps) => {
         setIsSearching(false);
         setText('');
         textRef.current = '';
-        setSearchStr('')
-    }, [])
+        setSearchStr('');
+    }, []);
 
-    const onChange = useCallback((v: React.ChangeEvent<HTMLInputElement>) => {
-        const value = v.target.value;
-        setText(value);
-        textRef.current = value;
-        setSearchStr(value)
-    }, [setSearchStr]);
+    const onChange = useCallback(
+        (v: React.ChangeEvent<HTMLInputElement>) => {
+            const value = v.target.value;
+            setText(value);
+            textRef.current = value;
+            setSearchStr(value);
+        },
+        [setSearchStr]
+    );
+
+    const onKeydown = useCallback((event: React.KeyboardEvent) => {
+        if (event.key === 'Escape' || event.keyCode === 27) {
+            setText('');
+            textRef.current = '';
+            setIsSearching(false);
+        } else if (event.key === 'Enter' || event.keyCode === 13) {
+            inputRef.current?.blur();
+        }
+    }, []);
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
@@ -111,20 +133,22 @@ export const Search = ({setSearchStr}: SearchProps) => {
             }
         };
 
-        window.addEventListener('click', handler)
+        window.addEventListener('click', handler);
         return () => {
             window.removeEventListener('click', handler);
-        }
-    }, [])
+        };
+    }, []);
+
     return (
         <StyledSearch
+            onKeyDown={onKeydown}
             isSearching={isSearching}
-            onClick={onClick} 
+            onClick={onClick}
             ref={selfRef}
         >
-            <Icon type="search"/>
-            <input ref={inputRef} onChange={onChange} value={text}/>
-            <Icon type="close" className="close" onClick={clear}/>
+            <Icon type="search" />
+            <input ref={inputRef} onChange={onChange} value={text} />
+            <Icon type="close" className="close" onClick={clear} />
         </StyledSearch>
     );
 };

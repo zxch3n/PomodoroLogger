@@ -38,11 +38,10 @@ export const Markdown = styled.div`
 
     .pl-tag {
         border-radius: 1em;
-        padding: 0px 0.5em;
+        padding: 2px 0.5em;
         cursor: pointer;
-        transition: transform 150ms;
         &:hover {
-            transform: scale(1.05);
+            background-color: var(--hover-background) !important;
         }
     }
 
