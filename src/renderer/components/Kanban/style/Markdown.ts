@@ -37,11 +37,15 @@ export const Markdown = styled.div`
     }
 
     .pl-tag {
+        font-size: 0.9em;
         border-radius: 1em;
         padding: 2px 0.5em;
         cursor: pointer;
+        background-color: #dddddd;
+        color: #222;
+        margin: 0 2px;
         &:hover {
-            background-color: var(--hover-background) !important;
+            background-color: var(--hover-background, #ccc) !important;
         }
     }
 
