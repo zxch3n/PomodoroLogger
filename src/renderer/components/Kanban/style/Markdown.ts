@@ -89,4 +89,8 @@ export const Markdown = styled.div`
     .search-highlight {
         background-color: rgba(208, 227, 66, 1);
     }
+
+    input {
+        vertical-align: middle;
+    }
 `;
