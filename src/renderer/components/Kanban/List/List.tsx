@@ -20,6 +20,7 @@ const Container = styled.div`
 `;
 
 const ListHead = styled.div`
+    user-select: none;
     height: 4em;
     min-width: 250px;
     padding: 4px 12px;
@@ -33,6 +34,7 @@ const ListHead = styled.div`
     }
 
     .list-head-text {
+        user-select: none;
         position: absolute;
         top: 24px;
         transform: translateY(-50%);

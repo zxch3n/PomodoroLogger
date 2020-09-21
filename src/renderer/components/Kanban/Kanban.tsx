@@ -288,7 +288,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                                             paddingTop: 6,
                                         }}
                                     >
-                                        <label>Collapse View</label>
+                                        <label style={{ userSelect: 'none' }}>Collapse View</label>
                                         <Switch
                                             checked={
                                                 props.boards[props.kanban.chosenBoardId].collapsed
