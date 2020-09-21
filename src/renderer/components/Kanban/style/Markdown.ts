@@ -6,6 +6,7 @@ export const Markdown = styled.div`
     font-size: 14px;
     position: relative;
     padding: 0 0 4px 0;
+    line-height: 1.8;
     ${thinScrollBar};
 
     ::before {
@@ -41,11 +42,11 @@ export const Markdown = styled.div`
         border-radius: 1em;
         padding: 2px 0.5em;
         cursor: pointer;
-        background-color: #dddddd;
+        background-color: #98989869;
         color: #222;
         margin: 0 2px;
         &:hover {
-            background-color: var(--hover-background, #ccc) !important;
+            background-color: var(--hover-background, #98989855) !important;
         }
     }
 
