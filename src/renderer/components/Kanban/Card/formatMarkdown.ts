@@ -7,7 +7,7 @@ export interface MarkdownContext {
 
 const defaultContext = {
     stringColorMap: () => ({
-        background: '#dddddd',
+        background: '#98989869',
         color: '#222',
     }),
 };
@@ -23,7 +23,7 @@ export function parseTag(
         const { background, color } = stringColorMap(p1);
         registerTag && registerTag(p1);
         return `<span class="pl-tag" style="background:${background}; color:${color}; --hover-background: ${
-            background + 'aa'
+            background.slice(0, 7) + '55'
         }">${p1}</span>${p2}`;
     });
 }
