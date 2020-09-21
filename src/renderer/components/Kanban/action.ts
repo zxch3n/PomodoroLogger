@@ -99,7 +99,7 @@ export const reducer = createReducer<KanbanState, any>(defaultState, (handle) =>
     })),
     handle(setSearchReg, (state, { payload: { reg } }) => ({
         ...state,
-        searchReg: reg,
+        searchReg: reg || undefined,
     })),
     handle(setConfiguringBoardId, (state, { payload: { _id } }) => ({
         ...state,
