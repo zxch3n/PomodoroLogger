@@ -1,22 +1,30 @@
 import marked from 'marked';
 
 export interface MarkdownContext {
-    stringColorMap: (name: string) => { background: string; color: string };
+    stringColorMap?: (name: string) => { background: string; color: string };
+    registerTag?: (name: string) => void;
 }
 
-const defaultContext: MarkdownContext = {
+const defaultContext = {
     stringColorMap: () => ({
         background: '#dddddd',
         color: '#222',
     }),
 };
 
-export function parseTag(html: string, { stringColorMap }: MarkdownContext = defaultContext) {
-    return html.replace(/(#[^\s\\]+)(\s|$)/gi, (_, p1) => {
+export function parseTag(
+    html: string,
+    {
+        stringColorMap = defaultContext.stringColorMap,
+        registerTag,
+    }: MarkdownContext = defaultContext
+) {
+    return html.replace(/(#[^\s\\<>]+)(\s|$|<)/gi, (_, p1, p2) => {
         const { background, color } = stringColorMap(p1);
+        registerTag && registerTag(p1);
         return `<span class="pl-tag" style="background:${background}; color:${color}; --hover-background: ${
             background + 'aa'
-        }">${p1}</span>&nbsp;`;
+        }">${p1}</span>${p2}`;
     });
 }
 

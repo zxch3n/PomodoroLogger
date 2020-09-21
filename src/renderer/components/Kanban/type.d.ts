@@ -19,6 +19,11 @@ export interface AggInfo {
     keywordWeights: { [key: string]: number };
 }
 
+export interface Tag {
+    name: string;
+    count: number;
+}
+
 export interface KanbanBoard {
     _id: string;
     name: string;

@@ -11,6 +11,8 @@ import { Markdown } from '../style/Markdown';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Card as CardType } from '../type';
 import { matchParent } from '../../../utils';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../reducers';
 
 // TODO: set a fixed width
 
@@ -62,6 +64,9 @@ interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes
     collapsed?: boolean;
 }
 export const Card: FC<Props> = React.memo((props: Props) => {
+    const [tagManager] = useSelector((rootState: RootState) => [
+        rootState.kanban.kanban.tagManager,
+    ]);
     const { index, _id, isDraggingOver } = props;
     const onClick = React.useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -164,7 +169,15 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                         </h1>
                                         <Markdown
                                             dangerouslySetInnerHTML={{
-                                                __html: formatMarkdown(content),
+                                                __html: formatMarkdown(content, {
+                                                    registerTag: (tag) => {
+                                                        tagManager.push(tag, {
+                                                            boardId: props.boardId,
+                                                            listId: props.listId,
+                                                            cardId: props.cardId,
+                                                        });
+                                                    },
+                                                }),
                                             }}
                                             style={{ maxHeight: 250 }}
                                         />
