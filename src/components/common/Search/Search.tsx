@@ -124,6 +124,7 @@ export const Search = ({ setSearchStr, searchHistory, searchStr, tags }: SearchP
 
         setText(searchStr);
         textRef.current = searchStr;
+        setIsSearching(true);
     }, [searchStr]);
 
     const clear = useCallback((event: React.MouseEvent) => {

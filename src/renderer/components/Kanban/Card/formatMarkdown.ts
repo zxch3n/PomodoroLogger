@@ -12,7 +12,7 @@ const defaultContext: MarkdownContext = {
 };
 
 export function parseTag(html: string, { stringColorMap }: MarkdownContext = defaultContext) {
-    return html.replace(/(#[^\s\\]+)(\s|$)/i, (_, p1) => {
+    return html.replace(/(#[^\s\\]+)(\s|$)/gi, (_, p1) => {
         const { background, color } = stringColorMap(p1);
         return `<span class="pl-tag" style="background:${background}; color:${color}; --hover-background: ${
             background + 'aa'
