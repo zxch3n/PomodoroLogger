@@ -276,7 +276,10 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                         {props.kanban.chosenBoardId ? (
                             <>
                                 <LabelButton>
-                                    <Search setSearchStr={search} />
+                                    <Search
+                                        setSearchStr={search}
+                                        searchStr={props.kanban.searchReg}
+                                    />
                                     <div
                                         style={{
                                             display: 'flex',

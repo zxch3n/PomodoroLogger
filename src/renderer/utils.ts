@@ -221,3 +221,18 @@ export function mergeRefs<T = any>(
         });
     };
 }
+
+export function matchParent(
+    node: HTMLElement | undefined | null,
+    selector: string
+): HTMLElement | undefined {
+    while (node) {
+        if (node.matches(selector)) {
+            return node;
+        }
+
+        node = node.parentElement;
+    }
+
+    return;
+}

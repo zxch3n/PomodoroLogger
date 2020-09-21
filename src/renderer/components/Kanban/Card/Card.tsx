@@ -10,6 +10,7 @@ import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
 import { Card as CardType } from '../type';
+import { matchParent } from '../../../utils';
 
 // TODO: set a fixed width
 
@@ -62,9 +63,18 @@ interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes
 }
 export const Card: FC<Props> = React.memo((props: Props) => {
     const { index, _id, isDraggingOver } = props;
-    const onClick = React.useCallback(() => {
-        props.setEditCard(true, props.listId, props._id);
-    }, [props.listId, props._id]);
+    const onClick = React.useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            const node = matchParent(e.nativeEvent.target as HTMLElement, '.pl-tag');
+            if (node && node.textContent) {
+                props.setSearchReg(node.textContent);
+                e.stopPropagation();
+            } else {
+                props.setEditCard(true, props.listId, props._id);
+            }
+        },
+        [props.listId, props._id]
+    );
     const content = React.useMemo(() => {
         if (!props.searchReg) {
             return props.content;
