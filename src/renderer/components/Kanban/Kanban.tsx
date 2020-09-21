@@ -279,6 +279,7 @@ export const Kanban: FunctionComponent<Props> = React.memo(
                                     <Search
                                         setSearchStr={search}
                                         searchStr={props.kanban.searchReg}
+                                        tags={props.kanban.tagManager.getSortedTag}
                                     />
                                     <div
                                         style={{

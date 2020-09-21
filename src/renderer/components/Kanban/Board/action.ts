@@ -21,14 +21,14 @@ export const defaultBoard: KanbanBoard = {
     description: '',
     collapsed: false,
     relatedSessions: [],
-    spentHours: 0
+    spentHours: 0,
 };
 
 export type KanbanBoardState = { [_id: string]: KanbanBoard };
 
 const addBoard = createActionCreator(
     '[Board]ADD',
-    resolve => (
+    (resolve) => (
         _id: string,
         name: string,
         description: string,
@@ -40,66 +40,67 @@ const addBoard = createActionCreator(
 
 const setBoardMap = createActionCreator(
     '[Board]SET_BOARD_MAP',
-    resolve => (boards: KanbanBoardState) => resolve(boards)
+    (resolve) => (boards: KanbanBoardState) => resolve(boards)
 );
 
 const moveList = createActionCreator(
     '[Board]MOVE_LIST',
-    resolve => (_id: string, fromIndex: number, toIndex: number) =>
+    (resolve) => (_id: string, fromIndex: number, toIndex: number) =>
         resolve({ _id, fromIndex, toIndex })
 );
 
-const renameBoard = createActionCreator('[Board]RENAME', resolve => (_id, name) =>
+const renameBoard = createActionCreator('[Board]RENAME', (resolve) => (_id, name) =>
     resolve({ _id, name })
 );
 
-const addList = createActionCreator('[Board]ADD_LIST', resolve => (_id, listId) =>
+const addList = createActionCreator('[Board]ADD_LIST', (resolve) => (_id, listId) =>
     resolve({ _id, cardId: listId })
 );
 
-const deleteBoard = createActionCreator('[Board]DEL_BOARD', resolve => _id => resolve({ _id }));
+const deleteBoard = createActionCreator('[Board]DEL_BOARD', (resolve) => (_id) => resolve({ _id }));
 
-const deleteList = createActionCreator('[Board]DEL_LIST', resolve => (_id, listId) =>
+const deleteList = createActionCreator('[Board]DEL_LIST', (resolve) => (_id, listId) =>
     resolve({ _id, listId })
 );
 
-const setLastVisitTime = createActionCreator('[Board]SET_LAST_VISIT_TIME', resolve => (_id, time) =>
-    resolve({ _id, time })
+const setLastVisitTime = createActionCreator(
+    '[Board]SET_LAST_VISIT_TIME',
+    (resolve) => (_id, time) => resolve({ _id, time })
 );
 
 const onTimerFinished = createActionCreator(
     '[Board]ON_TIMER_FINISHED',
-    resolve => (_id: string, sessionId: string, spentTime: number) =>
+    (resolve) => (_id: string, sessionId: string, spentTime: number) =>
         resolve({ _id, sessionId, spentTime })
 );
 
 const editBoard = createActionCreator(
     '[Board]EDIT',
-    resolve => (_id: string, name: string, description: string) =>
+    (resolve) => (_id: string, name: string, description: string) =>
         resolve({ _id, name, description })
 );
 
-const setPin = createActionCreator('[Board]SET_PIN', resolve => (_id: string, pin: boolean) =>
+const setPin = createActionCreator('[Board]SET_PIN', (resolve) => (_id: string, pin: boolean) =>
     resolve({ _id, pin })
 );
 
 const updateAggInfo = createActionCreator(
     '[Board]UPDATE_AGG_INFO',
-    resolve => (_id: string, aggInfo: AggInfo) => resolve({ _id, aggInfo })
+    (resolve) => (_id: string, aggInfo: AggInfo) => resolve({ _id, aggInfo })
 );
 
 const setDistractionList = createActionCreator(
     '[Board]SET_DISTRACTION_LIST',
-    resolve => (_id: string, distractionList?: DistractingRow[]) =>
+    (resolve) => (_id: string, distractionList?: DistractingRow[]) =>
         resolve({ _id, distractionList })
 );
 
 const setCollapsed = createActionCreator(
     '[Board]SET_COLLAPSED',
-    resolve => (_id: string, collapsed: boolean) => resolve({ _id, collapsed })
+    (resolve) => (_id: string, collapsed: boolean) => resolve({ _id, collapsed })
 );
 
-export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
+export const boardReducer = createReducer<KanbanBoardState, any>({}, (handle) => [
     handle(
         addBoard,
         (state, { payload: { _id, name, description, lists, focusedList, doneList } }) => ({
@@ -111,8 +112,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
                 name,
                 lists,
                 focusedList,
-                doneList
-            }
+                doneList,
+            },
         })
     ),
 
@@ -121,8 +122,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         ...state,
         [_id]: {
             ...state[_id],
-            pin
-        }
+            pin,
+        },
     })),
     handle(moveList, (state, { payload: { _id, fromIndex, toIndex } }) => {
         const newState = { ...state };
@@ -138,8 +139,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
             ...state,
             [_id]: {
                 ...state[_id],
-                name
-            }
+                name,
+            },
         };
     }),
 
@@ -147,8 +148,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         ...state,
         [_id]: {
             ...state[_id],
-            lists: [...state[_id].lists, cardId]
-        }
+            lists: [...state[_id].lists, cardId],
+        },
     })),
 
     handle(deleteBoard, (state, { payload: { _id } }) => {
@@ -158,7 +159,7 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
 
     handle(deleteList, (state, { payload: { _id, listId } }) => {
         const newState = { ...state };
-        newState[_id].lists = newState[_id].lists.filter(v => v !== listId);
+        newState[_id].lists = newState[_id].lists.filter((v) => v !== listId);
         return newState;
     }),
 
@@ -168,8 +169,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
             [_id]: {
                 ...state[_id],
                 relatedSessions: state[_id].relatedSessions.concat([sessionId]),
-                spentHours: state[_id].spentHours + spentTime
-            }
+                spentHours: state[_id].spentHours + spentTime,
+            },
         };
     }),
 
@@ -178,8 +179,8 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
             ...state,
             [_id]: {
                 ...state[_id],
-                lastVisitTime: time
-            }
+                lastVisitTime: time,
+            },
         };
     }),
 
@@ -188,25 +189,25 @@ export const boardReducer = createReducer<KanbanBoardState, any>({}, handle => [
         [_id]: {
             ...state[_id],
             name,
-            description
-        }
+            description,
+        },
     })),
 
     handle(setDistractionList, (state, { payload: { _id, distractionList } }) => ({
         ...state,
         [_id]: {
             ...state[_id],
-            distractionList
-        }
+            distractionList,
+        },
     })),
 
     handle(setCollapsed, (state, { payload: { _id, collapsed } }) => ({
         ...state,
         [_id]: {
             ...state[_id],
-            collapsed
-        }
-    }))
+            collapsed,
+        },
+    })),
 ]);
 
 export const actions = {
@@ -275,7 +276,7 @@ export const actions = {
             lists,
             lastVisitTime: new Date().getTime(),
             focusedList: lists[1],
-            doneList: lists[2]
+            doneList: lists[2],
         } as KanbanBoard);
     },
 
@@ -329,7 +330,7 @@ export const actions = {
     setCollapsed: (_id: string, collapsed: boolean) => async (dispatch: Dispatch) => {
         dispatch(setCollapsed(_id, collapsed));
         await db.update({ _id }, { $set: { collapsed } });
-    }
+    },
 };
 
 export type BoardActionTypes = { [key in keyof typeof actions]: typeof actions[key] };

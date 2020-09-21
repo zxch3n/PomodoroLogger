@@ -5,8 +5,8 @@ import styled, { keyframes } from 'styled-components';
 
 export interface SearchProps {
     searchStr?: string;
-    tags?: string[];
-    searchHistory?: string[];
+    tags?: () => string[];
+    searchHistory?: () => string[];
     setSearchStr(str: string): void;
 }
 
@@ -222,7 +222,11 @@ export const Search = ({ setSearchStr, searchHistory, searchStr, tags }: SearchP
                 <Icon type="close" className="close" onClick={clear} />
             </header>
             {showPanel && isSearching && (
-                <SearchPanel tags={tags} history={searchHistory} search={search} />
+                <SearchPanel
+                    tags={tags && tags()}
+                    history={searchHistory && searchHistory()}
+                    search={search}
+                />
             )}
         </StyledSearch>
     );
