@@ -12,7 +12,6 @@ import { Card } from '../type';
 import { Markdown } from '../style/Markdown';
 import formatMarkdown from './formatMarkdown';
 import { EditorContainer } from '../style/editorStyle';
-import { debounce, last } from 'lodash';
 const { TabPane } = Tabs;
 
 interface Props extends CardActionTypes {
