@@ -9,9 +9,6 @@ const AnimeSvg = styled.svg`
     user-select: none;
     cursor: pointer;
     font-weight: 600;
-    :hover {
-        transform: scale(1.06);
-    }
     .clip-path {
         transition: all 0.65s;
     }
