@@ -13,6 +13,7 @@ import { Card as CardType } from '../type';
 import { matchParent } from '../../../utils';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../reducers';
+import { check } from 'prettier';
 
 // TODO: set a fixed width
 
@@ -63,22 +64,58 @@ export interface InputProps {
 interface Props extends CardType, InputProps, CardActionTypes, KanbanActionTypes {
     collapsed?: boolean;
 }
+
 export const Card: FC<Props> = React.memo((props: Props) => {
     const [tagManager] = useSelector((rootState: RootState) => [
         rootState.kanban.kanban.tagManager,
     ]);
-    const { index, _id, isDraggingOver } = props;
+    const markdownRef = React.useRef<HTMLDivElement>(null);
+    const { index, _id, isDraggingOver, listId } = props;
     const onClick = React.useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
-            const node = matchParent(e.nativeEvent.target as HTMLElement, '.pl-tag');
-            if (node && node.textContent) {
-                props.setSearchReg(node.textContent);
+            const target = e.nativeEvent.target as HTMLElement;
+            const tag = matchParent(target, '.pl-tag');
+            const checkbox = matchParent(target, '[type="checkbox"]');
+            if (tag && tag.textContent) {
+                props.setSearchReg(tag.textContent);
                 e.stopPropagation();
+            } else if (checkbox) {
+                if (!markdownRef.current) {
+                    return;
+                }
+
+                const checkboxes = markdownRef.current.querySelectorAll('[type="checkbox"]');
+                let checkboxIndex = -1;
+                let index = 0;
+                for (const x of Array.from(checkboxes)) {
+                    if (x === checkbox) {
+                        checkboxIndex = index;
+                        break;
+                    }
+
+                    index += 1;
+                }
+
+                const reg = /\[(x| )\]/g;
+                let match: null | undefined | RegExpExecArray;
+                for (let i = 0; i < checkboxIndex + 1; i += 1) {
+                    match = reg.exec(props.content);
+                }
+
+                if (match && match.length > 1) {
+                    const char = match[1] === 'x' ? ' ' : 'x';
+                    props.setContent(
+                        _id,
+                        `${props.content.slice(0, match.index)}[${char}]${props.content.slice(
+                            match.index + 3
+                        )}`
+                    );
+                }
             } else {
                 props.setEditCard(true, props.listId, props._id);
             }
         },
-        [props.listId, props._id]
+        [listId, _id, props.content]
     );
     const content = React.useMemo(() => {
         if (!props.searchReg) {
@@ -180,6 +217,7 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                 }),
                                             }}
                                             style={{ maxHeight: 250 }}
+                                            ref={markdownRef}
                                         />
                                         <Divider style={{ margin: '0 0 4px 0' }} />
                                         <BadgeHolder>
