@@ -5,7 +5,6 @@ import { BoardActionTypes } from './Board/action';
 import { message, Button, Form, Icon, Layout, Select, Switch } from 'antd';
 import Board from './Board';
 import styled from 'styled-components';
-import { SearchBar } from './SearchBar';
 import { Overview } from './Board/Overview';
 import { LabelButton } from '../../style/form';
 import backIcon from '../../../res/back.svg';
