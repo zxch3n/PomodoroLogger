@@ -6,12 +6,22 @@ const Demo = () => {
     const divRef = React.useRef(null);
     const [div, setDiv] = React.useState(null);
     React.useEffect(() => {
-        setDiv(divRef.current);
-    }, []);
-    React.useEffect(() => {
-        divRef.current.addEventListener('keyup', (event) => {
+        divRef.current.addEventListener('keydown', (event) => {
             if (event.key === '#' || event.char === '#') {
-                setDiv(divRef.current);
+                event.preventDefault();
+                const span = document.createElement('span');
+                span.innerHTML = '#';
+                divRef.current.appendChild(span);
+                setDiv(span);
+
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                const range = document.createRange();
+                const last = span.lastChild;
+                const offset = last.textContent.length;
+                range.setStart(last, offset);
+                range.setEnd(last, offset);
+                sel.addRange(range);
             }
         });
     }, []);
@@ -25,12 +35,12 @@ const Demo = () => {
                 element={div}
                 autoComplete={(s) => [s + '1', s + '2', s + '3']}
                 select={(x) => {
-                    divRef.current.textContent = x;
+                    div.textContent = x;
                     setDiv(undefined);
                     const sel = window.getSelection();
                     sel.removeAllRanges();
                     const range = document.createRange();
-                    const last = divRef.current.lastChild;
+                    const last = div.lastChild;
                     const offset = last.textContent.length;
                     range.setStart(last, offset);
                     range.setEnd(last, offset);
