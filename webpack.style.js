@@ -64,6 +64,10 @@ module.exports = merge.smart(baseConfig, {
                     },
                 ],
             },
+            {
+                test: /\.css$/,
+                loaders: ['style-loader', 'css-loader']
+            },
         ],
     },
     plugins: [
