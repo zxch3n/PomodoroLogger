@@ -35,6 +35,11 @@ const Demo = () => {
                 element={div}
                 autoComplete={(s) => [s + '1', s + '2', s + '3']}
                 select={(x) => {
+                    if (x == null) {
+                        setDiv(undefined);
+                        return;
+                    }
+
                     div.textContent = x;
                     setDiv(undefined);
                     const sel = window.getSelection();

@@ -6,7 +6,7 @@ import 'antd/es/menu/style/css';
 interface Props {
     element?: HTMLElement;
     autoComplete: (s?: string) => string[];
-    select: (s: string) => void;
+    select: (s?: string) => void;
 }
 
 export const AutoComplete = ({ element, autoComplete, select }: Props) => {
@@ -38,6 +38,7 @@ export const AutoComplete = ({ element, autoComplete, select }: Props) => {
             inc: () => setIndex((index) => Math.min(index + 1, options.length - 1)),
             dec: () => setIndex((index) => Math.max(index - 1, -1)),
             sel: () => indexRef.current >= 0 && select(options[indexRef.current]),
+            cancel: () => select(),
         };
     }, [options]);
 
@@ -63,14 +64,15 @@ export const AutoComplete = ({ element, autoComplete, select }: Props) => {
             if (event.key === 'ArrowDown' || event.keyCode === 40) {
                 event.preventDefault();
                 controlRef.current.inc();
-            }
-            if (event.key === 'ArrowUp' || event.keyCode === 38) {
+            } else if (event.key === 'ArrowUp' || event.keyCode === 38) {
                 event.preventDefault();
                 controlRef.current.dec();
-            }
-            if (event.key === 'Enter' || event.keyCode === 13) {
+            } else if (event.key === 'Enter' || event.keyCode === 13) {
                 event.preventDefault();
                 controlRef.current.sel();
+            } else if (event.key === 'Escape' || event.keyCode === 27) {
+                event.preventDefault();
+                controlRef.current.cancel();
             }
         };
 
