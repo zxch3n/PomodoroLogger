@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Menu from 'antd/es/menu';
 import 'antd/es/dropdown/style/css';
 import 'antd/es/menu/style/css';
+import { debounce } from 'lodash';
 interface Props {
     element?: HTMLElement;
     autoComplete: (s?: string) => string[];
@@ -13,9 +14,9 @@ export const AutoComplete = ({ element, autoComplete, select }: Props) => {
     const [options, setOptions] = useState<string[]>([]);
     const [position, setPosition] = useState({ x: -1000, y: -1000 });
     const [index, setIndex] = useState<number>(-1);
-    const set = () => {
-        setOptions(autoComplete(element?.textContent || undefined));
-    };
+    const set = useMemo(() => {
+        return debounce(() => setOptions(autoComplete(element?.textContent || undefined)), 200);
+    }, [autoComplete]);
 
     useEffect(set, [element?.textContent, autoComplete]);
 
