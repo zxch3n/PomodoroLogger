@@ -18,8 +18,12 @@ const Title = styled.p`
     color: #777;
     font-size: 0.8rem;
 `;
+
 const Group = styled.div`
     padding: 4px;
+    max-width: 280px;
+    word-break: normal;
+    line-height: 1.8;
 `;
 
 export const SearchPanel = ({
@@ -33,9 +37,12 @@ export const SearchPanel = ({
             <Title>#TAGS</Title>
             <Group>
                 {tags.map((x) => (
-                    <span className="pl-tag" key={x} onClick={setSearch(x)}>
-                        {x}
-                    </span>
+                    <>
+                        <span className="pl-tag" key={x} onClick={setSearch(x)}>
+                            {x}
+                        </span>
+                        <span/>
+                    </>
                 ))}
             </Group>
             {/* <Title>HISTORY</Title>
