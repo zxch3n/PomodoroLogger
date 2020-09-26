@@ -38,14 +38,14 @@ export const SearchPanel = ({
                     </span>
                 ))}
             </Group>
-            <Title>HISTORY</Title>
+            {/* <Title>HISTORY</Title>
             <Group>
                 {history.map((x) => (
                     <span className="pl-tag" key={x} onClick={setSearch(x)}>
                         {x}
                     </span>
                 ))}
-            </Group>
+            </Group> */}
         </StyledPanel>
     );
 };
