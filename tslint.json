@@ -25,7 +25,8 @@
         "jsx-no-lambda": false,
         "import-name": false,
         "prefer-template": false,
-        "no-parameter-properties": false
+        "no-parameter-properties": false,
+        "no-increment-decrement": false
     },
     "rulesDirectory": []
 }

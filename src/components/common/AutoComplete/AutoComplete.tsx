@@ -2,7 +2,6 @@ import 'antd/es/dropdown/style/css';
 import Menu from 'antd/es/menu';
 import 'antd/es/menu/style/css';
 import { debounce } from 'lodash';
-import { element } from 'prop-types';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 interface Props {

@@ -2,17 +2,35 @@ import AppIcon from '../../../res/icon.png';
 import { ipcRenderer } from 'electron';
 import { IpcEventName } from '../../../main/ipc/type';
 
+const canvasTemp = document.createElement('canvas');
 function drawText(ctx: CanvasRenderingContext2D, isMac: boolean, size: number, leftTime: string) {
-    ctx.fillStyle = 'white';
-    ctx.font = `${(size / 3) * 2}px Helvetica`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    if (isMac) {
-        ctx.fillText(leftTime, size / 2, size / 2);
-    } else {
-        ctx.fillText(leftTime, size / 2, (size / 9) * 5);
+    canvasTemp.width = size;
+    canvasTemp.height = size;
+    const ctxB = canvasTemp.getContext('2d');
+    if (!ctxB) {
+        return;
     }
+
+    ctxB.fillStyle = 'rbg(0, 0, 0)';
+    ctxB.font = `${(size / 3) * 2}px Helvetica`;
+    ctxB.textAlign = 'center';
+    ctxB.textBaseline = 'middle';
+    ctxB.textAlign = 'center';
+    if (isMac) {
+        ctxB.fillText(leftTime, size / 2, size / 2);
+    } else {
+        ctxB.fillText(leftTime, size / 2, (size / 9) * 5);
+    }
+
+    const a = ctx.getImageData(0, 0, size, size);
+    const b = ctxB.getImageData(0, 0, size, size);
+    for (let i = 3; i < size * size * 4; i += 4) {
+        if (b.data[i]) {
+            a.data[i] = 0;
+        }
+    }
+
+    ctx.putImageData(a, 0, 0);
 }
 
 function drawPause(ctx: CanvasRenderingContext2D, size: number) {
