@@ -67,6 +67,7 @@ const BeforePlaceHolder = styled.div`
         rgba(222, 222, 222, 0.001)
     ); /* transparent keyword is broken in Safari */
     pointer-events: none;
+    z-index: 1;
 `;
 
 const AfterPlaceHolder = styled.div`
@@ -82,6 +83,7 @@ const AfterPlaceHolder = styled.div`
         rgba(222, 222, 222, 1)
     ); /* transparent keyword is broken in Safari */
     pointer-events: none;
+    z-index: 1;
 `;
 
 interface CardsProps {
