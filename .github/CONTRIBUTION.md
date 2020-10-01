@@ -23,8 +23,14 @@ yarn test
 Start development 💻
 
 ```
-yarn start-dev
+yarn start
 ```
+
+```
+// within another terminal
+npx electron .
+```
+
 
 ---
 
