@@ -10,7 +10,7 @@ import { AutoUpdater } from './AutoUpdater';
 import { initialize } from './ipc/ipc';
 import { IpcEventName } from './ipc/type';
 
-const { compact, refreshDbs, loadDBs } = db;
+const { refreshDbs, loadDBs } = db;
 export let win: BrowserWindow | undefined;
 
 export const gotTheLock = process.env.NODE_ENV !== 'production' || app.requestSingleInstanceLock();
@@ -30,7 +30,6 @@ if (!gotTheLock) {
 const mGlobal: typeof global & {
     sharedDB?: typeof db.DBs;
     utils?: {
-        compact: typeof compact;
         refreshDbs: typeof refreshDbs;
         loadDBs: typeof loadDBs;
     };
@@ -40,7 +39,6 @@ const mGlobal: typeof global & {
 } = global;
 mGlobal.sharedDB = db.DBs;
 mGlobal.utils = {
-    compact,
     refreshDbs,
     loadDBs,
 };
