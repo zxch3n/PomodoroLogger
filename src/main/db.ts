@@ -51,7 +51,6 @@ export async function loadDBs() {
 }
 
 export async function refreshDbs() {
-    await compact();
     DBs = {
         projectDB: new nedb({ filename: projectDB }),
         sessionDB: new nedb({ filename: sessionDB }),
@@ -64,16 +63,4 @@ export async function refreshDbs() {
 
     await loadDBs();
     return DBs;
-}
-
-export async function compact() {
-    const promises = Object.values(DBs).map(
-        (db) =>
-            new Promise((r) => {
-                db.once('compaction.done', r);
-                (db as nedb).persistence.persistCachedDatabase(r);
-            })
-    );
-
-    await Promise.race([Promise.all(promises), new Promise((r) => setTimeout(r, 2000))]);
 }
