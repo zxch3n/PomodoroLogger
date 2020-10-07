@@ -49,7 +49,7 @@ const Demo = () => {
             isRunning={isRunning}
             isFocusing={isFocusing}
             task="完成 MiniLogger 功能"
-            style={{ width: 300 }}
+            style={{ width: 360 }}
         />
     );
 };
