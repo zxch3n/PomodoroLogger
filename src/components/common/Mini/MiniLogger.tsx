@@ -23,7 +23,16 @@ const StyledLogger = styled.div`
         flex-shrink: 0;
     }
 
-    div.task {
+    & > div.state {
+        font-weight: 700;
+        margin: 0 2px 0 4px;
+        color: #555;
+        flex-shrink: 0;
+        text-align: right;
+    }
+
+    & > div.task {
+        color: #777;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -33,47 +42,29 @@ const StyledLogger = styled.div`
 interface Props {
     play: () => void;
     pause: () => void;
-    getTime: () => [string, number];
+    done: () => void;
+    clear: () => void;
+    switch: () => void;
+    time: string;
+    percentage: number;
     isRunning: boolean;
     isFocusing: boolean;
     task: string;
     style?: React.CSSProperties;
 }
 
-interface State {
-    time: string;
-    percentage: number;
-}
-
-export class MiniLogger extends React.Component<Props, State> {
-    private _interval: number | undefined;
-
+export class MiniLogger extends React.Component<Props> {
     constructor(props: Props) {
         super(props);
-        this.state = {
-            time: '',
-            percentage: 0,
-        };
     }
 
-    componentDidMount() {
-        this._interval = window.setInterval(() => {
-            const [time, percentage] = this.props.getTime();
-            this.setState({ time, percentage });
-        }, 500);
-    }
-
-    componentDidCatch() {
-        window.clearInterval(this._interval);
-    }
-
-    componentWillUnmount() {
-        window.clearInterval(this._interval);
-    }
+    clear = () => {
+        this.setState({ percentage: 0 });
+        this.props.clear();
+    };
 
     render() {
-        const { time, percentage } = this.state;
-        const { style, isRunning, play, pause } = this.props;
+        const { style, isRunning, play, pause, time, percentage, isFocusing } = this.props;
         return (
             <StyledLogger style={style}>
                 <svg viewBox="0 0 100 100" width="28px" height="28px">
@@ -86,7 +77,7 @@ export class MiniLogger extends React.Component<Props, State> {
                             >
                                 <line
                                     y1="0"
-                                    y2="14"
+                                    y2="12"
                                     x1="50"
                                     x2="50"
                                     style={{
@@ -94,7 +85,7 @@ export class MiniLogger extends React.Component<Props, State> {
                                             i / 18 < percentage
                                                 ? 'rgb(200, 200, 200)'
                                                 : 'rgb(99,99,99)',
-                                        strokeWidth: 6,
+                                        strokeWidth: 12,
                                     }}
                                 />
                             </g>
@@ -110,14 +101,20 @@ export class MiniLogger extends React.Component<Props, State> {
                     </text>
                 </svg>
                 {isRunning ? (
-                    <Button icon="pause" onClick={play} />
+                    <Button icon="pause" onClick={pause} />
                 ) : (
-                    <Button icon="caret-right" onClick={pause} />
+                    <Button icon="caret-right" onClick={play} />
                 )}
-                <Button icon="check" />
+                {percentage === 0 ? (
+                    <Button icon="swap" title="Switch Mode" onClick={this.props.switch} />
+                ) : (
+                    <Button icon="check" title="Done" onClick={this.props.done} />
+                )}
+                <Button icon="close" title="Clear" onClick={this.clear} />
                 <div className="task" style={{ margin: 4 }}>
                     {this.props.task}
                 </div>
+                <div className="state">{isFocusing ? 'Working' : 'Break'}</div>
             </StyledLogger>
         );
     }
