@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import { fatScrollBar } from '../../style/scrollbar';
 import ReactHotkeys from 'react-hot-keys';
 import { formatTimeHMS, formatTimeYmdHms } from './Timeline';
+import { EChartOption } from 'echarts';
 
 const FullscreenStyled = styled.div`
     padding: 20px;
@@ -239,7 +240,7 @@ const getLinkAndNode = (
     };
 };
 
-const getOption = (props: Props) => {
+const getOption = (props: Props): EChartOption => {
     const data = getLinkAndNode(props.record!, props.efficiencyAnalyser, props.showSwitch);
     return {
         title: {
@@ -316,7 +317,7 @@ const getOption = (props: Props) => {
                 },
             },
         ],
-    };
+    } as any;
 };
 
 export const PomodoroSankey = (props: Props) => {

@@ -162,7 +162,7 @@ export const switchTab = createActionCreator('[App]SWITCH_TAB', (resolve) => (di
     resolve(direction)
 );
 
-const throwError = (err: Error) => {
+const throwError = (err: Error | null) => {
     if (err) {
         throw err;
     }
@@ -187,7 +187,7 @@ export const actions = {
             return;
         }
 
-        const settingKeywords = [
+        const settingKeywords: [string, any][] = [
             ['focusDuration', setFocusDuration],
             ['restDuration', setRestDuration],
             ['monitorInterval', setMonitorInterval],

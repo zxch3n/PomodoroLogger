@@ -1,3 +1,4 @@
+import { EChartOption } from 'echarts';
 import ReactEcharts from 'echarts-for-react';
 import * as React from 'react';
 
@@ -8,8 +9,8 @@ export interface Props {
     onProjectClick?: (project: string) => void;
 }
 
-function getOption(props: Props) {
-    const option = {
+function getOption(props: Props): EChartOption {
+    const option: EChartOption = {
         tooltip: {
             trigger: 'item',
             formatter: '{a} <br/>{b}: {c} ({d}%)',
