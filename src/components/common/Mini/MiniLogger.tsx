@@ -45,6 +45,7 @@ interface Props {
     done: () => void;
     clear: () => void;
     switch: () => void;
+    expand: () => void;
     time: string;
     percentage: number;
     isRunning: boolean;
@@ -111,6 +112,7 @@ export class MiniLogger extends React.Component<Props> {
                     <Button icon="check" title="Done" onClick={this.props.done} />
                 )}
                 <Button icon="close" title="Clear" onClick={this.clear} />
+                <Button icon="fullscreen" title="Expand" onClick={this.props.expand} />
                 <div className="task" style={{ margin: 4 }}>
                     {this.props.task}
                 </div>
