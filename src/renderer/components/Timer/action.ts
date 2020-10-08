@@ -48,6 +48,7 @@ export interface TimerState extends Setting {
     isRunning: boolean;
     boardId?: string;
     iBreak: number; // i-th break session, if i can be divided by 4, start longer break
+    minimize: boolean;
 
     currentTab: tabType;
 }
@@ -75,6 +76,7 @@ export const defaultState: TimerState = {
     isFocusing: true,
     startOnBoot: false,
     useHardwareAcceleration: false,
+    minimize: false,
 
     monitorInterval: 1000,
     screenShotInterval: undefined,
@@ -94,6 +96,7 @@ export const uiStateNames = [
     'isRunning',
     'boardId',
     'iBreak',
+    'minimize',
 ];
 
 export const startTimer = createActionCreator('[Timer]START_TIMER');
@@ -101,6 +104,10 @@ export const stopTimer = createActionCreator('[Timer]STOP_TIMER');
 export const continueTimer = createActionCreator('[Timer]CONTINUE_TIMER');
 export const clearTimer = createActionCreator('[Timer]CLEAR_TIMER');
 export const timerFinished = createActionCreator('[Timer]TIMER_FINISHED');
+export const setMinimize = createActionCreator(
+    '[Timer]SET_MINIMIZE',
+    (resolve) => (value: boolean) => resolve(value)
+);
 export const setAutoUpdate = createActionCreator(
     '[Timer]SET_AUTO_UPDATE',
     (resolve) => (value: boolean) => resolve(value)
@@ -223,6 +230,17 @@ export const actions = {
             { upsert: true },
             throwError
         );
+    },
+    setMinimize: (mini: boolean) => async (dispatch: Dispatch) => {
+        dispatch(setMinimize(mini));
+        const { remote } = await import('electron');
+        const win = remote.getCurrentWindow();
+        win.setAlwaysOnTop(mini);
+        if (mini) {
+            win.setBounds({ height: 80, width: 366 });
+        } else {
+            win.setBounds({ height: 800, width: 1080 });
+        }
     },
     setDistractingList: (distractingList: DistractingRow[]) => async (dispatch: Dispatch) => {
         dispatch(setDistractingList(distractingList));
@@ -443,5 +461,10 @@ export const reducer = createReducer<TimerState, any>(defaultState, (handle) => 
     handle(setTimerManager, (state, { payload: { manager } }) => ({
         ...state,
         timerManager: manager,
+    })),
+    handle(setMinimize, (state, { payload }) => ({
+        ...state,
+        minimize: payload,
+        currentTab: 'timer',
     })),
 ]);
