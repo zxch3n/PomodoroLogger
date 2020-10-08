@@ -111,6 +111,7 @@ const Cards = styled.div<CardsProps>`
     border-radius: 4px;
     max-height: calc(100vh - 230px);
     overflow-y: overlay;
+    overflow-x: hidden;
     min-height: 200px;
     max-width: 270px;
     & > * {
