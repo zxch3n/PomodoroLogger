@@ -116,7 +116,10 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
 
     const keydownEventHandler = React.useCallback(
         (event: KeyboardEvent<any>) => {
-            if (event.ctrlKey && !event.altKey && (event.which === 13 || event.keyCode === 13)) {
+            if (
+                (event.ctrlKey || event.altKey || event.shiftKey) &&
+                (event.which === 13 || event.keyCode === 13)
+            ) {
                 onSave();
             } else if (event.keyCode === 27) {
                 onCancel();
@@ -142,15 +145,14 @@ const _CardInDetail: FC<Props> = React.memo((props: Props) => {
             visible={visible}
             title={thisIsCreating ? 'Create a new card' : 'Edit'}
             okText={thisIsCreating ? 'Create' : 'Save'}
-            onCancel={onSave}
+            onCancel={onCancel}
             cancelButtonProps={{ style: { display: 'none' } }}
             style={{ minWidth: 300 }}
             width={'60vw'}
             onOk={onSave}
         >
-            <ReactHotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
             <EditorContainer>
-                <Form layout="vertical">
+                <Form layout="vertical" onKeyDown={keydownEventHandler}>
                     <Form.Item label="Title">
                         {getFieldDecorator('title', {
                             rules: [{ required: true, message: 'Please input the name of board!' }],

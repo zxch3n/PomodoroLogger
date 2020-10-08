@@ -1,5 +1,5 @@
-import * as React from 'react';
 import ReactEcharts from 'echarts-for-react';
+import * as React from 'react';
 
 export interface Props {
     width?: number;

@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { SearchPanel } from './SearchPanel';
 import { Icon } from 'antd';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+
+import { SearchPanel } from './SearchPanel';
 
 export interface SearchProps {
     searchStr?: string;

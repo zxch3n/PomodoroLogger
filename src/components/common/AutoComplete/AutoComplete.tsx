@@ -1,9 +1,11 @@
 import 'antd/es/dropdown/style/css';
-import Menu from 'antd/es/menu';
 import 'antd/es/menu/style/css';
+
+import Menu from 'antd/es/menu';
 import { debounce } from 'lodash';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+
 interface Props {
     element?: HTMLElement;
     autoComplete: (s?: string) => string[];

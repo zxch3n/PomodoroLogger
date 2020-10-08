@@ -1,4 +1,4 @@
-import React, { KeyboardEvent } from 'react';
+import React from 'react';
 import { Button, Form, Input, Modal, Popconfirm, Tabs } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import Hotkeys from 'react-hot-keys';
@@ -47,6 +47,17 @@ export const EditKanbanForm = Form.create<
             this.setDescriptionState();
         }
 
+        private onKeydown = (e: React.KeyboardEvent<any>) => {
+            console.log(e);
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                if (e.ctrlKey || e.shiftKey || e.altKey) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    this.props.onSave();
+                }
+            }
+        };
+
         setDescriptionState = () => {
             this.setState({ description: this.props.form.getFieldValue('description') || '' });
         };
@@ -71,12 +82,6 @@ export const EditKanbanForm = Form.create<
             callback(`Board "${name}" already exists`);
         };
 
-        onKeyDown = (event: KeyboardEvent<any>) => {
-            if (event.ctrlKey && !event.altKey && (event.keyCode === 13 || event.which === 13)) {
-                this.props.onSave();
-            }
-        };
-
         onTabChange = (key: string) => {
             const toPreview = key === 'preview';
             if (toPreview) {
@@ -87,22 +92,21 @@ export const EditKanbanForm = Form.create<
         };
 
         render() {
-            const { visible, onSave, form, isCreating, onDelete, boardId } = this.props;
+            const { visible, onSave, form, isCreating, onDelete, boardId, onCancel } = this.props;
             const { getFieldDecorator } = form;
             return (
                 <Modal
                     visible={visible}
                     title={isCreating ? 'Create a new board' : 'Edit'}
                     okText={isCreating ? 'Create' : 'Save'}
-                    onCancel={onSave}
+                    onCancel={onCancel}
                     cancelButtonProps={{ style: { display: 'none' } }}
                     onOk={onSave}
                     style={{ minWidth: 300 }}
                     width={'60vw'}
                 >
                     <EditorContainer>
-                        <Form layout="vertical">
-                            <Hotkeys keyName={'ctrl+enter'} onKeyDown={onSave} />
+                        <Form layout="vertical" onKeyDown={this.onKeydown}>
                             <Form.Item label="Name">
                                 {getFieldDecorator('name', {
                                     rules: [
@@ -113,7 +117,7 @@ export const EditKanbanForm = Form.create<
                                         { max: 48, message: 'Max length of name is 48' },
                                         { validator: this.validator },
                                     ],
-                                })(<Input onKeyDown={this.onKeyDown} />)}
+                                })(<Input onKeyDown={this.onKeydown} />)}
                             </Form.Item>
                             <Tabs
                                 onChange={this.onTabChange}
@@ -125,7 +129,7 @@ export const EditKanbanForm = Form.create<
                                     {getFieldDecorator('description')(
                                         <TextArea
                                             autosize={{ minRows: 3, maxRows: 5 }}
-                                            onKeyDown={this.onKeyDown}
+                                            onKeyDown={this.onKeydown}
                                         />
                                     )}
                                 </TabPane>

@@ -1,7 +1,8 @@
-import * as React from 'react';
-import PinSvg from '../../../res/pin.svg';
 import { Icon } from 'antd';
+import * as React from 'react';
 import styled from 'styled-components';
+
+import PinSvg from '../../../res/pin.svg';
 
 const RoundedContainer = styled.button``;
 
