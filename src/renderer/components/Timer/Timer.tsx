@@ -29,6 +29,7 @@ import { EfficiencyAnalyser } from '../../../shared/efficiency/efficiency';
 import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
 import { waitUntil } from './wait';
+import { MiniLogger } from '../../../components/common/Mini/MiniLogger';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -70,7 +71,7 @@ const TimerInnerLayout = styled.div`
     margin: 0 auto;
 `;
 
-const MyLayout = styled.div`
+const Layout = styled.div`
     display: flex;
     flex: auto;
     flex-direction: row;
@@ -632,7 +633,7 @@ class Timer extends Component<Props, State> {
         }, timeout);
     };
 
-    private extendCurrentSession = (timeInMinutes: number) => {
+    private extendCurrentSession = (minutes: number) => {
         if (this.monitor) {
             this.monitor.resume();
         } else if (__DEV__) {
@@ -643,11 +644,11 @@ class Timer extends Component<Props, State> {
         }
 
         if (__DEV__) {
-            timeInMinutes = 1 / 60;
+            minutes = 1 / 60;
         }
 
-        this.extendedTimeInMinute += timeInMinutes;
-        this.props.extendCurrentSession(timeInMinutes * 60);
+        this.extendedTimeInMinute += minutes;
+        this.props.extendCurrentSession(minutes * 60);
         this.setState({ showMask: false });
     };
 
@@ -696,30 +697,51 @@ class Timer extends Component<Props, State> {
         message.error(error.toString());
     }
 
+    minimize = () => {
+        this.props.setMinimize(!this.props.timer.minimize);
+    };
+
     render() {
         const { leftTime, percent, more, pomodorosToday, showMask } = this.state;
-        const { isRunning, targetTime } = this.props.timer;
-        const apps: { [appName: string]: { appName: string; spentHours: number } } = {};
-        for (const pomodoro of pomodorosToday) {
-            for (const appName in pomodoro.apps) {
-                if (!(appName in apps)) {
-                    apps[appName] = {
-                        appName,
-                        spentHours: 0,
-                    };
-                }
-
-                apps[appName].spentHours += pomodoro.apps[appName].spentTimeInHour;
-            }
-        }
-
+        const { isRunning, targetTime, minimize, isFocusing } = this.props.timer;
         const shownLeftTime =
             (isRunning || targetTime) && leftTime.length ? leftTime : this.defaultLeftTime();
         const boardId = this.props.timer.boardId;
+
+        if (minimize) {
+            const name = boardId && this.props.kanban.boards[boardId]?.name;
+            return (
+                <Layout style={{ backgroundColor: 'white' }} ref={this.selfRef}>
+                    <ReactHotkeys keyName={'f5,f6,tab'} onKeyDown={this.onKeyDown} />
+                    <MiniLogger
+                        clear={this.onClear}
+                        done={this.onDone}
+                        expand={this.minimize}
+                        isFocusing={isFocusing}
+                        isRunning={isRunning}
+                        pause={this.onStop}
+                        percentage={percent}
+                        play={this.onStopResumeOrStart}
+                        switch={this.switchMode}
+                        task={name || ''}
+                        time={shownLeftTime.slice(0, 2)}
+                        style={{ zIndex: 999, overflow: 'hidden' }}
+                        isConfirming={showMask}
+                        extendCurrentSession={this.extendCurrentSession}
+                        stagedPomodoro={this.stagedSession}
+                        confirm={this.onMaskClick}
+                        confirmAndStartNextSession={this.onMaskButtonClick}
+                    />
+                    <audio src={dingMp3} ref={this.sound} />
+                </Layout>
+            );
+        }
+
         const listId =
             boardId !== undefined ? this.props.kanban.boards[boardId].focusedList : undefined;
+
         return (
-            <MyLayout style={{ backgroundColor: 'white' }} ref={this.selfRef}>
+            <Layout style={{ backgroundColor: 'white' }} ref={this.selfRef}>
                 <ReactHotkeys keyName={'f5,f6,tab'} onKeyDown={this.onKeyDown} />
                 <TimerMask
                     extendCurrentSession={this.extendCurrentSession}
@@ -727,7 +749,7 @@ class Timer extends Component<Props, State> {
                     showMask={showMask}
                     onCancel={this.onMaskClick}
                     onStart={this.onMaskButtonClick}
-                    pomodoros={this.state.pomodorosToday}
+                    pomodoros={pomodorosToday}
                 />
                 {listId === undefined || boardId === undefined ? undefined : (
                     <MySider
@@ -758,12 +780,23 @@ class Timer extends Component<Props, State> {
                     </MySider>
                 )}
                 <TimerLayout ref={this.mainDiv}>
+                    <Button
+                        icon={'fullscreen-exit'}
+                        onClick={this.minimize}
+                        shape={'circle'}
+                        style={{
+                            position: 'absolute',
+                            zIndex: 50,
+                            top: 14,
+                            right: 14,
+                        }}
+                    />
                     <HelpIcon
                         storyName={'allStories'}
                         style={{
                             position: 'absolute',
                             zIndex: 50,
-                            top: 14,
+                            bottom: 14,
                             right: 14,
                         }}
                     />
@@ -888,7 +921,7 @@ class Timer extends Component<Props, State> {
                     </TimerInnerLayout>
                 </TimerLayout>
                 <audio src={dingMp3} ref={this.sound} />
-            </MyLayout>
+            </Layout>
         );
     }
 }
