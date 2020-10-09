@@ -35,7 +35,7 @@ const Demo = () => {
                 timer = setInterval(() => {
                     setTimePercentage((timePercentage) => {
                         const time = parseInt(timePercentage[0]) - 1;
-                        const percentage = (25 - time) / 25;
+                        const percentage = ((25 - time) / 25) * 100;
                         setTimePercentage([time.toString(), percentage]);
                     });
                 }, 1000);
