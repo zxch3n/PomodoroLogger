@@ -33,7 +33,7 @@ const Main = styled.div<StyledProps>`
         margin: 0;
     }
 
-    ${({ minimize }) => (minimize ? 'overflow: hidden;' : '')}
+    ${({ minimize }) => (minimize ? 'overflow: hidden; height: 100vh;' : '')}
     .ant-tabs-nav-container,.ant-modal-content {
         ${({ minimize }) => (minimize ? 'display: none;' : '')}
     }

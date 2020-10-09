@@ -237,7 +237,11 @@ export const actions = {
         const win = remote.getCurrentWindow();
         win.setAlwaysOnTop(mini);
         if (mini) {
-            win.setBounds({ height: 80, width: 366 });
+            if (process.platform !== 'darwin') {
+                win.setBounds({ height: 80, width: 366 });
+            } else {
+                win.setBounds({ height: 63, width: 366 });
+            }
         } else {
             win.setBounds({ height: 800, width: 1080 });
         }

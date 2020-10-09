@@ -241,7 +241,7 @@ export class MiniLogger extends React.Component<Props> {
                         fontSize="40"
                         style={{ fill: 'rgb(99,99,99)' }}
                     >
-                        {isConfirming ? '🍅' : time}
+                        {isConfirming ? (isFocusing ? '🍅' : '') : time}
                     </text>
                 </svg>
                 {this.getButtonRow()}
