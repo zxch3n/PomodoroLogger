@@ -48,7 +48,6 @@ export const EditKanbanForm = Form.create<
         }
 
         private onKeydown = (e: React.KeyboardEvent<any>) => {
-            console.log(e);
             if (e.key === 'Enter' || e.keyCode === 13) {
                 if (e.ctrlKey || e.shiftKey || e.altKey) {
                     e.stopPropagation();
