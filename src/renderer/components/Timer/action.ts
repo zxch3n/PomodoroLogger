@@ -11,7 +11,7 @@ import { PomodoroRecord } from '../../monitor/type';
 import { workers } from '../../workers';
 import { DEBUG_TIME_SCALE, __DEV__ } from '../../../config';
 import { AsyncDB } from '../../../utils/dbHelper';
-import { getNameFromBoardId } from '../../utils';
+import { getNameFromBoardId } from '../../getNameFromBoardId';
 
 export const LONG_BREAK_INTERVAL = 4;
 const settingDB = new AsyncDB(dbs.settingDB);

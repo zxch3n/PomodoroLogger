@@ -14,7 +14,7 @@ import { PomodoroRecord } from '../../monitor/type';
 import { formatTimeYMD } from '../Visualization/Timeline';
 import { BadgeHolder } from '../Kanban/style/Badge';
 import { PomodoroDot } from '../Visualization/PomodoroDot';
-import { TimeBadge } from '../Kanban/Card/Badge';
+import { TimeBadge } from '../../../components/Visualization/Badge/Badge';
 import { workers } from '../../workers';
 import { Card as CardState } from '../Kanban/type';
 import { DualPieChart } from '../../../components/Visualization/DualPieChart';

@@ -1,6 +1,4 @@
 import { Dispatch } from 'redux';
-import { workers } from './workers';
-import { KanbanBoard } from './components/Kanban/type';
 import { MapDispatchToPropsParam } from 'react-redux';
 
 let creatorMap = new WeakMap();
@@ -200,12 +198,6 @@ function equal(a: any, b: any, equalKey: string) {
     }
 
     return a === b;
-}
-
-export async function getNameFromBoardId(_id: string) {
-    const worker = workers.dbWorkers.kanbanDB;
-    const board: KanbanBoard = await worker.findOne({ _id });
-    return board.name;
 }
 
 export function mergeRefs<T = any>(

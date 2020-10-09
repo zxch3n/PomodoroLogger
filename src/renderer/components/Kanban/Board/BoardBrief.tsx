@@ -8,7 +8,7 @@ import { Dispatch } from 'redux';
 import styled, { keyframes } from 'styled-components';
 import { CardsState } from '../Card/action';
 import { Button, Divider, message } from 'antd';
-import { Badge, TimeBadge } from '../Card/Badge';
+import { Badge, TimeBadge } from '../../../../components/Visualization/Badge/Badge';
 import formatMarkdown from '../Card/formatMarkdown';
 import { IdTrend } from '../../Visualization/ProjectTrend';
 import { BadgeHolder } from '../style/Badge';

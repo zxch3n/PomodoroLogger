@@ -1,6 +1,7 @@
 import { Counter } from '../../../utils/Counter';
 import { PomodoroRecord } from '../../monitor/type';
-import { getBetterAppName, getNameFromBoardId } from '../../utils';
+import { getBetterAppName } from '../../utils';
+import { getNameFromBoardId } from '../../getNameFromBoardId';
 import { workers } from '../../workers';
 import { Card } from '../Kanban/type';
 

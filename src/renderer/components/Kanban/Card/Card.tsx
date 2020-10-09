@@ -5,7 +5,7 @@ import { KanbanActionTypes } from '../action';
 import styled from 'styled-components';
 import { Divider } from 'antd';
 import formatMarkdown from './formatMarkdown';
-import { TimeBadge } from './Badge';
+import { TimeBadge } from '../../../../components/Visualization/Badge/Badge';
 import { BadgeHolder } from '../style/Badge';
 import { Markdown } from '../style/Markdown';
 import { PomodoroDot } from '../../Visualization/PomodoroDot';
@@ -229,8 +229,10 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                                 <TimeBadge
                                                     spentTime={props.spentTimeInHour.actual}
                                                     leftTime={
-                                                        props.spentTimeInHour.estimated -
-                                                        props.spentTimeInHour.actual
+                                                        props.spentTimeInHour.estimated === 0
+                                                            ? undefined
+                                                            : props.spentTimeInHour.estimated -
+                                                              props.spentTimeInHour.actual
                                                     }
                                                 />
                                             ) : undefined}

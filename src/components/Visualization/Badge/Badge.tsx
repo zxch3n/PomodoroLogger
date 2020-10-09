@@ -1,5 +1,5 @@
-import React from 'react';
-import { formatTime } from '../../../utils';
+import React, { useMemo } from 'react';
+import { formatTime } from '../../../renderer/utils';
 import shortid from 'shortid';
 import styled from 'styled-components';
 import { throttle } from 'lodash';
@@ -7,10 +7,10 @@ import { throttle } from 'lodash';
 const AnimeSvg = styled.svg`
     transition: transform 0.25s;
     user-select: none;
-    cursor: pointer;
+    cursor: default;
     font-weight: 600;
     .clip-path {
-        transition: all 0.65s;
+        transition: all 0.6s 0.1s;
     }
     .label {
         font-weight: 700;
@@ -105,9 +105,11 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
     const [clipState, setClipState] = React.useState('default');
     const id = React.useMemo(shortid.generate, []);
     const id1 = id + '1';
+    let exceeded = false;
     let { spentTime = 0, leftTime = 0 } = props;
     if (leftTime < 0) {
-        leftTime = 0;
+        leftTime = -leftTime;
+        exceeded = true;
     }
     if (spentTime < 0) {
         spentTime = 0;
@@ -119,9 +121,38 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
     const totalWidth = 168;
     const spentWidth = sum ? ((totalWidth - 100) / sum) * spentTime + 50 : 90;
     const estimatedWidth = totalWidth - spentWidth;
-    const onHoverSpent = throttle(() => setClipState('spent'), 800);
-    const onLeave = throttle(() => setClipState('default'), 800);
-    const onHoverLeft = throttle(() => setClipState('left'), 800);
+    const _onMove = useMemo(
+        () =>
+            throttle((event: React.MouseEvent<HTMLOrSVGElement>) => {
+                let node = event.nativeEvent.target as Element | null;
+                while (node && node.tagName !== 'svg') {
+                    node = node.parentElement;
+                }
+                if (!node) {
+                    return;
+                }
+
+                const x = node.getBoundingClientRect().x;
+                const offset = event.clientX - x;
+                if (offset < totalWidth / 4) {
+                    setClipState('spent');
+                } else if (offset > (totalWidth / 4) * 3) {
+                    setClipState('left');
+                } else {
+                    setClipState('default');
+                }
+            }, 100),
+        []
+    );
+    const onMove = (event: React.MouseEvent<any>) => {
+        event.persist();
+        _onMove(event);
+    };
+    const onLeave = () => {
+        setTimeout(() => {
+            setClipState('default');
+        }, 110);
+    };
     let state = clipState;
     if (estimatedWidth < 53) {
         state = 'spent';
@@ -145,9 +176,10 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
                 width={totalWidth}
                 height="20"
                 style={{ margin: '0 0 2px 6px', fontSize: 12 }}
+                onMouseMove={onMove}
                 onMouseLeave={onLeave}
             >
-                <g onMouseOver={onHoverSpent} clipPath={`url(#${id1})`}>
+                <g clipPath={`url(#${id1})`}>
                     <text
                         x={0}
                         y={10}
@@ -168,6 +200,7 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
             width={totalWidth}
             height="20"
             style={{ margin: '0 0 2px 6px', fontSize: 12 }}
+            onMouseMove={onMove}
             onMouseLeave={onLeave}
         >
             <defs>
@@ -191,7 +224,7 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
                 </clipPath>
             </defs>
 
-            <g onMouseOver={onHoverSpent} clipPath={`url(#${id1})`}>
+            <g clipPath={`url(#${id1})`}>
                 <rect height={20} width={totalWidth - 50} x={50} rx={3} fill={'#b37e5b'} />
                 <text
                     x={4}
@@ -202,6 +235,7 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
                     fill={'black'}
                 >
                     {sSpentTime}
+                    <title>Spent Time</title>
                 </text>
 
                 <text
@@ -217,18 +251,24 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
                 </text>
             </g>
 
-            <g clipPath={`url(#${id})`} onMouseOver={onHoverLeft}>
-                <rect height={20} width={totalWidth - 50} x={0} rx={3} fill={'#ddd'} />
+            <g clipPath={`url(#${id})`}>
+                <rect
+                    height={20}
+                    width={totalWidth - 50}
+                    x={0}
+                    rx={3}
+                    fill={exceeded ? '#740606' : '#ddd'}
+                />
                 <text
                     className={'label'}
                     x={4}
                     y={10}
-                    textLength={30}
+                    textLength={30 + (exceeded ? 8 : 0)}
                     textAnchor={'start'}
                     alignmentBaseline={'central'}
                     fill={'white'}
                 >
-                    LEFT
+                    {exceeded ? 'EXTRA' : 'LEFT'}
                 </text>
                 <text
                     x={spentWidth + estimatedWidth - 4}
@@ -239,6 +279,7 @@ export const TimeBadge = React.memo((props: TimeBadgeProps) => {
                     fill={'black'}
                 >
                     {sEstimatedTime}
+                    <title>{exceeded ? 'Extra Time' : 'Left Time'}</title>
                 </text>
             </g>
         </AnimeSvg>
