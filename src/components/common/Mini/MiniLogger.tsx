@@ -189,17 +189,17 @@ export class MiniLogger extends React.Component<Props> {
         ) : (
             <>
                 {isRunning ? (
-                    <Button icon="pause" onClick={pause} />
+                    <Button icon="pause" title="Pause (F6)" onClick={pause} />
                 ) : (
-                    <Button icon="caret-right" onClick={play} />
+                    <Button icon="caret-right" title="Start (F5)" onClick={play} />
                 )}
                 {percentage === 0 ? (
-                    <Button icon="swap" title="Switch Mode" onClick={this.props.switch} />
+                    <Button icon="swap" title="Switch Mode (Tab)" onClick={this.props.switch} />
                 ) : (
                     <Button icon="check" title="Done" onClick={this.props.done} />
                 )}
                 <Button icon="close" title="Clear" onClick={this.clear} />
-                <Button icon="fullscreen" title="Expand" onClick={this.props.expand} />
+                <Button icon="fullscreen" title="Expand (F12)" onClick={this.props.expand} />
             </>
         );
     }

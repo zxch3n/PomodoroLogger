@@ -82,6 +82,10 @@ class Application extends React.Component<Props> {
             case 'ctrl+q':
                 ipcRenderer.send(IpcEventName.Quit, 'quit');
                 break;
+            case 'f11':
+            case 'f12':
+                this.props.setMinimize(!this.props.minimize);
+                break;
         }
     };
 
@@ -177,7 +181,7 @@ class Application extends React.Component<Props> {
                     </>
                 )}
                 <ReactHotkeys
-                    keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12,ctrl+q'}
+                    keyName={'ctrl+tab,ctrl+shift+tab,ctrl+f12,ctrl+q,f11,f12'}
                     onKeyDown={this.onKeyDown}
                 />
             </Main>

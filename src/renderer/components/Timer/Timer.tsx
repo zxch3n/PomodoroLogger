@@ -783,6 +783,7 @@ class Timer extends Component<Props, State> {
                     <Button
                         icon={'fullscreen-exit'}
                         onClick={this.minimize}
+                        title="Minimize (F12)"
                         shape={'circle'}
                         style={{
                             position: 'absolute',
@@ -841,14 +842,14 @@ class Timer extends Component<Props, State> {
                                 {isRunning ? (
                                     <Button
                                         icon="pause"
-                                        title="Pause"
+                                        title="Pause (F6)"
                                         shape={'circle'}
                                         onClick={this.onStopResumeOrStart}
                                     />
                                 ) : (
                                     <Button
                                         icon="caret-right"
-                                        title="Start"
+                                        title="Start (F5)"
                                         shape={'circle'}
                                         onClick={this.onStopResumeOrStart}
                                     />
@@ -864,7 +865,7 @@ class Timer extends Component<Props, State> {
                             ) : (
                                 <Button
                                     id="mode-switching-button"
-                                    title="Switch Mode"
+                                    title="Switch Mode (Tab)"
                                     icon="swap"
                                     shape="circle"
                                     onClick={this.switchMode}
