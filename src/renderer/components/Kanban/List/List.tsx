@@ -106,12 +106,12 @@ const displayScrollbarFn = ({ displayScrollbar }: CardsProps) => {
 
 const Cards = styled.div<CardsProps>`
     position: relative;
-    padding: 0 0 0 2px;
+    padding: 0;
     background-color: #dedede;
     border-radius: 4px;
     max-height: calc(100vh - 230px);
     overflow-y: overlay;
-    overflow-x: hidden;
+    overflow-x: visible;
     min-height: 200px;
     max-width: 270px;
     & > * {
@@ -123,6 +123,7 @@ const Cards = styled.div<CardsProps>`
         height: 4px;
         background-color: rgba(0, 0, 0, 0);
     }
+
     ::-webkit-scrollbar-track {
         width: 4px;
         background-color: rgba(0, 0, 0, 0);
