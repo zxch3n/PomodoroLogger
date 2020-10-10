@@ -6,7 +6,7 @@ export const Markdown = styled.div`
     font-size: 14px;
     position: relative;
     padding: 0 0 4px 0;
-    line-height: 1.8;
+    line-height: 1.4;
     ${thinScrollBar};
 
     ::before {
@@ -44,7 +44,8 @@ export const Markdown = styled.div`
         cursor: pointer;
         background-color: #98989869;
         color: #222;
-        margin: 0 2px;
+        margin: 0px 2px;
+        line-height: 1.8;
         &:hover {
             background-color: var(--hover-background, #98989855) !important;
         }
@@ -52,20 +53,20 @@ export const Markdown = styled.div`
 
     h1 {
         font-size: 1.2em;
-        margin: 0 !important;
+        margin: 0.4em 0 !important;
     }
     h2 {
         font-size: 1.15em;
-        margin: 0 !important;
+        margin: 0.4em 0 !important;
     }
     h3 {
         font-size: 1.1em;
-        margin: 0 !important;
+        margin: 0.4em 0 !important;
     }
     h4 {
         font-size: 1.05em;
         font-weight: 700;
-        margin: 0 !important;
+        margin: 0.4em 0 !important;
     }
 
     h5,
@@ -73,17 +74,18 @@ export const Markdown = styled.div`
     h7 {
         font-size: 1.05em;
         font-weight: 600;
-        margin: 0 !important;
+        margin: 0.4em 0 !important;
     }
 
     p {
-        margin: 0 !important;
+        margin: 0.4em 0 !important;
     }
 
     ul,
     ol {
         padding-left: 24px;
         margin-bottom: 0;
+        margin: 0.4em 0 !important;
     }
 
     .search-highlight {
