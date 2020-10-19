@@ -11,6 +11,10 @@ describe('Markdown tag', () => {
         );
     });
 
+    it('#world', () => {
+        expect(parseTag(`#world`).trim()).toEqual(`<span class="pl-tag" ${style}>#world</span>`);
+    });
+
     it("'hello'", () => {
         expect(formatMarkdown("'hello'").trim()).toEqual('<p>&#39;hello&#39;</p>');
     });
