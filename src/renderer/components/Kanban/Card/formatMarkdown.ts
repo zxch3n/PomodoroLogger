@@ -19,16 +19,16 @@ export function parseTag(
         registerTag,
     }: MarkdownContext = defaultContext
 ) {
-    return html.replace(/(#[^\s\\<>]+)(\s|$|<)/gi, (_, p1, p2) => {
+    return html.replace(/([^&\*#@a-z]|^)(#[^\s\\<>]+)(\s|$|<)/gi, (_, p1, p2, p3) => {
         const { background, color } = stringColorMap(p1);
         registerTag && registerTag(p1);
-        return `<span class="pl-tag" style="background:${background}; color:${color}; --hover-background: ${
+        return `${p1}<span class="pl-tag" style="background:${background}; color:${color}; --hover-background: ${
             background.slice(0, 7) + '55'
-        }">${p1}</span>${p2}`;
+        }">${p2}</span>${p3}`;
     });
 }
 
-const formatMarkdown = (markdown: string, context: MarkdownContext = defaultContext) => {
+export const formatMarkdown = (markdown: string, context: MarkdownContext = defaultContext) => {
     let i = 0;
     const html = marked(markdown, { gfm: true, breaks: true })
         .replace(/<a/g, '<a target="_blank"')
