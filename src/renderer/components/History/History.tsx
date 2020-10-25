@@ -66,7 +66,7 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
     const [targetDate, setTargetDate] = useState<undefined | [number, number, number]>(undefined);
     const [shownPomodoros, setPomodoros] = useState<undefined | PomodoroRecord[]>(undefined);
     const [aggInfo, setAggInfo] = useState<AggPomodoroInfo>({
-        count: {
+        agg: {
             day: undefined,
             month: undefined,
             week: undefined,
@@ -174,12 +174,16 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                     </BadgeHolder>
                 </Row>
                 <Row gutter={16}>
-                    <Col span={8}>
+                    <Col
+                        span={8}
+                        title={aggInfo.agg.day ? aggInfo.agg.day.hours.toFixed(1) + 'h' : ''}
+                        style={{ cursor: 'default' }}
+                    >
                         <Card>
-                            {aggInfo.count.day != null ? (
+                            {aggInfo.agg.day != null ? (
                                 <Statistic
                                     title="Pomodoros Today"
-                                    value={aggInfo.count.day}
+                                    value={aggInfo.agg.day.count}
                                     precision={0}
                                     valueStyle={{ color: '#3f8600' }}
                                 />
@@ -188,12 +192,16 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                             )}
                         </Card>
                     </Col>
-                    <Col span={8}>
+                    <Col
+                        span={8}
+                        title={aggInfo.agg.week ? aggInfo.agg.week.hours.toFixed(1) + 'h' : ''}
+                        style={{ cursor: 'default' }}
+                    >
                         <Card>
-                            {aggInfo.count.week != null ? (
+                            {aggInfo.agg.week != null ? (
                                 <Statistic
                                     title="Pomodoros This Week"
-                                    value={aggInfo.count.week}
+                                    value={aggInfo.agg.week.count}
                                     precision={0}
                                     valueStyle={{ color: '#3f8600' }}
                                 />
@@ -202,12 +210,16 @@ export const History: React.FunctionComponent<Props> = React.memo((props: Props)
                             )}
                         </Card>
                     </Col>
-                    <Col span={8}>
+                    <Col
+                        span={8}
+                        title={aggInfo.agg.month ? aggInfo.agg.month.hours.toFixed(1) + 'h' : ''}
+                        style={{ cursor: 'default' }}
+                    >
                         <Card>
-                            {aggInfo.count.month != null ? (
+                            {aggInfo.agg.month != null ? (
                                 <Statistic
                                     title="Pomodoros This Month"
-                                    value={aggInfo.count.month}
+                                    value={aggInfo.agg.month.count}
                                     precision={0}
                                     valueStyle={{ color: '#cf1322' }}
                                 />

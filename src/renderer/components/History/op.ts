@@ -28,16 +28,21 @@ const _getDateFromTimestamp = (time: number): Date => {
     return new Date(dateStr);
 };
 
-export const getPomodoroCount = (days: number, pomodoros: PomodoroRecord[]): number => {
+export const getPomodoroAgg = (
+    days: number,
+    pomodoros: PomodoroRecord[]
+): { count: number; hours: number } => {
     const time = _getDateFromTimestamp(new Date().getTime()).getTime() - days * 24 * 3600 * 1000;
-    let n = 0;
+    let count = 0;
+    let hours = 0;
     for (const p of pomodoros) {
         if (p.startTime >= time) {
-            n += 1;
+            count += 1;
+            hours += p.spentTimeInHour;
         }
     }
 
-    return n;
+    return { count, hours };
 };
 
 export interface TimeSpentData {
@@ -85,10 +90,10 @@ export const getTimeSpentDataFromRecords = async (
 };
 
 export interface AggPomodoroInfo {
-    count: {
-        day?: number;
-        week?: number;
-        month?: number;
+    agg: {
+        day?: { count: number; hours: number };
+        week?: { count: number; hours: number };
+        month?: { count: number; hours: number };
     };
     total: {
         count?: number;
@@ -104,10 +109,10 @@ export async function getAggPomodoroInfo(
     cards: Card[]
 ): Promise<AggPomodoroInfo> {
     return {
-        count: {
-            day: getPomodoroCount(0, pomodoros),
-            week: getPomodoroCount(new Date().getDay(), pomodoros),
-            month: getPomodoroCount(new Date().getDate() - 1, pomodoros),
+        agg: {
+            day: getPomodoroAgg(0, pomodoros),
+            week: getPomodoroAgg(new Date().getDay(), pomodoros),
+            month: getPomodoroAgg(new Date().getDate() - 1, pomodoros),
         },
         total: {
             count: pomodoros.length,
