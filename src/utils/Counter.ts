@@ -24,8 +24,12 @@ export class Counter {
 
     getNameValuePairs({
         toFixed = undefined,
-        topK = undefined
-    }: { toFixed?: number; topK?: number } = {}): { name: string; value: number }[] {
+        topK = undefined,
+        minRatio = undefined,
+    }: { toFixed?: number; topK?: number; minRatio?: number } = {}): {
+        name: string;
+        value: number;
+    }[] {
         let ans = [];
         for (const key in this._dict) {
             let value = this._dict[key];
@@ -42,6 +46,11 @@ export class Counter {
         if (topK && ans.length > topK) {
             ans.sort((a, b) => -a.value + b.value);
             ans = ans.slice(0, topK);
+        }
+
+        if (minRatio != null) {
+            const sum = ans.reduce((sum, cur) => sum + cur.value, 0);
+            ans = ans.filter((x) => x.value / sum > minRatio);
         }
 
         return ans;

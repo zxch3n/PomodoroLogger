@@ -69,7 +69,10 @@ export const getTimeSpentDataFromRecords = async (
         }
     }
 
-    const projectData = projectTimeCounter.getNameValuePairs({ toFixed: 2, topK: 10 });
+    const projectData = projectTimeCounter.getNameValuePairs({
+        toFixed: 2,
+        topK: 10,
+    });
     for (const v of projectData) {
         if (v.name === UNK) {
             v.name = 'Unknown';
@@ -80,7 +83,7 @@ export const getTimeSpentDataFromRecords = async (
     }
 
     const appData = appTimeCounter
-        .getNameValuePairs({ toFixed: 2, topK: 10 })
+        .getNameValuePairs({ toFixed: 2, topK: 10, minRatio: 0.01 })
         .map((v) => ({ ...v, name: getBetterAppName(v.name) }));
 
     return {
