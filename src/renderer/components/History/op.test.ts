@@ -5,10 +5,10 @@ describe('History aggregating operations', () => {
     it('agg empty record', async () => {
         const agg = await op.getAggPomodoroInfo([], []);
         expect(agg).toStrictEqual({
-            count: {
-                day: 0,
-                week: 0,
-                month: 0,
+            agg: {
+                day: { count: 0, hours: 0 },
+                week: { count: 0, hours: 0 },
+                month: { count: 0, hours: 0 },
             },
             wordWeights: [],
             pieChart: {
