@@ -7,14 +7,16 @@ import { Card } from '../Kanban/type';
 
 export const getPomodoroCalendarData = (pomodoros: PomodoroRecord[]) => {
     const counter = new Counter();
+    const timeSum = new Counter();
     pomodoros.forEach((v) => {
         const date = _getDateFromTimestamp(v.startTime).getTime();
         counter.add(date);
+        timeSum.add(date, v.spentTimeInHour);
     });
 
-    const ans: Record<string, any> = counter.dict;
-    for (const key in ans) {
-        ans[key] = { count: ans[key] };
+    const ans: Record<string, { count: number; hours: number }> = {};
+    for (const key in counter.dict) {
+        ans[key] = { count: counter.dict[key], hours: timeSum.dict[key] };
     }
 
     return ans;

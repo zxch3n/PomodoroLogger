@@ -25,6 +25,7 @@ const SvgText = styled.text`
 type Data = {
     [timestamp: number]: {
         count: number;
+        hours: number;
     };
 };
 
@@ -50,6 +51,7 @@ interface GridData {
     count: number;
     date: number;
     year: number;
+    spentHours: number;
 }
 
 interface Props {
@@ -69,9 +71,11 @@ function getLastDayTimestamp(date: Date | string | number) {
 function getGridData(data: Data, till: number, shownGrids: number): GridData[] {
     const firstDayTimestamp = till - shownGrids * 3600 * 1000 * 24;
     let grids = Array(shownGrids).fill(0);
+    const timeSpent = Array(shownGrids).fill(0);
     for (const key in data) {
         const index = Math.floor((parseInt(key, 10) - firstDayTimestamp) / 3600 / 24 / 1000);
         grids[index] += data[key].count;
+        timeSpent[index] += data[key].hours;
     }
 
     grids = grids.map((v, index) => {
@@ -83,9 +87,18 @@ function getGridData(data: Data, till: number, shownGrids: number): GridData[] {
             week: Math.floor(index / 7),
             day: date.getDay(),
             count: v,
-        };
+            spentHours: timeSpent[index],
+        } as GridData;
     });
     return grids;
+}
+
+function getHoverInfo(data: GridData) {
+    if (data.count === 0) {
+        return `${data.count} pomodoros `;
+    }
+
+    return `${data.count} pomodoros (${data.spentHours.toFixed(1)}h) `;
 }
 
 export const GridCalendar = React.memo((props: Props) => {
@@ -131,7 +144,7 @@ export const GridCalendar = React.memo((props: Props) => {
                 position: 'absolute',
                 transition: 'all 0.1s',
                 left: tooltipPositionLeft,
-                maxWidth: 180,
+                maxWidth: 160,
                 top: toolTipTop,
                 padding: '8px 8px',
                 borderRadius: 4,
@@ -139,12 +152,13 @@ export const GridCalendar = React.memo((props: Props) => {
                 overflow: 'hidden',
                 textOverflow: 'clip',
                 display: chosenIndex ? undefined : 'none',
+                pointerEvents: 'none',
             }}
         >
             <span style={{ fontWeight: 700 }}>
-                {chosenIndex != null ? `${grids[chosenIndex].count} pomodoros ` : ''}
+                {chosenIndex != null ? getHoverInfo(grids[chosenIndex]) : ''}
             </span>
-            <span style={{ fontWeight: 300, fontSize: '0.7em', marginLeft: 8 }}>
+            <span style={{ fontWeight: 300, fontSize: '0.7em' }}>
                 {chosenIndex != null
                     ? `${grids[chosenIndex].year}-${grids[chosenIndex].month}-${grids[chosenIndex].date}`
                     : ''}
