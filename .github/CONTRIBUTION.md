@@ -30,7 +30,7 @@ yarn start
 // within another terminal
 npx electron .
 ```
-
+- If you are using windows10 install bash shell for running above commands
 
 ---
 
