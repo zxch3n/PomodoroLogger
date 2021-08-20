@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'test' && !remote) {
 
 export type ActiveWinListener = (result?: BaseResult, screenshot?: string) => void;
 export class Monitor {
-    timer?: number;
+    timer?: any;
     screenshotTimer?: number;
     intervalTimeout: number;
     listener: ActiveWinListener;
