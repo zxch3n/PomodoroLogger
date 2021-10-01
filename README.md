@@ -54,7 +54,7 @@ By connecting your todo items with the corresponding recorded Pomodoro sessions,
 
 Pomodoro Logger keeps a list of distracting app (you can config it in the setting). When it detect your using distracting apps, you lose your efficiency.
 
-It calculates user efficiency by [a heuristic method](./src/efficiency/efficiency.png).
+It calculates user efficiency by [a heuristic method](./src/shared/efficiency/efficiency.png).
 
 Demonstrating your efficiency by the dots. The larger the hole, the less efficient you are.
 
