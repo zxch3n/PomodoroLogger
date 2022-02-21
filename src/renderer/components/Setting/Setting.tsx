@@ -187,7 +187,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                                 marks={restMarks}
                                 step={1}
                                 min={process.env.NODE_ENV === 'production' ? 5 : 1}
-                                max={10}
+                                max={20}
                                 value={props.restDuration / 60}
                                 onChange={onChangeRest}
                             />
@@ -200,7 +200,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                                 marks={longBreakMarks}
                                 step={1}
                                 min={10}
-                                max={20}
+                                max={40}
                                 value={props.longBreakDuration / 60}
                                 onChange={onChangeLongBreak}
                             />
