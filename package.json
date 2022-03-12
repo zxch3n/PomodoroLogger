@@ -147,7 +147,7 @@
         "jest": "25.2.3",
         "jest-junit": "^7.0.0",
         "lint-staged": "^8.1.7",
-        "lodash-es": "^4.17.15",
+        "lodash-es": "^4.17.21",
         "marked": "^0.7.0",
         "native-ext-loader": "^2.3.0",
         "nedb": "^1.8.0",
