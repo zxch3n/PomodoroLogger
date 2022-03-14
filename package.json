@@ -194,7 +194,9 @@
         "worker-loader": "^2.0.0"
     },
     "dependencies": {
-        "active-win": "^5.1.2"
+        "active-win": "^5.1.2",
+        "graphql": "^16.3.0",
+        "graphql-request": "^4.1.0"
     },
     "sideEffects": [
         "**/*.css",
