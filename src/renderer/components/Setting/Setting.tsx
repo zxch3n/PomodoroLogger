@@ -120,7 +120,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 
         const setStartOnBoot = React.useCallback((v: boolean) => {
             props.setStartOnBoot(v);
-            window.api.setOpenAtLogin(v);
+            window.api.openAtLogin(v);
         }, []);
 
         const setUseHardwareAcceleration = useCallback((v: boolean) => {

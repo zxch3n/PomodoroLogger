@@ -4,7 +4,8 @@ declare global {
     interface Window {
         api: {
             activeWin(): Promise<BaseResult>;
-            setOpenAtLogin(on: boolean): void;
+            openAtLogin(on: boolean): void;
+            minimizeWindow(on: boolean, contentHeight: number): void;
         };
     }
 }

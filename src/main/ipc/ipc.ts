@@ -1,4 +1,4 @@
-import { ipcMain, dialog, app } from 'electron';
+import { ipcMain, dialog, app, BrowserWindow } from 'electron';
 import { IpcEventName, WorkerMessageType } from './type';
 import { sendWorkerMessage } from '../worker/fork';
 import { promisify } from 'util';
@@ -9,6 +9,20 @@ import { readAllData } from '../io/read';
 import activeWin from 'active-win';
 
 export function initialize() {
+    ipcMain.handle(IpcEventName.MinimizeWindow, (event, on, contentHeight) => {
+        const win = BrowserWindow.getFocusedWindow();
+        if (!win) {
+            return;
+        }
+
+        win.setAlwaysOnTop(on);
+        const { height } = win.getBounds();
+        if (on) {
+            win.setBounds({ height: height - contentHeight + 43, width: 366 });
+        } else {
+            win.setBounds({ height: 800, width: 1080 });
+        }
+    });
     ipcMain.handle(IpcEventName.OpenAtLogin, (event, on) => {
         if (on) {
             app.setLoginItemSettings({
