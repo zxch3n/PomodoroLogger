@@ -1,6 +1,5 @@
 import type { BaseResult } from 'active-win';
 import { getScreen } from './screenshot';
-const activeWin = window.api.activeWin;
 export type ActiveWinListener = (result?: BaseResult, screenshot?: string) => void;
 export class Monitor {
     timer?: any;
@@ -40,7 +39,7 @@ export class Monitor {
     };
 
     watch = async () => {
-        const data = await activeWin();
+        const data = await window.api.activeWin();
         if (data) {
             try {
                 if (this.shouldTakeScreenshot) {

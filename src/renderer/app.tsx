@@ -6,6 +6,17 @@ import { AppContainer } from 'react-hot-loader';
 import Application from './components/Application';
 import store from './store';
 
+import { ipcRenderer } from 'electron';
+import { IpcEventName } from '../main/ipc/type';
+
+const dict: { [event: string]: Function } = {};
+for (const name of Object.values(IpcEventName)) {
+    dict[name] = (...args: any) => ipcRenderer.invoke(name, ...args);
+}
+
+console.log(dict);
+(window as any).api = dict;
+
 // Create main element
 const mainElement = document.getElementById('root');
 const splashElement = document.getElementById('logo-container');
