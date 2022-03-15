@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron';
+import { ipcMain, dialog, app } from 'electron';
 import { IpcEventName, WorkerMessageType } from './type';
 import { sendWorkerMessage } from '../worker/fork';
 import { promisify } from 'util';
@@ -6,8 +6,22 @@ import { readFile, writeFile } from 'fs';
 import { writeAllFile } from '../io/write';
 import { restart } from '../init';
 import { readAllData } from '../io/read';
+import activeWin from 'active-win';
 
 export function initialize() {
+    ipcMain.handle(IpcEventName.OpenAtLogin, (event, on) => {
+        if (on) {
+            app.setLoginItemSettings({
+                openAtLogin: true,
+                openAsHidden: true,
+            });
+        } else {
+            app.setLoginItemSettings({
+                openAtLogin: false,
+            });
+        }
+    });
+    ipcMain.handle(IpcEventName.ActiveWin, activeWin);
     ipcMain.handle(IpcEventName.ExportData, async () => {
         const path = await dialog.showSaveDialog({
             defaultPath: 'pomodoro-logger-exported-data.json',

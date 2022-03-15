@@ -55,8 +55,11 @@ const createWindow = async () => {
         icon: nativeImage.createFromPath(path.join(__dirname, logo)),
         title: 'Pomodoro Logger',
         webPreferences: {
-            nodeIntegrationInWorker: true,
-            nodeIntegration: true,
+            nodeIntegrationInWorker: false,
+            nodeIntegration: false,
+            contextIsolation: true,
+            enableRemoteModule: false,
+            preload: path.join(__dirname, 'preload.js'),
         },
     });
 

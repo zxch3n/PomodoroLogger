@@ -2,7 +2,6 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { screenshotDir } from '../../config';
-import { generateRandomName } from '../utils';
 
 const remote = electron.remote;
 
@@ -11,7 +10,7 @@ const getCurrentScreen = () => {
         const screen = electron.screen || remote.screen;
         const currentWindow = remote.getCurrentWindow();
         const { x, y } = currentWindow.getBounds();
-        return screen.getAllDisplays().filter(d => {
+        return screen.getAllDisplays().filter((d) => {
             return (
                 x <= d.bounds.x + d.bounds.width &&
                 x >= d.bounds.x &&
@@ -86,7 +85,7 @@ function getScreenCallback(
         require('electron').desktopCapturer.getSources(
             {
                 types: ['screen'],
-                thumbnailSize: { width: 1, height: 1 }
+                thumbnailSize: { width: 1, height: 1 },
             },
             (e: any, sources: any) => {
                 const selectSource = sources.filter(
@@ -99,13 +98,13 @@ function getScreenCallback(
                             // @ts-ignore
                             mandatory: {
                                 chromeMediaSource: 'desktop',
-                                chromeMediaSourceId: selectSource.id + ''
+                                chromeMediaSourceId: selectSource.id + '',
                                 // minWidth: 3,
                                 // minHeight: 3,
                                 // maxWidth: maxSize,
                                 // maxHeight: maxSize
-                            }
-                        }
+                            },
+                        },
                     },
                     (e: MediaStream) => {
                         handleStream(e);
@@ -123,9 +122,9 @@ function getScreenCallback(
                     mandatory: {
                         chromeMediaSource: 'screen',
                         maxWidth: 1920,
-                        maxHeight: 1080
-                    }
-                }
+                        maxHeight: 1080,
+                    },
+                },
             },
             (event: any) => {
                 handleStream(event);
@@ -159,7 +158,7 @@ export async function getScreen(
                 const url = canvas.toDataURL('image/jpg', 0.1);
                 // remove Base64 stuff from the Image
                 const base64Data = url.replace(/^data:image\/png;base64,/, '');
-                fs.writeFile(filePath, base64Data, 'base64', err => {
+                fs.writeFile(filePath, base64Data, 'base64', (err) => {
                     if (err) {
                         console.log(err);
                     }

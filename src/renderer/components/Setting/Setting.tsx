@@ -3,14 +3,12 @@ import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
 import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
 import { deleteAllUserData } from '../../monitor/sessionManager';
-import { shell, remote, ipcRenderer } from 'electron';
+import { shell, ipcRenderer } from 'electron';
 import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
 import pkg from '../../../../package.json';
 import { IpcEventName } from '../../../main/ipc/type';
 import { refreshDbs } from '../../../main/db';
-
-const {app} = remote.require('electron')
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -122,16 +120,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 
         const setStartOnBoot = React.useCallback((v: boolean) => {
             props.setStartOnBoot(v);
-            if (v) {
-                app.setLoginItemSettings({
-                    openAtLogin: true,
-                    openAsHidden: true,
-                });
-            } else {
-                app.setLoginItemSettings({
-                    openAtLogin: false,
-                });
-            }
+            window.api.setOpenAtLogin(v);
         }, []);
 
         const setUseHardwareAcceleration = useCallback((v: boolean) => {

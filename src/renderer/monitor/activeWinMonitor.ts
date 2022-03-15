@@ -1,16 +1,6 @@
-import { remote } from 'electron';
-import { BaseResult } from 'active-win';
+import type { BaseResult } from 'active-win';
 import { getScreen } from './screenshot';
-let activeWin: any;
-
-if (process.env.NODE_ENV === 'test' && !remote) {
-    // Node Environment
-    activeWin = require('active-win');
-} else {
-    // renderer env
-    activeWin = remote.require('active-win');
-}
-
+const activeWin = window.api.activeWin;
 export type ActiveWinListener = (result?: BaseResult, screenshot?: string) => void;
 export class Monitor {
     timer?: any;

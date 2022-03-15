@@ -7,6 +7,8 @@ export enum IpcEventName {
     DownloadUpdate = 'download-update',
     ExportData = 'export-data',
     ImportData = 'import-data',
+    ActiveWin = 'active-win',
+    OpenAtLogin = 'open-at-login',
 }
 
 export enum WorkerMessageType {
