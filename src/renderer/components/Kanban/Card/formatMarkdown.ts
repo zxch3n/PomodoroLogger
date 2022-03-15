@@ -1,4 +1,4 @@
-import marked from 'marked';
+import { marked } from 'marked';
 
 export interface MarkdownContext {
     stringColorMap?: (name: string) => { background: string; color: string };
