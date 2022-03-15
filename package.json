@@ -6,7 +6,7 @@
     "scripts": {
         "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
         "build-renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
-        "prebuild": "rm -rf ./dist && mkdir ./dist  && cp ./node_modules",
+        "prebuild": "rm -rf ./dist",
         "build": "concurrently \"npm:build-main\" \"npm:build-renderer\"",
         "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config webpack.renderer.dev.config.js",
         "start-main-dev": "webpack --config webpack.main.config.js",
