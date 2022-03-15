@@ -1,11 +1,7 @@
-import type { BaseResult } from 'active-win';
+import type { ExposedAPI } from '../main/ipc/type';
 
 declare global {
     interface Window {
-        api: {
-            activeWin(): Promise<BaseResult>;
-            openAtLogin(on: boolean): void;
-            minimizeWindow(on: boolean, contentHeight: number): void;
-        };
+        api: ExposedAPI;
     }
 }

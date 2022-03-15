@@ -1,20 +1,33 @@
-import { ipcMain, dialog, app, BrowserWindow } from 'electron';
+import { ipcMain, dialog, app, BrowserWindow, nativeImage, Notification } from 'electron';
 import { IpcEventName, WorkerMessageType } from './type';
 import { sendWorkerMessage } from '../worker/fork';
 import { promisify } from 'util';
 import { readFile, writeFile } from 'fs';
 import { writeAllFile } from '../io/write';
-import { restart } from '../init';
+import { restart, win } from '../init';
 import { readAllData } from '../io/read';
 import activeWin from 'active-win';
 
 export function initialize() {
+    ipcMain.handle(IpcEventName.FocusOnWindow, () => {
+        if (!win) return;
+        win.show();
+        win.focus();
+    });
+    ipcMain.handle(IpcEventName.Notify, (e, title, body, iconPath) => {
+        const notification = new Notification({
+            title,
+            body,
+            icon: iconPath && nativeImage.createFromPath(iconPath),
+        });
+        notification.show();
+    });
+    ipcMain.handle(IpcEventName.OpenDevTools, () => {
+        if (!win) return;
+        win.webContents.openDevTools({ activate: true, mode: 'detach' });
+    });
     ipcMain.handle(IpcEventName.MinimizeWindow, (event, on, contentHeight) => {
-        const win = BrowserWindow.getFocusedWindow();
-        if (!win) {
-            return;
-        }
-
+        if (!win) return;
         win.setAlwaysOnTop(on);
         const { height } = win.getBounds();
         if (on) {

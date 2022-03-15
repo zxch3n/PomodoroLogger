@@ -77,7 +77,7 @@ class Application extends React.Component<Props> {
                 this.props.switchTab(-1);
                 break;
             case 'ctrl+f12':
-                remote.getCurrentWebContents().openDevTools({ activate: true, mode: 'detach' });
+                window.api.openDevTools();
                 break;
             case 'ctrl+q':
                 ipcRenderer.send(IpcEventName.Quit, 'quit');

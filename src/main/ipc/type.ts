@@ -1,3 +1,4 @@
+import type { BaseResult } from 'active-win';
 import { SourceData } from '../../shared/dataMerger/dataMerger';
 
 export enum IpcEventName {
@@ -10,7 +11,19 @@ export enum IpcEventName {
     ActiveWin = 'activeWin',
     OpenAtLogin = 'openAtLogin',
     MinimizeWindow = 'minimizeWindow',
+    OpenDevTools = 'openDevTools',
+    Notify = 'notify',
+    FocusOnWindow = 'focusOnWindow',
 }
+
+export type ExposedAPI = {
+    [IpcEventName.ActiveWin](): Promise<BaseResult>;
+    [IpcEventName.OpenAtLogin](on: boolean): void;
+    [IpcEventName.MinimizeWindow](on: boolean, contentHeight: number): void;
+    [IpcEventName.OpenDevTools](): void;
+    [IpcEventName.Notify](title: string, body: string, iconPath: string): void;
+    [IpcEventName.FocusOnWindow](): void;
+};
 
 export enum WorkerMessageType {
     MergeData = 'MergeData',
