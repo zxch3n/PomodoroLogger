@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import { DBs, refreshDbs as _refresh, loadDBs as _loadDBs } from '../main/db';
 
 export let refreshDbs = _refresh;

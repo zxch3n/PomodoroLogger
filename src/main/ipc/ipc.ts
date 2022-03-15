@@ -1,4 +1,4 @@
-import { ipcMain, dialog, app, BrowserWindow, nativeImage, Notification } from 'electron';
+import { ipcMain, dialog, app, nativeImage, Notification } from 'electron';
 import { IpcEventName, WorkerMessageType } from './type';
 import { sendWorkerMessage } from '../worker/fork';
 import { promisify } from 'util';
@@ -8,13 +8,33 @@ import { restart, win } from '../init';
 import { readAllData } from '../io/read';
 import activeWin from 'active-win';
 
+/**
+ * token is used to identify the sender of the message
+ * @param name
+ * @param callback
+ */
+function handle(name: string, callback: (...args: any[]) => Promise<void> | any) {
+    ipcMain.on(name, async (event, token, ...args) => {
+        try {
+            const ans = await callback(...args);
+            event.reply('reply', token, ans);
+        } catch (e) {
+            console.error(e);
+            event.reply('reply', token, 'error', (e as any).toString());
+        }
+    });
+}
+
 export function initialize() {
-    ipcMain.handle(IpcEventName.FocusOnWindow, () => {
+    handle(IpcEventName.ActiveWin, async () => {
+        return await activeWin();
+    });
+    handle(IpcEventName.FocusOnWindow, () => {
         if (!win) return;
         win.show();
         win.focus();
     });
-    ipcMain.handle(IpcEventName.Notify, (e, title, body, iconPath) => {
+    handle(IpcEventName.Notify, (title, body, iconPath) => {
         const notification = new Notification({
             title,
             body,
@@ -22,11 +42,11 @@ export function initialize() {
         });
         notification.show();
     });
-    ipcMain.handle(IpcEventName.OpenDevTools, () => {
+    handle(IpcEventName.OpenDevTools, () => {
         if (!win) return;
         win.webContents.openDevTools({ activate: true, mode: 'detach' });
     });
-    ipcMain.handle(IpcEventName.MinimizeWindow, (event, on, contentHeight) => {
+    handle(IpcEventName.MinimizeWindow, (on, contentHeight) => {
         if (!win) return;
         win.setAlwaysOnTop(on);
         const { height } = win.getBounds();
@@ -36,7 +56,7 @@ export function initialize() {
             win.setBounds({ height: 800, width: 1080 });
         }
     });
-    ipcMain.handle(IpcEventName.OpenAtLogin, (event, on) => {
+    handle(IpcEventName.OpenAtLogin, (on) => {
         if (on) {
             app.setLoginItemSettings({
                 openAtLogin: true,
@@ -48,8 +68,7 @@ export function initialize() {
             });
         }
     });
-    ipcMain.handle(IpcEventName.ActiveWin, activeWin);
-    ipcMain.handle(IpcEventName.ExportData, async () => {
+    handle(IpcEventName.ExportData, async () => {
         const path = await dialog.showSaveDialog({
             defaultPath: 'pomodoro-logger-exported-data.json',
             filters: [
@@ -71,7 +90,7 @@ export function initialize() {
         await promisify(writeFile)(path.filePath, JSON.stringify(data), { encoding: 'utf-8' });
     });
 
-    ipcMain.handle(IpcEventName.ImportData, async () => {
+    handle(IpcEventName.ImportData, async () => {
         const path = await dialog.showOpenDialog({
             filters: [
                 {

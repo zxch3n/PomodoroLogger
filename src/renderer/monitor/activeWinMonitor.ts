@@ -30,7 +30,7 @@ export class Monitor {
 
         this.timer = setInterval(this.watch, this.intervalTimeout);
         if (this.screenshotInterval) {
-            this.screenshotTimer = setInterval(() => {
+            this.screenshotTimer = window.setInterval(() => {
                 this.shouldTakeScreenshot = true;
             }, this.screenshotInterval);
         }

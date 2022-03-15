@@ -9,6 +9,8 @@ import { build } from '../../package.json';
 import { AutoUpdater } from './AutoUpdater';
 import { initialize } from './ipc/ipc';
 import { IpcEventName } from './ipc/type';
+import * as remoteMain from '@electron/remote/main';
+remoteMain.initialize();
 
 const { refreshDbs, loadDBs } = db;
 export let win: BrowserWindow | undefined;
@@ -57,12 +59,12 @@ const createWindow = async () => {
         webPreferences: {
             nodeIntegrationInWorker: true,
             nodeIntegration: true,
-            enableRemoteModule: true,
-            // contextIsolation: true,
+            contextIsolation: false,
             // preload: path.join(__dirname, 'preload.js'),
         },
     });
 
+    remoteMain.enable(win.webContents);
     win.removeMenu();
     if (process.env.NODE_ENV === 'production') {
         win.removeMenu();

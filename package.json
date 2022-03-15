@@ -6,7 +6,7 @@
     "scripts": {
         "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
         "build-renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
-        "prebuild": "rm -rf ./dist",
+        "prebuild": "rm -rf ./dist && mkdir ./dist  && cp ./node_modules",
         "build": "concurrently \"npm:build-main\" \"npm:build-renderer\"",
         "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config webpack.renderer.dev.config.js",
         "start-main-dev": "webpack --config webpack.main.config.js",
@@ -129,7 +129,7 @@
         "deox": "^2.1.0",
         "echarts": "^4.5.0",
         "echarts-for-react": "^2.0.15-beta.1",
-        "electron": "^7.2.4",
+        "electron": "^14.2.6",
         "electron-builder": "^21.2.0",
         "electron-devtools-installer": "^2.2.4",
         "electron-rebuild": "^1.8.5",
@@ -142,6 +142,7 @@
         "happypack": "^5.0.1",
         "html-webpack-plugin": "^3.2.0",
         "husky": "^2.3.0",
+        "iconv": "^3.0.1",
         "image-webpack-loader": "^4.6.0",
         "interpolate-html-plugin": "^3.0.0",
         "jest": "25.2.3",
@@ -151,7 +152,7 @@
         "marked": "^4.0.10",
         "native-ext-loader": "^2.3.0",
         "nedb": "^1.8.0",
-        "node-gyp": "6.0.1",
+        "node-gyp": "^9.0.0",
         "node-sass": "^7.0.0",
         "prettier": "^2.0.2",
         "prop-types": "^15.7.2",
@@ -194,7 +195,8 @@
         "worker-loader": "^2.0.0"
     },
     "dependencies": {
-        "active-win": "^5.1.2"
+        "@electron/remote": "^2.0.8",
+        "active-win": "^7.7.2"
     },
     "sideEffects": [
         "**/*.css",

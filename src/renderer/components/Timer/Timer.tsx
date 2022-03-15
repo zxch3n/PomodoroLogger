@@ -1,5 +1,5 @@
 import { Button, Divider, message, Tooltip } from 'antd';
-import { BrowserWindow, remote } from 'electron';
+import * as remote from '@electron/remote';
 import { debounce } from 'lodash';
 import React, { Component } from 'react';
 import ReactHotkeys from 'react-hot-keys';

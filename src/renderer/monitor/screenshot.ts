@@ -2,8 +2,7 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { screenshotDir } from '../../config';
-
-const remote = electron.remote;
+import * as remote from '@electron/remote';
 
 const getCurrentScreen = () => {
     try {
@@ -82,12 +81,12 @@ function getScreenCallback(
     };
 
     if (require('os').platform() === 'win32') {
-        require('electron').desktopCapturer.getSources(
-            {
+        require('electron')
+            .desktopCapturer.getSources({
                 types: ['screen'],
                 thumbnailSize: { width: 1, height: 1 },
-            },
-            (e: any, sources: any) => {
+            })
+            .then((sources) => {
                 const selectSource = sources.filter(
                     (source: any) => source.display_id + '' === curScreen.id + ''
                 )[0];
@@ -111,8 +110,7 @@ function getScreenCallback(
                     },
                     handleError
                 );
-            }
-        );
+            });
     } else {
         navigator.getUserMedia(
             {

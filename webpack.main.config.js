@@ -49,5 +49,7 @@ module.exports = merge.smart(baseConfig, {
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
         }),
     ],
-    // externals: [nodeExternals()],
+    externals: {
+        'active-win': 'commonjs2 active-win',
+    },
 });

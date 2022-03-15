@@ -1,6 +1,6 @@
 import { Icon, Tabs } from 'antd';
 import 'antd/dist/antd.css';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import * as React from 'react';
 import ReactHotkeys from 'react-hot-keys';
 import { hot } from 'react-hot-loader/root';
