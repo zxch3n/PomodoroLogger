@@ -1,0 +1,5 @@
+{
+    "explorer.experimental.fileNesting.patterns": {
+        "webpack.main.config.js": "webpack.*"
+    }
+}

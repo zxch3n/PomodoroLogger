@@ -95,9 +95,12 @@ class Application extends React.Component<Props> {
 
     onError = (event: ErrorEvent) => this.handleError(event.error);
     handleError = (err: Error) => {
-        if (process.env.NODE_ENV === 'production') {
-            ipcRenderer.send(IpcEventName.Restart, 'error');
-        }
+        console.error(err);
+        setTimeout(() => {
+            if (process.env.NODE_ENV === 'production') {
+                ipcRenderer.send(IpcEventName.Restart, 'error');
+            }
+        }, 3000);
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {

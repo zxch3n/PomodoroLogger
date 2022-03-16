@@ -4,14 +4,12 @@ release/
 *db/
 screenshots/
 .idea/
-.vscode/
-build/*
 coverage/
 yarn.error
-!build/icon.png
 junit.xml
 *.DS_Store
 .token
 dev-app-update.yml
 webpack-visualization/
 yarn-error.log
+__scripts/

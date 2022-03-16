@@ -18,7 +18,7 @@ export async function loadDBs() {
     const promises = [];
     for (const db in DBs) {
         promises.push(
-            new Promise((r, reject) => {
+            new Promise<void>((r, reject) => {
                 let times = 0;
                 const load = () => {
                     // @ts-ignore

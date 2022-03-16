@@ -90,8 +90,8 @@ function getScreenCallback(
                 const selectSource = sources.filter(
                     (source: any) => source.display_id + '' === curScreen.id + ''
                 )[0];
-                navigator.getUserMedia(
-                    {
+                navigator.mediaDevices
+                    .getUserMedia({
                         audio: false,
                         video: {
                             // @ts-ignore
@@ -104,16 +104,15 @@ function getScreenCallback(
                                 // maxHeight: maxSize
                             },
                         },
-                    },
-                    (e: MediaStream) => {
+                    })
+                    .then((e: MediaStream) => {
                         handleStream(e);
-                    },
-                    handleError
-                );
+                    })
+                    .catch(handleError);
             });
     } else {
-        navigator.getUserMedia(
-            {
+        navigator.mediaDevices
+            .getUserMedia({
                 audio: false,
                 video: {
                     // @ts-ignore
@@ -123,15 +122,14 @@ function getScreenCallback(
                         maxHeight: 1080,
                     },
                 },
-            },
-            (event: any) => {
+            })
+            .then((event: any) => {
                 handleStream(event);
-            },
-            (err: Error) => {
+            })
+            .catch((err: Error) => {
                 console.trace(err);
                 handleError(err);
-            }
-        );
+            });
     }
 }
 

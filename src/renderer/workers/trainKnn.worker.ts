@@ -11,7 +11,7 @@ async function getRecords() {
     const sessionDB = new nedb({ filename: dbPaths.sessionDB, autoload: false });
     let reloadTimes = 0;
     const loadDatabase = () => {
-        sessionDB.loadDatabase(err => {
+        sessionDB.loadDatabase((err) => {
             if (err) {
                 reloadTimes += 1;
                 if (reloadTimes > 10) {
@@ -36,7 +36,7 @@ async function getRecords() {
         });
     });
 
-    return records.filter(r => r.boardId !== undefined);
+    return records.filter((r) => r.boardId !== undefined);
 }
 
 let knn = new KNN();
@@ -47,7 +47,7 @@ async function train(isTest: boolean, code: number) {
             ctx.postMessage({
                 code,
                 type: 'error',
-                payload: 'Training array is empty'
+                payload: 'Training array is empty',
             });
             return;
         }
@@ -63,13 +63,13 @@ async function train(isTest: boolean, code: number) {
         ctx.postMessage({
             code,
             type: 'setProgress',
-            payload: 20
+            payload: 20,
         });
         knn.fit(train);
         ctx.postMessage({
             code,
             type: 'setProgress',
-            payload: 80
+            payload: 80,
         });
         const preds = knn.predict(test);
         let t = 0;
@@ -87,19 +87,19 @@ async function train(isTest: boolean, code: number) {
         ctx.postMessage({
             code,
             type: 'setAcc',
-            payload: t / (t + f)
+            payload: t / (t + f),
         });
         ctx.postMessage({
             code,
             type: 'setProgress',
-            payload: 100
+            payload: 100,
         });
     } catch (e) {
         console.error(e);
         ctx.postMessage({
             code,
             type: 'error',
-            payload: e.toString()
+            payload: (e as Error).toString(),
         });
     }
 }
@@ -110,13 +110,13 @@ function saveModel(code: number) {
         writeFileSync(modelPath.knnPath, JSON.stringify(json), { encoding: 'utf-8' });
         ctx.postMessage({
             code,
-            type: 'onDone'
+            type: 'onDone',
         });
     } catch (e) {
         ctx.postMessage({
             code,
             type: 'error',
-            payload: e
+            payload: e,
         });
     }
 }
@@ -137,7 +137,7 @@ async function loadModel(dbSize: number, code: number) {
 
     ctx.postMessage({
         code,
-        type: 'onDone'
+        type: 'onDone',
     });
 }
 
@@ -147,7 +147,7 @@ function predict(payload: PomodoroRecord[], code: number) {
     ctx.postMessage({
         code,
         type: 'predict',
-        payload: ans
+        payload: ans,
     });
 }
 
@@ -171,7 +171,7 @@ ctx.addEventListener('message', async ({ data: { type, payload, code } }) => {
         ctx.postMessage({
             code,
             type: 'error',
-            payload: JSON.stringify(e)
+            payload: JSON.stringify(e),
         });
     }
 });
