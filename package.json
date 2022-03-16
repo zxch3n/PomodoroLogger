@@ -44,6 +44,7 @@
         ]
     },
     "build": {
+        "afterSign": "electron-builder-notarize",
         "productName": "Pomodoro Logger",
         "appId": "com.github.rem2016.pomodoro-logger",
         "publish": {
@@ -138,7 +139,9 @@
         "echarts-for-react": "^2.0.15-beta.1",
         "electron": "^14.2.6",
         "electron-builder": "^23.0.2",
+        "electron-builder-notarize": "^1.4.0",
         "electron-devtools-installer": "^2.2.4",
+        "electron-notarize": "^1.1.1",
         "electron-rebuild": "^1.8.5",
         "electron-updater": "^4.5.2",
         "enzyme": "^3.10.0",
