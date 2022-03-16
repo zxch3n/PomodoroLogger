@@ -209,6 +209,9 @@
         "active-win": "^7.7.2",
         "node-mac-permissions": "^2.2.0"
     },
+    "resolutions": {
+        "node-ipc": "9.1.1"
+    },
     "sideEffects": [
         "**/*.css",
         "**/*.scss",
