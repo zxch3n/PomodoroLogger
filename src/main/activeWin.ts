@@ -6,6 +6,8 @@ export async function initActiveWin() {
         await _activeWin();
         hasPermission = true;
     } catch (e) {}
+
+    console.log('Initialized with activeWin title permission?', hasPermission);
 }
 
 export async function activeWin() {

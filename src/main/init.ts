@@ -139,6 +139,8 @@ const createWindow = async () => {
             app.exit();
         });
     }
+
+    initActiveWin();
 };
 app.on('ready', async () => {
     if (!gotTheLock) {
@@ -182,7 +184,6 @@ app.on('ready', async () => {
 
     await createWindow();
 
-    initActiveWin();
     db.DBs.settingDB.findOne({ name: 'setting' }, (err, settings) => {
         if (err) {
             console.error(err);
