@@ -56,7 +56,18 @@
             "target": [
                 "zip",
                 "dmg"
-            ]
+            ],
+            "arch": [
+                "x64",
+                "arm64"
+            ],
+            "hardenedRuntime": true,
+            "gatekeeperAssess": false,
+            "entitlements": "build/entitlements.mac.plist",
+            "entitlementsInherit": "build/entitlements.mac.plist",
+            "extendInfo": {
+                "NSAppleEventsUsageDescription": "Please allow access to script browser applications to detect the current URL when triggering instant lookup."
+            }
         },
         "directories": {
             "output": "release"
@@ -130,10 +141,10 @@
         "echarts": "^4.5.0",
         "echarts-for-react": "^2.0.15-beta.1",
         "electron": "^14.2.6",
-        "electron-builder": "^21.2.0",
+        "electron-builder": "^22.14.2",
         "electron-devtools-installer": "^2.2.4",
         "electron-rebuild": "^1.8.5",
-        "electron-updater": "^4.1.2",
+        "electron-updater": "^4.5.2",
         "enzyme": "^3.10.0",
         "enzyme-adapter-react-16": "^1.14.0",
         "file-loader": "^3.0.1",
@@ -174,7 +185,7 @@
         "sass-loader": "^8.0.0",
         "shortid": "^2.2.14",
         "source-map-loader": "^0.2.4",
-        "spectron": "^8.0.0",
+        "spectron": "^16.0.0",
         "style-loader": "^1.0.1",
         "styled-components": "^4.3.2",
         "ts-jest": "^24.0.2",
@@ -183,7 +194,7 @@
         "tslint-config-airbnb": "^5.11.1",
         "tslint-config-prettier": "^1.18.0",
         "tslint-react": "^4.0.0",
-        "typescript": "3.8.3",
+        "typescript": "4.6.2",
         "url-loader": "^2.0.1",
         "webpack": "^4.32.2",
         "webpack-cli": "^3.3.2",

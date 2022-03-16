@@ -59,7 +59,7 @@ describe('renderer.utils', () => {
         const dispatchMap = utils.genMapDispatchToProp(actions);
         for (const key in actions) {
             const args = [Math.random()];
-            await new Promise(resolve => {
+            await new Promise<void>((resolve) => {
                 // @ts-ignore
                 const dispatchDict = dispatchMap(([_name, _args]) => {
                     expect(_name).toEqual(key);

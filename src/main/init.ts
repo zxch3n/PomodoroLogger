@@ -10,6 +10,7 @@ import { AutoUpdater } from './AutoUpdater';
 import { initialize } from './ipc/ipc';
 import { IpcEventName } from './ipc/type';
 import * as remoteMain from '@electron/remote/main';
+import { initActiveWin } from './activeWin';
 remoteMain.initialize();
 
 const { refreshDbs, loadDBs } = db;
@@ -47,6 +48,8 @@ mGlobal.utils = {
 if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
 }
+
+const isMac = process.platform === 'darwin';
 const createWindow = async () => {
     win = new BrowserWindow({
         width: 1080,
@@ -179,6 +182,7 @@ app.on('ready', async () => {
 
     await createWindow();
 
+    initActiveWin();
     db.DBs.settingDB.findOne({ name: 'setting' }, (err, settings) => {
         if (err) {
             console.error(err);

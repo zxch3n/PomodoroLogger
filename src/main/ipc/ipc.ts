@@ -6,7 +6,7 @@ import { readFile, writeFile } from 'fs';
 import { writeAllFile } from '../io/write';
 import { restart, win } from '../init';
 import { readAllData } from '../io/read';
-import activeWin from 'active-win';
+import { activeWin } from '../activeWin';
 
 /**
  * token is used to identify the sender of the message
@@ -26,9 +26,7 @@ function handle(name: string, callback: (...args: any[]) => Promise<void> | any)
 }
 
 export function initialize() {
-    handle(IpcEventName.ActiveWin, async () => {
-        return await activeWin();
-    });
+    handle(IpcEventName.ActiveWin, activeWin);
     handle(IpcEventName.FocusOnWindow, () => {
         if (!win) return;
         win.show();
