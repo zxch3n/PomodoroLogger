@@ -57,10 +57,6 @@
                 "zip",
                 "dmg"
             ],
-            "arch": [
-                "x64",
-                "arm64"
-            ],
             "hardenedRuntime": true,
             "gatekeeperAssess": false,
             "entitlements": "build/entitlements.mac.plist",
@@ -141,7 +137,7 @@
         "echarts": "^4.5.0",
         "echarts-for-react": "^2.0.15-beta.1",
         "electron": "^14.2.6",
-        "electron-builder": "^22.14.2",
+        "electron-builder": "^23.0.2",
         "electron-devtools-installer": "^2.2.4",
         "electron-rebuild": "^1.8.5",
         "electron-updater": "^4.5.2",
@@ -207,7 +203,8 @@
     },
     "dependencies": {
         "@electron/remote": "^2.0.8",
-        "active-win": "^7.7.2"
+        "active-win": "^7.7.2",
+        "node-mac-permissions": "^2.2.0"
     },
     "sideEffects": [
         "**/*.css",

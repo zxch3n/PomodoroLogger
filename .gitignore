@@ -4,7 +4,6 @@ release/
 *db/
 screenshots/
 .idea/
-.vscode/
 build/*
 coverage/
 yarn.error

@@ -17,7 +17,7 @@ export enum IpcEventName {
 }
 
 export type ExposedAPI = {
-    [IpcEventName.ActiveWin](): Promise<BaseResult>;
+    [IpcEventName.ActiveWin](): Promise<BaseResult | undefined>;
     [IpcEventName.OpenAtLogin](on: boolean): void;
     [IpcEventName.MinimizeWindow](on: boolean, contentHeight: number): void;
     [IpcEventName.OpenDevTools](): void;

@@ -49,7 +49,6 @@ if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
 }
 
-const isMac = process.platform === 'darwin';
 const createWindow = async () => {
     win = new BrowserWindow({
         width: 1080,
@@ -140,7 +139,7 @@ const createWindow = async () => {
         });
     }
 
-    initActiveWin();
+    setTimeout(initActiveWin, 2000);
 };
 app.on('ready', async () => {
     if (!gotTheLock) {
