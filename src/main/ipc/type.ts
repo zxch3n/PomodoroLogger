@@ -6,8 +6,8 @@ export enum IpcEventName {
     Restart = 'restart-app',
     SetTray = 'set-tray',
     DownloadUpdate = 'download-update',
-    ExportData = 'export-data',
-    ImportData = 'import-data',
+    ExportData = 'exportData',
+    ImportData = 'importData',
     ActiveWin = 'activeWin',
     OpenAtLogin = 'openAtLogin',
     MinimizeWindow = 'minimizeWindow',
@@ -17,6 +17,8 @@ export enum IpcEventName {
 }
 
 export type ExposedAPI = {
+    [IpcEventName.ImportData](): Promise<void>;
+    [IpcEventName.ExportData](): Promise<void>;
     [IpcEventName.ActiveWin](): Promise<BaseResult | undefined>;
     [IpcEventName.OpenAtLogin](on: boolean): void;
     [IpcEventName.MinimizeWindow](on: boolean, contentHeight: number): void;

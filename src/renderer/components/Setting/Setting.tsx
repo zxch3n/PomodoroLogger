@@ -280,12 +280,12 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 
 async function onExportData() {
     await refreshDbs();
-    await ipcRenderer.invoke(IpcEventName.ExportData);
+    await window.api.exportData();
 }
 
 async function onImportData() {
     await refreshDbs();
-    await ipcRenderer.invoke(IpcEventName.ImportData);
+    await window.api.importData();
 }
 
 function openIssuePage() {
