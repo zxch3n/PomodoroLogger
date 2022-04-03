@@ -13,3 +13,4 @@ dev-app-update.yml
 webpack-visualization/
 yarn-error.log
 __scripts/
+build/config.gypi

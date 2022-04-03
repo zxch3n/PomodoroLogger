@@ -3,7 +3,7 @@ import { getScreen } from './screenshot';
 export type ActiveWinListener = (result?: BaseResult, screenshot?: string) => void;
 export class Monitor {
     timer?: any;
-    screenshotTimer?: NodeJS.Timeout;
+    screenshotTimer?: number;
     intervalTimeout: number;
     listener: ActiveWinListener;
     screenshotInterval: number | undefined;
