@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'test' && !remote) {
 export type ActiveWinListener = (result?: BaseResult, screenshot?: string) => void;
 export class Monitor {
     timer?: any;
-    screenshotTimer?: number;
+    screenshotTimer?: NodeJS.Timeout;
     intervalTimeout: number;
     listener: ActiveWinListener;
     screenshotInterval: number | undefined;

@@ -209,6 +209,7 @@ describe('listReducer', () => {
         // expect(state).toStrictEqual(oldState);
     });
 
+    // @ts-ignore
     it('should update', async (done) => {
         let state: ListsState = {};
 

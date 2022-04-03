@@ -24,7 +24,7 @@ const moveCard = createActionCreator(
         toListId: string,
         fromIndex: number,
         toIndex: number,
-        done: () => void
+        done: (value: any) => void
     ) => resolve({ fromListId, toListId, fromIndex, toIndex, done })
 );
 

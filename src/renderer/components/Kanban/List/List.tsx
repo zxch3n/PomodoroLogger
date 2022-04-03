@@ -393,7 +393,10 @@ export const List: FC<Props> = React.memo((props: Props) => {
                             />
                         </ButtonWrapper>
                     </Container>
-                    {provided.placeholder}
+                    {
+                        // @ts-ignore
+                        provided.placeholder
+                    }
                 </div>
             )}
         </Draggable>
