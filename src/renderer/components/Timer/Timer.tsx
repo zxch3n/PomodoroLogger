@@ -1,35 +1,35 @@
-import React, { Component } from 'react';
 import { Button, Divider, message, Tooltip } from 'antd';
-import Progress from './Progress';
-import { KanbanActionTypes } from '../Kanban/action';
-import { BoardActionTypes } from '../Kanban/Board/action';
-import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes, uiStateNames } from './action';
-import { RootState } from '../../reducers';
+import * as remote from '@electron/remote';
 import { debounce } from 'lodash';
-import { FocusSelector } from './FocusSelector';
-import { Monitor } from '../../monitor';
-import styled from 'styled-components';
-import { BrowserWindow, ipcRenderer, nativeImage, remote } from 'electron';
-import AppIcon from '../../../res/icon.png';
-import { setTrayImageWithMadeIcon } from './iconMaker';
-import { getTodaySessions } from '../../monitor/sessionManager';
-import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
-import { PomodoroNumView } from './PomodoroNumView';
-import { PomodoroRecord } from '../../monitor/type';
-import { workers } from '../../workers';
-import { TimerMask } from './SessionEndingMask';
-import { __DEV__, DEBUG_TIME_SCALE } from '../../../config';
-import { AsyncWordCloud } from '../Visualization/WordCloud';
-import { WorkRestIcon } from './WorkRestIcon';
-import Board from '../Kanban/Board';
-import { HelpIcon } from '../UserGuide/HelpIcon';
-import dingMp3 from '../../../res/ding.mp3';
+import React, { Component } from 'react';
 import ReactHotkeys from 'react-hot-keys';
+import styled from 'styled-components';
+import { MiniLogger } from '../../../components/common/Mini/MiniLogger';
+import { DEBUG_TIME_SCALE, __DEV__ } from '../../../config';
+import dingMp3 from '../../../res/ding.mp3';
+import AppIcon from '../../../res/icon.png';
 import { EfficiencyAnalyser } from '../../../shared/efficiency/efficiency';
+import { Monitor } from '../../monitor';
+import { getTodaySessions } from '../../monitor/sessionManager';
+import { PomodoroRecord } from '../../monitor/type';
+import { RootState } from '../../reducers';
 import { tabMaxHeight, thinScrollBar } from '../../style/scrollbar';
 import { isShallowEqual, isShallowEqualByKeys } from '../../utils';
+import { workers } from '../../workers';
+import { KanbanActionTypes } from '../Kanban/action';
+import Board from '../Kanban/Board';
+import { BoardActionTypes } from '../Kanban/Board/action';
+import { HelpIcon } from '../UserGuide/HelpIcon';
+import { PomodoroDualPieChart } from '../Visualization/DualPieChart';
+import { AsyncWordCloud } from '../Visualization/WordCloud';
+import { LONG_BREAK_INTERVAL, TimerActionTypes as ThisActionTypes, uiStateNames } from './action';
+import { FocusSelector } from './FocusSelector';
+import { setTrayImageWithMadeIcon } from './iconMaker';
+import { PomodoroNumView } from './PomodoroNumView';
+import Progress from './Progress';
+import { TimerMask } from './SessionEndingMask';
 import { waitUntil } from './wait';
-import { MiniLogger } from '../../../components/common/Mini/MiniLogger';
+import { WorkRestIcon } from './WorkRestIcon';
 
 const setMenuItems: (...args: any) => void = remote.getGlobal('setMenuItems');
 
@@ -155,7 +155,6 @@ interface State {
 class Timer extends Component<Props, State> {
     interval?: any;
     monitor?: Monitor;
-    win?: BrowserWindow;
     willStartNextSessionImmediately = false;
     mainDiv: React.RefObject<HTMLDivElement>;
     sound: React.RefObject<HTMLAudioElement>;
@@ -196,7 +195,6 @@ class Timer extends Component<Props, State> {
     componentDidMount(): void {
         this.efficiencyAnalyser = new EfficiencyAnalyser(this.props.timer.distractingList);
         this.interval = setInterval(this.updateLeftTime, 500);
-        this.win = remote.getCurrentWindow();
         this.updateLeftTime();
         this.selfRef.current!.addEventListener('resize', this.onResize);
         this.selfRef.current!.addEventListener('keydown', this.handleNativeKeydown);
@@ -450,12 +448,11 @@ class Timer extends Component<Props, State> {
         if (this.props.timer.isFocusing) {
             await this.onFocusingSessionDone(shouldRemind, isRotten);
         } else if (shouldRemind) {
-            const notification = new remote.Notification({
-                title: 'Resting session ended',
-                body: `Completed ${this.state.pomodoroNum} sessions today. \n\n`,
-                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`),
-            });
-            notification.show();
+            window.api.notify(
+                'Resting session ended',
+                `Completed ${this.state.pomodoroNum} sessions today. \n\n`,
+                `${__dirname}/${AppIcon}`
+            );
         }
 
         this.setState({
@@ -477,12 +474,11 @@ class Timer extends Component<Props, State> {
         }
 
         if (shouldRemind) {
-            const notification = new remote.Notification({
-                title: 'Focusing finished. Start resting.',
-                body: `Completed ${this.state.pomodoroNum + 1} sessions today. \n\n`,
-                icon: nativeImage.createFromPath(`${__dirname}/${AppIcon}`),
-            });
-            notification.show();
+            window.api.notify(
+                'Focusing finished. Start resting.',
+                `Completed ${this.state.pomodoroNum + 1} sessions today. \n\n`,
+                `${__dirname}/${AppIcon}`
+            );
         }
 
         const thisSession = this.monitor.sessionData;
@@ -572,10 +568,7 @@ class Timer extends Component<Props, State> {
     }, 50);
 
     private focusOnCurrentWindow() {
-        if (this.win) {
-            this.win.show();
-            this.win.focus();
-        }
+        window.api.focusOnWindow();
     }
 
     toggleMode = () => {

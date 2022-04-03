@@ -9,6 +9,9 @@ import { build } from '../../package.json';
 import { AutoUpdater } from './AutoUpdater';
 import { initialize } from './ipc/ipc';
 import { IpcEventName } from './ipc/type';
+import * as remoteMain from '@electron/remote/main';
+import { initActiveWin } from './activeWin';
+remoteMain.initialize();
 
 const { refreshDbs, loadDBs } = db;
 export let win: BrowserWindow | undefined;
@@ -45,6 +48,7 @@ mGlobal.utils = {
 if (process.platform === 'win32') {
     app.setAppUserModelId('com.electron.time-logger');
 }
+
 const createWindow = async () => {
     win = new BrowserWindow({
         width: 1080,
@@ -57,9 +61,12 @@ const createWindow = async () => {
         webPreferences: {
             nodeIntegrationInWorker: true,
             nodeIntegration: true,
+            contextIsolation: false,
+            // preload: path.join(__dirname, 'preload.js'),
         },
     });
 
+    remoteMain.enable(win.webContents);
     win.removeMenu();
     if (process.env.NODE_ENV === 'production') {
         win.removeMenu();
@@ -131,6 +138,8 @@ const createWindow = async () => {
             app.exit();
         });
     }
+
+    setTimeout(initActiveWin, 2000);
 };
 app.on('ready', async () => {
     if (!gotTheLock) {

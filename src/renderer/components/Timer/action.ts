@@ -233,16 +233,8 @@ export const actions = {
     },
     setMinimize: (mini: boolean) => async (dispatch: Dispatch) => {
         dispatch(setMinimize(mini));
-        const { remote } = await import('electron');
-        const win = remote.getCurrentWindow();
-        win.setAlwaysOnTop(mini);
-        const { height } = win.getBounds();
         const contentHeight = document.documentElement.offsetHeight;
-        if (mini) {
-            win.setBounds({ height: height - contentHeight + 43, width: 366 });
-        } else {
-            win.setBounds({ height: 800, width: 1080 });
-        }
+        window.api.minimizeWindow(mini, contentHeight);
     },
     setDistractingList: (distractingList: DistractingRow[]) => async (dispatch: Dispatch) => {
         dispatch(setDistractingList(distractingList));

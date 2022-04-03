@@ -1,6 +1,6 @@
 import { PomodoroRecord } from './type';
 import { ActiveWinListener } from './activeWinMonitor';
-import { BaseResult } from 'active-win';
+import type { BaseResult } from 'active-win';
 import { cloneDeep } from 'lodash';
 import shortid from 'shortid';
 
@@ -147,7 +147,10 @@ export class UsageRecorder {
         const row = this.record.apps[appName];
         const now = new Date().getTime();
         if (!row) {
-            throw new Error();
+            const spentTimeInHour = (now - this.lastUpdateTime!) / 1000 / 3600;
+            this.record.spentTimeInHour += spentTimeInHour;
+            this.lastUpdateTime = now;
+            return;
         }
 
         // Count the title occurrences.

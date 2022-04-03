@@ -3,14 +3,12 @@ import { TimerActionTypes, TimerState } from '../Timer/action';
 import styled from 'styled-components';
 import { Button, Col, Icon, message, notification, Popconfirm, Row, Slider, Switch } from 'antd';
 import { deleteAllUserData } from '../../monitor/sessionManager';
-import { shell, remote, ipcRenderer } from 'electron';
+import { shell, ipcRenderer } from 'electron';
 import { DistractingListModalButton } from './DistractingList';
 import { isShallowEqualByKeys } from '../../utils';
 import pkg from '../../../../package.json';
 import { IpcEventName } from '../../../main/ipc/type';
 import { refreshDbs } from '../../../main/db';
-
-const {app} = remote.require('electron')
 
 const Container = styled.div`
     padding: 12px 36px;
@@ -122,16 +120,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 
         const setStartOnBoot = React.useCallback((v: boolean) => {
             props.setStartOnBoot(v);
-            if (v) {
-                app.setLoginItemSettings({
-                    openAtLogin: true,
-                    openAsHidden: true,
-                });
-            } else {
-                app.setLoginItemSettings({
-                    openAtLogin: false,
-                });
-            }
+            window.api.openAtLogin(v);
         }, []);
 
         const setUseHardwareAcceleration = useCallback((v: boolean) => {
@@ -187,7 +176,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                                 marks={restMarks}
                                 step={1}
                                 min={process.env.NODE_ENV === 'production' ? 5 : 1}
-                                max={10}
+                                max={20}
                                 value={props.restDuration / 60}
                                 onChange={onChangeRest}
                             />
@@ -200,7 +189,7 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
                                 marks={longBreakMarks}
                                 step={1}
                                 min={10}
-                                max={20}
+                                max={40}
                                 value={props.longBreakDuration / 60}
                                 onChange={onChangeLongBreak}
                             />
@@ -291,12 +280,12 @@ export const Setting: React.FunctionComponent<Props> = React.memo(
 
 async function onExportData() {
     await refreshDbs();
-    await ipcRenderer.invoke(IpcEventName.ExportData);
+    await window.api.exportData();
 }
 
 async function onImportData() {
     await refreshDbs();
-    await ipcRenderer.invoke(IpcEventName.ImportData);
+    await window.api.importData();
 }
 
 function openIssuePage() {

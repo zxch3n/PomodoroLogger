@@ -1,6 +1,6 @@
 import { Icon, Tabs } from 'antd';
 import 'antd/dist/antd.css';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import * as React from 'react';
 import ReactHotkeys from 'react-hot-keys';
 import { hot } from 'react-hot-loader/root';
@@ -77,7 +77,7 @@ class Application extends React.Component<Props> {
                 this.props.switchTab(-1);
                 break;
             case 'ctrl+f12':
-                remote.getCurrentWebContents().openDevTools({ activate: true, mode: 'detach' });
+                window.api.openDevTools();
                 break;
             case 'ctrl+q':
                 ipcRenderer.send(IpcEventName.Quit, 'quit');
@@ -95,9 +95,12 @@ class Application extends React.Component<Props> {
 
     onError = (event: ErrorEvent) => this.handleError(event.error);
     handleError = (err: Error) => {
-        if (process.env.NODE_ENV === 'production') {
-            ipcRenderer.send(IpcEventName.Restart, 'error');
-        }
+        console.error(err);
+        setTimeout(() => {
+            if (process.env.NODE_ENV === 'production') {
+                ipcRenderer.send(IpcEventName.Restart, 'error');
+            }
+        }, 3000);
     };
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {

@@ -1,6 +1,6 @@
 {
     "name": "pomodoro-logger",
-    "version": "0.5.3",
+    "version": "0.6.3",
     "description": "Pomodoro Logger -- When a time logger meets Pomodoro and Kanban board",
     "main": "./dist/main.js",
     "scripts": {
@@ -44,6 +44,7 @@
         ]
     },
     "build": {
+        "afterSign": "electron-builder-notarize",
         "productName": "Pomodoro Logger",
         "appId": "com.github.rem2016.pomodoro-logger",
         "publish": {
@@ -56,7 +57,14 @@
             "target": [
                 "zip",
                 "dmg"
-            ]
+            ],
+            "hardenedRuntime": true,
+            "gatekeeperAssess": false,
+            "entitlements": "build/entitlements.mac.plist",
+            "entitlementsInherit": "build/entitlements.mac.plist",
+            "extendInfo": {
+                "NSAppleEventsUsageDescription": "Please allow access to script browser applications to detect the current URL when triggering instant lookup."
+            }
         },
         "directories": {
             "output": "release"
@@ -103,21 +111,21 @@
         "@types/electron-devtools-installer": "^2.2.1",
         "@types/enzyme": "^3.10.11",
         "@types/enzyme-adapter-react-16": "^1.0.5",
-        "@types/jest": "^27.4.1",
-        "@types/lodash": "^4.14.181",
-        "@types/marked": "^4.0.3",
-        "@types/nedb": "^1.8.12",
-        "@types/react": "^17.0.43",
-        "@types/react-beautiful-dnd": "^13.1.2",
-        "@types/react-dom": "^17.0.14",
+        "@types/jest": "^24.0.13",
+        "@types/lodash": "^4.14.135",
+        "@types/marked": "^4.0.2",
+        "@types/nedb": "^1.8.7",
+        "@types/react": "^16.8.18",
+        "@types/react-beautiful-dnd": "^11.0.3",
+        "@types/react-dom": "^16.8.4",
         "@types/react-hot-loader": "^4.1.0",
         "@types/react-redux": "^7.1.23",
         "@types/react-test-renderer": "^17.0.1",
         "@types/redux-thunk": "^2.1.0",
         "@types/shortid": "^0.0.29",
         "@types/styled-components": "^5.1.24",
-        "@types/webdriverio": "^5.0.0",
-        "@types/webpack-env": "^1.16.3",
+        "@types/webdriverio": "^4.8.7",
+        "@types/webpack-env": "^1.13.3",
         "antd": "^3.19.7",
         "babel-loader": "^8.0.6",
         "classnames": "^2.3.1",
@@ -129,11 +137,13 @@
         "deox": "^2.1.0",
         "echarts": "^4.5.0",
         "echarts-for-react": "^2.0.15-beta.1",
-        "electron": "^9.4.0",
-        "electron-builder": "^21.2.0",
+        "electron": "^14.2.6",
+        "electron-builder": "^23.0.2",
+        "electron-builder-notarize": "^1.4.0",
         "electron-devtools-installer": "^2.2.4",
+        "electron-notarize": "^1.1.1",
         "electron-rebuild": "^1.8.5",
-        "electron-updater": "^4.1.2",
+        "electron-updater": "^4.5.2",
         "enzyme": "^3.10.0",
         "enzyme-adapter-react-16": "^1.14.0",
         "file-loader": "^3.0.1",
@@ -142,17 +152,18 @@
         "happypack": "^5.0.1",
         "html-webpack-plugin": "^3.2.0",
         "husky": "^2.3.0",
+        "iconv": "^3.0.1",
         "image-webpack-loader": "^4.6.0",
         "interpolate-html-plugin": "^3.0.0",
         "jest": "25.2.3",
         "jest-junit": "^7.0.0",
         "lint-staged": "^8.1.7",
-        "lodash-es": "^4.17.15",
         "marked": "^4.0.12",
+        "lodash-es": "^4.17.21",
         "native-ext-loader": "^2.3.0",
         "nedb": "^1.8.0",
-        "node-gyp": "6.0.1",
-        "node-sass": "^4.12.0",
+        "node-gyp": "^9.0.0",
+        "node-sass": "^7.0.0",
         "prettier": "^2.0.2",
         "prop-types": "^15.7.2",
         "react": "^16.8.6",
@@ -173,9 +184,9 @@
         "sass-loader": "^8.0.0",
         "shortid": "^2.2.14",
         "source-map-loader": "^0.2.4",
-        "spectron": "^8.0.0",
+        "spectron": "^16.0.0",
         "style-loader": "^1.0.1",
-        "styled-components": "^4.3.2",
+        "styled-components": "^5.3.3",
         "ts-jest": "^24.0.2",
         "ts-loader": "^6.0.4",
         "tslint": "^5.16.0",
@@ -194,9 +205,14 @@
         "worker-loader": "^2.0.0"
     },
     "dependencies": {
-        "active-win": "^5.1.2",
+        "@electron/remote": "^2.0.8",
+        "active-win": "^7.7.2",
         "graphql": "^16.3.0",
-        "graphql-request": "^4.1.0"
+        "graphql-request": "^4.1.0",
+        "node-mac-permissions": "^2.2.0"
+    },
+    "resolutions": {
+        "node-ipc": "9.1.1"
     },
     "sideEffects": [
         "**/*.css",

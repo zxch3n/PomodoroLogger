@@ -99,7 +99,7 @@ async function train(isTest: boolean, code: number) {
         ctx.postMessage({
             code,
             type: 'error',
-            payload: e.toString(),
+            payload: (e as Error).toString(),
         });
     }
 }

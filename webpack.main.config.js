@@ -8,6 +8,7 @@ module.exports = merge.smart(baseConfig, {
     target: 'electron-main',
     entry: {
         main: './src/main/main.ts',
+        preload: './src/main/preload.ts',
         worker: './src/main/worker/worker.ts',
     },
     module: {
@@ -15,7 +16,7 @@ module.exports = merge.smart(baseConfig, {
             {
                 test: [/\.jsx?$/, /\.tsx?$/],
                 exclude: /node_modules/,
-                loader: 'ts-loader'
+                loader: 'ts-loader',
             },
             {
                 test: /\.(gif|png|jpe?g)$/,
@@ -24,20 +25,20 @@ module.exports = merge.smart(baseConfig, {
                     {
                         loader: 'image-webpack-loader',
                         options: {
-                            disable: true
-                        }
-                    }
-                ]
+                            disable: true,
+                        },
+                    },
+                ],
             },
             {
                 test: /\.dat$/,
-                use: 'file-loader'
+                use: 'file-loader',
             },
             {
                 test: /\.worker\.js$/,
-                use: { loader: 'index-loader' }
-            }
-        ]
+                use: { loader: 'index-loader' },
+            },
+        ],
     },
     watch: true,
     plugins: [
@@ -45,8 +46,10 @@ module.exports = merge.smart(baseConfig, {
             reportFiles: ['src/main/**/*'],
         }),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
         }),
     ],
-    // externals: [nodeExternals()],
+    externals: {
+        'active-win': 'commonjs2 active-win',
+    },
 });

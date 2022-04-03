@@ -1,16 +1,5 @@
-import { remote } from 'electron';
-import { BaseResult } from 'active-win';
+import type { BaseResult } from 'active-win';
 import { getScreen } from './screenshot';
-let activeWin: any;
-
-if (process.env.NODE_ENV === 'test' && !remote) {
-    // Node Environment
-    activeWin = require('active-win');
-} else {
-    // renderer env
-    activeWin = remote.require('active-win');
-}
-
 export type ActiveWinListener = (result?: BaseResult, screenshot?: string) => void;
 export class Monitor {
     timer?: any;
@@ -41,7 +30,7 @@ export class Monitor {
 
         this.timer = setInterval(this.watch, this.intervalTimeout);
         if (this.screenshotInterval) {
-            this.screenshotTimer = setInterval(() => {
+            this.screenshotTimer = window.setInterval(() => {
                 this.shouldTakeScreenshot = true;
             }, this.screenshotInterval);
         }
@@ -50,7 +39,7 @@ export class Monitor {
     };
 
     watch = async () => {
-        const data = await activeWin();
+        const data = await window.api.activeWin();
         if (data) {
             try {
                 if (this.shouldTakeScreenshot) {

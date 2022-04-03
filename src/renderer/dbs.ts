@@ -1,19 +1,19 @@
 /* istanbul ignore file */
-import { remote } from 'electron';
 import { DBs, refreshDbs as _refresh, loadDBs as _loadDBs } from '../main/db';
 
 export let refreshDbs = _refresh;
 export let loadDBs = _loadDBs;
 export let dbs: typeof DBs;
-if (remote) {
-    dbs = remote.getGlobal('sharedDB');
-    const utils = remote.getGlobal('utils');
-    refreshDbs = utils.refreshDbs;
-    loadDBs = utils.loadDBs;
-}
 
 if (process.env.NODE_ENV === 'test') {
     loadDBs();
+} else {
+    import('@electron/remote').then((remote) => {
+        dbs = remote.getGlobal('sharedDB');
+        const utils = remote.getGlobal('utils');
+        refreshDbs = utils.refreshDbs;
+        loadDBs = utils.loadDBs;
+    });
 }
 
 // @ts-ignore

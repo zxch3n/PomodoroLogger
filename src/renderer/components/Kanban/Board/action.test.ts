@@ -3,7 +3,7 @@ import { Dispatch } from 'redux';
 import { dbBaseDir, dbPaths } from '../../../../config';
 import { existsSync, unlink, mkdir } from 'fs';
 import { promisify } from 'util';
-import shortid = require('shortid');
+import shortid from 'shortid';
 import dbs from '../../../dbs';
 import { AsyncDB } from '../../../../utils/dbHelper';
 import { KanbanBoard } from '../type';
@@ -89,7 +89,7 @@ describe('board actions', () => {
         expect(state[_id].description).toBe('new_name');
         expect(state[_id].relatedSessions).toStrictEqual(['111']);
         expect(state[_id].spentHours).toStrictEqual(123);
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500));
         const board = await db.findOne({ _id });
         expect(board).toStrictEqual(state[_id]);
         actions.deleteBoard(_id)(dispatch);

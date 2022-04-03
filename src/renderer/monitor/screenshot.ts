@@ -2,9 +2,7 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { screenshotDir } from '../../config';
-import { generateRandomName } from '../utils';
-
-const remote = electron.remote;
+import * as remote from '@electron/remote';
 
 const getCurrentScreen = () => {
     try {
@@ -83,17 +81,17 @@ async function getScreenCallback(
     };
 
     if (require('os').platform() === 'win32') {
-        require('electron').desktopCapturer.getSources(
-            {
+        require('electron')
+            .desktopCapturer.getSources({
                 types: ['screen'],
                 thumbnailSize: { width: 1, height: 1 },
-            },
-            async (e: any, sources: any) => {
+            })
+            .then((sources) => {
                 const selectSource = sources.filter(
                     (source: any) => source.display_id + '' === curScreen.id + ''
                 )[0];
-                try {
-                    const userMedia = await navigator.mediaDevices.getUserMedia({
+                navigator.mediaDevices
+                    .getUserMedia({
                         audio: false,
                         video: {
                             // @ts-ignore
@@ -106,16 +104,15 @@ async function getScreenCallback(
                                 // maxHeight: maxSize
                             },
                         },
-                    });
-                    handleStream(userMedia);
-                } catch (error: any) {
-                    handleError(error);
-                }
-            }
-        );
+                    })
+                    .then((e: MediaStream) => {
+                        handleStream(e);
+                    })
+                    .catch(handleError);
+            });
     } else {
-        try {
-            const userMedia = await navigator.mediaDevices.getUserMedia({
+        navigator.mediaDevices
+            .getUserMedia({
                 audio: false,
                 video: {
                     // @ts-ignore
@@ -125,11 +122,14 @@ async function getScreenCallback(
                         maxHeight: 1080,
                     },
                 },
+            })
+            .then((event: any) => {
+                handleStream(event);
+            })
+            .catch((err: Error) => {
+                console.trace(err);
+                handleError(err);
             });
-            handleStream(userMedia);
-        } catch (error: any) {
-            handleError(error);
-        }
     }
 }
 

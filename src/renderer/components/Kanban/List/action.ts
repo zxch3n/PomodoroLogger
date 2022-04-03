@@ -24,7 +24,7 @@ const moveCard = createActionCreator(
         toListId: string,
         fromIndex: number,
         toIndex: number,
-        done: (value: any) => void
+        done: () => void
     ) => resolve({ fromListId, toListId, fromIndex, toIndex, done })
 );
 
@@ -165,7 +165,7 @@ export const actions = {
     moveCard: (fromListId: string, toListId: string, fromIndex: number, toIndex: number) => async (
         dispatch: Dispatch
     ) => {
-        await new Promise((r) => {
+        await new Promise<void>((r) => {
             dispatch(moveCard(fromListId, toListId, fromIndex, toIndex, r));
         });
     },
