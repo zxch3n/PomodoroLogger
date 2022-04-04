@@ -239,7 +239,10 @@ export const Card: FC<Props> = React.memo((props: Props) => {
                                     </CardContent>
                                 )}
                             </CardContainer>
-                            {isDraggingOver && provided.placeholder}
+                            {
+                                // @ts-ignore
+                                isDraggingOver && provided.placeholder
+                            }
                         </>
                     );
                 }}

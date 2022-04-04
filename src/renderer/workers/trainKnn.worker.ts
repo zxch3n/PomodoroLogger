@@ -94,7 +94,7 @@ async function train(isTest: boolean, code: number) {
             type: 'setProgress',
             payload: 100,
         });
-    } catch (e) {
+    } catch (e: any) {
         console.error(e);
         ctx.postMessage({
             code,

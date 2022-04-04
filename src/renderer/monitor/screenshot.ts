@@ -29,7 +29,7 @@ const getCurrentScreen = () => {
 };
 
 const curScreen = getCurrentScreen();
-function getScreenCallback(
+async function getScreenCallback(
     maxSize: number | undefined,
     callback: (err?: Error, canvas?: HTMLCanvasElement) => void
 ) {

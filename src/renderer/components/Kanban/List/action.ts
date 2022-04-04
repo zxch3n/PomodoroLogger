@@ -9,44 +9,37 @@ import { List, ListsState } from '../type';
 const db = workers.dbWorkers.listsDB;
 const moveDB = workers.dbWorkers.moveDB;
 
-const addList = createActionCreator(
-    '[List]ADD',
-    (resolve) => (_id: string, title: string) => resolve({ _id, title })
+const addList = createActionCreator('[List]ADD', (resolve) => (_id: string, title: string) =>
+    resolve({ _id, title })
 );
 
-const setLists = createActionCreator(
-    '[List]SET_Lists',
-    (resolve) => (lists: ListsState) => resolve(lists)
+const setLists = createActionCreator('[List]SET_Lists', (resolve) => (lists: ListsState) =>
+    resolve(lists)
 );
 
 const moveCard = createActionCreator(
     '[List]MOVE_CARD',
-    (resolve) =>
-        (
-            fromListId: string,
-            toListId: string,
-            fromIndex: number,
-            toIndex: number,
-            done: () => void
-        ) =>
-            resolve({ fromListId, toListId, fromIndex, toIndex, done })
+    (resolve) => (
+        fromListId: string,
+        toListId: string,
+        fromIndex: number,
+        toIndex: number,
+        done: () => void
+    ) => resolve({ fromListId, toListId, fromIndex, toIndex, done })
 );
 
-const renameList = createActionCreator(
-    '[List]RENAME',
-    (resolve) => (_id, title) => resolve({ _id, title })
+const renameList = createActionCreator('[List]RENAME', (resolve) => (_id, title) =>
+    resolve({ _id, title })
 );
 
-const addCard = createActionCreator(
-    '[List]ADD_CARD',
-    (resolve) => (_id, cardId) => resolve({ _id, cardId })
+const addCard = createActionCreator('[List]ADD_CARD', (resolve) => (_id, cardId) =>
+    resolve({ _id, cardId })
 );
 
 const deleteList = createActionCreator('[List]DEL_LIST', (resolve) => (_id) => resolve({ _id }));
 
-const deleteCard = createActionCreator(
-    '[List]DEL_CARD',
-    (resolve) => (_id, cardId) => resolve({ _id, cardId })
+const deleteCard = createActionCreator('[List]DEL_CARD', (resolve) => (_id, cardId) =>
+    resolve({ _id, cardId })
 );
 
 const setVisibleCards = createActionCreator(
@@ -169,23 +162,24 @@ export const actions = {
         dispatch(setLists(listMap));
     },
 
-    moveCard:
-        (fromListId: string, toListId: string, fromIndex: number, toIndex: number) =>
-        async (dispatch: Dispatch) => {
-            await new Promise<void>((r) => {
-                dispatch(moveCard(fromListId, toListId, fromIndex, toIndex, r));
-            });
-        },
+    moveCard: (fromListId: string, toListId: string, fromIndex: number, toIndex: number) => async (
+        dispatch: Dispatch
+    ) => {
+        await new Promise<void>((r) => {
+            dispatch(moveCard(fromListId, toListId, fromIndex, toIndex, r));
+        });
+    },
     renameList: (_id: string, title: string) => async (dispatch: Dispatch) => {
         dispatch(renameList(_id, title));
         await db.update({ _id }, { $set: { title } });
     },
-    addCard:
-        (_id: string, cardTitle: string, cardContent?: string) => async (dispatch: Dispatch) => {
-            const cardId = shortid.generate();
-            dispatch(addCard(_id, cardId));
-            await cardAction.addCard(cardId, _id, cardTitle, cardContent)(dispatch);
-        },
+    addCard: (_id: string, cardTitle: string, cardContent?: string) => async (
+        dispatch: Dispatch
+    ) => {
+        const cardId = shortid.generate();
+        dispatch(addCard(_id, cardId));
+        await cardAction.addCard(cardId, _id, cardTitle, cardContent)(dispatch);
+    },
     addCardById: (_id: string, cardId: string) => async (dispatch: Dispatch) => {
         dispatch(addCard(_id, cardId));
         await db.update({ _id }, { $push: { cards: cardId } }, {});

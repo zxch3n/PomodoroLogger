@@ -11,6 +11,13 @@ import { initialize } from './ipc/ipc';
 import { IpcEventName } from './ipc/type';
 import * as remoteMain from '@electron/remote/main';
 import { initActiveWin } from './activeWin';
+
+import contextMenu from 'electron-context-menu';
+
+contextMenu({
+    showSaveImageAs: true,
+});
+
 remoteMain.initialize();
 
 const { refreshDbs, loadDBs } = db;
@@ -62,6 +69,7 @@ const createWindow = async () => {
             nodeIntegrationInWorker: true,
             nodeIntegration: true,
             contextIsolation: false,
+            spellcheck: true,
             // preload: path.join(__dirname, 'preload.js'),
         },
     });

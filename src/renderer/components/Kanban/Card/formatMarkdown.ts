@@ -32,7 +32,7 @@ export const formatMarkdown = (markdown: string, context: MarkdownContext = defa
     let i = 0;
     const html = marked(markdown, { gfm: true, breaks: true })
         .replace(/<a/g, '<a target="_blank"')
-        .replace(/\[(\s|x)\]/g, (match) => {
+        .replace(/\[(\s|x)\]/g, (match: string) => {
             let newString;
             if (match === '[ ]') {
                 newString = `<input id=${i} onclick="return false" type="checkbox">`;
