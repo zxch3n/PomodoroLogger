@@ -208,6 +208,7 @@
     "dependencies": {
         "@electron/remote": "^2.0.8",
         "active-win": "^7.7.2",
+        "electron-context-menu": "^3.1.2",
         "graphql": "^16.3.0",
         "graphql-request": "^4.1.0",
         "node-mac-permissions": "^2.2.0"
