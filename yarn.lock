@@ -1120,7 +1120,7 @@
     ajv "^6.12.0"
     ajv-keywords "^3.4.1"
 
-"@electron/get@^1.0.1", "@electron/get@^1.12.4":
+"@electron/get@^1.12.4", "@electron/get@^1.13.0":
   version "1.14.1"
   resolved "https://registry.npmjs.org/@electron/get/-/get-1.14.1.tgz#16ba75f02dffb74c23965e72d617adc721d27f40"
   integrity sha512-BrZYyL/6m0ZXz/lDxy/nlVhQz+WF+iPS6qXolEU8atw7h6v1aYkjwJZ63m+bJMBTxDE66X+r2tPS4a/8C82sZw==
@@ -1980,10 +1980,10 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-12.20.47.tgz#ca9237d51f2a2557419688511dab1c8daf475188"
   integrity sha512-BzcaRsnFuznzOItW1WpQrDHM7plAa7GIDMZ6b5pnMbkqEtM/6WCOhvZar39oeMQP79gwvFUWjjptE7/KGcNqFg==
 
-"@types/node@^14.6.2":
-  version "14.18.12"
-  resolved "https://registry.npmjs.org/@types/node/-/node-14.18.12.tgz#0d4557fd3b94497d793efd4e7d92df2f83b4ef24"
-  integrity sha512-q4jlIR71hUpWTnGhXWcakgkZeHa3CCjcQcnuzU8M891BAWA2jHiziiWEPEkdS5pFsz7H9HJiy8BrK7tBRNrY7A==
+"@types/node@^16.11.26":
+  version "16.18.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.3.tgz#d7f7ba828ad9e540270f01ce00d391c54e6e0abc"
+  integrity sha512-jh6m0QUhIRcZpNv7Z/rpN+ZWXOicUUQbSoWks7Htkbb9IjFQj4kzcX/xFCkjstCj5flMsN8FiSvt+q+Tcs4Llg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -5991,13 +5991,13 @@ electron-updater@^4.5.2:
     lodash.isequal "^4.5.0"
     semver "^7.3.5"
 
-electron@^14.2.6:
-  version "14.2.7"
-  resolved "https://registry.npmjs.org/electron/-/electron-14.2.7.tgz#cd291e0bcfddab651967728adc66ab90dd8ad53a"
-  integrity sha512-JYK2DviM9l0UDR6PgIKg9w/r7klty2u1+a3hqWIyXi0f3BSFpcswcSpY6kThrsFdSxeeXO9m4sXjWExDl/YquQ==
+electron@^18.3.7:
+  version "18.3.7"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-18.3.7.tgz#a22a23d63811d067c8e33abc5674122408319265"
+  integrity sha512-SDvX0VYejR1xw9PrJyvnyiDcuIhdzFVaA1NaRN2LEWXr5R6mEFl8NVTM+i5dtxMm2SHP/FPnkvmsWZs6MHijqg==
   dependencies:
-    "@electron/get" "^1.0.1"
-    "@types/node" "^14.6.2"
+    "@electron/get" "^1.13.0"
+    "@types/node" "^16.11.26"
     extract-zip "^1.0.3"
 
 elegant-spinner@^1.0.1:
