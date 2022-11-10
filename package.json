@@ -137,7 +137,7 @@
         "deox": "^2.1.0",
         "echarts": "^4.5.0",
         "echarts-for-react": "^2.0.15-beta.1",
-        "electron": "^14.2.6",
+        "electron": "^18.3.7",
         "electron-builder": "^23.0.2",
         "electron-builder-notarize": "^1.4.0",
         "electron-devtools-installer": "^2.2.4",
